@@ -2048,7 +2048,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vertex115/architect-core@^1.0.5-alpha.0, @vertex115/architect-core@workspace:packages/architect-core":
+"@vertex115/architect-core@^1.0.6-alpha.0, @vertex115/architect-core@workspace:packages/architect-core":
   version: 0.0.0-use.local
   resolution: "@vertex115/architect-core@workspace:packages/architect-core"
   dependencies:
@@ -2088,7 +2088,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@vertex115/architect-k8s-crds@^1.0.5-alpha.0, @vertex115/architect-k8s-crds@workspace:packages/architect-k8s-crds":
+"@vertex115/architect-k8s-crds@^1.0.6-alpha.0, @vertex115/architect-k8s-crds@workspace:packages/architect-k8s-crds":
   version: 0.0.0-use.local
   resolution: "@vertex115/architect-k8s-crds@workspace:packages/architect-k8s-crds"
   dependencies:
@@ -2115,8 +2115,8 @@ __metadata:
     "@types/yargs": ^17.0.24
     "@typescript-eslint/eslint-plugin": ^5.59.5
     "@typescript-eslint/parser": ^5.59.5
-    "@vertex115/architect-core": ^1.0.5-alpha.0
-    "@vertex115/architect-k8s-crds": ^1.0.5-alpha.0
+    "@vertex115/architect-core": ^1.0.6-alpha.0
+    "@vertex115/architect-k8s-crds": ^1.0.6-alpha.0
     commander: 10.0.1
     eslint: ^8.40.0
     eslint-import-resolver-node: ^0.3.7
