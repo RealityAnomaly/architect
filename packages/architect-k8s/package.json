@@ -18,12 +18,6 @@
     "organization": false
   },
   "devDependencies": {
-    "@types/js-yaml": "^4.0.5",
-    "@types/lodash": "^4.14.194",
-    "@types/node": "^16",
-    "@types/semver": "^7.3.13",
-    "@types/uuid": "^9.0.1",
-    "@types/yargs": "^17.0.24",
     "@typescript-eslint/eslint-plugin": "^5",
     "@typescript-eslint/parser": "^5",
     "eslint": "^8",
@@ -37,6 +31,12 @@
   },
   "dependencies": {
     "@kubernetes-models/apimachinery": "^1.1.1",
+    "@types/js-yaml": "^4.0.5",
+    "@types/lodash": "^4.14.194",
+    "@types/node": "^16",
+    "@types/semver": "^7.3.13",
+    "@types/uuid": "^9.0.1",
+    "@types/yargs": "^17.0.24",
     "@vertex115/architect-core": "^1.0.3-alpha.0",
     "@vertex115/architect-k8s-crds": "^1.0.3-alpha.0",
     "commander": "10.0.1",
