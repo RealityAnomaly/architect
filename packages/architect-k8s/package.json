@@ -53,6 +53,9 @@
     "wildcard-match": "^5.1.2",
     "yargs": "^17.7.2"
   },
+  "directories": {
+    "src": "src"
+  },
   "keywords": [
     "devops",
     "iac",
