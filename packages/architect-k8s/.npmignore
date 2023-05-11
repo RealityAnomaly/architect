@@ -3,7 +3,6 @@
 /dist/version.txt
 /test/
 /tsconfig.dev.json
-/src/
 !/lib/
 !/lib/**/*.js
 !/lib/**/*.d.ts

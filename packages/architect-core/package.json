@@ -54,9 +54,6 @@
     "tst-reflect-transformer": "^0.12.5",
     "uuid": "^9.0.0"
   },
-  "directories": {
-    "src": "src"
-  },
   "main": "lib/index.js",
   "license": "MIT",
   "publishConfig": {
