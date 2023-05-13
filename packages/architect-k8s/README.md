@@ -20,15 +20,22 @@ This is an extension to the [Architect framework](https://github.com/Vertex115/a
 ## FAQ
 
 - **Why TypeScript?** JavaScript/TypeScript is the home of JSON, the language that YAML extends from. It provided the best working experience as WYSIWYG.
-- **Aren't there other frameworks that do the same thing?** Architect was built specifically to address significant shortfalls in other JavaScript/TypeScript-based frameworks. For example:
-  - **Pulumi** is stateful; is slow, and has too much overhead
-  - **CDK8s** has a lot of overhead with how it manages resources as individual constructs and no caching for build processes
-  - **Tanka** is slow when building thousands of resources with differing configuration, and doesn't support granular caching
-  - **Kosko** is, unfortunately, too opinionated, and offers no caching support
+- **Aren't there other frameworks that do the same thing?** Architect was built specifically to address significant shortfalls in other JavaScript/TypeScript-based frameworks.
 - **What was wrong with Fractal?**
   - Fractal was a decent attempt at a framework, but it unfortunately ran into pitfalls surrounding the interactions between Nix and Kubernetes types/Jsonnet. Nix was never really built to handle or validate Kubernetes' complex models.
   - Neither Nix nor Jsonnet were typed, so validation could only occur (slowly) either at compile time or when the manifests were applied to the cluster.
   - The framework was also overengineered and overcomplicated, making use of Go, Nix, and Jsonnet, for different components. Here, we unify everything into TypeScript.
+
+## Comparison with other frameworks
+
+| Framework | Model | Apply Methodology | Language | Overhead | Caching | Typing | Integrations |
+| :-- | :-- | :-- | :-- | :-- | :-- | :-- | :-- |
+| Pulumi | Stateful | Direct | Multiple | Heavy | Helm-only | Static | Helm, Kustomize |
+| CDK8s | Stateful | Direct | Multiple | Heavy | No | Static | Helm, Kustomize |
+| Tanka | Stateless | Direct | Jsonnet | Light | No | Dynamic | Helm, Kustomize, Jsonnet |
+| Kosko | Stateless | Direct | JS/TS | Light | No | Static | Helm, Kustomize |
+| Fractal | Stateless | GitOps | Jsonnet | Light | Yes | Dynamic | Helm, Kustomize, Jsonnet |
+| Architect | Stateless | GitOps, Direct (planned), Hybrid (planned) | JS/TS | Light | Yes | Static | Helm, Kustomize, Jsonnet |
 
 ## Example
 
