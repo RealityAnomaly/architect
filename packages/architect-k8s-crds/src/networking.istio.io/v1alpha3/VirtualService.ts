@@ -1305,7 +1305,14 @@ export interface IVirtualService {
         /**
          * String patterns that match allowed origins.
          */
-        "allowOrigins"?: Array<Exclude<{
+        "allowOrigins"?: Array<{
+          "exact"?: string;
+          "prefix"?: string;
+          /**
+           * RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).
+           */
+          "regex"?: string;
+        } & (Exclude<{
           "exact"?: string;
           "prefix"?: string;
           /**
@@ -1313,6 +1320,13 @@ export interface IVirtualService {
            */
           "regex"?: string;
         }, {
+          "exact"?: string;
+          "prefix"?: string;
+          /**
+           * RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).
+           */
+          "regex"?: string;
+        } & ({
           "exact": string;
           "prefix"?: string;
           /**
@@ -1333,7 +1347,7 @@ export interface IVirtualService {
            * RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).
            */
           "regex": string;
-        }> | {
+        })> | {
           "exact": string;
           "prefix"?: string;
           /**
@@ -1354,7 +1368,7 @@ export interface IVirtualService {
            * RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).
            */
           "regex": string;
-        }>;
+        })>;
         "exposeHeaders"?: Array<string>;
         "maxAge"?: string;
       };
@@ -1372,7 +1386,20 @@ export interface IVirtualService {
        * Fault injection policy to apply on HTTP traffic at the client side.
        */
       "fault"?: {
-        "abort"?: Exclude<{
+        "abort"?: {
+          "grpcStatus"?: string;
+          "http2Error"?: string;
+          /**
+           * HTTP status code to use to abort the Http request.
+           */
+          "httpStatus"?: number;
+          /**
+           * Percentage of requests to be aborted with the error code provided.
+           */
+          "percentage"?: {
+            "value"?: number;
+          };
+        } & (Exclude<{
           "grpcStatus"?: string;
           "http2Error"?: string;
           /**
@@ -1386,6 +1413,19 @@ export interface IVirtualService {
             "value"?: number;
           };
         }, {
+          "grpcStatus"?: string;
+          "http2Error"?: string;
+          /**
+           * HTTP status code to use to abort the Http request.
+           */
+          "httpStatus"?: number;
+          /**
+           * Percentage of requests to be aborted with the error code provided.
+           */
+          "percentage"?: {
+            "value"?: number;
+          };
+        } & ({
           "grpcStatus"?: string;
           "http2Error"?: string;
           /**
@@ -1424,7 +1464,7 @@ export interface IVirtualService {
           "percentage"?: {
             "value"?: number;
           };
-        }> | {
+        })> | {
           "grpcStatus"?: string;
           "http2Error"?: string;
           /**
@@ -1463,8 +1503,24 @@ export interface IVirtualService {
           "percentage"?: {
             "value"?: number;
           };
-        };
-        "delay"?: Exclude<{
+        });
+        "delay"?: {
+          "exponentialDelay"?: string;
+          /**
+           * Add a fixed delay before forwarding the request.
+           */
+          "fixedDelay"?: string;
+          /**
+           * Percentage of requests on which the delay will be injected (0-100).
+           */
+          "percent"?: number;
+          /**
+           * Percentage of requests on which the delay will be injected.
+           */
+          "percentage"?: {
+            "value"?: number;
+          };
+        } & (Exclude<{
           "exponentialDelay"?: string;
           /**
            * Add a fixed delay before forwarding the request.
@@ -1485,22 +1541,6 @@ export interface IVirtualService {
           /**
            * Add a fixed delay before forwarding the request.
            */
-          "fixedDelay": string;
-          /**
-           * Percentage of requests on which the delay will be injected (0-100).
-           */
-          "percent"?: number;
-          /**
-           * Percentage of requests on which the delay will be injected.
-           */
-          "percentage"?: {
-            "value"?: number;
-          };
-        } | {
-          "exponentialDelay": string;
-          /**
-           * Add a fixed delay before forwarding the request.
-           */
           "fixedDelay"?: string;
           /**
            * Percentage of requests on which the delay will be injected (0-100).
@@ -1512,7 +1552,7 @@ export interface IVirtualService {
           "percentage"?: {
             "value"?: number;
           };
-        }> | {
+        } & ({
           "exponentialDelay"?: string;
           /**
            * Add a fixed delay before forwarding the request.
@@ -1544,7 +1584,39 @@ export interface IVirtualService {
           "percentage"?: {
             "value"?: number;
           };
-        };
+        })> | {
+          "exponentialDelay"?: string;
+          /**
+           * Add a fixed delay before forwarding the request.
+           */
+          "fixedDelay": string;
+          /**
+           * Percentage of requests on which the delay will be injected (0-100).
+           */
+          "percent"?: number;
+          /**
+           * Percentage of requests on which the delay will be injected.
+           */
+          "percentage"?: {
+            "value"?: number;
+          };
+        } | {
+          "exponentialDelay": string;
+          /**
+           * Add a fixed delay before forwarding the request.
+           */
+          "fixedDelay"?: string;
+          /**
+           * Percentage of requests on which the delay will be injected (0-100).
+           */
+          "percent"?: number;
+          /**
+           * Percentage of requests on which the delay will be injected.
+           */
+          "percentage"?: {
+            "value"?: number;
+          };
+        });
       };
       "headers"?: {
         "request"?: {
@@ -1567,7 +1639,14 @@ export interface IVirtualService {
         };
       };
       "match"?: Array<{
-        "authority"?: Exclude<{
+        "authority"?: {
+          "exact"?: string;
+          "prefix"?: string;
+          /**
+           * RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).
+           */
+          "regex"?: string;
+        } & (Exclude<{
           "exact"?: string;
           "prefix"?: string;
           /**
@@ -1575,6 +1654,13 @@ export interface IVirtualService {
            */
           "regex"?: string;
         }, {
+          "exact"?: string;
+          "prefix"?: string;
+          /**
+           * RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).
+           */
+          "regex"?: string;
+        } & ({
           "exact": string;
           "prefix"?: string;
           /**
@@ -1595,7 +1681,7 @@ export interface IVirtualService {
            * RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).
            */
           "regex": string;
-        }> | {
+        })> | {
           "exact": string;
           "prefix"?: string;
           /**
@@ -1616,13 +1702,20 @@ export interface IVirtualService {
            * RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).
            */
           "regex": string;
-        };
+        });
         /**
          * Names of gateways where the rule should be applied.
          */
         "gateways"?: Array<string>;
         "headers"?: {
-          [key: string]: Exclude<{
+          [key: string]: {
+            "exact"?: string;
+            "prefix"?: string;
+            /**
+             * RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).
+             */
+            "regex"?: string;
+          } & (Exclude<{
             "exact"?: string;
             "prefix"?: string;
             /**
@@ -1630,6 +1723,13 @@ export interface IVirtualService {
              */
             "regex"?: string;
           }, {
+            "exact"?: string;
+            "prefix"?: string;
+            /**
+             * RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).
+             */
+            "regex"?: string;
+          } & ({
             "exact": string;
             "prefix"?: string;
             /**
@@ -1650,7 +1750,7 @@ export interface IVirtualService {
              * RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).
              */
             "regex": string;
-          }> | {
+          })> | {
             "exact": string;
             "prefix"?: string;
             /**
@@ -1671,13 +1771,20 @@ export interface IVirtualService {
              * RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).
              */
             "regex": string;
-          };
+          });
         };
         /**
          * Flag to specify whether the URI matching should be case-insensitive.
          */
         "ignoreUriCase"?: boolean;
-        "method"?: Exclude<{
+        "method"?: {
+          "exact"?: string;
+          "prefix"?: string;
+          /**
+           * RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).
+           */
+          "regex"?: string;
+        } & (Exclude<{
           "exact"?: string;
           "prefix"?: string;
           /**
@@ -1685,6 +1792,13 @@ export interface IVirtualService {
            */
           "regex"?: string;
         }, {
+          "exact"?: string;
+          "prefix"?: string;
+          /**
+           * RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).
+           */
+          "regex"?: string;
+        } & ({
           "exact": string;
           "prefix"?: string;
           /**
@@ -1705,7 +1819,7 @@ export interface IVirtualService {
            * RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).
            */
           "regex": string;
-        }> | {
+        })> | {
           "exact": string;
           "prefix"?: string;
           /**
@@ -1726,7 +1840,7 @@ export interface IVirtualService {
            * RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).
            */
           "regex": string;
-        };
+        });
         /**
          * The name assigned to a match.
          */
@@ -1739,7 +1853,14 @@ export interface IVirtualService {
          * Query parameters for matching.
          */
         "queryParams"?: {
-          [key: string]: Exclude<{
+          [key: string]: {
+            "exact"?: string;
+            "prefix"?: string;
+            /**
+             * RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).
+             */
+            "regex"?: string;
+          } & (Exclude<{
             "exact"?: string;
             "prefix"?: string;
             /**
@@ -1747,6 +1868,13 @@ export interface IVirtualService {
              */
             "regex"?: string;
           }, {
+            "exact"?: string;
+            "prefix"?: string;
+            /**
+             * RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).
+             */
+            "regex"?: string;
+          } & ({
             "exact": string;
             "prefix"?: string;
             /**
@@ -1767,7 +1895,7 @@ export interface IVirtualService {
              * RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).
              */
             "regex": string;
-          }> | {
+          })> | {
             "exact": string;
             "prefix"?: string;
             /**
@@ -1788,9 +1916,16 @@ export interface IVirtualService {
              * RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).
              */
             "regex": string;
-          };
+          });
         };
-        "scheme"?: Exclude<{
+        "scheme"?: {
+          "exact"?: string;
+          "prefix"?: string;
+          /**
+           * RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).
+           */
+          "regex"?: string;
+        } & (Exclude<{
           "exact"?: string;
           "prefix"?: string;
           /**
@@ -1798,6 +1933,13 @@ export interface IVirtualService {
            */
           "regex"?: string;
         }, {
+          "exact"?: string;
+          "prefix"?: string;
+          /**
+           * RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).
+           */
+          "regex"?: string;
+        } & ({
           "exact": string;
           "prefix"?: string;
           /**
@@ -1818,7 +1960,7 @@ export interface IVirtualService {
            * RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).
            */
           "regex": string;
-        }> | {
+        })> | {
           "exact": string;
           "prefix"?: string;
           /**
@@ -1839,7 +1981,7 @@ export interface IVirtualService {
            * RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).
            */
           "regex": string;
-        };
+        });
         "sourceLabels"?: {
           [key: string]: string;
         };
@@ -1847,7 +1989,14 @@ export interface IVirtualService {
          * Source namespace constraining the applicability of a rule to workloads in that namespace.
          */
         "sourceNamespace"?: string;
-        "uri"?: Exclude<{
+        "uri"?: {
+          "exact"?: string;
+          "prefix"?: string;
+          /**
+           * RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).
+           */
+          "regex"?: string;
+        } & (Exclude<{
           "exact"?: string;
           "prefix"?: string;
           /**
@@ -1855,6 +2004,13 @@ export interface IVirtualService {
            */
           "regex"?: string;
         }, {
+          "exact"?: string;
+          "prefix"?: string;
+          /**
+           * RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).
+           */
+          "regex"?: string;
+        } & ({
           "exact": string;
           "prefix"?: string;
           /**
@@ -1875,7 +2031,7 @@ export interface IVirtualService {
            * RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).
            */
           "regex": string;
-        }> | {
+        })> | {
           "exact": string;
           "prefix"?: string;
           /**
@@ -1896,12 +2052,19 @@ export interface IVirtualService {
            * RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).
            */
           "regex": string;
-        };
+        });
         /**
          * withoutHeader has the same syntax with the header, but has opposite meaning.
          */
         "withoutHeaders"?: {
-          [key: string]: Exclude<{
+          [key: string]: {
+            "exact"?: string;
+            "prefix"?: string;
+            /**
+             * RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).
+             */
+            "regex"?: string;
+          } & (Exclude<{
             "exact"?: string;
             "prefix"?: string;
             /**
@@ -1909,6 +2072,13 @@ export interface IVirtualService {
              */
             "regex"?: string;
           }, {
+            "exact"?: string;
+            "prefix"?: string;
+            /**
+             * RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).
+             */
+            "regex"?: string;
+          } & ({
             "exact": string;
             "prefix"?: string;
             /**
@@ -1929,7 +2099,7 @@ export interface IVirtualService {
              * RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).
              */
             "regex": string;
-          }> | {
+          })> | {
             "exact": string;
             "prefix"?: string;
             /**
@@ -1950,7 +2120,7 @@ export interface IVirtualService {
              * RE2 style regex-based match (https://github.com/google/re2/wiki/Syntax).
              */
             "regex": string;
-          };
+          });
         };
       }>;
       "mirror"?: {
@@ -1990,7 +2160,20 @@ export interface IVirtualService {
       /**
        * A HTTP rule can either redirect or forward (default) traffic.
        */
-      "redirect"?: Exclude<{
+      "redirect"?: {
+        "authority"?: string;
+        "derivePort"?: "FROM_PROTOCOL_DEFAULT" | "FROM_REQUEST_PORT";
+        /**
+         * On a redirect, overwrite the port portion of the URL with this value.
+         */
+        "port"?: number;
+        "redirectCode"?: number;
+        /**
+         * On a redirect, overwrite the scheme portion of the URL with this value.
+         */
+        "scheme"?: string;
+        "uri"?: string;
+      } & (Exclude<{
         "authority"?: string;
         "derivePort"?: "FROM_PROTOCOL_DEFAULT" | "FROM_REQUEST_PORT";
         /**
@@ -2009,19 +2192,6 @@ export interface IVirtualService {
         /**
          * On a redirect, overwrite the port portion of the URL with this value.
          */
-        "port": number;
-        "redirectCode"?: number;
-        /**
-         * On a redirect, overwrite the scheme portion of the URL with this value.
-         */
-        "scheme"?: string;
-        "uri"?: string;
-      } | {
-        "authority"?: string;
-        "derivePort": "FROM_PROTOCOL_DEFAULT" | "FROM_REQUEST_PORT";
-        /**
-         * On a redirect, overwrite the port portion of the URL with this value.
-         */
         "port"?: number;
         "redirectCode"?: number;
         /**
@@ -2029,7 +2199,7 @@ export interface IVirtualService {
          */
         "scheme"?: string;
         "uri"?: string;
-      }> | {
+      } & ({
         "authority"?: string;
         "derivePort"?: "FROM_PROTOCOL_DEFAULT" | "FROM_REQUEST_PORT";
         /**
@@ -2055,7 +2225,33 @@ export interface IVirtualService {
          */
         "scheme"?: string;
         "uri"?: string;
-      };
+      })> | {
+        "authority"?: string;
+        "derivePort"?: "FROM_PROTOCOL_DEFAULT" | "FROM_REQUEST_PORT";
+        /**
+         * On a redirect, overwrite the port portion of the URL with this value.
+         */
+        "port": number;
+        "redirectCode"?: number;
+        /**
+         * On a redirect, overwrite the scheme portion of the URL with this value.
+         */
+        "scheme"?: string;
+        "uri"?: string;
+      } | {
+        "authority"?: string;
+        "derivePort": "FROM_PROTOCOL_DEFAULT" | "FROM_REQUEST_PORT";
+        /**
+         * On a redirect, overwrite the port portion of the URL with this value.
+         */
+        "port"?: number;
+        "redirectCode"?: number;
+        /**
+         * On a redirect, overwrite the scheme portion of the URL with this value.
+         */
+        "scheme"?: string;
+        "uri"?: string;
+      });
       /**
        * Retry policy for HTTP requests.
        */

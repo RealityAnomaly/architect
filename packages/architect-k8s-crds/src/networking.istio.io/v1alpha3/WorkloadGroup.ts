@@ -265,7 +265,66 @@ export interface IWorkloadGroup {
     /**
      * `ReadinessProbe` describes the configuration the user must provide for healthchecking on their workload.
      */
-    "probe"?: Exclude<{
+    "probe"?: {
+      /**
+       * Health is determined by how the command that is executed exited.
+       */
+      "exec"?: {
+        /**
+         * Command to run.
+         */
+        "command"?: Array<string>;
+      };
+      /**
+       * Minimum consecutive failures for the probe to be considered failed after having succeeded.
+       */
+      "failureThreshold"?: number;
+      "httpGet"?: {
+        /**
+         * Host name to connect to, defaults to the pod IP.
+         */
+        "host"?: string;
+        /**
+         * Headers the proxy will pass on to make the request.
+         */
+        "httpHeaders"?: Array<{
+          "name"?: string;
+          "value"?: string;
+        }>;
+        /**
+         * Path to access on the HTTP server.
+         */
+        "path"?: string;
+        /**
+         * Port on which the endpoint lives.
+         */
+        "port"?: number;
+        "scheme"?: string;
+      };
+      /**
+       * Number of seconds after the container has started before readiness probes are initiated.
+       */
+      "initialDelaySeconds"?: number;
+      /**
+       * How often (in seconds) to perform the probe.
+       */
+      "periodSeconds"?: number;
+      /**
+       * Minimum consecutive successes for the probe to be considered successful after having failed.
+       */
+      "successThreshold"?: number;
+      /**
+       * Health is determined by if the proxy is able to connect.
+       */
+      "tcpSocket"?: {
+        "host"?: string;
+        "port"?: number;
+      };
+      /**
+       * Number of seconds after which the probe times out.
+       */
+      "timeoutSeconds"?: number;
+    } & (Exclude<{
       /**
        * Health is determined by how the command that is executed exited.
        */
@@ -338,124 +397,6 @@ export interface IWorkloadGroup {
        * Minimum consecutive failures for the probe to be considered failed after having succeeded.
        */
       "failureThreshold"?: number;
-      "httpGet": {
-        /**
-         * Host name to connect to, defaults to the pod IP.
-         */
-        "host"?: string;
-        /**
-         * Headers the proxy will pass on to make the request.
-         */
-        "httpHeaders"?: Array<{
-          "name"?: string;
-          "value"?: string;
-        }>;
-        /**
-         * Path to access on the HTTP server.
-         */
-        "path"?: string;
-        /**
-         * Port on which the endpoint lives.
-         */
-        "port"?: number;
-        "scheme"?: string;
-      };
-      /**
-       * Number of seconds after the container has started before readiness probes are initiated.
-       */
-      "initialDelaySeconds"?: number;
-      /**
-       * How often (in seconds) to perform the probe.
-       */
-      "periodSeconds"?: number;
-      /**
-       * Minimum consecutive successes for the probe to be considered successful after having failed.
-       */
-      "successThreshold"?: number;
-      /**
-       * Health is determined by if the proxy is able to connect.
-       */
-      "tcpSocket"?: {
-        "host"?: string;
-        "port"?: number;
-      };
-      /**
-       * Number of seconds after which the probe times out.
-       */
-      "timeoutSeconds"?: number;
-    } | {
-      /**
-       * Health is determined by how the command that is executed exited.
-       */
-      "exec"?: {
-        /**
-         * Command to run.
-         */
-        "command"?: Array<string>;
-      };
-      /**
-       * Minimum consecutive failures for the probe to be considered failed after having succeeded.
-       */
-      "failureThreshold"?: number;
-      "httpGet"?: {
-        /**
-         * Host name to connect to, defaults to the pod IP.
-         */
-        "host"?: string;
-        /**
-         * Headers the proxy will pass on to make the request.
-         */
-        "httpHeaders"?: Array<{
-          "name"?: string;
-          "value"?: string;
-        }>;
-        /**
-         * Path to access on the HTTP server.
-         */
-        "path"?: string;
-        /**
-         * Port on which the endpoint lives.
-         */
-        "port"?: number;
-        "scheme"?: string;
-      };
-      /**
-       * Number of seconds after the container has started before readiness probes are initiated.
-       */
-      "initialDelaySeconds"?: number;
-      /**
-       * How often (in seconds) to perform the probe.
-       */
-      "periodSeconds"?: number;
-      /**
-       * Minimum consecutive successes for the probe to be considered successful after having failed.
-       */
-      "successThreshold"?: number;
-      /**
-       * Health is determined by if the proxy is able to connect.
-       */
-      "tcpSocket": {
-        "host"?: string;
-        "port"?: number;
-      };
-      /**
-       * Number of seconds after which the probe times out.
-       */
-      "timeoutSeconds"?: number;
-    } | {
-      /**
-       * Health is determined by how the command that is executed exited.
-       */
-      "exec": {
-        /**
-         * Command to run.
-         */
-        "command"?: Array<string>;
-      };
-      /**
-       * Minimum consecutive failures for the probe to be considered failed after having succeeded.
-       */
-      "failureThreshold"?: number;
       "httpGet"?: {
         /**
          * Host name to connect to, defaults to the pod IP.
@@ -501,7 +442,7 @@ export interface IWorkloadGroup {
        * Number of seconds after which the probe times out.
        */
       "timeoutSeconds"?: number;
-    }> | {
+    } & ({
       /**
        * Health is determined by how the command that is executed exited.
        */
@@ -678,7 +619,184 @@ export interface IWorkloadGroup {
        * Number of seconds after which the probe times out.
        */
       "timeoutSeconds"?: number;
-    };
+    })> | {
+      /**
+       * Health is determined by how the command that is executed exited.
+       */
+      "exec"?: {
+        /**
+         * Command to run.
+         */
+        "command"?: Array<string>;
+      };
+      /**
+       * Minimum consecutive failures for the probe to be considered failed after having succeeded.
+       */
+      "failureThreshold"?: number;
+      "httpGet": {
+        /**
+         * Host name to connect to, defaults to the pod IP.
+         */
+        "host"?: string;
+        /**
+         * Headers the proxy will pass on to make the request.
+         */
+        "httpHeaders"?: Array<{
+          "name"?: string;
+          "value"?: string;
+        }>;
+        /**
+         * Path to access on the HTTP server.
+         */
+        "path"?: string;
+        /**
+         * Port on which the endpoint lives.
+         */
+        "port"?: number;
+        "scheme"?: string;
+      };
+      /**
+       * Number of seconds after the container has started before readiness probes are initiated.
+       */
+      "initialDelaySeconds"?: number;
+      /**
+       * How often (in seconds) to perform the probe.
+       */
+      "periodSeconds"?: number;
+      /**
+       * Minimum consecutive successes for the probe to be considered successful after having failed.
+       */
+      "successThreshold"?: number;
+      /**
+       * Health is determined by if the proxy is able to connect.
+       */
+      "tcpSocket"?: {
+        "host"?: string;
+        "port"?: number;
+      };
+      /**
+       * Number of seconds after which the probe times out.
+       */
+      "timeoutSeconds"?: number;
+    } | {
+      /**
+       * Health is determined by how the command that is executed exited.
+       */
+      "exec"?: {
+        /**
+         * Command to run.
+         */
+        "command"?: Array<string>;
+      };
+      /**
+       * Minimum consecutive failures for the probe to be considered failed after having succeeded.
+       */
+      "failureThreshold"?: number;
+      "httpGet"?: {
+        /**
+         * Host name to connect to, defaults to the pod IP.
+         */
+        "host"?: string;
+        /**
+         * Headers the proxy will pass on to make the request.
+         */
+        "httpHeaders"?: Array<{
+          "name"?: string;
+          "value"?: string;
+        }>;
+        /**
+         * Path to access on the HTTP server.
+         */
+        "path"?: string;
+        /**
+         * Port on which the endpoint lives.
+         */
+        "port"?: number;
+        "scheme"?: string;
+      };
+      /**
+       * Number of seconds after the container has started before readiness probes are initiated.
+       */
+      "initialDelaySeconds"?: number;
+      /**
+       * How often (in seconds) to perform the probe.
+       */
+      "periodSeconds"?: number;
+      /**
+       * Minimum consecutive successes for the probe to be considered successful after having failed.
+       */
+      "successThreshold"?: number;
+      /**
+       * Health is determined by if the proxy is able to connect.
+       */
+      "tcpSocket": {
+        "host"?: string;
+        "port"?: number;
+      };
+      /**
+       * Number of seconds after which the probe times out.
+       */
+      "timeoutSeconds"?: number;
+    } | {
+      /**
+       * Health is determined by how the command that is executed exited.
+       */
+      "exec": {
+        /**
+         * Command to run.
+         */
+        "command"?: Array<string>;
+      };
+      /**
+       * Minimum consecutive failures for the probe to be considered failed after having succeeded.
+       */
+      "failureThreshold"?: number;
+      "httpGet"?: {
+        /**
+         * Host name to connect to, defaults to the pod IP.
+         */
+        "host"?: string;
+        /**
+         * Headers the proxy will pass on to make the request.
+         */
+        "httpHeaders"?: Array<{
+          "name"?: string;
+          "value"?: string;
+        }>;
+        /**
+         * Path to access on the HTTP server.
+         */
+        "path"?: string;
+        /**
+         * Port on which the endpoint lives.
+         */
+        "port"?: number;
+        "scheme"?: string;
+      };
+      /**
+       * Number of seconds after the container has started before readiness probes are initiated.
+       */
+      "initialDelaySeconds"?: number;
+      /**
+       * How often (in seconds) to perform the probe.
+       */
+      "periodSeconds"?: number;
+      /**
+       * Minimum consecutive successes for the probe to be considered successful after having failed.
+       */
+      "successThreshold"?: number;
+      /**
+       * Health is determined by if the proxy is able to connect.
+       */
+      "tcpSocket"?: {
+        "host"?: string;
+        "port"?: number;
+      };
+      /**
+       * Number of seconds after which the probe times out.
+       */
+      "timeoutSeconds"?: number;
+    });
     /**
      * Template to be used for the generation of `WorkloadEntry` resources that belong to this `WorkloadGroup`.
      */
