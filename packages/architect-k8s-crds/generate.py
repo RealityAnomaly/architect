@@ -96,7 +96,7 @@ with tempfile.NamedTemporaryFile(mode="w") as f:
     os.makedirs(generated_path, exist_ok=True)
 
     # now run the build
-    params = ["npx", "crd-generate", "--input", f.name, "--output", generated_path]
+    params = ["npx", "@kubernetes-models/crd-generate", "--input", f.name, "--output", generated_path]
     subprocess.run(params, stdout=subprocess.DEVNULL)
 
 with open("src/index.ts", "a") as f:

@@ -195,6 +195,15 @@ export interface IVolumeSnapshotContent {
       /**
        * snapshotHandle specifies the CSI "snapshot_id" of a pre-existing snapshot on the underlying storage system for which a Kubernetes object representation was (or should be) created. This field is immutable.
        */
+      "snapshotHandle"?: string;
+      /**
+       * volumeHandle specifies the CSI "volume_id" of the volume from which a snapshot should be dynamically taken from. This field is immutable.
+       */
+      "volumeHandle"?: string;
+    } & ({
+      /**
+       * snapshotHandle specifies the CSI "snapshot_id" of a pre-existing snapshot on the underlying storage system for which a Kubernetes object representation was (or should be) created. This field is immutable.
+       */
       "snapshotHandle": string;
       /**
        * volumeHandle specifies the CSI "volume_id" of the volume from which a snapshot should be dynamically taken from. This field is immutable.
@@ -209,7 +218,7 @@ export interface IVolumeSnapshotContent {
        * volumeHandle specifies the CSI "volume_id" of the volume from which a snapshot should be dynamically taken from. This field is immutable.
        */
       "volumeHandle": string;
-    };
+    });
     /**
      * SourceVolumeMode is the mode of the volume whose snapshot is taken. Can be either “Filesystem” or “Block”. If not specified, it indicates the source volume's mode is unknown. This field is immutable. This field is an alpha field.
      */
