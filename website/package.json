@@ -1,6 +1,6 @@
 {
   "name": "@vertex115/architect-website",
-  "version": "0.0.0",
+  "version": "1.0.7-alpha.0",
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
