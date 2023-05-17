@@ -320,10 +320,70 @@ export interface ICiliumLocalRedirectPolicy {
      * RedirectFrontend specifies frontend configuration to redirect traffic from. It can not be empty.
      */
     "redirectFrontend": {
+      /**
+       * AddressMatcher is a tuple {IP, port, protocol} that matches traffic to be redirected.
+       */
+      "addressMatcher"?: {
+        /**
+         * IP is a destination ip address for traffic to be redirected. 
+         *  Example: When it is set to "169.254.169.254", traffic destined to "169.254.169.254" is redirected.
+         */
+        "ip": string;
+        /**
+         * ToPorts is a list of destination L4 ports with protocol for traffic to be redirected. When multiple ports are specified, the ports must be named. 
+         *  Example: When set to Port: "53" and Protocol: UDP, traffic destined to port '53' with UDP protocol is redirected.
+         */
+        "toPorts": Array<{
+          /**
+           * Name is a port name, which must contain at least one [a-z], and may also contain [0-9] and '-' anywhere except adjacent to another '-' or in the beginning or the end.
+           */
+          "name"?: string;
+          /**
+           * Port is an L4 port number. The string will be strictly parsed as a single uint16.
+           */
+          "port": string;
+          /**
+           * Protocol is the L4 protocol. Accepted values: "TCP", "UDP"
+           */
+          "protocol": "TCP" | "UDP";
+        }>;
+      };
+      /**
+       * ServiceMatcher specifies Kubernetes service and port that matches traffic to be redirected.
+       */
+      "serviceMatcher"?: {
+        /**
+         * Namespace is the Kubernetes service namespace. The service namespace must match the namespace of the parent Local Redirect Policy.  For Cluster-wide Local Redirect Policy, this can be any namespace.
+         */
+        "namespace": string;
+        /**
+         * Name is the name of a destination Kubernetes service that identifies traffic to be redirected. The service type needs to be ClusterIP. 
+         *  Example: When this field is populated with 'serviceName:myService', all the traffic destined to the cluster IP of this service at the (specified) service port(s) will be redirected.
+         */
+        "serviceName": string;
+        /**
+         * ToPorts is a list of destination service L4 ports with protocol for traffic to be redirected. If not specified, traffic for all the service ports will be redirected. When multiple ports are specified, the ports must be named.
+         */
+        "toPorts"?: Array<{
+          /**
+           * Name is a port name, which must contain at least one [a-z], and may also contain [0-9] and '-' anywhere except adjacent to another '-' or in the beginning or the end.
+           */
+          "name"?: string;
+          /**
+           * Port is an L4 port number. The string will be strictly parsed as a single uint16.
+           */
+          "port": string;
+          /**
+           * Protocol is the L4 protocol. Accepted values: "TCP", "UDP"
+           */
+          "protocol": "TCP" | "UDP";
+        }>;
+      };
+    } & ({
       "addressMatcher": any;
     } | {
       "serviceMatcher": any;
-    };
+    });
   };
   /**
    * Status is the most recent status of the local redirect policy. It is a read-only field.

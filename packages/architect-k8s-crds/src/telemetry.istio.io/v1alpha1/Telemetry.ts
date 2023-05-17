@@ -421,7 +421,17 @@ export interface ITelemetry {
         /**
          * Match allows provides the scope of the override.
          */
-        "match"?: Exclude<{
+        "match"?: {
+          /**
+           * Allows free-form specification of a metric.
+           */
+          "customMetric"?: string;
+          /**
+           * One of the well-known Istio Standard Metrics.
+           */
+          "metric"?: "ALL_METRICS" | "REQUEST_COUNT" | "REQUEST_DURATION" | "REQUEST_SIZE" | "RESPONSE_SIZE" | "TCP_OPENED_CONNECTIONS" | "TCP_CLOSED_CONNECTIONS" | "TCP_SENT_BYTES" | "TCP_RECEIVED_BYTES" | "GRPC_REQUEST_MESSAGES" | "GRPC_RESPONSE_MESSAGES";
+          "mode"?: "CLIENT_AND_SERVER" | "CLIENT" | "SERVER";
+        } & (Exclude<{
           /**
            * Allows free-form specification of a metric.
            */
@@ -439,19 +449,9 @@ export interface ITelemetry {
           /**
            * One of the well-known Istio Standard Metrics.
            */
-          "metric": "ALL_METRICS" | "REQUEST_COUNT" | "REQUEST_DURATION" | "REQUEST_SIZE" | "RESPONSE_SIZE" | "TCP_OPENED_CONNECTIONS" | "TCP_CLOSED_CONNECTIONS" | "TCP_SENT_BYTES" | "TCP_RECEIVED_BYTES" | "GRPC_REQUEST_MESSAGES" | "GRPC_RESPONSE_MESSAGES";
-          "mode"?: "CLIENT_AND_SERVER" | "CLIENT" | "SERVER";
-        } | {
-          /**
-           * Allows free-form specification of a metric.
-           */
-          "customMetric": string;
-          /**
-           * One of the well-known Istio Standard Metrics.
-           */
           "metric"?: "ALL_METRICS" | "REQUEST_COUNT" | "REQUEST_DURATION" | "REQUEST_SIZE" | "RESPONSE_SIZE" | "TCP_OPENED_CONNECTIONS" | "TCP_CLOSED_CONNECTIONS" | "TCP_SENT_BYTES" | "TCP_RECEIVED_BYTES" | "GRPC_REQUEST_MESSAGES" | "GRPC_RESPONSE_MESSAGES";
           "mode"?: "CLIENT_AND_SERVER" | "CLIENT" | "SERVER";
-        }> | {
+        } & ({
           /**
            * Allows free-form specification of a metric.
            */
@@ -471,7 +471,27 @@ export interface ITelemetry {
            */
           "metric"?: "ALL_METRICS" | "REQUEST_COUNT" | "REQUEST_DURATION" | "REQUEST_SIZE" | "RESPONSE_SIZE" | "TCP_OPENED_CONNECTIONS" | "TCP_CLOSED_CONNECTIONS" | "TCP_SENT_BYTES" | "TCP_RECEIVED_BYTES" | "GRPC_REQUEST_MESSAGES" | "GRPC_RESPONSE_MESSAGES";
           "mode"?: "CLIENT_AND_SERVER" | "CLIENT" | "SERVER";
-        };
+        })> | {
+          /**
+           * Allows free-form specification of a metric.
+           */
+          "customMetric"?: string;
+          /**
+           * One of the well-known Istio Standard Metrics.
+           */
+          "metric": "ALL_METRICS" | "REQUEST_COUNT" | "REQUEST_DURATION" | "REQUEST_SIZE" | "RESPONSE_SIZE" | "TCP_OPENED_CONNECTIONS" | "TCP_CLOSED_CONNECTIONS" | "TCP_SENT_BYTES" | "TCP_RECEIVED_BYTES" | "GRPC_REQUEST_MESSAGES" | "GRPC_RESPONSE_MESSAGES";
+          "mode"?: "CLIENT_AND_SERVER" | "CLIENT" | "SERVER";
+        } | {
+          /**
+           * Allows free-form specification of a metric.
+           */
+          "customMetric": string;
+          /**
+           * One of the well-known Istio Standard Metrics.
+           */
+          "metric"?: "ALL_METRICS" | "REQUEST_COUNT" | "REQUEST_DURATION" | "REQUEST_SIZE" | "RESPONSE_SIZE" | "TCP_OPENED_CONNECTIONS" | "TCP_CLOSED_CONNECTIONS" | "TCP_SENT_BYTES" | "TCP_RECEIVED_BYTES" | "GRPC_REQUEST_MESSAGES" | "GRPC_RESPONSE_MESSAGES";
+          "mode"?: "CLIENT_AND_SERVER" | "CLIENT" | "SERVER";
+        });
         /**
          * Optional.
          */
@@ -514,7 +534,40 @@ export interface ITelemetry {
        * Optional.
        */
       "customTags"?: {
-        [key: string]: Exclude<{
+        [key: string]: {
+          /**
+           * Environment adds the value of an environment variable to each span.
+           */
+          "environment"?: {
+            /**
+             * Optional.
+             */
+            "defaultValue"?: string;
+            /**
+             * Name of the environment variable from which to extract the tag value.
+             */
+            "name"?: string;
+          };
+          "header"?: {
+            /**
+             * Optional.
+             */
+            "defaultValue"?: string;
+            /**
+             * Name of the header from which to extract the tag value.
+             */
+            "name"?: string;
+          };
+          /**
+           * Literal adds the same, hard-coded value to each span.
+           */
+          "literal"?: {
+            /**
+             * The tag value to use.
+             */
+            "value"?: string;
+          };
+        } & (Exclude<{
           /**
            * Environment adds the value of an environment variable to each span.
            */
@@ -574,79 +627,13 @@ export interface ITelemetry {
           /**
            * Literal adds the same, hard-coded value to each span.
            */
-          "literal": {
-            /**
-             * The tag value to use.
-             */
-            "value"?: string;
-          };
-        } | {
-          /**
-           * Environment adds the value of an environment variable to each span.
-           */
-          "environment": {
-            /**
-             * Optional.
-             */
-            "defaultValue"?: string;
-            /**
-             * Name of the environment variable from which to extract the tag value.
-             */
-            "name"?: string;
-          };
-          "header"?: {
-            /**
-             * Optional.
-             */
-            "defaultValue"?: string;
-            /**
-             * Name of the header from which to extract the tag value.
-             */
-            "name"?: string;
-          };
-          /**
-           * Literal adds the same, hard-coded value to each span.
-           */
           "literal"?: {
             /**
              * The tag value to use.
              */
             "value"?: string;
           };
-        } | {
-          /**
-           * Environment adds the value of an environment variable to each span.
-           */
-          "environment"?: {
-            /**
-             * Optional.
-             */
-            "defaultValue"?: string;
-            /**
-             * Name of the environment variable from which to extract the tag value.
-             */
-            "name"?: string;
-          };
-          "header": {
-            /**
-             * Optional.
-             */
-            "defaultValue"?: string;
-            /**
-             * Name of the header from which to extract the tag value.
-             */
-            "name"?: string;
-          };
-          /**
-           * Literal adds the same, hard-coded value to each span.
-           */
-          "literal"?: {
-            /**
-             * The tag value to use.
-             */
-            "value"?: string;
-          };
-        }> | {
+        } & ({
           /**
            * Environment adds the value of an environment variable to each span.
            */
@@ -745,7 +732,106 @@ export interface ITelemetry {
              */
             "value"?: string;
           };
-        };
+        })> | {
+          /**
+           * Environment adds the value of an environment variable to each span.
+           */
+          "environment"?: {
+            /**
+             * Optional.
+             */
+            "defaultValue"?: string;
+            /**
+             * Name of the environment variable from which to extract the tag value.
+             */
+            "name"?: string;
+          };
+          "header"?: {
+            /**
+             * Optional.
+             */
+            "defaultValue"?: string;
+            /**
+             * Name of the header from which to extract the tag value.
+             */
+            "name"?: string;
+          };
+          /**
+           * Literal adds the same, hard-coded value to each span.
+           */
+          "literal": {
+            /**
+             * The tag value to use.
+             */
+            "value"?: string;
+          };
+        } | {
+          /**
+           * Environment adds the value of an environment variable to each span.
+           */
+          "environment": {
+            /**
+             * Optional.
+             */
+            "defaultValue"?: string;
+            /**
+             * Name of the environment variable from which to extract the tag value.
+             */
+            "name"?: string;
+          };
+          "header"?: {
+            /**
+             * Optional.
+             */
+            "defaultValue"?: string;
+            /**
+             * Name of the header from which to extract the tag value.
+             */
+            "name"?: string;
+          };
+          /**
+           * Literal adds the same, hard-coded value to each span.
+           */
+          "literal"?: {
+            /**
+             * The tag value to use.
+             */
+            "value"?: string;
+          };
+        } | {
+          /**
+           * Environment adds the value of an environment variable to each span.
+           */
+          "environment"?: {
+            /**
+             * Optional.
+             */
+            "defaultValue"?: string;
+            /**
+             * Name of the environment variable from which to extract the tag value.
+             */
+            "name"?: string;
+          };
+          "header": {
+            /**
+             * Optional.
+             */
+            "defaultValue"?: string;
+            /**
+             * Name of the header from which to extract the tag value.
+             */
+            "name"?: string;
+          };
+          /**
+           * Literal adds the same, hard-coded value to each span.
+           */
+          "literal"?: {
+            /**
+             * The tag value to use.
+             */
+            "value"?: string;
+          };
+        });
       };
       /**
        * Controls span reporting.

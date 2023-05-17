@@ -350,7 +350,121 @@ export interface IEnvoyFilter {
       /**
        * Match on listener/route configuration/cluster.
        */
-      "match"?: Exclude<{
+      "match"?: {
+        /**
+         * Match on envoy cluster attributes.
+         */
+        "cluster"?: {
+          /**
+           * The exact name of the cluster to match.
+           */
+          "name"?: string;
+          /**
+           * The service port for which this cluster was generated.
+           */
+          "portNumber"?: number;
+          /**
+           * The fully qualified service name for this cluster.
+           */
+          "service"?: string;
+          /**
+           * The subset associated with the service.
+           */
+          "subset"?: string;
+        };
+        /**
+         * The specific config generation context to match on.
+         */
+        "context"?: "ANY" | "SIDECAR_INBOUND" | "SIDECAR_OUTBOUND" | "GATEWAY";
+        /**
+         * Match on envoy listener attributes.
+         */
+        "listener"?: {
+          /**
+           * Match a specific filter chain in a listener.
+           */
+          "filterChain"?: {
+            /**
+             * Applies only to sidecars.
+             */
+            "applicationProtocols"?: string;
+            /**
+             * The destination_port value used by a filter chain's match condition.
+             */
+            "destinationPort"?: number;
+            /**
+             * The name of a specific filter to apply the patch to.
+             */
+            "filter"?: {
+              /**
+               * The filter name to match on.
+               */
+              "name"?: string;
+              "subFilter"?: {
+                /**
+                 * The filter name to match on.
+                 */
+                "name"?: string;
+              };
+            };
+            /**
+             * The name assigned to the filter chain.
+             */
+            "name"?: string;
+            /**
+             * The SNI value used by a filter chain's match condition.
+             */
+            "sni"?: string;
+            /**
+             * Applies only to `SIDECAR_INBOUND` context.
+             */
+            "transportProtocol"?: string;
+          };
+          /**
+           * Match a specific listener by its name.
+           */
+          "name"?: string;
+          "portName"?: string;
+          "portNumber"?: number;
+        };
+        /**
+         * Match on properties associated with a proxy.
+         */
+        "proxy"?: {
+          "metadata"?: {
+            [key: string]: string;
+          };
+          "proxyVersion"?: string;
+        };
+        /**
+         * Match on envoy HTTP route configuration attributes.
+         */
+        "routeConfiguration"?: {
+          "gateway"?: string;
+          /**
+           * Route configuration name to match on.
+           */
+          "name"?: string;
+          /**
+           * Applicable only for GATEWAY context.
+           */
+          "portName"?: string;
+          "portNumber"?: number;
+          "vhost"?: {
+            "name"?: string;
+            /**
+             * Match a specific route within the virtual host.
+             */
+            "route"?: {
+              /**
+               * Match a route with specific action type.
+               */
+              "action"?: "ANY" | "ROUTE" | "REDIRECT" | "DIRECT_RESPONSE";
+              "name"?: string;
+            };
+          };
+        };
+      } & (Exclude<{
         /**
          * Match on envoy cluster attributes.
          */
@@ -493,234 +607,6 @@ export interface IEnvoyFilter {
         /**
          * Match on envoy listener attributes.
          */
-        "listener": {
-          /**
-           * Match a specific filter chain in a listener.
-           */
-          "filterChain"?: {
-            /**
-             * Applies only to sidecars.
-             */
-            "applicationProtocols"?: string;
-            /**
-             * The destination_port value used by a filter chain's match condition.
-             */
-            "destinationPort"?: number;
-            /**
-             * The name of a specific filter to apply the patch to.
-             */
-            "filter"?: {
-              /**
-               * The filter name to match on.
-               */
-              "name"?: string;
-              "subFilter"?: {
-                /**
-                 * The filter name to match on.
-                 */
-                "name"?: string;
-              };
-            };
-            /**
-             * The name assigned to the filter chain.
-             */
-            "name"?: string;
-            /**
-             * The SNI value used by a filter chain's match condition.
-             */
-            "sni"?: string;
-            /**
-             * Applies only to `SIDECAR_INBOUND` context.
-             */
-            "transportProtocol"?: string;
-          };
-          /**
-           * Match a specific listener by its name.
-           */
-          "name"?: string;
-          "portName"?: string;
-          "portNumber"?: number;
-        };
-        /**
-         * Match on properties associated with a proxy.
-         */
-        "proxy"?: {
-          "metadata"?: {
-            [key: string]: string;
-          };
-          "proxyVersion"?: string;
-        };
-        /**
-         * Match on envoy HTTP route configuration attributes.
-         */
-        "routeConfiguration"?: {
-          "gateway"?: string;
-          /**
-           * Route configuration name to match on.
-           */
-          "name"?: string;
-          /**
-           * Applicable only for GATEWAY context.
-           */
-          "portName"?: string;
-          "portNumber"?: number;
-          "vhost"?: {
-            "name"?: string;
-            /**
-             * Match a specific route within the virtual host.
-             */
-            "route"?: {
-              /**
-               * Match a route with specific action type.
-               */
-              "action"?: "ANY" | "ROUTE" | "REDIRECT" | "DIRECT_RESPONSE";
-              "name"?: string;
-            };
-          };
-        };
-      } | {
-        /**
-         * Match on envoy cluster attributes.
-         */
-        "cluster"?: {
-          /**
-           * The exact name of the cluster to match.
-           */
-          "name"?: string;
-          /**
-           * The service port for which this cluster was generated.
-           */
-          "portNumber"?: number;
-          /**
-           * The fully qualified service name for this cluster.
-           */
-          "service"?: string;
-          /**
-           * The subset associated with the service.
-           */
-          "subset"?: string;
-        };
-        /**
-         * The specific config generation context to match on.
-         */
-        "context"?: "ANY" | "SIDECAR_INBOUND" | "SIDECAR_OUTBOUND" | "GATEWAY";
-        /**
-         * Match on envoy listener attributes.
-         */
-        "listener"?: {
-          /**
-           * Match a specific filter chain in a listener.
-           */
-          "filterChain"?: {
-            /**
-             * Applies only to sidecars.
-             */
-            "applicationProtocols"?: string;
-            /**
-             * The destination_port value used by a filter chain's match condition.
-             */
-            "destinationPort"?: number;
-            /**
-             * The name of a specific filter to apply the patch to.
-             */
-            "filter"?: {
-              /**
-               * The filter name to match on.
-               */
-              "name"?: string;
-              "subFilter"?: {
-                /**
-                 * The filter name to match on.
-                 */
-                "name"?: string;
-              };
-            };
-            /**
-             * The name assigned to the filter chain.
-             */
-            "name"?: string;
-            /**
-             * The SNI value used by a filter chain's match condition.
-             */
-            "sni"?: string;
-            /**
-             * Applies only to `SIDECAR_INBOUND` context.
-             */
-            "transportProtocol"?: string;
-          };
-          /**
-           * Match a specific listener by its name.
-           */
-          "name"?: string;
-          "portName"?: string;
-          "portNumber"?: number;
-        };
-        /**
-         * Match on properties associated with a proxy.
-         */
-        "proxy"?: {
-          "metadata"?: {
-            [key: string]: string;
-          };
-          "proxyVersion"?: string;
-        };
-        /**
-         * Match on envoy HTTP route configuration attributes.
-         */
-        "routeConfiguration": {
-          "gateway"?: string;
-          /**
-           * Route configuration name to match on.
-           */
-          "name"?: string;
-          /**
-           * Applicable only for GATEWAY context.
-           */
-          "portName"?: string;
-          "portNumber"?: number;
-          "vhost"?: {
-            "name"?: string;
-            /**
-             * Match a specific route within the virtual host.
-             */
-            "route"?: {
-              /**
-               * Match a route with specific action type.
-               */
-              "action"?: "ANY" | "ROUTE" | "REDIRECT" | "DIRECT_RESPONSE";
-              "name"?: string;
-            };
-          };
-        };
-      } | {
-        /**
-         * Match on envoy cluster attributes.
-         */
-        "cluster": {
-          /**
-           * The exact name of the cluster to match.
-           */
-          "name"?: string;
-          /**
-           * The service port for which this cluster was generated.
-           */
-          "portNumber"?: number;
-          /**
-           * The fully qualified service name for this cluster.
-           */
-          "service"?: string;
-          /**
-           * The subset associated with the service.
-           */
-          "subset"?: string;
-        };
-        /**
-         * The specific config generation context to match on.
-         */
-        "context"?: "ANY" | "SIDECAR_INBOUND" | "SIDECAR_OUTBOUND" | "GATEWAY";
-        /**
-         * Match on envoy listener attributes.
-         */
         "listener"?: {
           /**
            * Match a specific filter chain in a listener.
@@ -806,7 +692,7 @@ export interface IEnvoyFilter {
             };
           };
         };
-      }> | {
+      } & ({
         /**
          * Match on envoy cluster attributes.
          */
@@ -1148,7 +1034,349 @@ export interface IEnvoyFilter {
             };
           };
         };
-      };
+      })> | {
+        /**
+         * Match on envoy cluster attributes.
+         */
+        "cluster"?: {
+          /**
+           * The exact name of the cluster to match.
+           */
+          "name"?: string;
+          /**
+           * The service port for which this cluster was generated.
+           */
+          "portNumber"?: number;
+          /**
+           * The fully qualified service name for this cluster.
+           */
+          "service"?: string;
+          /**
+           * The subset associated with the service.
+           */
+          "subset"?: string;
+        };
+        /**
+         * The specific config generation context to match on.
+         */
+        "context"?: "ANY" | "SIDECAR_INBOUND" | "SIDECAR_OUTBOUND" | "GATEWAY";
+        /**
+         * Match on envoy listener attributes.
+         */
+        "listener": {
+          /**
+           * Match a specific filter chain in a listener.
+           */
+          "filterChain"?: {
+            /**
+             * Applies only to sidecars.
+             */
+            "applicationProtocols"?: string;
+            /**
+             * The destination_port value used by a filter chain's match condition.
+             */
+            "destinationPort"?: number;
+            /**
+             * The name of a specific filter to apply the patch to.
+             */
+            "filter"?: {
+              /**
+               * The filter name to match on.
+               */
+              "name"?: string;
+              "subFilter"?: {
+                /**
+                 * The filter name to match on.
+                 */
+                "name"?: string;
+              };
+            };
+            /**
+             * The name assigned to the filter chain.
+             */
+            "name"?: string;
+            /**
+             * The SNI value used by a filter chain's match condition.
+             */
+            "sni"?: string;
+            /**
+             * Applies only to `SIDECAR_INBOUND` context.
+             */
+            "transportProtocol"?: string;
+          };
+          /**
+           * Match a specific listener by its name.
+           */
+          "name"?: string;
+          "portName"?: string;
+          "portNumber"?: number;
+        };
+        /**
+         * Match on properties associated with a proxy.
+         */
+        "proxy"?: {
+          "metadata"?: {
+            [key: string]: string;
+          };
+          "proxyVersion"?: string;
+        };
+        /**
+         * Match on envoy HTTP route configuration attributes.
+         */
+        "routeConfiguration"?: {
+          "gateway"?: string;
+          /**
+           * Route configuration name to match on.
+           */
+          "name"?: string;
+          /**
+           * Applicable only for GATEWAY context.
+           */
+          "portName"?: string;
+          "portNumber"?: number;
+          "vhost"?: {
+            "name"?: string;
+            /**
+             * Match a specific route within the virtual host.
+             */
+            "route"?: {
+              /**
+               * Match a route with specific action type.
+               */
+              "action"?: "ANY" | "ROUTE" | "REDIRECT" | "DIRECT_RESPONSE";
+              "name"?: string;
+            };
+          };
+        };
+      } | {
+        /**
+         * Match on envoy cluster attributes.
+         */
+        "cluster"?: {
+          /**
+           * The exact name of the cluster to match.
+           */
+          "name"?: string;
+          /**
+           * The service port for which this cluster was generated.
+           */
+          "portNumber"?: number;
+          /**
+           * The fully qualified service name for this cluster.
+           */
+          "service"?: string;
+          /**
+           * The subset associated with the service.
+           */
+          "subset"?: string;
+        };
+        /**
+         * The specific config generation context to match on.
+         */
+        "context"?: "ANY" | "SIDECAR_INBOUND" | "SIDECAR_OUTBOUND" | "GATEWAY";
+        /**
+         * Match on envoy listener attributes.
+         */
+        "listener"?: {
+          /**
+           * Match a specific filter chain in a listener.
+           */
+          "filterChain"?: {
+            /**
+             * Applies only to sidecars.
+             */
+            "applicationProtocols"?: string;
+            /**
+             * The destination_port value used by a filter chain's match condition.
+             */
+            "destinationPort"?: number;
+            /**
+             * The name of a specific filter to apply the patch to.
+             */
+            "filter"?: {
+              /**
+               * The filter name to match on.
+               */
+              "name"?: string;
+              "subFilter"?: {
+                /**
+                 * The filter name to match on.
+                 */
+                "name"?: string;
+              };
+            };
+            /**
+             * The name assigned to the filter chain.
+             */
+            "name"?: string;
+            /**
+             * The SNI value used by a filter chain's match condition.
+             */
+            "sni"?: string;
+            /**
+             * Applies only to `SIDECAR_INBOUND` context.
+             */
+            "transportProtocol"?: string;
+          };
+          /**
+           * Match a specific listener by its name.
+           */
+          "name"?: string;
+          "portName"?: string;
+          "portNumber"?: number;
+        };
+        /**
+         * Match on properties associated with a proxy.
+         */
+        "proxy"?: {
+          "metadata"?: {
+            [key: string]: string;
+          };
+          "proxyVersion"?: string;
+        };
+        /**
+         * Match on envoy HTTP route configuration attributes.
+         */
+        "routeConfiguration": {
+          "gateway"?: string;
+          /**
+           * Route configuration name to match on.
+           */
+          "name"?: string;
+          /**
+           * Applicable only for GATEWAY context.
+           */
+          "portName"?: string;
+          "portNumber"?: number;
+          "vhost"?: {
+            "name"?: string;
+            /**
+             * Match a specific route within the virtual host.
+             */
+            "route"?: {
+              /**
+               * Match a route with specific action type.
+               */
+              "action"?: "ANY" | "ROUTE" | "REDIRECT" | "DIRECT_RESPONSE";
+              "name"?: string;
+            };
+          };
+        };
+      } | {
+        /**
+         * Match on envoy cluster attributes.
+         */
+        "cluster": {
+          /**
+           * The exact name of the cluster to match.
+           */
+          "name"?: string;
+          /**
+           * The service port for which this cluster was generated.
+           */
+          "portNumber"?: number;
+          /**
+           * The fully qualified service name for this cluster.
+           */
+          "service"?: string;
+          /**
+           * The subset associated with the service.
+           */
+          "subset"?: string;
+        };
+        /**
+         * The specific config generation context to match on.
+         */
+        "context"?: "ANY" | "SIDECAR_INBOUND" | "SIDECAR_OUTBOUND" | "GATEWAY";
+        /**
+         * Match on envoy listener attributes.
+         */
+        "listener"?: {
+          /**
+           * Match a specific filter chain in a listener.
+           */
+          "filterChain"?: {
+            /**
+             * Applies only to sidecars.
+             */
+            "applicationProtocols"?: string;
+            /**
+             * The destination_port value used by a filter chain's match condition.
+             */
+            "destinationPort"?: number;
+            /**
+             * The name of a specific filter to apply the patch to.
+             */
+            "filter"?: {
+              /**
+               * The filter name to match on.
+               */
+              "name"?: string;
+              "subFilter"?: {
+                /**
+                 * The filter name to match on.
+                 */
+                "name"?: string;
+              };
+            };
+            /**
+             * The name assigned to the filter chain.
+             */
+            "name"?: string;
+            /**
+             * The SNI value used by a filter chain's match condition.
+             */
+            "sni"?: string;
+            /**
+             * Applies only to `SIDECAR_INBOUND` context.
+             */
+            "transportProtocol"?: string;
+          };
+          /**
+           * Match a specific listener by its name.
+           */
+          "name"?: string;
+          "portName"?: string;
+          "portNumber"?: number;
+        };
+        /**
+         * Match on properties associated with a proxy.
+         */
+        "proxy"?: {
+          "metadata"?: {
+            [key: string]: string;
+          };
+          "proxyVersion"?: string;
+        };
+        /**
+         * Match on envoy HTTP route configuration attributes.
+         */
+        "routeConfiguration"?: {
+          "gateway"?: string;
+          /**
+           * Route configuration name to match on.
+           */
+          "name"?: string;
+          /**
+           * Applicable only for GATEWAY context.
+           */
+          "portName"?: string;
+          "portNumber"?: number;
+          "vhost"?: {
+            "name"?: string;
+            /**
+             * Match a specific route within the virtual host.
+             */
+            "route"?: {
+              /**
+               * Match a route with specific action type.
+               */
+              "action"?: "ANY" | "ROUTE" | "REDIRECT" | "DIRECT_RESPONSE";
+              "name"?: string;
+            };
+          };
+        };
+      });
       /**
        * The patch to apply along with the operation.
        */
