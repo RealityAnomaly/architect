@@ -1,6 +1,6 @@
 import { Component, ComponentArgs } from './component';
 import { Target } from './target';
-import { Condition, constructor, DeepPartial, DeepValue, Lazy, LazyAuto, _LazyProxy } from './utils';
+import { Condition, constructor, DeepPartial, Lazy, LazyAuto, _LazyProxy, DeepLazySpec } from './utils';
 
 type Extract<T extends Component> = T extends Component<infer _R, infer U> ? U : never;
 
@@ -24,7 +24,7 @@ export class ConfigurationContext {
 
   public enable<T extends Component>(
     token: constructor<T>,
-    config?: DeepValue<DeepPartial<Extract<T>>>,
+    config?: DeepLazySpec<DeepPartial<Extract<T>>>,
     name?: string,
     weight?: number,
     force?: boolean,
@@ -35,7 +35,7 @@ export class ConfigurationContext {
 
   public set<T extends Component>(
     token: constructor<T>,
-    value: DeepValue<DeepPartial<Extract<T>>>,
+    value: DeepLazySpec<DeepPartial<Extract<T>>>,
     weight?: number,
     force?: boolean,
     condition = this.enabler,

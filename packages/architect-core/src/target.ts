@@ -5,7 +5,7 @@ import _ from 'lodash';
 import { Component } from './component';
 import { Registry } from './registry';
 import { ResolvedComponent, Result } from './result';
-import { asyncFilter, Condition, constructor, DeepPartial, DeepValue } from './utils';
+import { asyncFilter, Condition, constructor, DeepLazySpec, DeepPartial } from './utils';
 
 type Extract<T extends Component> = T extends Component<infer _R, infer U> ? U : never;
 
@@ -31,8 +31,8 @@ export abstract class BaseFact<T = unknown> {
   };
 };
 
-/*
- * Context for constructing objects.
+/**
+ * Represents a location to which rendered configuration or objects is applied against
  */
 export class Target {
   public static async collectFolder(input: string): Promise<Record<string, Target>> {
@@ -71,8 +71,7 @@ export class Target {
     // Aggregate all enabled components
     const values: Component[] = await asyncFilter(
       Object.values(this.components.data),
-      // TODO: somehow make the null check & .$resolve() a single operation
-      async (c: Component) => ((c.props.enable !== undefined && await c.props.enable.$resolve() === true)),
+      async (c: Component) => await c.props.enable.$resolve() === true,
     );
 
     const results: Record<string, Partial<ResolvedComponent>> = Object.fromEntries(values.map((v): [string, Partial<ResolvedComponent>] => {
@@ -80,8 +79,9 @@ export class Target {
     }));
 
     // Ensure component inter-requirements are met
-    values.forEach((v) => {
-      results[v.rid].dependencies = v.requirements.reduce<Component[]>((prev, cur) => {
+    await Promise.all(values.map(async (v) => {
+      const requirements = await v.getRequirements();
+      results[v.rid].dependencies = requirements.reduce<Component[]>((prev, cur) => {
         const matches = values.filter(v2 => cur.match(v2));
         if ((matches.length <= 0) && params.requirements !== false) {
           throw Error(`Component ${v.toString()}\nMatcher ${cur.toString()} failed`);
@@ -89,7 +89,7 @@ export class Target {
 
         return prev.concat(matches);
       }, []);
-    });
+    }));
 
     // Execute component build async
     await Promise.all(values.map(async (v): Promise<void> => {
@@ -111,7 +111,7 @@ export class Target {
    */
   public enable<T extends Component>(
     token: constructor<T>,
-    config?: DeepValue<DeepPartial<Extract<T>>>,
+    config?: DeepLazySpec<DeepPartial<Extract<T>>>,
     name?: string,
     weight?: number,
     force?: boolean,

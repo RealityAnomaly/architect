@@ -22,12 +22,26 @@ export abstract class Component<
   TArgs extends ComponentArgs = ComponentArgs,
   TParent extends Component = any
 > implements Named {
+  public static ref<T extends Component>(input: T): ComponentReference<T> {
+    return {
+      name: input.name,
+      context: input.context,
+    };
+  };
+
   protected readonly target: Target;
 
   protected readonly children: Component[] = [];
   protected readonly parent?: TParent;
 
+  /**
+   * The name of the component, unique within a context
+   */
   public readonly name: string;
+
+  /**
+   * The configuration model of the component as a {LazyAuto}
+   */
   public props: LazyAuto<TArgs>;
 
   constructor(target: Target, props: TArgs = {} as TArgs, name?: string, parent?: TParent) {
@@ -69,6 +83,13 @@ export abstract class Component<
   };
 
   /**
+   * Returns the context of this component
+   */
+  public get context(): Record<string, any> {
+    return {};
+  };
+
+  /**
    * Returns the capabilities that this component declares
    */
   public get capabilities(): Capability<any>[] {
@@ -78,7 +99,7 @@ export abstract class Component<
   /**
    * Returns the component types required by this component
    */
-  public get requirements(): IComponentMatcher[] {
+  public async getRequirements(): Promise<IComponentMatcher[]> {
     // if we have a parent, add an automatic requirement on it
     if (this.parent !== undefined) {
       return [new ComponentInstanceMatcher(this.parent)];
@@ -102,6 +123,31 @@ export abstract class Component<
   };
 
   /**
+   * Creates a reference to a component with the same context
+   */
+  protected localRef<T extends Component>(type: constructor<T>, name?: string): ComponentReference<T> {
+    if (name === undefined) {
+      name = Reflect.getMetadata('name', type);
+    };
+
+    if (name === undefined) {
+      throw Error(`localRef(${type.name}): neither the name metadata attribute nor the name parameter were set`);
+    };
+
+    return {
+      name: name,
+      context: this.context,
+    };
+  };
+
+  /**
+   * Sets the default values for this component's properties. Should be called in the configure() function, or alternatively init()
+   */
+  protected setDefaults(defaults: Partial<TArgs>) {
+    this.props.$setFallback(defaults);
+  };
+
+  /**
    * Constructs this component, setting properties on the Result object.
    */
   public async build(result: TResult = {} as any): Promise<TResult> {
@@ -114,6 +160,7 @@ export abstract class Component<
 
   /**
    * Invoked by the target during the build phase. Sets lazy properties on other components.
+   * Do not resolve configuration in this function, use references instead.
    */
   public configure(_context: ConfigurationContext) {
     this.children.forEach(c => c.configure);
@@ -158,6 +205,11 @@ export abstract class Component<
   };
 };
 
+export interface ComponentReference<_T extends Component> {
+  name: string;
+  context: Record<string, any>;
+};
+
 /**
  * Defines an object that matches one or more components according to a defined ruleset
  */
@@ -194,5 +246,20 @@ export class ComponentInstanceMatcher implements IComponentMatcher {
 
   toString(): string {
     return `${this.constructor.name}(${this.instance.rid})`;
+  }
+};
+
+export class ComponentReferenceMatcher<T extends Component> implements IComponentMatcher {
+  private readonly ref: ComponentReference<T>;
+  constructor(ref: ComponentReference<T>) {
+    this.ref = ref;
+  };
+
+  match(input: Component): boolean {
+    return input.name === this.ref.name && _.isEqual(input.context, this.ref.context);
+  };
+
+  toString(): string {
+    return `${this.constructor.name}(${this.ref.name}(${this.ref.context}))`;
   }
 };
