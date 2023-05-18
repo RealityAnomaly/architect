@@ -4648,7 +4648,7 @@ __metadata:
     fast-glob: ^3.2.12
     fast-safe-stringify: ^2.1.1
     js-yaml: 4.1.0
-    kubernetes-models: ^4.2.1
+    kubernetes-models: ^4.3.0
     lodash: ^4.17.21
     npm-check-updates: ^16.10.12
     projen: ^0.71.52
@@ -11651,18 +11651,6 @@ __metadata:
   version: 2.0.6
   resolution: "klona@npm:2.0.6"
   checksum: ac9ee3732e42b96feb67faae4d27cf49494e8a3bf3fa7115ce242fe04786788e0aff4741a07a45a2462e2079aa983d73d38519c85d65b70ef11447bbc3c58ce7
-  languageName: node
-  linkType: hard
-
-"kubernetes-models@npm:^4.2.1":
-  version: 4.2.1
-  resolution: "kubernetes-models@npm:4.2.1"
-  dependencies:
-    "@kubernetes-models/apimachinery": ^1.1.1
-    "@kubernetes-models/base": ^4.0.1
-    "@kubernetes-models/validate": ^3.0.1
-    tslib: ^2.4.0
-  checksum: ddf3dcbbd2fb5d1ac4edd5c64694dbc69af6ba14bcf61393a7169cd66122fe556bbe70f4cffb3e5288d952d512604e80936a93f233bc62a3f1f02b72256fcf97
   languageName: node
   linkType: hard
 

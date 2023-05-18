@@ -1,3 +1,5 @@
+import * as fs from 'node:fs/promises';
+import path from 'node:path';
 import _ from 'lodash';
 
 import { Component } from './component';
@@ -33,6 +35,26 @@ export abstract class BaseFact<T = unknown> {
  * Context for constructing objects.
  */
 export class Target {
+  public static async collectFolder(input: string): Promise<Record<string, Target>> {
+    const result = await fs.readdir(input);
+
+    // attempt to import every result as a Target instance
+    let results = await Promise.all(result.map(async (k): Promise<[string, Target | null]> => {
+      if (k.endsWith('.d.ts')) return [k, null]; // ignore type definitions
+
+      const stripped = k.replace(/\.[^/.]+$/, ''); // strip extension
+      const file = path.join(input, stripped);
+
+      const imported = await import(file);
+      return [stripped, imported.default];
+    }));
+
+    const targets = {} as Record<string, Target>;
+    results = results.filter(([_k, v]) => v !== null);
+    results.forEach(([k, v]) => targets[k] = v as Target);
+    return targets;
+  };
+
   public readonly params: TargetParams;
 
   public readonly components = new Registry([this]);

@@ -1,6 +1,7 @@
+import * as fs from 'node:fs/promises';
 import path from 'path';
 import * as commander from 'commander';
-import { Sequencer } from '../sequencer';
+import { Target, TargetResolveParams } from '../target';
 
 export class App {
   private readonly dir: string;
@@ -15,12 +16,19 @@ export class App {
   };
 
   private async compile(options: any) {
-    const sequencer = new Sequencer();
-    await sequencer.loadFolder(path.join(this.dir, 'targets'));
-    await sequencer.run(options.output, {
+    const output = options.output;
+    const targets = await Target.collectFolder(path.join(this.dir, 'targets'));
+    const params: TargetResolveParams = {
       requirements: options.requirements,
       validate: options.validate,
-    });
+    };
+
+    await fs.rm(output, { recursive: true, force: true });
+    await fs.mkdir(output, { recursive: true });
+    await Promise.all(Object.entries(targets).map(async ([k, v]): Promise<void> => {
+      const resolved = await v.resolve(params);
+      await resolved.write(path.join(output, k));
+    }));
   };
 
   protected build(): commander.Command {

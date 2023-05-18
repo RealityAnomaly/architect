@@ -128,7 +128,7 @@ export abstract class Component<
   /**
    * Passthrough function that performs postprocessing on this component's build outputs
    */
-  public postBuild(data: any): any {
+  public async postBuild(data: any): Promise<any> {
     return data;
   };
 
