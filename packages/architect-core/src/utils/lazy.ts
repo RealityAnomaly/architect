@@ -18,18 +18,26 @@ export interface _LazyProxy<T> {
   $__path__: ValuePath;
 
   /**
+   * The result of the last evaluation attempt
+   */
+  $__cachedResult__: T;
+
+  /**
+   * The fallback value to use if the value is undefined
+   */
+  $__fallback__?: Partial<T>;
+
+  /**
     * Resolves the entire configuration tree and returns the result
     * @param fallback Default value to be merged if the value does not exist
     * @returns The result of the evaluation
     */
-  $resolve(fallback?: Partial<T> | null, depth?: number): Promise<T>;
+  $resolve(fallback?: Partial<T>, depth?: number): Promise<T>;
 
-  // /**
-  //   * Creates a reference within the context of this object
-  //   * @param fallback Fallback value if the result is undefined
-  //   * @returns A Resolver function containing the result
-  //   */
-  // $ref<K>(func: Ref<T, K>, fallback?: K): Resolver<K>;
+  /**
+   * Transforms this proxy using the specified function and wraps it in a Resolver<T>
+   */
+  $transform<TResult>(func: (value: T) => TResult): Resolver<TResult>;
 
   /**
     * Sets the value of this object recursively, from a value or another Lazy<U>
@@ -40,6 +48,11 @@ export interface _LazyProxy<T> {
     * Note that conditions that reference the value of this object will cause infinite recursion.
     */
   $set(value: DeepLazySpec<DeepPartial<T>>, weight?: number, force?: boolean, condition?: Condition): void;
+
+  /**
+   * Sets the fallback value for this object
+   */
+  $setFallback(value: Partial<T>): void;
 };
 
 class LazyProxy {
@@ -47,11 +60,17 @@ class LazyProxy {
     const internal = {
       $__root__: root,
       $__path__: path,
+      $__cachedResult__: undefined,
 
-      $resolve: async (fallback?: Partial<T> | undefined, depth: number = 0) => {
+      $resolve: async (fallback?: Partial<T>, depth: number = 0) => {
         depth += 1;
         if (depth > MAX_EVALUATION_DEPTH) {
           throw new Error(`Maximum evaluation depth of ${MAX_EVALUATION_DEPTH} exceeded`);
+        };
+
+        // use the persistent fallback value, if present
+        if (fallback === undefined && internal.$__fallback__ !== undefined) {
+          fallback = internal.$__fallback__;
         };
 
         let result: any;
@@ -73,11 +92,23 @@ class LazyProxy {
           };
         };
 
+        internal.$__cachedResult__ = result;
         return result;
+      },
+
+      $transform<TResult>(func: (value: T) => TResult): Resolver<TResult> {
+        return (async () => {
+          const result = await internal.$resolve();
+          return func(result);
+        });
       },
 
       $set(value, weight?, force?, condition?) {
         root.set(path, value, weight, force, condition);
+      },
+
+      $setFallback(value) {
+        internal.$__fallback__ = value;
       },
     } as _LazyProxy<T>;
 
