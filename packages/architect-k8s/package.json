@@ -43,7 +43,7 @@
     "fast-glob": "^3.2.12",
     "fast-safe-stringify": "^2.1.1",
     "js-yaml": "4.1.0",
-    "kubernetes-models": "^4.2.1",
+    "kubernetes-models": "^4.3.0",
     "lodash": "^4.17.21",
     "projen": "^0.71.52",
     "reflect-metadata": "^0.1.13",
