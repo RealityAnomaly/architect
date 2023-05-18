@@ -15,6 +15,10 @@ export interface KubeComponentGenericResources {
   result?: Resource[];
 };
 
+export interface KubeComponentContext {
+  namespace: string;
+};
+
 export abstract class KubeComponent<
   TResult extends object = KubeComponentGenericResources,
   TArgs extends KubeComponentArgs = KubeComponentArgs,
@@ -31,16 +35,22 @@ export abstract class KubeComponent<
     super(target, props, name, parent);
   };
 
+  public get context(): KubeComponentContext {
+    return {
+      namespace: this.namespace,
+    };
+  };
+
   /**
    * Returns the default set of requirements.
    */
-  public get requirements(): IComponentMatcher[] {
+  public async getRequirements(): Promise<IComponentMatcher[]> {
     const def: IComponentMatcher[] = this.standardRequirements ? [
       new CapabilityMatcher(CNICapability),
       new CapabilityMatcher(DNSCapability),
     ] : [];
 
-    return super.requirements.concat(def, [
+    return (await super.getRequirements()).concat(def, [
       new ComponentMatcher(KubePreludeComponent),
     ]);
   };
@@ -67,15 +77,23 @@ export abstract class KubeComponent<
     // run post-build resource fixup at the top level
     let resources = normaliseResources(data);
 
+    // TODO: a bit of a hack... might want to improve $resolve logic to add caching
+    // we need to not just resolve here, because we might have default values that were added in the build phase
+    let resolved = this.props.$__cachedResult__;
+    if (resolved === undefined) {
+      resolved = await this.props.$resolve();
+    };
+
     // adds the metadata ConfigMap
-    const resolved = await this.props.$resolve();
     const metadata = new api.v1.ConfigMap({
       metadata: {
         name: `${this.name}-metadata`,
       },
       data: {
-        props: JSON.stringify(resolved, null, 2),
+        name: this.name,
         uuid: this.uuid,
+        context: JSON.stringify(this.context),
+        config: JSON.stringify(resolved, null, 2),
       },
     });
     resources.push(metadata);
@@ -145,7 +163,7 @@ export class KubePreludeComponent extends KubeComponent {
     this.resources.push(...items);
   };
 
-  public get requirements(): IComponentMatcher[] {
+  public async getRequirements(): Promise<IComponentMatcher[]> {
     return [];
   };
 };
