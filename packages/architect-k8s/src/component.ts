@@ -1,4 +1,5 @@
 import { CapabilityMatcher, Component, ComponentArgs, ComponentMatcher, IComponentMatcher, Target } from '@vertex115/architect-core/src';
+import * as api from 'kubernetes-models';
 import _ from 'lodash';
 import { CNICapability, DNSCapability } from './capabilities';
 
@@ -62,9 +63,23 @@ export abstract class KubeComponent<
     return result;
   };
 
-  public postBuild(data: any) {
+  public async postBuild(data: any) {
     // run post-build resource fixup at the top level
     let resources = normaliseResources(data);
+
+    // adds the metadata ConfigMap
+    const resolved = await this.props.$resolve();
+    const metadata = new api.v1.ConfigMap({
+      metadata: {
+        name: `${this.name}-metadata`,
+      },
+      data: {
+        props: JSON.stringify(resolved, null, 2),
+        uuid: this.uuid,
+      },
+    });
+    resources.push(metadata);
+
     resources = resources.map(obj => {
       obj = fixupResource(obj);
       return obj;
