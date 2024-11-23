@@ -2,7 +2,6 @@ export * from './components';
 export * from './cli';
 export { Helm } from './helm';
 export { Kustomize } from './kustomize';
-export * from './projen';
 export { GVK } from './types';
 export * from './utils';
 export * from './capabilities';

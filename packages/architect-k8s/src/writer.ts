@@ -1,7 +1,8 @@
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
-import { Result, Writer } from '@vertex115/architect-core/src';
+import { Result, Writer } from '@perdition/architect-core/src';
 import * as yaml from 'js-yaml';
+import { KubeComponentContext } from './component';
 import { Resource, resourceId } from './resource';
 import { KubeTarget, KubeTargetOutputFormat } from './target';
 
@@ -30,13 +31,16 @@ export class KubeWriter implements Writer {
     }));
   };
 
-  private async writePerComponent(result: Result, dir: string) {
-    await Promise.all(Object.entries(result.components).map(async ([k, v]) => {
-      const rd = path.join(dir, k);
+  private async writePerComponent(result: Result, dir: string, flux: boolean = false) {
+    await Promise.all(Object.entries(result.components).map(async ([_, v]) => {
+      const ctx = v.component.context as KubeComponentContext;
+      const rd = path.join(dir, ctx.namespace, v.component.name);
       await fs.rm(rd, { recursive: true, force: true });
       await fs.mkdir(rd, { recursive: true });
 
-      const resources = v.result as Resource[] ?? [];
+      // namespaces are handled separately in flux mode
+      let resources = v.result as Resource[] ?? [];
+      if (flux) resources = resources.filter(r => r.kind !== 'Namespace');
       if (resources.length <= 0) return;
 
       await Promise.all(resources.map(async r => {
@@ -50,7 +54,7 @@ export class KubeWriter implements Writer {
 
   private async writeFluxCD(result: Result, dir: string) {
     // write all the components
-    await this.writePerComponent(result, path.join(dir, 'components'));
+    await this.writePerComponent(result, path.join(dir, 'components'), true);
 
     // write the cluster dir
     const clusterDir = path.join(dir, 'cluster');
@@ -60,6 +64,10 @@ export class KubeWriter implements Writer {
     await Promise.all(Object.values(result.components).map(async (v) => {
       const resource = this.target.flux.componentObject(v, this.target.params.modes.flux!);
       await fs.writeFile(path.join(clusterDir, `${resourceId(resource)}.yaml`), yaml.dump(resource));
+
+      // extract and write any namespaces the component declares to the cluster dir
+      const namespaces = (v.result as Resource[] ?? []).filter(r => r.kind === 'Namespace');
+      await Promise.all(namespaces.map(r => fs.writeFile(path.join(clusterDir, `${resourceId(r)}.yaml`), yaml.dump(r))));
     }));
   };
 

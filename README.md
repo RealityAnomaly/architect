@@ -1,7 +1,7 @@
 # Architect
 
 <p align="center">
-  <img src="https://img.shields.io/npm/v/@vertex115/architect-core" />
+  <img src="https://img.shields.io/npm/v/@perdition/architect-core" />
 </p>
 
 Architect is a framework for constructing very complex structured configuration trees in TypeScript.

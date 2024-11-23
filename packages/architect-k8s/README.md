@@ -1,14 +1,14 @@
 # Kubernetes module for Architect
 
 <p align="center">
-  <img src="https://img.shields.io/npm/v/@vertex115/architect-k8s" />
+  <img src="https://img.shields.io/npm/v/@perdition/architect-k8s" />
 </p>
 
-This is an extension to the [Architect framework](https://github.com/Vertex115/architect) which allows you to define, validate, and deploy Kubernetes resources in TypeScript. It can scale to hundreds of thousand of resources and allows you to manage entire fleets of clusters in a DRY fashion.
+This is an extension to the [Architect framework](https://github.com/realityanomaly/architect) which allows you to define, validate, and deploy Kubernetes resources in TypeScript. It can scale to hundreds of thousand of resources and allows you to manage entire fleets of clusters in a DRY fashion.
 
 `architect-k8s` is currently in Alpha and the **API surface may change without warning** so usage in production is strongly advised against (unless you're crazy, like me).
 
-## Features
+## Current features
 
 - **GitOps support** (FluxCD implemented, ArgoCD planned)
 - **Typed CRDs for in-editor and compile-time validation** - never watch your CI fail again! (Thanks to Tommy Chen ([@tommy351](https://github.com/tommy351)) for their [Kubernetes models](https://github.com/tommy351/kubernetes-models-ts) library)
@@ -16,6 +16,12 @@ This is an extension to the [Architect framework](https://github.com/Vertex115/a
 - **Component system** - define your cluster resources in logical units
   - Declare relationships between resources as dependencies which are respected when applying via FluxCD
   - Highly flexible lazy parameter system, reminiscent of Nix's structured configuration tree, allows components to be highly customisable, and reusable
+
+## Planned features
+
+- **GitOps bootstrapping** - Bootstrap the cluster with a GitOps provider automatically
+- **Direct apply** - apply your changes directly to the cluster
+- **Hybrid apply** - apply your changes via GitOps and watch them happen live with a connection to the target cluster
 
 ## FAQ
 
@@ -39,4 +45,4 @@ This is an extension to the [Architect framework](https://github.com/Vertex115/a
 
 ## Example
 
-Please see the [architect-k8s-template](https://github.com/Vertex115/architect-k8s-template) repository for a starting point and a component example. You can use this repository as a template for your own clusters.
+Please see the [architect-k8s-template](https://github.com/realityanomaly/architect-k8s-template) repository for a starting point and a component example. You can use this repository as a template for your own clusters.

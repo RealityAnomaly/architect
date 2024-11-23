@@ -1,4 +1,4 @@
-import { CapabilityMatcher, Component, ComponentArgs, ComponentMatcher, IComponentMatcher, Target } from '@vertex115/architect-core/src';
+import { CapabilityMatcher, Component, ComponentArgs, ComponentMatcher, IComponentMatcher, Target } from '@perdition/architect-core/src';
 import * as api from 'kubernetes-models';
 import _ from 'lodash';
 import { CNICapability, DNSCapability } from './capabilities';
@@ -36,6 +36,10 @@ export abstract class KubeComponent<
   };
 
   public get context(): KubeComponentContext {
+    if (this.parent !== undefined) {
+      return this.parent.context as KubeComponentContext;
+    };
+
     return {
       namespace: this.namespace,
     };
