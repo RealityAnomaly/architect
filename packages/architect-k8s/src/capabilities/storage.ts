@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { Capability } from '@vertex115/architect-core/src';
+import { Capability } from '@perdition/architect-core/src';
 
 /**
  * Represents an available cluster CSI driver

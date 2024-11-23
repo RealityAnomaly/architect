@@ -3,7 +3,7 @@ import * as fs from 'node:fs/promises';
 import * as os from 'os';
 import * as path from 'path';
 import * as util from 'util';
-import { cache, compositeHash } from '@vertex115/architect-core/src';
+import { cache, compositeHash } from '@perdition/architect-core/src';
 import * as yaml from 'js-yaml';
 
 import { Resource } from '../resource';

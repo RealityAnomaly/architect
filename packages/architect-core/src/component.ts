@@ -1,10 +1,11 @@
 import 'reflect-metadata';
 import _ from 'lodash';
+import objectHash from 'object-hash';
 
 import { Capability } from './capability';
 import { ConfigurationContext } from './config';
 import { Target } from './target';
-import { constructor, Lazy, LazyAuto, Named, setNamed } from './utils';
+import { constructor, DeepPartial, Lazy, LazyAuto, Named, setNamed } from './utils';
 
 export interface ComponentArgs {
   /**
@@ -86,6 +87,10 @@ export abstract class Component<
    * Returns the context of this component
    */
   public get context(): Record<string, any> {
+    if (this.parent !== undefined) {
+      return this.parent.context;
+    };
+
     return {};
   };
 
@@ -143,7 +148,7 @@ export abstract class Component<
   /**
    * Sets the default values for this component's properties. Should be called in the configure() function, or alternatively init()
    */
-  protected setDefaults(defaults: Partial<TArgs>) {
+  protected setDefaults(defaults: DeepPartial<TArgs>) {
     this.props.$setFallback(defaults);
   };
 
@@ -194,7 +199,7 @@ export abstract class Component<
    * Returns this component's short result ID (RID)
    */
   public get rid(): string {
-    return `${this.name}-${this.uuid.slice(0, 7)}`;
+    return `${this.name}-${objectHash(this.context).slice(0, 7)}`;
   };
 
   /**

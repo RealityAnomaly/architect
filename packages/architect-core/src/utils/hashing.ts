@@ -2,7 +2,7 @@ import * as crypto from 'crypto';
 import objectHash from 'object-hash';
 
 /**
- * Returns the composite hash of all objects specified by the parameter.
+ * Given a list of objects, this function hashes them together and returns the hash as a hex digest.
  *
  * @public
  */

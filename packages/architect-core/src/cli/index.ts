@@ -48,3 +48,5 @@ export class App {
     return program;
   };
 };
+
+new App(process.cwd()).run();

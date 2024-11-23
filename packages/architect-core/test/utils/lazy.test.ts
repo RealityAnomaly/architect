@@ -173,7 +173,7 @@ test('weight conflict on atomic property throws error', async () => {
 
   await expect(async () => {
     await lazy.$resolve();
-  }).rejects.toThrowError('conflict: two atomic values with weight 0 at path foo');
+  }).rejects.toThrow('conflict: two atomic values with weight 0 at path foo');
 });
 
 test('internal properties cannot be mutated', async () => {
