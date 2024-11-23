@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { BaseFact } from '@vertex115/architect-core/src';
+import { BaseFact } from '@perdition/architect-core/src';
 import _ from 'lodash';
 import { SemVer } from 'semver';
 

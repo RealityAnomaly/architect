@@ -1,8 +1,11 @@
 {
-  "name": "@vertex115/architect-core",
+  "name": "@perdition/architect-core",
   "repository": {
     "type": "git",
-    "url": "https://github.com/VertexA115/architect.git"
+    "url": "https://github.com/RealityAnomaly/architect.git"
+  },
+  "bin": {
+    "architect": "bin/cli/index.js"
   },
   "scripts": {
     "compile": "tsc --build",
@@ -18,6 +21,7 @@
     "organization": false
   },
   "devDependencies": {
+    "@babel/preset-typescript": "^7.26.0",
     "@typescript-eslint/eslint-plugin": "^5.59.5",
     "@typescript-eslint/parser": "^5.59.5",
     "eslint": "^8.40.0",
@@ -42,12 +46,9 @@
     "@types/uuid": "^9.0.1",
     "appdirsjs": "^1.2.7",
     "commander": "10.0.1",
-    "fast-safe-stringify": "^2.1.1",
     "js-yaml": "^4.1.0",
     "lodash": "^4.17.21",
-    "memfs": "^3.5.1",
     "object-hash": "^3.0.0",
-    "projen": "^0.71.52",
     "reflect-metadata": "^0.1.13",
     "semver": "^7.5.0",
     "tst-reflect": "^0.12.0",

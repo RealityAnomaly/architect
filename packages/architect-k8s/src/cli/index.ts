@@ -1,4 +1,4 @@
-import { App } from '@vertex115/architect-core/src';
+import { App } from '@perdition/architect-core/src';
 import * as commander from 'commander';
 
 export class K8sApp extends App {

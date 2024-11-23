@@ -1,8 +1,8 @@
 {
-  "name": "@vertex115/architect-k8s-crds",
+  "name": "@perdition/architect-k8s-crds",
   "repository": {
     "type": "git",
-    "url": "https://github.com/VertexA115/architect.git"
+    "url": "https://github.com/RealityAnomaly/architect.git"
   },
   "scripts": {
     "compile": "tsc --build",
