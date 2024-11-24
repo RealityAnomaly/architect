@@ -60,7 +60,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "version": "1.0.6-alpha.0",
+  "version": "1.0.7",
   "jest": {
     "testMatch": [
       "<rootDir>/src/**/__tests__/**/*.ts?(x)",
