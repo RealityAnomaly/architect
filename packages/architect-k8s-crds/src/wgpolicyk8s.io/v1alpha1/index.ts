@@ -1,2 +1,2 @@
-export * from "./ClusterPolicyReport";
-export * from "./PolicyReport";
+export * from "./ClusterPolicyReport.js";
+export * from "./PolicyReport.js";

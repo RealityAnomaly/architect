@@ -1,3 +1,3 @@
-export * from "./ImageRepository";
-export * from "./ImagePolicy";
-export * from "./ImageUpdateAutomation";
+export * from "./ImageRepository.js";
+export * from "./ImagePolicy.js";
+export * from "./ImageUpdateAutomation.js";

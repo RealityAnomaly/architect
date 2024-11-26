@@ -1,3 +1,3 @@
-export * from "./PeerAuthentication";
-export * from "./RequestAuthentication";
-export * from "./AuthorizationPolicy";
+export * from "./PeerAuthentication.js";
+export * from "./RequestAuthentication.js";
+export * from "./AuthorizationPolicy.js";

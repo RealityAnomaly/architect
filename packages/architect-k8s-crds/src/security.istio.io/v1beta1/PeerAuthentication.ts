@@ -1,101 +1,7 @@
 import { IObjectMeta } from "@kubernetes-models/apimachinery/apis/meta/v1/ObjectMeta";
-import { addSchema } from "@kubernetes-models/apimachinery/_schemas/IoK8sApimachineryPkgApisMetaV1ObjectMeta";
-import { Model, setSchema, ModelData, createTypeMetaGuard } from "@kubernetes-models/base";
-import { register } from "@kubernetes-models/validate";
-
-const schemaId = "security.istio.io.v1beta1.PeerAuthentication";
-const schema = {
-  "type": "object",
-  "properties": {
-    "spec": {
-      "properties": {
-        "mtls": {
-          "properties": {
-            "mode": {
-              "enum": [
-                "UNSET",
-                "DISABLE",
-                "PERMISSIVE",
-                "STRICT"
-              ],
-              "type": "string",
-              "nullable": true
-            }
-          },
-          "type": "object",
-          "nullable": true
-        },
-        "portLevelMtls": {
-          "additionalProperties": {
-            "properties": {
-              "mode": {
-                "enum": [
-                  "UNSET",
-                  "DISABLE",
-                  "PERMISSIVE",
-                  "STRICT"
-                ],
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "type": "object"
-          },
-          "type": "object",
-          "properties": {},
-          "nullable": true
-        },
-        "selector": {
-          "properties": {
-            "matchLabels": {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "type": "object",
-              "properties": {},
-              "nullable": true
-            }
-          },
-          "type": "object",
-          "nullable": true
-        }
-      },
-      "type": "object",
-      "nullable": true
-    },
-    "status": {
-      "type": "object",
-      "properties": {},
-      "nullable": true
-    },
-    "apiVersion": {
-      "type": "string",
-      "enum": [
-        "security.istio.io/v1beta1"
-      ]
-    },
-    "kind": {
-      "type": "string",
-      "enum": [
-        "PeerAuthentication"
-      ]
-    },
-    "metadata": {
-      "oneOf": [
-        {
-          "$ref": "io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta#"
-        },
-        {
-          "type": "null"
-        }
-      ]
-    }
-  },
-  "required": [
-    "apiVersion",
-    "kind"
-  ]
-};
+import { Model, ModelData, setValidateFunc, createTypeMetaGuard } from "@kubernetes-models/base";
+import { ValidateFunc } from "@kubernetes-models/validate";
+import { validate } from "../../_schemas/SecurityIstioIoV1beta1PeerAuthentication.js";
 
 export interface IPeerAuthentication {
   /**
@@ -159,7 +65,4 @@ constructor(data?: ModelData<IPeerAuthentication>) {
 }
 
 
-setSchema(PeerAuthentication, schemaId, () => {
-  addSchema();
-  register(schemaId, schema);
-});
+setValidateFunc(PeerAuthentication, validate as ValidateFunc<IPeerAuthentication>);

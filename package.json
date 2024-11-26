@@ -2,10 +2,11 @@
   "name": "root",
   "private": true,
   "devDependencies": {
-    "lerna": "^6.6.2"
+    "lerna": "^8.1.9"
   },
   "workspaces": [
     "packages/*",
     "website"
-  ]
+  ],
+  "packageManager": "yarn@4.5.3"
 }

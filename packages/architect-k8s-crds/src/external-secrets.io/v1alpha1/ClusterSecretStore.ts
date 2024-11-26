@@ -1,1386 +1,25 @@
 import { IObjectMeta } from "@kubernetes-models/apimachinery/apis/meta/v1/ObjectMeta";
-import { addSchema } from "@kubernetes-models/apimachinery/_schemas/IoK8sApimachineryPkgApisMetaV1ObjectMeta";
-import { Model, setSchema, ModelData, createTypeMetaGuard } from "@kubernetes-models/base";
-import { register } from "@kubernetes-models/validate";
-
-const schemaId = "external-secrets.io.v1alpha1.ClusterSecretStore";
-const schema = {
-  "type": "object",
-  "properties": {
-    "apiVersion": {
-      "type": "string",
-      "enum": [
-        "external-secrets.io/v1alpha1"
-      ]
-    },
-    "kind": {
-      "type": "string",
-      "enum": [
-        "ClusterSecretStore"
-      ]
-    },
-    "metadata": {
-      "oneOf": [
-        {
-          "$ref": "io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta#"
-        },
-        {
-          "type": "null"
-        }
-      ]
-    },
-    "spec": {
-      "properties": {
-        "controller": {
-          "type": "string",
-          "nullable": true
-        },
-        "provider": {
-          "maxProperties": 1,
-          "minProperties": 1,
-          "properties": {
-            "akeyless": {
-              "properties": {
-                "akeylessGWApiURL": {
-                  "type": "string"
-                },
-                "authSecretRef": {
-                  "properties": {
-                    "secretRef": {
-                      "properties": {
-                        "accessID": {
-                          "properties": {
-                            "key": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "name": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "namespace": {
-                              "type": "string",
-                              "nullable": true
-                            }
-                          },
-                          "type": "object",
-                          "nullable": true
-                        },
-                        "accessType": {
-                          "properties": {
-                            "key": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "name": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "namespace": {
-                              "type": "string",
-                              "nullable": true
-                            }
-                          },
-                          "type": "object",
-                          "nullable": true
-                        },
-                        "accessTypeParam": {
-                          "properties": {
-                            "key": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "name": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "namespace": {
-                              "type": "string",
-                              "nullable": true
-                            }
-                          },
-                          "type": "object",
-                          "nullable": true
-                        }
-                      },
-                      "type": "object"
-                    }
-                  },
-                  "required": [
-                    "secretRef"
-                  ],
-                  "type": "object"
-                }
-              },
-              "required": [
-                "akeylessGWApiURL",
-                "authSecretRef"
-              ],
-              "type": "object",
-              "nullable": true
-            },
-            "alibaba": {
-              "properties": {
-                "auth": {
-                  "properties": {
-                    "secretRef": {
-                      "properties": {
-                        "accessKeyIDSecretRef": {
-                          "properties": {
-                            "key": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "name": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "namespace": {
-                              "type": "string",
-                              "nullable": true
-                            }
-                          },
-                          "type": "object"
-                        },
-                        "accessKeySecretSecretRef": {
-                          "properties": {
-                            "key": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "name": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "namespace": {
-                              "type": "string",
-                              "nullable": true
-                            }
-                          },
-                          "type": "object"
-                        }
-                      },
-                      "required": [
-                        "accessKeyIDSecretRef",
-                        "accessKeySecretSecretRef"
-                      ],
-                      "type": "object"
-                    }
-                  },
-                  "required": [
-                    "secretRef"
-                  ],
-                  "type": "object"
-                },
-                "endpoint": {
-                  "type": "string",
-                  "nullable": true
-                },
-                "regionID": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "auth",
-                "regionID"
-              ],
-              "type": "object",
-              "nullable": true
-            },
-            "aws": {
-              "properties": {
-                "auth": {
-                  "properties": {
-                    "jwt": {
-                      "properties": {
-                        "serviceAccountRef": {
-                          "properties": {
-                            "name": {
-                              "type": "string"
-                            },
-                            "namespace": {
-                              "type": "string",
-                              "nullable": true
-                            }
-                          },
-                          "required": [
-                            "name"
-                          ],
-                          "type": "object",
-                          "nullable": true
-                        }
-                      },
-                      "type": "object",
-                      "nullable": true
-                    },
-                    "secretRef": {
-                      "properties": {
-                        "accessKeyIDSecretRef": {
-                          "properties": {
-                            "key": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "name": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "namespace": {
-                              "type": "string",
-                              "nullable": true
-                            }
-                          },
-                          "type": "object",
-                          "nullable": true
-                        },
-                        "secretAccessKeySecretRef": {
-                          "properties": {
-                            "key": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "name": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "namespace": {
-                              "type": "string",
-                              "nullable": true
-                            }
-                          },
-                          "type": "object",
-                          "nullable": true
-                        }
-                      },
-                      "type": "object",
-                      "nullable": true
-                    }
-                  },
-                  "type": "object",
-                  "nullable": true
-                },
-                "region": {
-                  "type": "string"
-                },
-                "role": {
-                  "type": "string",
-                  "nullable": true
-                },
-                "service": {
-                  "enum": [
-                    "SecretsManager",
-                    "ParameterStore"
-                  ],
-                  "type": "string"
-                }
-              },
-              "required": [
-                "region",
-                "service"
-              ],
-              "type": "object",
-              "nullable": true
-            },
-            "azurekv": {
-              "properties": {
-                "authSecretRef": {
-                  "properties": {
-                    "clientId": {
-                      "properties": {
-                        "key": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "name": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "namespace": {
-                          "type": "string",
-                          "nullable": true
-                        }
-                      },
-                      "type": "object",
-                      "nullable": true
-                    },
-                    "clientSecret": {
-                      "properties": {
-                        "key": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "name": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "namespace": {
-                          "type": "string",
-                          "nullable": true
-                        }
-                      },
-                      "type": "object",
-                      "nullable": true
-                    }
-                  },
-                  "type": "object",
-                  "nullable": true
-                },
-                "authType": {
-                  "default": "ServicePrincipal",
-                  "enum": [
-                    "ServicePrincipal",
-                    "ManagedIdentity",
-                    "WorkloadIdentity"
-                  ],
-                  "type": "string",
-                  "nullable": true
-                },
-                "identityId": {
-                  "type": "string",
-                  "nullable": true
-                },
-                "serviceAccountRef": {
-                  "properties": {
-                    "name": {
-                      "type": "string"
-                    },
-                    "namespace": {
-                      "type": "string",
-                      "nullable": true
-                    }
-                  },
-                  "required": [
-                    "name"
-                  ],
-                  "type": "object",
-                  "nullable": true
-                },
-                "tenantId": {
-                  "type": "string",
-                  "nullable": true
-                },
-                "vaultUrl": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "vaultUrl"
-              ],
-              "type": "object",
-              "nullable": true
-            },
-            "fake": {
-              "properties": {
-                "data": {
-                  "items": {
-                    "properties": {
-                      "key": {
-                        "type": "string"
-                      },
-                      "value": {
-                        "type": "string",
-                        "nullable": true
-                      },
-                      "valueMap": {
-                        "additionalProperties": {
-                          "type": "string"
-                        },
-                        "type": "object",
-                        "properties": {},
-                        "nullable": true
-                      },
-                      "version": {
-                        "type": "string",
-                        "nullable": true
-                      }
-                    },
-                    "required": [
-                      "key"
-                    ],
-                    "type": "object"
-                  },
-                  "type": "array"
-                }
-              },
-              "required": [
-                "data"
-              ],
-              "type": "object",
-              "nullable": true
-            },
-            "gcpsm": {
-              "properties": {
-                "auth": {
-                  "properties": {
-                    "secretRef": {
-                      "properties": {
-                        "secretAccessKeySecretRef": {
-                          "properties": {
-                            "key": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "name": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "namespace": {
-                              "type": "string",
-                              "nullable": true
-                            }
-                          },
-                          "type": "object",
-                          "nullable": true
-                        }
-                      },
-                      "type": "object",
-                      "nullable": true
-                    },
-                    "workloadIdentity": {
-                      "properties": {
-                        "clusterLocation": {
-                          "type": "string"
-                        },
-                        "clusterName": {
-                          "type": "string"
-                        },
-                        "clusterProjectID": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "serviceAccountRef": {
-                          "properties": {
-                            "name": {
-                              "type": "string"
-                            },
-                            "namespace": {
-                              "type": "string",
-                              "nullable": true
-                            }
-                          },
-                          "required": [
-                            "name"
-                          ],
-                          "type": "object"
-                        }
-                      },
-                      "required": [
-                        "clusterLocation",
-                        "clusterName",
-                        "serviceAccountRef"
-                      ],
-                      "type": "object",
-                      "nullable": true
-                    }
-                  },
-                  "type": "object",
-                  "nullable": true
-                },
-                "projectID": {
-                  "type": "string",
-                  "nullable": true
-                }
-              },
-              "type": "object",
-              "nullable": true
-            },
-            "gitlab": {
-              "properties": {
-                "auth": {
-                  "properties": {
-                    "SecretRef": {
-                      "properties": {
-                        "accessToken": {
-                          "properties": {
-                            "key": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "name": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "namespace": {
-                              "type": "string",
-                              "nullable": true
-                            }
-                          },
-                          "type": "object",
-                          "nullable": true
-                        }
-                      },
-                      "type": "object"
-                    }
-                  },
-                  "required": [
-                    "SecretRef"
-                  ],
-                  "type": "object"
-                },
-                "projectID": {
-                  "type": "string",
-                  "nullable": true
-                },
-                "url": {
-                  "type": "string",
-                  "nullable": true
-                }
-              },
-              "required": [
-                "auth"
-              ],
-              "type": "object",
-              "nullable": true
-            },
-            "ibm": {
-              "properties": {
-                "auth": {
-                  "properties": {
-                    "secretRef": {
-                      "properties": {
-                        "secretApiKeySecretRef": {
-                          "properties": {
-                            "key": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "name": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "namespace": {
-                              "type": "string",
-                              "nullable": true
-                            }
-                          },
-                          "type": "object",
-                          "nullable": true
-                        }
-                      },
-                      "type": "object"
-                    }
-                  },
-                  "required": [
-                    "secretRef"
-                  ],
-                  "type": "object"
-                },
-                "serviceUrl": {
-                  "type": "string",
-                  "nullable": true
-                }
-              },
-              "required": [
-                "auth"
-              ],
-              "type": "object",
-              "nullable": true
-            },
-            "kubernetes": {
-              "properties": {
-                "auth": {
-                  "maxProperties": 1,
-                  "minProperties": 1,
-                  "properties": {
-                    "cert": {
-                      "properties": {
-                        "clientCert": {
-                          "properties": {
-                            "key": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "name": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "namespace": {
-                              "type": "string",
-                              "nullable": true
-                            }
-                          },
-                          "type": "object",
-                          "nullable": true
-                        },
-                        "clientKey": {
-                          "properties": {
-                            "key": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "name": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "namespace": {
-                              "type": "string",
-                              "nullable": true
-                            }
-                          },
-                          "type": "object",
-                          "nullable": true
-                        }
-                      },
-                      "type": "object",
-                      "nullable": true
-                    },
-                    "serviceAccount": {
-                      "properties": {
-                        "serviceAccount": {
-                          "properties": {
-                            "name": {
-                              "type": "string"
-                            },
-                            "namespace": {
-                              "type": "string",
-                              "nullable": true
-                            }
-                          },
-                          "required": [
-                            "name"
-                          ],
-                          "type": "object",
-                          "nullable": true
-                        }
-                      },
-                      "type": "object",
-                      "nullable": true
-                    },
-                    "token": {
-                      "properties": {
-                        "bearerToken": {
-                          "properties": {
-                            "key": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "name": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "namespace": {
-                              "type": "string",
-                              "nullable": true
-                            }
-                          },
-                          "type": "object",
-                          "nullable": true
-                        }
-                      },
-                      "type": "object",
-                      "nullable": true
-                    }
-                  },
-                  "type": "object"
-                },
-                "remoteNamespace": {
-                  "default": "default",
-                  "type": "string",
-                  "nullable": true
-                },
-                "server": {
-                  "properties": {
-                    "caBundle": {
-                      "format": "byte",
-                      "type": "string",
-                      "nullable": true
-                    },
-                    "caProvider": {
-                      "properties": {
-                        "key": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "name": {
-                          "type": "string"
-                        },
-                        "namespace": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "type": {
-                          "enum": [
-                            "Secret",
-                            "ConfigMap"
-                          ],
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "name",
-                        "type"
-                      ],
-                      "type": "object",
-                      "nullable": true
-                    },
-                    "url": {
-                      "default": "kubernetes.default",
-                      "type": "string",
-                      "nullable": true
-                    }
-                  },
-                  "type": "object",
-                  "nullable": true
-                }
-              },
-              "required": [
-                "auth"
-              ],
-              "type": "object",
-              "nullable": true
-            },
-            "oracle": {
-              "properties": {
-                "auth": {
-                  "properties": {
-                    "secretRef": {
-                      "properties": {
-                        "fingerprint": {
-                          "properties": {
-                            "key": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "name": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "namespace": {
-                              "type": "string",
-                              "nullable": true
-                            }
-                          },
-                          "type": "object"
-                        },
-                        "privatekey": {
-                          "properties": {
-                            "key": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "name": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "namespace": {
-                              "type": "string",
-                              "nullable": true
-                            }
-                          },
-                          "type": "object"
-                        }
-                      },
-                      "required": [
-                        "fingerprint",
-                        "privatekey"
-                      ],
-                      "type": "object"
-                    },
-                    "tenancy": {
-                      "type": "string"
-                    },
-                    "user": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "secretRef",
-                    "tenancy",
-                    "user"
-                  ],
-                  "type": "object",
-                  "nullable": true
-                },
-                "region": {
-                  "type": "string"
-                },
-                "vault": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "region",
-                "vault"
-              ],
-              "type": "object",
-              "nullable": true
-            },
-            "vault": {
-              "properties": {
-                "auth": {
-                  "properties": {
-                    "appRole": {
-                      "properties": {
-                        "path": {
-                          "default": "approle",
-                          "type": "string"
-                        },
-                        "roleId": {
-                          "type": "string"
-                        },
-                        "secretRef": {
-                          "properties": {
-                            "key": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "name": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "namespace": {
-                              "type": "string",
-                              "nullable": true
-                            }
-                          },
-                          "type": "object"
-                        }
-                      },
-                      "required": [
-                        "path",
-                        "roleId",
-                        "secretRef"
-                      ],
-                      "type": "object",
-                      "nullable": true
-                    },
-                    "cert": {
-                      "properties": {
-                        "clientCert": {
-                          "properties": {
-                            "key": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "name": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "namespace": {
-                              "type": "string",
-                              "nullable": true
-                            }
-                          },
-                          "type": "object",
-                          "nullable": true
-                        },
-                        "secretRef": {
-                          "properties": {
-                            "key": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "name": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "namespace": {
-                              "type": "string",
-                              "nullable": true
-                            }
-                          },
-                          "type": "object",
-                          "nullable": true
-                        }
-                      },
-                      "type": "object",
-                      "nullable": true
-                    },
-                    "jwt": {
-                      "properties": {
-                        "kubernetesServiceAccountToken": {
-                          "properties": {
-                            "audiences": {
-                              "items": {
-                                "type": "string"
-                              },
-                              "type": "array",
-                              "nullable": true
-                            },
-                            "expirationSeconds": {
-                              "format": "int64",
-                              "type": "integer",
-                              "nullable": true
-                            },
-                            "serviceAccountRef": {
-                              "properties": {
-                                "name": {
-                                  "type": "string"
-                                },
-                                "namespace": {
-                                  "type": "string",
-                                  "nullable": true
-                                }
-                              },
-                              "required": [
-                                "name"
-                              ],
-                              "type": "object"
-                            }
-                          },
-                          "required": [
-                            "serviceAccountRef"
-                          ],
-                          "type": "object",
-                          "nullable": true
-                        },
-                        "path": {
-                          "default": "jwt",
-                          "type": "string"
-                        },
-                        "role": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "secretRef": {
-                          "properties": {
-                            "key": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "name": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "namespace": {
-                              "type": "string",
-                              "nullable": true
-                            }
-                          },
-                          "type": "object",
-                          "nullable": true
-                        }
-                      },
-                      "required": [
-                        "path"
-                      ],
-                      "type": "object",
-                      "nullable": true
-                    },
-                    "kubernetes": {
-                      "properties": {
-                        "mountPath": {
-                          "default": "kubernetes",
-                          "type": "string"
-                        },
-                        "role": {
-                          "type": "string"
-                        },
-                        "secretRef": {
-                          "properties": {
-                            "key": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "name": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "namespace": {
-                              "type": "string",
-                              "nullable": true
-                            }
-                          },
-                          "type": "object",
-                          "nullable": true
-                        },
-                        "serviceAccountRef": {
-                          "properties": {
-                            "name": {
-                              "type": "string"
-                            },
-                            "namespace": {
-                              "type": "string",
-                              "nullable": true
-                            }
-                          },
-                          "required": [
-                            "name"
-                          ],
-                          "type": "object",
-                          "nullable": true
-                        }
-                      },
-                      "required": [
-                        "mountPath",
-                        "role"
-                      ],
-                      "type": "object",
-                      "nullable": true
-                    },
-                    "ldap": {
-                      "properties": {
-                        "path": {
-                          "default": "ldap",
-                          "type": "string"
-                        },
-                        "secretRef": {
-                          "properties": {
-                            "key": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "name": {
-                              "type": "string",
-                              "nullable": true
-                            },
-                            "namespace": {
-                              "type": "string",
-                              "nullable": true
-                            }
-                          },
-                          "type": "object",
-                          "nullable": true
-                        },
-                        "username": {
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "path",
-                        "username"
-                      ],
-                      "type": "object",
-                      "nullable": true
-                    },
-                    "tokenSecretRef": {
-                      "properties": {
-                        "key": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "name": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "namespace": {
-                          "type": "string",
-                          "nullable": true
-                        }
-                      },
-                      "type": "object",
-                      "nullable": true
-                    }
-                  },
-                  "type": "object"
-                },
-                "caBundle": {
-                  "format": "byte",
-                  "type": "string",
-                  "nullable": true
-                },
-                "caProvider": {
-                  "properties": {
-                    "key": {
-                      "type": "string",
-                      "nullable": true
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "namespace": {
-                      "type": "string",
-                      "nullable": true
-                    },
-                    "type": {
-                      "enum": [
-                        "Secret",
-                        "ConfigMap"
-                      ],
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "name",
-                    "type"
-                  ],
-                  "type": "object",
-                  "nullable": true
-                },
-                "forwardInconsistent": {
-                  "type": "boolean",
-                  "nullable": true
-                },
-                "namespace": {
-                  "type": "string",
-                  "nullable": true
-                },
-                "path": {
-                  "type": "string",
-                  "nullable": true
-                },
-                "readYourWrites": {
-                  "type": "boolean",
-                  "nullable": true
-                },
-                "server": {
-                  "type": "string"
-                },
-                "version": {
-                  "default": "v2",
-                  "enum": [
-                    "v1",
-                    "v2"
-                  ],
-                  "type": "string",
-                  "nullable": true
-                }
-              },
-              "required": [
-                "auth",
-                "server"
-              ],
-              "type": "object",
-              "nullable": true
-            },
-            "webhook": {
-              "properties": {
-                "body": {
-                  "type": "string",
-                  "nullable": true
-                },
-                "caBundle": {
-                  "format": "byte",
-                  "type": "string",
-                  "nullable": true
-                },
-                "caProvider": {
-                  "properties": {
-                    "key": {
-                      "type": "string",
-                      "nullable": true
-                    },
-                    "name": {
-                      "type": "string"
-                    },
-                    "namespace": {
-                      "type": "string",
-                      "nullable": true
-                    },
-                    "type": {
-                      "enum": [
-                        "Secret",
-                        "ConfigMap"
-                      ],
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "name",
-                    "type"
-                  ],
-                  "type": "object",
-                  "nullable": true
-                },
-                "headers": {
-                  "additionalProperties": {
-                    "type": "string"
-                  },
-                  "type": "object",
-                  "properties": {},
-                  "nullable": true
-                },
-                "method": {
-                  "type": "string",
-                  "nullable": true
-                },
-                "result": {
-                  "properties": {
-                    "jsonPath": {
-                      "type": "string",
-                      "nullable": true
-                    }
-                  },
-                  "type": "object"
-                },
-                "secrets": {
-                  "items": {
-                    "properties": {
-                      "name": {
-                        "type": "string"
-                      },
-                      "secretRef": {
-                        "properties": {
-                          "key": {
-                            "type": "string",
-                            "nullable": true
-                          },
-                          "name": {
-                            "type": "string",
-                            "nullable": true
-                          },
-                          "namespace": {
-                            "type": "string",
-                            "nullable": true
-                          }
-                        },
-                        "type": "object"
-                      }
-                    },
-                    "required": [
-                      "name",
-                      "secretRef"
-                    ],
-                    "type": "object"
-                  },
-                  "type": "array",
-                  "nullable": true
-                },
-                "timeout": {
-                  "type": "string",
-                  "nullable": true
-                },
-                "url": {
-                  "type": "string"
-                }
-              },
-              "required": [
-                "result",
-                "url"
-              ],
-              "type": "object",
-              "nullable": true
-            },
-            "yandexlockbox": {
-              "properties": {
-                "apiEndpoint": {
-                  "type": "string",
-                  "nullable": true
-                },
-                "auth": {
-                  "properties": {
-                    "authorizedKeySecretRef": {
-                      "properties": {
-                        "key": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "name": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "namespace": {
-                          "type": "string",
-                          "nullable": true
-                        }
-                      },
-                      "type": "object",
-                      "nullable": true
-                    }
-                  },
-                  "type": "object"
-                },
-                "caProvider": {
-                  "properties": {
-                    "certSecretRef": {
-                      "properties": {
-                        "key": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "name": {
-                          "type": "string",
-                          "nullable": true
-                        },
-                        "namespace": {
-                          "type": "string",
-                          "nullable": true
-                        }
-                      },
-                      "type": "object",
-                      "nullable": true
-                    }
-                  },
-                  "type": "object",
-                  "nullable": true
-                }
-              },
-              "required": [
-                "auth"
-              ],
-              "type": "object",
-              "nullable": true
-            }
-          },
-          "type": "object"
-        },
-        "retrySettings": {
-          "properties": {
-            "maxRetries": {
-              "format": "int32",
-              "type": "integer",
-              "nullable": true
-            },
-            "retryInterval": {
-              "type": "string",
-              "nullable": true
-            }
-          },
-          "type": "object",
-          "nullable": true
-        }
-      },
-      "required": [
-        "provider"
-      ],
-      "type": "object",
-      "nullable": true
-    },
-    "status": {
-      "properties": {
-        "conditions": {
-          "items": {
-            "properties": {
-              "lastTransitionTime": {
-                "format": "date-time",
-                "type": "string",
-                "nullable": true
-              },
-              "message": {
-                "type": "string",
-                "nullable": true
-              },
-              "reason": {
-                "type": "string",
-                "nullable": true
-              },
-              "status": {
-                "type": "string"
-              },
-              "type": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "status",
-              "type"
-            ],
-            "type": "object"
-          },
-          "type": "array",
-          "nullable": true
-        }
-      },
-      "type": "object",
-      "nullable": true
-    }
-  },
-  "required": [
-    "apiVersion",
-    "kind"
-  ]
-};
+import { Model, ModelData, setValidateFunc, createTypeMetaGuard } from "@kubernetes-models/base";
+import { ValidateFunc } from "@kubernetes-models/validate";
+import { validate } from "../../_schemas/ExternalSecretsIoV1alpha1ClusterSecretStore.js";
 
 /**
  * ClusterSecretStore represents a secure external location for storing secrets, which can be referenced as part of `storeRef` fields.
  */
 export interface IClusterSecretStore {
   /**
-   * APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+   * APIVersion defines the versioned schema of this representation of an object.
+   * Servers should convert recognized schemas to the latest internal value, and
+   * may reject unrecognized values.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
    */
   "apiVersion": "external-secrets.io/v1alpha1";
   /**
-   * Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+   * Kind is a string value representing the REST resource this object represents.
+   * Servers may infer this from the endpoint the client submits requests to.
+   * Cannot be updated.
+   * In CamelCase.
+   * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
    */
   "kind": "ClusterSecretStore";
   "metadata"?: IObjectMeta;
@@ -1389,7 +28,8 @@ export interface IClusterSecretStore {
    */
   "spec"?: {
     /**
-     * Used to select the correct KES controller (think: ingress.ingressClassName) The KES controller is instantiated with a specific controller name and filters ES based on this property
+     * Used to select the correct ESO controller (think: ingress.ingressClassName)
+     * The ESO controller is instantiated with a specific controller name and filters ES based on this property
      */
     "controller"?: string;
     /**
@@ -1409,15 +49,76 @@ export interface IClusterSecretStore {
          */
         "authSecretRef": {
           /**
-           * AkeylessAuthSecretRef AKEYLESS_ACCESS_TYPE_PARAM: AZURE_OBJ_ID OR GCP_AUDIENCE OR ACCESS_KEY OR KUB_CONFIG_NAME.
+           * Kubernetes authenticates with Akeyless by passing the ServiceAccount
+           * token stored in the named Secret resource.
            */
-          "secretRef": {
+          "kubernetesAuth"?: {
+            /**
+             * the Akeyless Kubernetes auth-method access-id
+             */
+            "accessID": string;
+            /**
+             * Kubernetes-auth configuration name in Akeyless-Gateway
+             */
+            "k8sConfName": string;
+            /**
+             * Optional secret field containing a Kubernetes ServiceAccount JWT used
+             * for authenticating with Akeyless. If a name is specified without a key,
+             * `token` is the default. If one is not specified, the one bound to
+             * the controller will be used.
+             */
+            "secretRef"?: {
+              /**
+               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be
+               * defaulted, in others it may be required.
+               */
+              "key"?: string;
+              /**
+               * The name of the Secret resource being referred to.
+               */
+              "name"?: string;
+              /**
+               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+               * to the namespace of the referent.
+               */
+              "namespace"?: string;
+            };
+            /**
+             * Optional service account field containing the name of a kubernetes ServiceAccount.
+             * If the service account is specified, the service account secret token JWT will be used
+             * for authenticating with Akeyless. If the service account selector is not supplied,
+             * the secretRef will be used instead.
+             */
+            "serviceAccountRef"?: {
+              /**
+               * Audience specifies the `aud` claim for the service account token
+               * If the service account uses a well-known annotation for e.g. IRSA or GCP Workload Identity
+               * then this audiences will be appended to the list
+               */
+              "audiences"?: Array<string>;
+              /**
+               * The name of the ServiceAccount resource being referred to.
+               */
+              "name": string;
+              /**
+               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+               * to the namespace of the referent.
+               */
+              "namespace"?: string;
+            };
+          };
+          /**
+           * Reference to a Secret that contains the details
+           * to authenticate with Akeyless.
+           */
+          "secretRef"?: {
             /**
              * The SecretAccessID is used for authentication
              */
             "accessID"?: {
               /**
-               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be defaulted, in others it may be required.
+               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be
+               * defaulted, in others it may be required.
                */
               "key"?: string;
               /**
@@ -1425,16 +126,19 @@ export interface IClusterSecretStore {
                */
               "name"?: string;
               /**
-               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults to the namespace of the referent.
+               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+               * to the namespace of the referent.
                */
               "namespace"?: string;
             };
             /**
-             * A reference to a specific 'key' within a Secret resource, In some instances, `key` is a required field.
+             * A reference to a specific 'key' within a Secret resource,
+             * In some instances, `key` is a required field.
              */
             "accessType"?: {
               /**
-               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be defaulted, in others it may be required.
+               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be
+               * defaulted, in others it may be required.
                */
               "key"?: string;
               /**
@@ -1442,16 +146,19 @@ export interface IClusterSecretStore {
                */
               "name"?: string;
               /**
-               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults to the namespace of the referent.
+               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+               * to the namespace of the referent.
                */
               "namespace"?: string;
             };
             /**
-             * A reference to a specific 'key' within a Secret resource, In some instances, `key` is a required field.
+             * A reference to a specific 'key' within a Secret resource,
+             * In some instances, `key` is a required field.
              */
             "accessTypeParam"?: {
               /**
-               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be defaulted, in others it may be required.
+               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be
+               * defaulted, in others it may be required.
                */
               "key"?: string;
               /**
@@ -1459,11 +166,39 @@ export interface IClusterSecretStore {
                */
               "name"?: string;
               /**
-               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults to the namespace of the referent.
+               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+               * to the namespace of the referent.
                */
               "namespace"?: string;
             };
           };
+        };
+        /**
+         * PEM/base64 encoded CA bundle used to validate Akeyless Gateway certificate. Only used
+         * if the AkeylessGWApiURL URL is using HTTPS protocol. If not set the system root certificates
+         * are used to validate the TLS connection.
+         */
+        "caBundle"?: string;
+        /**
+         * The provider for the CA bundle to use to validate Akeyless Gateway certificate.
+         */
+        "caProvider"?: {
+          /**
+           * The key the value inside of the provider type to use, only used with "Secret" type
+           */
+          "key"?: string;
+          /**
+           * The name of the object located at the provider type.
+           */
+          "name": string;
+          /**
+           * The namespace the Provider type is in.
+           */
+          "namespace"?: string;
+          /**
+           * The type of provider to use such as "Secret", or "ConfigMap".
+           */
+          "type": "Secret" | "ConfigMap";
         };
       };
       /**
@@ -1475,15 +210,25 @@ export interface IClusterSecretStore {
          */
         "auth": {
           /**
+           * Authenticate against Alibaba using RRSA.
+           */
+          "rrsa"?: {
+            "oidcProviderArn": string;
+            "oidcTokenFilePath": string;
+            "roleArn": string;
+            "sessionName": string;
+          };
+          /**
            * AlibabaAuthSecretRef holds secret references for Alibaba credentials.
            */
-          "secretRef": {
+          "secretRef"?: {
             /**
              * The AccessKeyID is used for authentication
              */
             "accessKeyIDSecretRef": {
               /**
-               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be defaulted, in others it may be required.
+               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be
+               * defaulted, in others it may be required.
                */
               "key"?: string;
               /**
@@ -1491,7 +236,8 @@ export interface IClusterSecretStore {
                */
               "name"?: string;
               /**
-               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults to the namespace of the referent.
+               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+               * to the namespace of the referent.
                */
               "namespace"?: string;
             };
@@ -1500,7 +246,8 @@ export interface IClusterSecretStore {
              */
             "accessKeySecretSecretRef": {
               /**
-               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be defaulted, in others it may be required.
+               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be
+               * defaulted, in others it may be required.
                */
               "key"?: string;
               /**
@@ -1508,13 +255,13 @@ export interface IClusterSecretStore {
                */
               "name"?: string;
               /**
-               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults to the namespace of the referent.
+               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+               * to the namespace of the referent.
                */
               "namespace"?: string;
             };
           };
         };
-        "endpoint"?: string;
         /**
          * Alibaba Region to be used for the provider
          */
@@ -1525,7 +272,9 @@ export interface IClusterSecretStore {
        */
       "aws"?: {
         /**
-         * Auth defines the information necessary to authenticate against AWS if not set aws sdk will infer credentials from your environment see: https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html#specifying-credentials
+         * Auth defines the information necessary to authenticate against AWS
+         * if not set aws sdk will infer credentials from your environment
+         * see: https://docs.aws.amazon.com/sdk-for-go/v1/developer-guide/configuring-sdk.html#specifying-credentials
          */
         "auth"?: {
           /**
@@ -1537,17 +286,25 @@ export interface IClusterSecretStore {
              */
             "serviceAccountRef"?: {
               /**
+               * Audience specifies the `aud` claim for the service account token
+               * If the service account uses a well-known annotation for e.g. IRSA or GCP Workload Identity
+               * then this audiences will be appended to the list
+               */
+              "audiences"?: Array<string>;
+              /**
                * The name of the ServiceAccount resource being referred to.
                */
               "name": string;
               /**
-               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults to the namespace of the referent.
+               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+               * to the namespace of the referent.
                */
               "namespace"?: string;
             };
           };
           /**
-           * AWSAuthSecretRef holds secret references for AWS credentials both AccessKeyID and SecretAccessKey must be defined in order to properly authenticate.
+           * AWSAuthSecretRef holds secret references for AWS credentials
+           * both AccessKeyID and SecretAccessKey must be defined in order to properly authenticate.
            */
           "secretRef"?: {
             /**
@@ -1555,7 +312,8 @@ export interface IClusterSecretStore {
              */
             "accessKeyIDSecretRef"?: {
               /**
-               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be defaulted, in others it may be required.
+               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be
+               * defaulted, in others it may be required.
                */
               "key"?: string;
               /**
@@ -1563,7 +321,8 @@ export interface IClusterSecretStore {
                */
               "name"?: string;
               /**
-               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults to the namespace of the referent.
+               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+               * to the namespace of the referent.
                */
               "namespace"?: string;
             };
@@ -1572,7 +331,8 @@ export interface IClusterSecretStore {
              */
             "secretAccessKeySecretRef"?: {
               /**
-               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be defaulted, in others it may be required.
+               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be
+               * defaulted, in others it may be required.
                */
               "key"?: string;
               /**
@@ -1580,7 +340,8 @@ export interface IClusterSecretStore {
                */
               "name"?: string;
               /**
-               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults to the namespace of the referent.
+               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+               * to the namespace of the referent.
                */
               "namespace"?: string;
             };
@@ -1612,7 +373,8 @@ export interface IClusterSecretStore {
            */
           "clientId"?: {
             /**
-             * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be defaulted, in others it may be required.
+             * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be
+             * defaulted, in others it may be required.
              */
             "key"?: string;
             /**
@@ -1620,7 +382,8 @@ export interface IClusterSecretStore {
              */
             "name"?: string;
             /**
-             * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults to the namespace of the referent.
+             * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+             * to the namespace of the referent.
              */
             "namespace"?: string;
           };
@@ -1629,7 +392,8 @@ export interface IClusterSecretStore {
            */
           "clientSecret"?: {
             /**
-             * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be defaulted, in others it may be required.
+             * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be
+             * defaulted, in others it may be required.
              */
             "key"?: string;
             /**
@@ -1637,13 +401,17 @@ export interface IClusterSecretStore {
              */
             "name"?: string;
             /**
-             * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults to the namespace of the referent.
+             * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+             * to the namespace of the referent.
              */
             "namespace"?: string;
           };
         };
         /**
-         * Auth type defines how to authenticate to the keyvault service. Valid values are: - "ServicePrincipal" (default): Using a service principal (tenantId, clientId, clientSecret) - "ManagedIdentity": Using Managed Identity assigned to the pod (see aad-pod-identity)
+         * Auth type defines how to authenticate to the keyvault service.
+         * Valid values are:
+         * - "ServicePrincipal" (default): Using a service principal (tenantId, clientId, clientSecret)
+         * - "ManagedIdentity": Using Managed Identity assigned to the pod (see aad-pod-identity)
          */
         "authType"?: "ServicePrincipal" | "ManagedIdentity" | "WorkloadIdentity";
         /**
@@ -1651,15 +419,23 @@ export interface IClusterSecretStore {
          */
         "identityId"?: string;
         /**
-         * ServiceAccountRef specified the service account that should be used when authenticating with WorkloadIdentity.
+         * ServiceAccountRef specified the service account
+         * that should be used when authenticating with WorkloadIdentity.
          */
         "serviceAccountRef"?: {
+          /**
+           * Audience specifies the `aud` claim for the service account token
+           * If the service account uses a well-known annotation for e.g. IRSA or GCP Workload Identity
+           * then this audiences will be appended to the list
+           */
+          "audiences"?: Array<string>;
           /**
            * The name of the ServiceAccount resource being referred to.
            */
           "name": string;
           /**
-           * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults to the namespace of the referent.
+           * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+           * to the namespace of the referent.
            */
           "namespace"?: string;
         };
@@ -1699,7 +475,8 @@ export interface IClusterSecretStore {
              */
             "secretAccessKeySecretRef"?: {
               /**
-               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be defaulted, in others it may be required.
+               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be
+               * defaulted, in others it may be required.
                */
               "key"?: string;
               /**
@@ -1707,7 +484,8 @@ export interface IClusterSecretStore {
                */
               "name"?: string;
               /**
-               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults to the namespace of the referent.
+               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+               * to the namespace of the referent.
                */
               "namespace"?: string;
             };
@@ -1721,11 +499,18 @@ export interface IClusterSecretStore {
              */
             "serviceAccountRef": {
               /**
+               * Audience specifies the `aud` claim for the service account token
+               * If the service account uses a well-known annotation for e.g. IRSA or GCP Workload Identity
+               * then this audiences will be appended to the list
+               */
+              "audiences"?: Array<string>;
+              /**
                * The name of the ServiceAccount resource being referred to.
                */
               "name": string;
               /**
-               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults to the namespace of the referent.
+               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+               * to the namespace of the referent.
                */
               "namespace"?: string;
             };
@@ -1737,7 +522,7 @@ export interface IClusterSecretStore {
         "projectID"?: string;
       };
       /**
-       * Gitlab configures this store to sync secrets using Gitlab Variables provider
+       * GitLab configures this store to sync secrets using GitLab Variables provider
        */
       "gitlab"?: {
         /**
@@ -1750,7 +535,8 @@ export interface IClusterSecretStore {
              */
             "accessToken"?: {
               /**
-               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be defaulted, in others it may be required.
+               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be
+               * defaulted, in others it may be required.
                */
               "key"?: string;
               /**
@@ -1758,7 +544,8 @@ export interface IClusterSecretStore {
                */
               "name"?: string;
               /**
-               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults to the namespace of the referent.
+               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+               * to the namespace of the referent.
                */
               "namespace"?: string;
             };
@@ -1787,7 +574,8 @@ export interface IClusterSecretStore {
              */
             "secretApiKeySecretRef"?: {
               /**
-               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be defaulted, in others it may be required.
+               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be
+               * defaulted, in others it may be required.
                */
               "key"?: string;
               /**
@@ -1795,7 +583,8 @@ export interface IClusterSecretStore {
                */
               "name"?: string;
               /**
-               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults to the namespace of the referent.
+               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+               * to the namespace of the referent.
                */
               "namespace"?: string;
             };
@@ -1819,11 +608,13 @@ export interface IClusterSecretStore {
            */
           "cert"?: {
             /**
-             * A reference to a specific 'key' within a Secret resource, In some instances, `key` is a required field.
+             * A reference to a specific 'key' within a Secret resource,
+             * In some instances, `key` is a required field.
              */
             "clientCert"?: {
               /**
-               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be defaulted, in others it may be required.
+               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be
+               * defaulted, in others it may be required.
                */
               "key"?: string;
               /**
@@ -1831,16 +622,19 @@ export interface IClusterSecretStore {
                */
               "name"?: string;
               /**
-               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults to the namespace of the referent.
+               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+               * to the namespace of the referent.
                */
               "namespace"?: string;
             };
             /**
-             * A reference to a specific 'key' within a Secret resource, In some instances, `key` is a required field.
+             * A reference to a specific 'key' within a Secret resource,
+             * In some instances, `key` is a required field.
              */
             "clientKey"?: {
               /**
-               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be defaulted, in others it may be required.
+               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be
+               * defaulted, in others it may be required.
                */
               "key"?: string;
               /**
@@ -1848,7 +642,8 @@ export interface IClusterSecretStore {
                */
               "name"?: string;
               /**
-               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults to the namespace of the referent.
+               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+               * to the namespace of the referent.
                */
               "namespace"?: string;
             };
@@ -1862,11 +657,18 @@ export interface IClusterSecretStore {
              */
             "serviceAccount"?: {
               /**
+               * Audience specifies the `aud` claim for the service account token
+               * If the service account uses a well-known annotation for e.g. IRSA or GCP Workload Identity
+               * then this audiences will be appended to the list
+               */
+              "audiences"?: Array<string>;
+              /**
                * The name of the ServiceAccount resource being referred to.
                */
               "name": string;
               /**
-               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults to the namespace of the referent.
+               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+               * to the namespace of the referent.
                */
               "namespace"?: string;
             };
@@ -1876,11 +678,13 @@ export interface IClusterSecretStore {
            */
           "token"?: {
             /**
-             * A reference to a specific 'key' within a Secret resource, In some instances, `key` is a required field.
+             * A reference to a specific 'key' within a Secret resource,
+             * In some instances, `key` is a required field.
              */
             "bearerToken"?: {
               /**
-               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be defaulted, in others it may be required.
+               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be
+               * defaulted, in others it may be required.
                */
               "key"?: string;
               /**
@@ -1888,7 +692,8 @@ export interface IClusterSecretStore {
                */
               "name"?: string;
               /**
-               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults to the namespace of the referent.
+               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+               * to the namespace of the referent.
                */
               "namespace"?: string;
             };
@@ -1938,7 +743,9 @@ export interface IClusterSecretStore {
        */
       "oracle"?: {
         /**
-         * Auth configures how secret-manager authenticates with the Oracle Vault. If empty, use the instance principal, otherwise the user credentials specified in Auth.
+         * Auth configures how secret-manager authenticates with the Oracle Vault.
+         * If empty, instance principal is used. Optionally, the authenticating principal type
+         * and/or user data may be supplied for the use of workload identity and user principal.
          */
         "auth"?: {
           /**
@@ -1950,7 +757,8 @@ export interface IClusterSecretStore {
              */
             "fingerprint": {
               /**
-               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be defaulted, in others it may be required.
+               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be
+               * defaulted, in others it may be required.
                */
               "key"?: string;
               /**
@@ -1958,7 +766,8 @@ export interface IClusterSecretStore {
                */
               "name"?: string;
               /**
-               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults to the namespace of the referent.
+               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+               * to the namespace of the referent.
                */
               "namespace"?: string;
             };
@@ -1967,7 +776,8 @@ export interface IClusterSecretStore {
              */
             "privatekey": {
               /**
-               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be defaulted, in others it may be required.
+               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be
+               * defaulted, in others it may be required.
                */
               "key"?: string;
               /**
@@ -1975,7 +785,8 @@ export interface IClusterSecretStore {
                */
               "name"?: string;
               /**
-               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults to the namespace of the referent.
+               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+               * to the namespace of the referent.
                */
               "namespace"?: string;
             };
@@ -1990,13 +801,89 @@ export interface IClusterSecretStore {
           "user": string;
         };
         /**
+         * Compartment is the vault compartment OCID.
+         * Required for PushSecret
+         */
+        "compartment"?: string;
+        /**
+         * EncryptionKey is the OCID of the encryption key within the vault.
+         * Required for PushSecret
+         */
+        "encryptionKey"?: string;
+        /**
+         * The type of principal to use for authentication. If left blank, the Auth struct will
+         * determine the principal type. This optional field must be specified if using
+         * workload identity.
+         */
+        "principalType"?: "" | "UserPrincipal" | "InstancePrincipal" | "Workload";
+        /**
          * Region is the region where vault is located.
          */
         "region": string;
         /**
+         * ServiceAccountRef specified the service account
+         * that should be used when authenticating with WorkloadIdentity.
+         */
+        "serviceAccountRef"?: {
+          /**
+           * Audience specifies the `aud` claim for the service account token
+           * If the service account uses a well-known annotation for e.g. IRSA or GCP Workload Identity
+           * then this audiences will be appended to the list
+           */
+          "audiences"?: Array<string>;
+          /**
+           * The name of the ServiceAccount resource being referred to.
+           */
+          "name": string;
+          /**
+           * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+           * to the namespace of the referent.
+           */
+          "namespace"?: string;
+        };
+        /**
          * Vault is the vault's OCID of the specific vault where secret is located.
          */
         "vault": string;
+      };
+      /**
+       * Configures a store to sync secrets with a Password Depot instance.
+       */
+      "passworddepot"?: {
+        /**
+         * Auth configures how secret-manager authenticates with a Password Depot instance.
+         */
+        "auth": {
+          "secretRef": {
+            /**
+             * Username / Password is used for authentication.
+             */
+            "credentials"?: {
+              /**
+               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be
+               * defaulted, in others it may be required.
+               */
+              "key"?: string;
+              /**
+               * The name of the Secret resource being referred to.
+               */
+              "name"?: string;
+              /**
+               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+               * to the namespace of the referent.
+               */
+              "namespace"?: string;
+            };
+          };
+        };
+        /**
+         * Database to use as source
+         */
+        "database": string;
+        /**
+         * URL configures the Password Depot instance URL.
+         */
+        "host": string;
       };
       /**
        * Vault configures this store to sync secrets using Hashi provider
@@ -2007,23 +894,30 @@ export interface IClusterSecretStore {
          */
         "auth": {
           /**
-           * AppRole authenticates with Vault using the App Role auth mechanism, with the role and secret stored in a Kubernetes Secret resource.
+           * AppRole authenticates with Vault using the App Role auth mechanism,
+           * with the role and secret stored in a Kubernetes Secret resource.
            */
           "appRole"?: {
             /**
-             * Path where the App Role authentication backend is mounted in Vault, e.g: "approle"
+             * Path where the App Role authentication backend is mounted
+             * in Vault, e.g: "approle"
              */
             "path": string;
             /**
-             * RoleID configured in the App Role authentication backend when setting up the authentication backend in Vault.
+             * RoleID configured in the App Role authentication backend when setting
+             * up the authentication backend in Vault.
              */
             "roleId": string;
             /**
-             * Reference to a key in a Secret that contains the App Role secret used to authenticate with Vault. The `key` field must be specified and denotes which entry within the Secret resource is used as the app role secret.
+             * Reference to a key in a Secret that contains the App Role secret used
+             * to authenticate with Vault.
+             * The `key` field must be specified and denotes which entry within the Secret
+             * resource is used as the app role secret.
              */
             "secretRef": {
               /**
-               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be defaulted, in others it may be required.
+               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be
+               * defaulted, in others it may be required.
                */
               "key"?: string;
               /**
@@ -2031,21 +925,25 @@ export interface IClusterSecretStore {
                */
               "name"?: string;
               /**
-               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults to the namespace of the referent.
+               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+               * to the namespace of the referent.
                */
               "namespace"?: string;
             };
           };
           /**
-           * Cert authenticates with TLS Certificates by passing client certificate, private key and ca certificate Cert authentication method
+           * Cert authenticates with TLS Certificates by passing client certificate, private key and ca certificate
+           * Cert authentication method
            */
           "cert"?: {
             /**
-             * ClientCert is a certificate to authenticate using the Cert Vault authentication method
+             * ClientCert is a certificate to authenticate using the Cert Vault
+             * authentication method
              */
             "clientCert"?: {
               /**
-               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be defaulted, in others it may be required.
+               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be
+               * defaulted, in others it may be required.
                */
               "key"?: string;
               /**
@@ -2053,16 +951,19 @@ export interface IClusterSecretStore {
                */
               "name"?: string;
               /**
-               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults to the namespace of the referent.
+               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+               * to the namespace of the referent.
                */
               "namespace"?: string;
             };
             /**
-             * SecretRef to a key in a Secret resource containing client private key to authenticate with Vault using the Cert authentication method
+             * SecretRef to a key in a Secret resource containing client private key to
+             * authenticate with Vault using the Cert authentication method
              */
             "secretRef"?: {
               /**
-               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be defaulted, in others it may be required.
+               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be
+               * defaulted, in others it may be required.
                */
               "key"?: string;
               /**
@@ -2070,25 +971,33 @@ export interface IClusterSecretStore {
                */
               "name"?: string;
               /**
-               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults to the namespace of the referent.
+               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+               * to the namespace of the referent.
                */
               "namespace"?: string;
             };
           };
           /**
-           * Jwt authenticates with Vault by passing role and JWT token using the JWT/OIDC authentication method
+           * Jwt authenticates with Vault by passing role and JWT token using the
+           * JWT/OIDC authentication method
            */
           "jwt"?: {
             /**
-             * Optional ServiceAccountToken specifies the Kubernetes service account for which to request a token for with the `TokenRequest` API.
+             * Optional ServiceAccountToken specifies the Kubernetes service account for which to request
+             * a token for with the `TokenRequest` API.
              */
             "kubernetesServiceAccountToken"?: {
               /**
-               * Optional audiences field that will be used to request a temporary Kubernetes service account token for the service account referenced by `serviceAccountRef`. Defaults to a single audience `vault` it not specified.
+               * Optional audiences field that will be used to request a temporary Kubernetes service
+               * account token for the service account referenced by `serviceAccountRef`.
+               * Defaults to a single audience `vault` it not specified.
                */
               "audiences"?: Array<string>;
               /**
-               * Optional expiration time in seconds that will be used to request a temporary Kubernetes service account token for the service account referenced by `serviceAccountRef`. Defaults to 10 minutes.
+               * Optional expiration time in seconds that will be used to request a temporary
+               * Kubernetes service account token for the service account referenced by
+               * `serviceAccountRef`.
+               * Defaults to 10 minutes.
                */
               "expirationSeconds"?: number;
               /**
@@ -2096,29 +1005,40 @@ export interface IClusterSecretStore {
                */
               "serviceAccountRef": {
                 /**
+                 * Audience specifies the `aud` claim for the service account token
+                 * If the service account uses a well-known annotation for e.g. IRSA or GCP Workload Identity
+                 * then this audiences will be appended to the list
+                 */
+                "audiences"?: Array<string>;
+                /**
                  * The name of the ServiceAccount resource being referred to.
                  */
                 "name": string;
                 /**
-                 * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults to the namespace of the referent.
+                 * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+                 * to the namespace of the referent.
                  */
                 "namespace"?: string;
               };
             };
             /**
-             * Path where the JWT authentication backend is mounted in Vault, e.g: "jwt"
+             * Path where the JWT authentication backend is mounted
+             * in Vault, e.g: "jwt"
              */
             "path": string;
             /**
-             * Role is a JWT role to authenticate using the JWT/OIDC Vault authentication method
+             * Role is a JWT role to authenticate using the JWT/OIDC Vault
+             * authentication method
              */
             "role"?: string;
             /**
-             * Optional SecretRef that refers to a key in a Secret resource containing JWT token to authenticate with Vault using the JWT/OIDC authentication method.
+             * Optional SecretRef that refers to a key in a Secret resource containing JWT token to
+             * authenticate with Vault using the JWT/OIDC authentication method.
              */
             "secretRef"?: {
               /**
-               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be defaulted, in others it may be required.
+               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be
+               * defaulted, in others it may be required.
                */
               "key"?: string;
               /**
@@ -2126,29 +1046,37 @@ export interface IClusterSecretStore {
                */
               "name"?: string;
               /**
-               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults to the namespace of the referent.
+               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+               * to the namespace of the referent.
                */
               "namespace"?: string;
             };
           };
           /**
-           * Kubernetes authenticates with Vault by passing the ServiceAccount token stored in the named Secret resource to the Vault server.
+           * Kubernetes authenticates with Vault by passing the ServiceAccount
+           * token stored in the named Secret resource to the Vault server.
            */
           "kubernetes"?: {
             /**
-             * Path where the Kubernetes authentication backend is mounted in Vault, e.g: "kubernetes"
+             * Path where the Kubernetes authentication backend is mounted in Vault, e.g:
+             * "kubernetes"
              */
             "mountPath": string;
             /**
-             * A required field containing the Vault Role to assume. A Role binds a Kubernetes ServiceAccount with a set of Vault policies.
+             * A required field containing the Vault Role to assume. A Role binds a
+             * Kubernetes ServiceAccount with a set of Vault policies.
              */
             "role": string;
             /**
-             * Optional secret field containing a Kubernetes ServiceAccount JWT used for authenticating with Vault. If a name is specified without a key, `token` is the default. If one is not specified, the one bound to the controller will be used.
+             * Optional secret field containing a Kubernetes ServiceAccount JWT used
+             * for authenticating with Vault. If a name is specified without a key,
+             * `token` is the default. If one is not specified, the one bound to
+             * the controller will be used.
              */
             "secretRef"?: {
               /**
-               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be defaulted, in others it may be required.
+               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be
+               * defaulted, in others it may be required.
                */
               "key"?: string;
               /**
@@ -2156,38 +1084,54 @@ export interface IClusterSecretStore {
                */
               "name"?: string;
               /**
-               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults to the namespace of the referent.
+               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+               * to the namespace of the referent.
                */
               "namespace"?: string;
             };
             /**
-             * Optional service account field containing the name of a kubernetes ServiceAccount. If the service account is specified, the service account secret token JWT will be used for authenticating with Vault. If the service account selector is not supplied, the secretRef will be used instead.
+             * Optional service account field containing the name of a kubernetes ServiceAccount.
+             * If the service account is specified, the service account secret token JWT will be used
+             * for authenticating with Vault. If the service account selector is not supplied,
+             * the secretRef will be used instead.
              */
             "serviceAccountRef"?: {
+              /**
+               * Audience specifies the `aud` claim for the service account token
+               * If the service account uses a well-known annotation for e.g. IRSA or GCP Workload Identity
+               * then this audiences will be appended to the list
+               */
+              "audiences"?: Array<string>;
               /**
                * The name of the ServiceAccount resource being referred to.
                */
               "name": string;
               /**
-               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults to the namespace of the referent.
+               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+               * to the namespace of the referent.
                */
               "namespace"?: string;
             };
           };
           /**
-           * Ldap authenticates with Vault by passing username/password pair using the LDAP authentication method
+           * Ldap authenticates with Vault by passing username/password pair using
+           * the LDAP authentication method
            */
           "ldap"?: {
             /**
-             * Path where the LDAP authentication backend is mounted in Vault, e.g: "ldap"
+             * Path where the LDAP authentication backend is mounted
+             * in Vault, e.g: "ldap"
              */
             "path": string;
             /**
-             * SecretRef to a key in a Secret resource containing password for the LDAP user used to authenticate with Vault using the LDAP authentication method
+             * SecretRef to a key in a Secret resource containing password for the LDAP
+             * user used to authenticate with Vault using the LDAP authentication
+             * method
              */
             "secretRef"?: {
               /**
-               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be defaulted, in others it may be required.
+               * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be
+               * defaulted, in others it may be required.
                */
               "key"?: string;
               /**
@@ -2195,12 +1139,14 @@ export interface IClusterSecretStore {
                */
               "name"?: string;
               /**
-               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults to the namespace of the referent.
+               * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+               * to the namespace of the referent.
                */
               "namespace"?: string;
             };
             /**
-             * Username is a LDAP user name used to authenticate using the LDAP Vault authentication method
+             * Username is a LDAP user name used to authenticate using the LDAP Vault
+             * authentication method
              */
             "username": string;
           };
@@ -2209,7 +1155,8 @@ export interface IClusterSecretStore {
            */
           "tokenSecretRef"?: {
             /**
-             * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be defaulted, in others it may be required.
+             * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be
+             * defaulted, in others it may be required.
              */
             "key"?: string;
             /**
@@ -2217,13 +1164,17 @@ export interface IClusterSecretStore {
              */
             "name"?: string;
             /**
-             * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults to the namespace of the referent.
+             * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+             * to the namespace of the referent.
              */
             "namespace"?: string;
           };
         };
         /**
-         * PEM encoded CA bundle used to validate Vault server certificate. Only used if the Server URL is using HTTPS protocol. This parameter is ignored for plain HTTP protocol connection. If not set the system root certificates are used to validate the TLS connection.
+         * PEM encoded CA bundle used to validate Vault server certificate. Only used
+         * if the Server URL is using HTTPS protocol. This parameter is ignored for
+         * plain HTTP protocol connection. If not set the system root certificates
+         * are used to validate the TLS connection.
          */
         "caBundle"?: string;
         /**
@@ -2248,19 +1199,30 @@ export interface IClusterSecretStore {
           "type": "Secret" | "ConfigMap";
         };
         /**
-         * ForwardInconsistent tells Vault to forward read-after-write requests to the Vault leader instead of simply retrying within a loop. This can increase performance if the option is enabled serverside. https://www.vaultproject.io/docs/configuration/replication#allow_forwarding_via_header
+         * ForwardInconsistent tells Vault to forward read-after-write requests to the Vault
+         * leader instead of simply retrying within a loop. This can increase performance if
+         * the option is enabled serverside.
+         * https://www.vaultproject.io/docs/configuration/replication#allow_forwarding_via_header
          */
         "forwardInconsistent"?: boolean;
         /**
-         * Name of the vault namespace. Namespaces is a set of features within Vault Enterprise that allows Vault environments to support Secure Multi-tenancy. e.g: "ns1". More about namespaces can be found here https://www.vaultproject.io/docs/enterprise/namespaces
+         * Name of the vault namespace. Namespaces is a set of features within Vault Enterprise that allows
+         * Vault environments to support Secure Multi-tenancy. e.g: "ns1".
+         * More about namespaces can be found here https://www.vaultproject.io/docs/enterprise/namespaces
          */
         "namespace"?: string;
         /**
-         * Path is the mount path of the Vault KV backend endpoint, e.g: "secret". The v2 KV secret engine version specific "/data" path suffix for fetching secrets from Vault is optional and will be appended if not present in specified path.
+         * Path is the mount path of the Vault KV backend endpoint, e.g:
+         * "secret". The v2 KV secret engine version specific "/data" path suffix
+         * for fetching secrets from Vault is optional and will be appended
+         * if not present in specified path.
          */
         "path"?: string;
         /**
-         * ReadYourWrites ensures isolated read-after-write semantics by providing discovered cluster replication states in each request. More information about eventual consistency in Vault can be found here https://www.vaultproject.io/docs/enterprise/consistency
+         * ReadYourWrites ensures isolated read-after-write semantics by
+         * providing discovered cluster replication states in each request.
+         * More information about eventual consistency in Vault can be found here
+         * https://www.vaultproject.io/docs/enterprise/consistency
          */
         "readYourWrites"?: boolean;
         /**
@@ -2268,7 +1230,8 @@ export interface IClusterSecretStore {
          */
         "server": string;
         /**
-         * Version is the Vault KV secret engine version. This can be either "v1" or "v2". Version defaults to "v2".
+         * Version is the Vault KV secret engine version. This can be either "v1" or
+         * "v2". Version defaults to "v2".
          */
         "version"?: "v1" | "v2";
       };
@@ -2281,7 +1244,10 @@ export interface IClusterSecretStore {
          */
         "body"?: string;
         /**
-         * PEM encoded CA bundle used to validate webhook server certificate. Only used if the Server URL is using HTTPS protocol. This parameter is ignored for plain HTTP protocol connection. If not set the system root certificates are used to validate the TLS connection.
+         * PEM encoded CA bundle used to validate webhook server certificate. Only used
+         * if the Server URL is using HTTPS protocol. This parameter is ignored for
+         * plain HTTP protocol connection. If not set the system root certificates
+         * are used to validate the TLS connection.
          */
         "caBundle"?: string;
         /**
@@ -2325,7 +1291,8 @@ export interface IClusterSecretStore {
           "jsonPath"?: string;
         };
         /**
-         * Secrets to fill in templates These secrets will be passed to the templating function as key value pairs under the given name
+         * Secrets to fill in templates
+         * These secrets will be passed to the templating function as key value pairs under the given name
          */
         "secrets"?: Array<{
           /**
@@ -2337,7 +1304,8 @@ export interface IClusterSecretStore {
            */
           "secretRef": {
             /**
-             * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be defaulted, in others it may be required.
+             * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be
+             * defaulted, in others it may be required.
              */
             "key"?: string;
             /**
@@ -2345,7 +1313,8 @@ export interface IClusterSecretStore {
              */
             "name"?: string;
             /**
-             * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults to the namespace of the referent.
+             * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+             * to the namespace of the referent.
              */
             "namespace"?: string;
           };
@@ -2376,7 +1345,8 @@ export interface IClusterSecretStore {
            */
           "authorizedKeySecretRef"?: {
             /**
-             * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be defaulted, in others it may be required.
+             * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be
+             * defaulted, in others it may be required.
              */
             "key"?: string;
             /**
@@ -2384,7 +1354,8 @@ export interface IClusterSecretStore {
              */
             "name"?: string;
             /**
-             * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults to the namespace of the referent.
+             * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+             * to the namespace of the referent.
              */
             "namespace"?: string;
           };
@@ -2394,11 +1365,13 @@ export interface IClusterSecretStore {
          */
         "caProvider"?: {
           /**
-           * A reference to a specific 'key' within a Secret resource, In some instances, `key` is a required field.
+           * A reference to a specific 'key' within a Secret resource,
+           * In some instances, `key` is a required field.
            */
           "certSecretRef"?: {
             /**
-             * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be defaulted, in others it may be required.
+             * The key of the entry in the Secret resource's `data` field to be used. Some instances of this field may be
+             * defaulted, in others it may be required.
              */
             "key"?: string;
             /**
@@ -2406,7 +1379,8 @@ export interface IClusterSecretStore {
              */
             "name"?: string;
             /**
-             * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults to the namespace of the referent.
+             * Namespace of the resource being referred to. Ignored if referent is not cluster-scoped. cluster-scoped defaults
+             * to the namespace of the referent.
              */
             "namespace"?: string;
           };
@@ -2459,7 +1433,4 @@ constructor(data?: ModelData<IClusterSecretStore>) {
 }
 
 
-setSchema(ClusterSecretStore, schemaId, () => {
-  addSchema();
-  register(schemaId, schema);
-});
+setValidateFunc(ClusterSecretStore, validate as ValidateFunc<IClusterSecretStore>);

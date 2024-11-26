@@ -1,60 +1,7 @@
 import { IObjectMeta } from "@kubernetes-models/apimachinery/apis/meta/v1/ObjectMeta";
-import { addSchema } from "@kubernetes-models/apimachinery/_schemas/IoK8sApimachineryPkgApisMetaV1ObjectMeta";
-import { Model, setSchema, ModelData, createTypeMetaGuard } from "@kubernetes-models/base";
-import { register } from "@kubernetes-models/validate";
-
-const schemaId = "snapshot.storage.k8s.io.v1beta1.VolumeSnapshotClass";
-const schema = {
-  "type": "object",
-  "properties": {
-    "apiVersion": {
-      "type": "string",
-      "enum": [
-        "snapshot.storage.k8s.io/v1beta1"
-      ]
-    },
-    "deletionPolicy": {
-      "enum": [
-        "Delete",
-        "Retain"
-      ],
-      "type": "string"
-    },
-    "driver": {
-      "type": "string"
-    },
-    "kind": {
-      "type": "string",
-      "enum": [
-        "VolumeSnapshotClass"
-      ]
-    },
-    "parameters": {
-      "additionalProperties": {
-        "type": "string"
-      },
-      "type": "object",
-      "properties": {},
-      "nullable": true
-    },
-    "metadata": {
-      "oneOf": [
-        {
-          "$ref": "io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta#"
-        },
-        {
-          "type": "null"
-        }
-      ]
-    }
-  },
-  "required": [
-    "deletionPolicy",
-    "driver",
-    "apiVersion",
-    "kind"
-  ]
-};
+import { Model, ModelData, setValidateFunc, createTypeMetaGuard } from "@kubernetes-models/base";
+import { ValidateFunc } from "@kubernetes-models/validate";
+import { validate } from "../../_schemas/SnapshotStorageK8sIoV1beta1VolumeSnapshotClass.js";
 
 /**
  * VolumeSnapshotClass specifies parameters that a underlying storage system uses when creating a volume snapshot. A specific VolumeSnapshotClass is used by specifying its name in a VolumeSnapshot object. VolumeSnapshotClasses are non-namespaced
@@ -110,7 +57,4 @@ constructor(data?: ModelData<IVolumeSnapshotClass>) {
 }
 
 
-setSchema(VolumeSnapshotClass, schemaId, () => {
-  addSchema();
-  register(schemaId, schema);
-});
+setValidateFunc(VolumeSnapshotClass, validate as ValidateFunc<IVolumeSnapshotClass>);

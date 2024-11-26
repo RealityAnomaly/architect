@@ -1,114 +1,7 @@
 import { IObjectMeta } from "@kubernetes-models/apimachinery/apis/meta/v1/ObjectMeta";
-import { addSchema } from "@kubernetes-models/apimachinery/_schemas/IoK8sApimachineryPkgApisMetaV1ObjectMeta";
-import { Model, setSchema, ModelData, createTypeMetaGuard } from "@kubernetes-models/base";
-import { register } from "@kubernetes-models/validate";
-
-const schemaId = "metal.sidero.dev.v1alpha1.Environment";
-const schema = {
-  "type": "object",
-  "properties": {
-    "apiVersion": {
-      "type": "string",
-      "enum": [
-        "metal.sidero.dev/v1alpha1"
-      ]
-    },
-    "kind": {
-      "type": "string",
-      "enum": [
-        "Environment"
-      ]
-    },
-    "metadata": {
-      "oneOf": [
-        {
-          "$ref": "io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta#"
-        },
-        {
-          "type": "null"
-        }
-      ]
-    },
-    "spec": {
-      "properties": {
-        "initrd": {
-          "properties": {
-            "sha512": {
-              "type": "string",
-              "nullable": true
-            },
-            "url": {
-              "type": "string",
-              "nullable": true
-            }
-          },
-          "type": "object",
-          "nullable": true
-        },
-        "kernel": {
-          "properties": {
-            "args": {
-              "items": {
-                "type": "string"
-              },
-              "type": "array",
-              "nullable": true
-            },
-            "sha512": {
-              "type": "string",
-              "nullable": true
-            },
-            "url": {
-              "type": "string",
-              "nullable": true
-            }
-          },
-          "type": "object",
-          "nullable": true
-        }
-      },
-      "type": "object",
-      "nullable": true
-    },
-    "status": {
-      "properties": {
-        "conditions": {
-          "items": {
-            "properties": {
-              "sha512": {
-                "type": "string",
-                "nullable": true
-              },
-              "status": {
-                "type": "string"
-              },
-              "type": {
-                "type": "string"
-              },
-              "url": {
-                "type": "string",
-                "nullable": true
-              }
-            },
-            "required": [
-              "status",
-              "type"
-            ],
-            "type": "object"
-          },
-          "type": "array",
-          "nullable": true
-        }
-      },
-      "type": "object",
-      "nullable": true
-    }
-  },
-  "required": [
-    "apiVersion",
-    "kind"
-  ]
-};
+import { Model, ModelData, setValidateFunc, createTypeMetaGuard } from "@kubernetes-models/base";
+import { ValidateFunc } from "@kubernetes-models/validate";
+import { validate } from "../../_schemas/MetalSideroDevV1alpha1Environment.js";
 
 /**
  * Environment is the Schema for the environments API.
@@ -174,7 +67,4 @@ constructor(data?: ModelData<IEnvironment>) {
 }
 
 
-setSchema(Environment, schemaId, () => {
-  addSchema();
-  register(schemaId, schema);
-});
+setValidateFunc(Environment, validate as ValidateFunc<IEnvironment>);

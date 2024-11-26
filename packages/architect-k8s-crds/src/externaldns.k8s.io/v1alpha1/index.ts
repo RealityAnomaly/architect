@@ -1,1 +1,1 @@
-export * from "./DNSEndpoint";
+export * from "./DNSEndpoint.js";

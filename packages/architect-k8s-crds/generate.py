@@ -4,6 +4,7 @@ import shutil
 import tempfile
 import subprocess
 import argparse
+import re
 from typing import List
 
 # https://github.com/yaml/pyyaml/issues/89
@@ -31,7 +32,9 @@ def update_crds(dir):
     crds = []
     with tempfile.TemporaryDirectory() as tmpdir:
         result = subprocess.run(os.path.abspath(script), cwd=tmpdir)
-        result.check_returncode()
+        if result.returncode != 0:
+            print(f"failed to update crds for {ns}")
+            return
 
         out = os.path.join(tmpdir, "out")
 
@@ -40,7 +43,7 @@ def update_crds(dir):
         for file in files:
             with open(file, "r") as f:
                 results = yaml.load_all(f, yaml.CSafeLoader)
-                crds.extend(filter_crds(results))
+                crds.extend(filter_crds(results)) # type: ignore
     
     # write out the results
     if len(crds) <= 0:
@@ -79,7 +82,7 @@ for ns in os.listdir("crds"):
             results = yaml.load_all(f, yaml.CSafeLoader)
             if not ns in per_ns_data:
                 per_ns_data[ns] = []
-            per_ns_data[ns].extend(filter_crds(results))
+            per_ns_data[ns].extend(filter_crds(results)) # type: ignore
 
 print("writing temporary data files")
 
@@ -99,5 +102,21 @@ with tempfile.NamedTemporaryFile(mode="w") as f:
     params = ["npx", "@kubernetes-models/crd-generate", "--input", f.name, "--output", generated_path]
     subprocess.run(params, stdout=subprocess.DEVNULL)
 
-with open("src/index.ts", "a") as f:
-    f.write("export const dir = __dirname;\n")
+for root, subdirs, files in os.walk("src"):
+    for file in files:
+        file = os.path.join(root, file)
+        with open(file, 'r') as f:
+            content = f.read()
+        if '_schemas' not in file:
+            content = re.sub(r'(_schemas\/.[^"]*)', r'\1.js', content)
+        
+        content = re.sub(r'(^export \*.*from )"(.*?)"', r'\1"\2.js"', content, flags=re.MULTILINE)
+        with open(file, 'w') as f:
+            f.write(content)
+
+print('compiling typescript')
+shutil.rmtree('lib')
+subprocess.run(["yarn", "compile"])
+
+print('copying schemas to destination')
+shutil.copytree('src/_schemas', 'lib/_schemas')
