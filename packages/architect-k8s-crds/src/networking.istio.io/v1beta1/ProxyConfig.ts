@@ -1,87 +1,7 @@
 import { IObjectMeta } from "@kubernetes-models/apimachinery/apis/meta/v1/ObjectMeta";
-import { addSchema } from "@kubernetes-models/apimachinery/_schemas/IoK8sApimachineryPkgApisMetaV1ObjectMeta";
-import { Model, setSchema, ModelData, createTypeMetaGuard } from "@kubernetes-models/base";
-import { register } from "@kubernetes-models/validate";
-
-const schemaId = "networking.istio.io.v1beta1.ProxyConfig";
-const schema = {
-  "type": "object",
-  "properties": {
-    "spec": {
-      "properties": {
-        "concurrency": {
-          "nullable": true,
-          "type": "integer"
-        },
-        "environmentVariables": {
-          "additionalProperties": {
-            "type": "string"
-          },
-          "type": "object",
-          "properties": {},
-          "nullable": true
-        },
-        "image": {
-          "properties": {
-            "imageType": {
-              "type": "string",
-              "nullable": true
-            }
-          },
-          "type": "object",
-          "nullable": true
-        },
-        "selector": {
-          "properties": {
-            "matchLabels": {
-              "additionalProperties": {
-                "type": "string"
-              },
-              "type": "object",
-              "properties": {},
-              "nullable": true
-            }
-          },
-          "type": "object",
-          "nullable": true
-        }
-      },
-      "type": "object",
-      "nullable": true
-    },
-    "status": {
-      "type": "object",
-      "properties": {},
-      "nullable": true
-    },
-    "apiVersion": {
-      "type": "string",
-      "enum": [
-        "networking.istio.io/v1beta1"
-      ]
-    },
-    "kind": {
-      "type": "string",
-      "enum": [
-        "ProxyConfig"
-      ]
-    },
-    "metadata": {
-      "oneOf": [
-        {
-          "$ref": "io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta#"
-        },
-        {
-          "type": "null"
-        }
-      ]
-    }
-  },
-  "required": [
-    "apiVersion",
-    "kind"
-  ]
-};
+import { Model, ModelData, setValidateFunc, createTypeMetaGuard } from "@kubernetes-models/base";
+import { ValidateFunc } from "@kubernetes-models/validate";
+import { validate } from "../../_schemas/NetworkingIstioIoV1beta1ProxyConfig.js";
 
 export interface IProxyConfig {
   /**
@@ -144,7 +64,4 @@ constructor(data?: ModelData<IProxyConfig>) {
 }
 
 
-setSchema(ProxyConfig, schemaId, () => {
-  addSchema();
-  register(schemaId, schema);
-});
+setValidateFunc(ProxyConfig, validate as ValidateFunc<IProxyConfig>);

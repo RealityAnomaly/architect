@@ -1,1 +1,1 @@
-export * from "./WasmPlugin";
+export * from "./WasmPlugin.js";

@@ -1,117 +1,7 @@
 import { IObjectMeta } from "@kubernetes-models/apimachinery/apis/meta/v1/ObjectMeta";
-import { addSchema } from "@kubernetes-models/apimachinery/_schemas/IoK8sApimachineryPkgApisMetaV1ObjectMeta";
-import { Model, setSchema, ModelData, createTypeMetaGuard } from "@kubernetes-models/base";
-import { register } from "@kubernetes-models/validate";
-
-const schemaId = "snapshot.storage.k8s.io.v1.VolumeSnapshot";
-const schema = {
-  "type": "object",
-  "properties": {
-    "apiVersion": {
-      "type": "string",
-      "enum": [
-        "snapshot.storage.k8s.io/v1"
-      ]
-    },
-    "kind": {
-      "type": "string",
-      "enum": [
-        "VolumeSnapshot"
-      ]
-    },
-    "spec": {
-      "properties": {
-        "source": {
-          "oneOf": [
-            {
-              "required": [
-                "persistentVolumeClaimName"
-              ]
-            },
-            {
-              "required": [
-                "volumeSnapshotContentName"
-              ]
-            }
-          ],
-          "properties": {
-            "persistentVolumeClaimName": {
-              "type": "string",
-              "nullable": true
-            },
-            "volumeSnapshotContentName": {
-              "type": "string",
-              "nullable": true
-            }
-          },
-          "type": "object"
-        },
-        "volumeSnapshotClassName": {
-          "type": "string",
-          "nullable": true
-        }
-      },
-      "required": [
-        "source"
-      ],
-      "type": "object"
-    },
-    "status": {
-      "properties": {
-        "boundVolumeSnapshotContentName": {
-          "type": "string",
-          "nullable": true
-        },
-        "creationTime": {
-          "format": "date-time",
-          "type": "string",
-          "nullable": true
-        },
-        "error": {
-          "properties": {
-            "message": {
-              "type": "string",
-              "nullable": true
-            },
-            "time": {
-              "format": "date-time",
-              "type": "string",
-              "nullable": true
-            }
-          },
-          "type": "object",
-          "nullable": true
-        },
-        "readyToUse": {
-          "type": "boolean",
-          "nullable": true
-        },
-        "restoreSize": {
-          "type": "string",
-          "pattern": "^(\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\\+|-)?(([0-9]+(\\.[0-9]*)?)|(\\.[0-9]+))))?$",
-          "nullable": true
-        }
-      },
-      "type": "object",
-      "nullable": true
-    },
-    "metadata": {
-      "oneOf": [
-        {
-          "$ref": "io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta#"
-        },
-        {
-          "type": "null"
-        }
-      ]
-    }
-  },
-  "required": [
-    "spec",
-    "apiVersion",
-    "kind"
-  ]
-};
+import { Model, ModelData, setValidateFunc, createTypeMetaGuard } from "@kubernetes-models/base";
+import { ValidateFunc } from "@kubernetes-models/validate";
+import { validate } from "../../_schemas/SnapshotStorageK8sIoV1VolumeSnapshot.js";
 
 /**
  * VolumeSnapshot is a user's request for either creating a point-in-time snapshot of a persistent volume, or binding to a pre-existing snapshot.
@@ -226,7 +116,4 @@ constructor(data?: ModelData<IVolumeSnapshot>) {
 }
 
 
-setSchema(VolumeSnapshot, schemaId, () => {
-  addSchema();
-  register(schemaId, schema);
-});
+setValidateFunc(VolumeSnapshot, validate as ValidateFunc<IVolumeSnapshot>);

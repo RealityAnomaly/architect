@@ -1,112 +1,7 @@
 import { IObjectMeta } from "@kubernetes-models/apimachinery/apis/meta/v1/ObjectMeta";
-import { addSchema } from "@kubernetes-models/apimachinery/_schemas/IoK8sApimachineryPkgApisMetaV1ObjectMeta";
-import { Model, setSchema, ModelData, createTypeMetaGuard } from "@kubernetes-models/base";
-import { register } from "@kubernetes-models/validate";
-
-const schemaId = "secretgenerator.mittwald.de.v1alpha1.BasicAuth";
-const schema = {
-  "type": "object",
-  "properties": {
-    "apiVersion": {
-      "type": "string",
-      "enum": [
-        "secretgenerator.mittwald.de/v1alpha1"
-      ]
-    },
-    "kind": {
-      "type": "string",
-      "enum": [
-        "BasicAuth"
-      ]
-    },
-    "metadata": {
-      "oneOf": [
-        {
-          "$ref": "io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta#"
-        },
-        {
-          "type": "null"
-        }
-      ]
-    },
-    "spec": {
-      "properties": {
-        "data": {
-          "additionalProperties": {
-            "type": "string"
-          },
-          "type": "object",
-          "properties": {},
-          "nullable": true
-        },
-        "encoding": {
-          "type": "string",
-          "nullable": true
-        },
-        "forceRegenerate": {
-          "type": "boolean",
-          "nullable": true
-        },
-        "length": {
-          "type": "string",
-          "nullable": true
-        },
-        "username": {
-          "type": "string"
-        }
-      },
-      "required": [
-        "username"
-      ],
-      "type": "object",
-      "nullable": true
-    },
-    "status": {
-      "properties": {
-        "secret": {
-          "properties": {
-            "apiVersion": {
-              "type": "string",
-              "nullable": true
-            },
-            "fieldPath": {
-              "type": "string",
-              "nullable": true
-            },
-            "kind": {
-              "type": "string",
-              "nullable": true
-            },
-            "name": {
-              "type": "string",
-              "nullable": true
-            },
-            "namespace": {
-              "type": "string",
-              "nullable": true
-            },
-            "resourceVersion": {
-              "type": "string",
-              "nullable": true
-            },
-            "uid": {
-              "type": "string",
-              "nullable": true
-            }
-          },
-          "type": "object",
-          "nullable": true
-        }
-      },
-      "type": "object",
-      "nullable": true
-    }
-  },
-  "required": [
-    "apiVersion",
-    "kind"
-  ]
-};
+import { Model, ModelData, setValidateFunc, createTypeMetaGuard } from "@kubernetes-models/base";
+import { ValidateFunc } from "@kubernetes-models/validate";
+import { validate } from "../../_schemas/SecretgeneratorMittwaldDeV1alpha1BasicAuth.js";
 
 /**
  * BasicAuth is the Schema for the basicauths API
@@ -197,7 +92,4 @@ constructor(data?: ModelData<IBasicAuth>) {
 }
 
 
-setSchema(BasicAuth, schemaId, () => {
-  addSchema();
-  register(schemaId, schema);
-});
+setValidateFunc(BasicAuth, validate as ValidateFunc<IBasicAuth>);

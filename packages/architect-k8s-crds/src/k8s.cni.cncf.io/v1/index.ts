@@ -1,1 +1,1 @@
-export * from "./NetworkAttachmentDefinition";
+export * from "./NetworkAttachmentDefinition.js";

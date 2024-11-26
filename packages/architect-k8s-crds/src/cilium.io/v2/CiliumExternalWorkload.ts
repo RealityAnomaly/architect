@@ -1,65 +1,7 @@
 import { IObjectMeta } from "@kubernetes-models/apimachinery/apis/meta/v1/ObjectMeta";
-import { addSchema } from "@kubernetes-models/apimachinery/_schemas/IoK8sApimachineryPkgApisMetaV1ObjectMeta";
-import { Model, setSchema, ModelData, createTypeMetaGuard } from "@kubernetes-models/base";
-import { register } from "@kubernetes-models/validate";
-
-const schemaId = "cilium.io.v2.CiliumExternalWorkload";
-const schema = {
-  "type": "object",
-  "properties": {
-    "apiVersion": {
-      "type": "string",
-      "enum": [
-        "cilium.io/v2"
-      ]
-    },
-    "kind": {
-      "type": "string",
-      "enum": [
-        "CiliumExternalWorkload"
-      ]
-    },
-    "metadata": {
-      "$ref": "io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta#"
-    },
-    "spec": {
-      "properties": {
-        "ipv4-alloc-cidr": {
-          "type": "string",
-          "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\/([0-9]|[1-2][0-9]|3[0-2])$",
-          "nullable": true
-        },
-        "ipv6-alloc-cidr": {
-          "type": "string",
-          "pattern": "^s*((([0-9A-Fa-f]{1,4}:){7}(:|([0-9A-Fa-f]{1,4})))|(([0-9A-Fa-f]{1,4}:){6}:([0-9A-Fa-f]{1,4})?)|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){0,1}):([0-9A-Fa-f]{1,4})?))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){0,2}):([0-9A-Fa-f]{1,4})?))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){0,3}):([0-9A-Fa-f]{1,4})?))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){0,4}):([0-9A-Fa-f]{1,4})?))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){0,5}):([0-9A-Fa-f]{1,4})?))|(:(:|((:[0-9A-Fa-f]{1,4}){1,7}))))(%.+)?s*\\/([0-9]|[1-9][0-9]|1[0-1][0-9]|12[0-8])$",
-          "nullable": true
-        }
-      },
-      "type": "object",
-      "nullable": true
-    },
-    "status": {
-      "properties": {
-        "id": {
-          "format": "int64",
-          "type": "integer",
-          "nullable": true
-        },
-        "ip": {
-          "type": "string",
-          "nullable": true
-        }
-      },
-      "type": "object",
-      "nullable": true
-    }
-  },
-  "required": [
-    "metadata",
-    "apiVersion",
-    "kind"
-  ]
-};
+import { Model, ModelData, setValidateFunc, createTypeMetaGuard } from "@kubernetes-models/base";
+import { ValidateFunc } from "@kubernetes-models/validate";
+import { validate } from "../../_schemas/CiliumIoV2CiliumExternalWorkload.js";
 
 /**
  * CiliumExternalWorkload is a Kubernetes Custom Resource that contains a specification for an external workload that can join the cluster.  The name of the CRD is the FQDN of the external workload, and it needs to match the name in the workload registration. The labels on the CRD object are the labels that will be used to allocate a Cilium Identity for the external workload. If 'io.kubernetes.pod.namespace' or 'io.kubernetes.pod.name' labels are not explicitly specified, they will be defaulted to 'default' and <workload name>, respectively. 'io.cilium.k8s.policy.cluster' will always be defined as the name of the current cluster, which defaults to "default".
@@ -126,7 +68,4 @@ constructor(data?: ModelData<ICiliumExternalWorkload>) {
 }
 
 
-setSchema(CiliumExternalWorkload, schemaId, () => {
-  addSchema();
-  register(schemaId, schema);
-});
+setValidateFunc(CiliumExternalWorkload, validate as ValidateFunc<ICiliumExternalWorkload>);

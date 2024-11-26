@@ -1,115 +1,7 @@
 import { IObjectMeta } from "@kubernetes-models/apimachinery/apis/meta/v1/ObjectMeta";
-import { addSchema } from "@kubernetes-models/apimachinery/_schemas/IoK8sApimachineryPkgApisMetaV1ObjectMeta";
-import { Model, setSchema, ModelData, createTypeMetaGuard } from "@kubernetes-models/base";
-import { register } from "@kubernetes-models/validate";
-
-const schemaId = "externaldns.k8s.io.v1alpha1.DNSEndpoint";
-const schema = {
-  "type": "object",
-  "properties": {
-    "apiVersion": {
-      "type": "string",
-      "enum": [
-        "externaldns.k8s.io/v1alpha1"
-      ]
-    },
-    "kind": {
-      "type": "string",
-      "enum": [
-        "DNSEndpoint"
-      ]
-    },
-    "metadata": {
-      "oneOf": [
-        {
-          "$ref": "io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta#"
-        },
-        {
-          "type": "null"
-        }
-      ]
-    },
-    "spec": {
-      "properties": {
-        "endpoints": {
-          "items": {
-            "properties": {
-              "dnsName": {
-                "type": "string",
-                "nullable": true
-              },
-              "labels": {
-                "additionalProperties": {
-                  "type": "string"
-                },
-                "type": "object",
-                "properties": {},
-                "nullable": true
-              },
-              "providerSpecific": {
-                "items": {
-                  "properties": {
-                    "name": {
-                      "type": "string",
-                      "nullable": true
-                    },
-                    "value": {
-                      "type": "string",
-                      "nullable": true
-                    }
-                  },
-                  "type": "object"
-                },
-                "type": "array",
-                "nullable": true
-              },
-              "recordTTL": {
-                "format": "int64",
-                "type": "integer",
-                "nullable": true
-              },
-              "recordType": {
-                "type": "string",
-                "nullable": true
-              },
-              "setIdentifier": {
-                "type": "string",
-                "nullable": true
-              },
-              "targets": {
-                "items": {
-                  "type": "string"
-                },
-                "type": "array",
-                "nullable": true
-              }
-            },
-            "type": "object"
-          },
-          "type": "array",
-          "nullable": true
-        }
-      },
-      "type": "object",
-      "nullable": true
-    },
-    "status": {
-      "properties": {
-        "observedGeneration": {
-          "format": "int64",
-          "type": "integer",
-          "nullable": true
-        }
-      },
-      "type": "object",
-      "nullable": true
-    }
-  },
-  "required": [
-    "apiVersion",
-    "kind"
-  ]
-};
+import { Model, ModelData, setValidateFunc, createTypeMetaGuard } from "@kubernetes-models/base";
+import { ValidateFunc } from "@kubernetes-models/validate";
+import { validate } from "../../_schemas/ExternaldnsK8sIoV1alpha1DNSEndpoint.js";
 
 export interface IDNSEndpoint {
   /**
@@ -193,7 +85,4 @@ constructor(data?: ModelData<IDNSEndpoint>) {
 }
 
 
-setSchema(DNSEndpoint, schemaId, () => {
-  addSchema();
-  register(schemaId, schema);
-});
+setValidateFunc(DNSEndpoint, validate as ValidateFunc<IDNSEndpoint>);
