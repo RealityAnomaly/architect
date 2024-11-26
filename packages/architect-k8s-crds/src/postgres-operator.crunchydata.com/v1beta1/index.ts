@@ -1,2 +1,2 @@
-export * from "./PostgresCluster";
-export * from "./PGUpgrade";
+export * from "./PostgresCluster.js";
+export * from "./PGUpgrade.js";

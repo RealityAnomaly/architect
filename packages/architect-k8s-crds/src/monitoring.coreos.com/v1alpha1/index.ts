@@ -1,1 +1,1 @@
-export * from "./AlertmanagerConfig";
+export * from "./AlertmanagerConfig.js";

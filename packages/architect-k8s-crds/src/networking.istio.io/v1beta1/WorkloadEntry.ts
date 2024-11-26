@@ -1,87 +1,7 @@
 import { IObjectMeta } from "@kubernetes-models/apimachinery/apis/meta/v1/ObjectMeta";
-import { addSchema } from "@kubernetes-models/apimachinery/_schemas/IoK8sApimachineryPkgApisMetaV1ObjectMeta";
-import { Model, setSchema, ModelData, createTypeMetaGuard } from "@kubernetes-models/base";
-import { register } from "@kubernetes-models/validate";
-
-const schemaId = "networking.istio.io.v1beta1.WorkloadEntry";
-const schema = {
-  "type": "object",
-  "properties": {
-    "spec": {
-      "properties": {
-        "address": {
-          "type": "string",
-          "nullable": true
-        },
-        "labels": {
-          "additionalProperties": {
-            "type": "string"
-          },
-          "type": "object",
-          "properties": {},
-          "nullable": true
-        },
-        "locality": {
-          "type": "string",
-          "nullable": true
-        },
-        "network": {
-          "type": "string",
-          "nullable": true
-        },
-        "ports": {
-          "additionalProperties": {
-            "type": "integer"
-          },
-          "type": "object",
-          "properties": {},
-          "nullable": true
-        },
-        "serviceAccount": {
-          "type": "string",
-          "nullable": true
-        },
-        "weight": {
-          "type": "integer",
-          "nullable": true
-        }
-      },
-      "type": "object",
-      "nullable": true
-    },
-    "status": {
-      "type": "object",
-      "properties": {},
-      "nullable": true
-    },
-    "apiVersion": {
-      "type": "string",
-      "enum": [
-        "networking.istio.io/v1beta1"
-      ]
-    },
-    "kind": {
-      "type": "string",
-      "enum": [
-        "WorkloadEntry"
-      ]
-    },
-    "metadata": {
-      "oneOf": [
-        {
-          "$ref": "io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta#"
-        },
-        {
-          "type": "null"
-        }
-      ]
-    }
-  },
-  "required": [
-    "apiVersion",
-    "kind"
-  ]
-};
+import { Model, ModelData, setValidateFunc, createTypeMetaGuard } from "@kubernetes-models/base";
+import { ValidateFunc } from "@kubernetes-models/validate";
+import { validate } from "../../_schemas/NetworkingIstioIoV1beta1WorkloadEntry.js";
 
 export interface IWorkloadEntry {
   /**
@@ -140,7 +60,4 @@ constructor(data?: ModelData<IWorkloadEntry>) {
 }
 
 
-setSchema(WorkloadEntry, schemaId, () => {
-  addSchema();
-  register(schemaId, schema);
-});
+setValidateFunc(WorkloadEntry, validate as ValidateFunc<IWorkloadEntry>);

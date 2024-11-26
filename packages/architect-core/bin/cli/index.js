@@ -1,3 +1,10 @@
 #!/usr/bin/env node
-require('ts-node').register();
-require('@perdition/architect-core/src/cli');
+import tsNode from 'ts-node';
+import path from 'path';
+
+tsNode.register({
+  project: path.resolve(`${import.meta.dirname}/../../tsconfig.json`)
+});
+
+import { App } from '@perdition/architect-core';
+new App(process.cwd()).run();

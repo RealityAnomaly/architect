@@ -1,53 +1,7 @@
 import { IObjectMeta } from "@kubernetes-models/apimachinery/apis/meta/v1/ObjectMeta";
-import { addSchema } from "@kubernetes-models/apimachinery/_schemas/IoK8sApimachineryPkgApisMetaV1ObjectMeta";
-import { Model, setSchema, ModelData, createTypeMetaGuard } from "@kubernetes-models/base";
-import { register } from "@kubernetes-models/validate";
-
-const schemaId = "bitnami.com.v1alpha1.SealedSecret";
-const schema = {
-  "type": "object",
-  "properties": {
-    "spec": {
-      "type": "object",
-      "properties": {},
-      "nullable": true
-    },
-    "status": {
-      "oneOf": [
-        {},
-        {
-          "type": "null"
-        }
-      ]
-    },
-    "apiVersion": {
-      "type": "string",
-      "enum": [
-        "bitnami.com/v1alpha1"
-      ]
-    },
-    "kind": {
-      "type": "string",
-      "enum": [
-        "SealedSecret"
-      ]
-    },
-    "metadata": {
-      "oneOf": [
-        {
-          "$ref": "io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta#"
-        },
-        {
-          "type": "null"
-        }
-      ]
-    }
-  },
-  "required": [
-    "apiVersion",
-    "kind"
-  ]
-};
+import { Model, ModelData, setValidateFunc, createTypeMetaGuard } from "@kubernetes-models/base";
+import { ValidateFunc } from "@kubernetes-models/validate";
+import { validate } from "../../_schemas/BitnamiComV1alpha1SealedSecret.js";
 
 export interface ISealedSecret {
   "spec"?: {
@@ -79,7 +33,4 @@ constructor(data?: ModelData<ISealedSecret>) {
 }
 
 
-setSchema(SealedSecret, schemaId, () => {
-  addSchema();
-  register(schemaId, schema);
-});
+setValidateFunc(SealedSecret, validate as ValidateFunc<ISealedSecret>);

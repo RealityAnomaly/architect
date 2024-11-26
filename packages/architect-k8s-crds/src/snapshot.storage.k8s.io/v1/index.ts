@@ -1,3 +1,3 @@
-export * from "./VolumeSnapshot";
-export * from "./VolumeSnapshotClass";
-export * from "./VolumeSnapshotContent";
+export * from "./VolumeSnapshot.js";
+export * from "./VolumeSnapshotClass.js";
+export * from "./VolumeSnapshotContent.js";

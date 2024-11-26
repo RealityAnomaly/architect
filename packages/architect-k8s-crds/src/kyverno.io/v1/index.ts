@@ -1,3 +1,3 @@
-export * from "./Policy";
-export * from "./GenerateRequest";
-export * from "./ClusterPolicy";
+export * from "./Policy.js";
+export * from "./GenerateRequest.js";
+export * from "./ClusterPolicy.js";

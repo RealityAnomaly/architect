@@ -1,3 +1,4 @@
-export * from "./SecretStore";
-export * from "./ClusterSecretStore";
-export * from "./ExternalSecret";
+export * from "./PushSecret.js";
+export * from "./SecretStore.js";
+export * from "./ClusterSecretStore.js";
+export * from "./ExternalSecret.js";
