@@ -3,8 +3,8 @@ import tsNode from 'ts-node';
 import path from 'path';
 
 tsNode.register({
-  project: path.resolve(`${import.meta.dirname}/../../tsconfig.json`)
+  project: path.resolve(`${import.meta.dirname}/../../tsconfig.json`),
 });
 
 import { App } from '@perdition/architect-core';
-new App(process.cwd()).run();
+await App.run(process.cwd());

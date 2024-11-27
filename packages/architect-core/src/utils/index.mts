@@ -1,3 +1,4 @@
+export * from './files.mts';
 export * from './hashing.mts';
 export * from './lazy.mts';
 export * from './state.mts';

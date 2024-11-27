@@ -1,61 +1,66 @@
-import * as fs from 'node:fs/promises';
 import path from 'path';
 import * as commander from 'commander';
-import { Target, TargetResolveParams } from '../target.mts';
+import { TargetResolveParams } from '../target.mts';
+import { Architect } from '../index.mts';
+import { ComponentCommand } from '../components/cli.mts';
 
 export class App {
-  private readonly dir: string;
+  public parent?: Architect;
+  private pluginCommand?: commander.Command;
 
-  public constructor(dir: string) {
-    this.dir = dir;
+  private constructor() {}
+
+  public static async run() {
+    const instance = new App();
+
+    const command = await instance.build();
+    await command.parseAsync();
   };
 
-  public run() {
-    const command = this.build();
-    command.parse();
-  };
+  private async preSubcommand(thisCommand: commander.Command, actionCommand: commander.Command): Promise<void> {
+    const options = thisCommand.opts();
+    this.parent = await Architect.create(options.workspace, options.config, options.debug);
+
+    // we have to do this late because the config file is only loaded once we have the -c parameter
+    if (actionCommand == this.pluginCommand!) {
+      for (const plugin of Object.values(this.parent.plugins.data)) {
+        plugin.registerCommand(actionCommand);
+      }
+    }
+  }
 
   private async compile(options: any) {
-    const output = options.output;
-    const targets = await Target.collectFolder(path.join(this.dir, 'targets'));
     const params: TargetResolveParams = {
       requirements: options.requirements,
       validate: options.validate,
     };
 
-    await fs.rm(output, { recursive: true, force: true });
-    await fs.mkdir(output, { recursive: true });
-    await Promise.all(Object.entries(targets).map(async ([k, v]): Promise<void> => {
-      const resolved = await v.resolve(params);
-      await resolved.write(path.join(output, k));
-    }));
+    await this.parent!.compile(options.output, params);
   };
 
-  protected build(): commander.Command {
+  protected async build(): Promise<commander.Command> {
     const program = new commander.Command();
+    program.hook('preSubcommand', this.preSubcommand.bind(this));
 
     program
       .name('architect')
-      .description('Architect is a framework for generating structured configuration trees in TypeScript.');
+      .description('Architect is a framework for generating structured configuration trees in TypeScript.')
+      .option('-d, --debug', 'enable debug logging', false)
+      .option('-w, --workspace <path>', 'path to the workspace to use (default current dir)', process.cwd())
+      .option('-c, --config <path>', 'configuration file (default architect.yaml)', path.join(process.cwd(), 'architect.yaml'))
 
     program.command('compile')
       .description('Runs the build process')
-      .option('-o, --output <dir>', 'output directory', path.join(this.dir, '../build'))
+      .option('-o, --output <dir>', 'output directory', path.join(process.cwd(), 'build'))
       .option('--no-validate', 'skips resource validation')
       .option('--no-requirements', 'skips requirement validation')
       .action(this.compile.bind(this));
     
-    const plugins = program.command('plugin')
+      program.addCommand(new ComponentCommand(this));
+    
+    this.pluginCommand = program.command('plugin')
       .description('Commands for plugin modules')
-    
-    // add from k8s package
-    //plugins.addCommand()
-    
-    plugins.command('k8s')
-      .description('Commands for the Kubernetes module')
 
     return program;
   };
 };
-
-//new App(process.cwd()).run();

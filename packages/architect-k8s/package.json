@@ -6,7 +6,8 @@
     "url": "https://github.com/RealityAnomaly/architect.git"
   },
   "exports": {
-    ".": "./src/index.mts"
+    ".": "./src/index.mts",
+    "./crds": "./src/generated/crds/index.ts"
   },
   "scripts": {
     "compile": " --build",
@@ -33,8 +34,8 @@
   },
   "dependencies": {
     "@kubernetes-models/apimachinery": "^2.0.1",
+    "@kubernetes-models/generate": "^2.4.0",
     "@perdition/architect-core": "^1.0.7",
-    "@perdition/architect-k8s-crds": "^1.0.7",
     "@types/js-yaml": "^4.0.9",
     "@types/lodash": "^4.17.13",
     "@types/node": "^22.9.4",
@@ -48,10 +49,12 @@
     "lodash": "^4.17.21",
     "reflect-metadata": "^0.2.2",
     "semver": "7.6.3",
+    "simple-git": "^3.27.0",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
     "uuid": "^11.0.3",
     "wildcard-match": "^5.1.3",
+    "winston": "^3.17.0",
     "yargs": "^17.7.2"
   },
   "keywords": [

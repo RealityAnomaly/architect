@@ -1,5 +1,5 @@
 import * as fs from 'node:fs/promises';
-import { Component } from './component.mts';
+import { Component } from './components/index.mts';
 import { ValidationError } from './target.mts';
 import { recursiveMerge } from './utils/index.mts';
 
