@@ -1,4 +1,4 @@
-import { Component, ComponentArgs } from './component.mts';
+import { Component, ComponentArgs } from './components/index.mts';
 import { Target } from './target.mts';
 import { Condition, constructor, DeepPartial, Lazy, LazyAuto, _LazyProxy, DeepLazySpec } from './utils/index.mts';
 

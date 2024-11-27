@@ -1,4 +1,4 @@
-import { Component, IComponentMatcher } from './component.mts';
+import { Component, IComponentMatcher } from './components/index.mts';
 import { constructor } from './utils/index.mts';
 
 type CapabilityCondition<T extends Capability<any>> = (capability: T) => boolean;
@@ -10,8 +10,8 @@ export abstract class Capability<T> {
     this.data = data;
   };
 
-  public get uuid(): string {
-    return Reflect.getMetadata('uuid', this.constructor);
+  public get clazz(): string {
+    return Reflect.getMetadata('class', this.constructor);
   };
 };
 
@@ -25,9 +25,9 @@ export class CapabilityMatcher<T extends Capability<any>> implements IComponentM
   };
 
   match(input: Component): boolean {
-    const uuid = Reflect.getMetadata('uuid', this.token);
+    const clazz = Reflect.getMetadata('class', this.token);
     const capability = input.capabilities.find(object => {
-      return object.uuid === uuid;
+      return object.clazz === clazz;
     });
 
     if (!capability) return false;

@@ -8,5 +8,8 @@
     "packages/*",
     "website"
   ],
-  "packageManager": "yarn@4.5.3"
+  "packageManager": "yarn@4.5.3",
+  "dependencies": {
+    "typescript": "^5.7.2"
+  }
 }

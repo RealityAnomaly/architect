@@ -1,4 +1,4 @@
-import { Component, Result, Target, TargetParams, TargetResolveParams } from '@perdition/architect-core';
+import { Architect, Component, Result, Target, TargetModel, TargetParams, TargetResolveParams } from '@perdition/architect-core';
 import * as api from 'kubernetes-models';
 import wcmatch from 'wildcard-match';
 import { FluxCDController, FluxCDMode } from './apply/flux/index.mts';
@@ -9,10 +9,9 @@ import { Helm } from './helm/index.mts';
 import { Kustomize } from './kustomize/index.mts';
 import { Resource } from './resource.mts';
 import { GVK } from './types/index.mts';
-import { TypeRegistry } from './types/registry.mts';
 import { isValidator } from './utils/index.mts';
 import { KubeWriter } from './writer.mts';
-import { ManifestLoader } from './yaml/load.mts';
+import { K8sPlugin } from './plugin.mts';
 
 export interface KubeCRDRequirement {
   exports: GVK[];
@@ -42,10 +41,8 @@ export interface KubeTargetResolveParams extends TargetResolveParams {};
  * Version of {Target} that provides build constructs for a specific Kubernetes cluster.
  */
 export class KubeTarget extends Target {
+  public static key = 'KubeTarget';
   declare public readonly params: KubeTargetParams;
-
-  public types: TypeRegistry;
-  public loader: ManifestLoader;
 
   public helm: Helm;
   public kustomize: Kustomize;
@@ -55,31 +52,30 @@ export class KubeTarget extends Target {
   private readonly markedCRDGVKs: GVK[] = [];
   private readonly markedCRDGroups: string[] = [];
 
-  constructor(spec: Partial<ClusterSpec>, params: KubeTargetParams = {
+  constructor(model: TargetModel<ClusterSpec>, params: KubeTargetParams = {
     modes: {},
     output: {
       format: KubeTargetOutputFormat.PerComponent,
     },
-  }) {
-    super(params);
+  }, parent: Architect) {
+    super(model, params, parent);
 
     // register our cluster fact
-    this.facts.register(ClusterFact, new ClusterFact(spec));
+    this.facts.register(ClusterFact, new ClusterFact(model.spec));
 
-    this.types = new TypeRegistry();
-    this.loader = new ManifestLoader(this);
-
-    this.helm = new Helm(this);
-    this.kustomize = new Kustomize(this);
+    this.helm = new Helm(this.plugin);
+    this.kustomize = new Kustomize(this.plugin);
 
     this.flux = new FluxCDController(this);
 
     this.enable(KubePreludeComponent);
     this.createDefaultResources();
-
-    // register the CRD module
-    this.registerCRDs('@perdition/architect-k8s-crds');
+    this.createCRDComponent();
   };
+
+  public get plugin(): K8sPlugin {
+    return this.parent.plugins.get(K8sPlugin.MODULE) as K8sPlugin;
+  }
 
   private createDefaultResources() {
     this.createNamespace(this.cluster.ns?.features!);
@@ -87,10 +83,8 @@ export class KubeTarget extends Target {
     this.createNamespace(this.cluster.ns?.services!);
   };
 
-  private registerCRDs(module: string) {
-    this.types.appendCRDModule(module);
-
-    const component = new CrdsComponent(this, module);
+  private createCRDComponent() {
+    const component = new CrdsComponent(this, this.plugin.parent.projectPaths);
     this.components.register(CrdsComponent, component);
     this.components.request(CrdsComponent)!.props.$set({ enable: true });
   };
@@ -234,7 +228,7 @@ export class KubeTarget extends Target {
       const component = result.components[k];
       dependencies.forEach(d => {
         // no self-dependencies
-        if (d.uuid === component.component.uuid) return;
+        if (d.clazz === component.component.clazz) return;
         if (component.dependencies.indexOf(d) !== -1) return;
         component.dependencies.push(d);
       });

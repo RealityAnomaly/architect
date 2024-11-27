@@ -12,5 +12,5 @@ export interface LoadBalancerCapabilitySpec {
 /**
  * Represents a cluster-wide load balancer, i.e. MetalLB
  */
-@Reflect.metadata('uuid', '0eff2358-1251-448d-89bc-e924894576be')
+@Reflect.metadata('class', 'capability.k8s.architect.glassway.net/loadbalancer')
 export class LoadBalancerCapability extends Capability<LoadBalancerCapabilitySpec> {};

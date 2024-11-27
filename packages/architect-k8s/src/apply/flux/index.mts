@@ -1,5 +1,5 @@
 import { Component, ResolvedComponent } from '@perdition/architect-core';
-import { kustomizeToolkitFluxcdIo } from '@perdition/architect-k8s-crds';
+import { kustomizeToolkitFluxcdIo } from '../../generated/crds/index.ts';
 import { KubeComponentContext } from '../../component.mts';
 import { KubeTarget } from '../../target.mts';
 

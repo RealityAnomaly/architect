@@ -7,13 +7,13 @@ import { cache, compositeHash } from '@perdition/architect-core';
 import * as yaml from 'js-yaml';
 
 import { Resource } from '../resource.mts';
-import { KubeTarget } from '../target.mts';
+import { K8sPlugin } from '../plugin.mts';
 
 export class Helm {
-  private readonly target: KubeTarget;
+  private readonly plugin: K8sPlugin;
 
-  constructor(target: KubeTarget) {
-    this.target = target;
+  constructor(plugin: K8sPlugin) {
+    this.plugin = plugin;
   };
 
   private buildParams(config: HelmChartOpts, params: string[]) {
@@ -97,7 +97,7 @@ export class Helm {
 
     const decoder = new util.TextDecoder();
     const data = decoder.decode(bytes);
-    return this.target.loader.loadString(data);
+    return this.plugin.loader.loadString(data);
   };
 
   private async storeCache(hash: string, data: string) {
@@ -139,7 +139,7 @@ export class Helm {
       const execFileAsync = util.promisify(execFile);
 
       const buf = await execFileAsync('helm', params.concat('--values', valuesFile), { maxBuffer: undefined });
-      const resources = await this.target.loader.loadString(buf.stdout);
+      const resources = await this.plugin.loader.loadString(buf.stdout);
 
       // cache the result from the inputs
       await this.storeCache(hash, buf.stdout);

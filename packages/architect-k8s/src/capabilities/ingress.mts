@@ -14,5 +14,5 @@ export interface IngressCapabilitySpec {
 /**
  * Represents a specific flavor of ingress controller
  */
-@Reflect.metadata('uuid', '7d512c4f-530c-48b6-abfe-c8a575d845e6')
+@Reflect.metadata('class', 'capability.k8s.architect.glassway.net/ingress')
 export class IngressCapability extends Capability<IngressCapabilitySpec> {};

@@ -1,8 +1,5 @@
-import { constructor, isNamed } from './utils/index.mts';
+import { constructor } from './utils/index.mts';
 
-/**
- * Type registry based on a "uuid" annotation
- */
 export class Registry {
   public readonly data: Record<string, any> = {};
 
@@ -28,10 +25,12 @@ export class Registry {
       instance = new token(...this.args);
     };
 
-    let id = Reflect.getMetadata('uuid', token);
-    if (isNamed(instance) && instance.name) {
-      id += `@${instance.name}`;
-    };
+    let id = Reflect.getMetadata('class', token);
+
+    // TODO: fix this
+    // if (isNamed(instance) && instance.name) {
+    //   id += `@${instance.name}`;
+    // };
 
     if (id in this.data) {
       throw Error(`${id} already exists in this Registry`);
@@ -47,14 +46,10 @@ export class Registry {
    * @param auto Create the object if it doesn't exist
    */
   public request<T>(token: constructor<T>, name?: string): T | undefined {
-    let id = Reflect.getMetadata('uuid', token);
-    if (!name && Reflect.hasMetadata('name', token)) {
-      name = Reflect.getMetadata('name', token);
-    };
+    let clazz = Reflect.getMetadata('class', token);
+    if (name) clazz += `@${name}`; // ...f38be@foobar-component
+    if (!(clazz in this.data)) return undefined;
 
-    if (name) id += `@${name}`; // ...f38be@foobar-component
-    if (!(id in this.data)) return undefined;
-
-    return this.data[id];
+    return this.data[clazz];
   };
 };
