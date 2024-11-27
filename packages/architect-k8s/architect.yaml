@@ -1,0 +1,9 @@
+library: true
+plugins:
+  kubernetes:
+    crds:
+      - name: fluxcd.io
+        http:
+          paths:
+            - >-
+              https://github.com/fluxcd/flux2/releases/latest/download/install.yaml

@@ -3,16 +3,16 @@ import { isRecord } from '@perdition/architect-core';
 import { loadAll } from 'js-yaml';
 
 import { isResource, Resource } from '../resource.mts';
-import { KubeTarget } from '../target.mts';
 import { GVK } from '../types/index.mts';
+import { K8sPlugin } from '../plugin.mts';
 
 //export interface ManifestLoadOptions {};
 
 export class ManifestLoader {
-  private readonly target: KubeTarget;
+  private readonly plugin: K8sPlugin;
 
-  constructor(target: KubeTarget) {
-    this.target = target;
+  constructor(plugin: K8sPlugin) {
+    this.plugin = plugin;
   };
 
   public async loadString(
@@ -32,7 +32,7 @@ export class ManifestLoader {
       };
 
       const gvk = GVK.fromAK(object.apiVersion, object.kind);
-      const Constructor = await this.target.types.getConstructor(gvk);
+      const Constructor = await this.plugin.types.getConstructor(gvk);
       const resource = Constructor ? new Constructor(object) : object;
       if (!resource) continue;
 

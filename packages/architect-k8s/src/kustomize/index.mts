@@ -2,13 +2,13 @@ import { execFile } from 'node:child_process';
 import * as util from 'util';
 
 import { Resource } from '../resource.mts';
-import { KubeTarget } from '../target.mts';
+import { K8sPlugin } from '../plugin.mts';
 
 export class Kustomize {
-  private readonly target: KubeTarget;
+  private readonly plugin: K8sPlugin;
 
-  constructor(target: KubeTarget) {
-    this.target = target;
+  constructor(plugin: K8sPlugin) {
+    this.plugin = plugin;
   };
 
   private buildParams(config: KustomizeOpts, params: string[]) {
@@ -60,18 +60,18 @@ export class Kustomize {
     };
   };
 
-  public async build(dir: string, config: KustomizeOpts = {}): Promise<Resource[]> {
+  public async build(path: string, config: KustomizeOpts = {}): Promise<Resource[]> {
     const params: string[] = [];
 
     // build operation
     params.push('build');
-    params.push(dir);
+    params.push(path);
 
     this.buildParams(config, params);
 
     const execFileAsync = util.promisify(execFile);
     const buf = await execFileAsync('kustomize', params, { maxBuffer: undefined });
-    const resources = await this.target.loader.loadString(buf.stdout);
+    const resources = await this.plugin.loader.loadString(buf.stdout);
     return resources;
   };
 };

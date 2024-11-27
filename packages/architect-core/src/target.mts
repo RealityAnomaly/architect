@@ -1,13 +1,29 @@
+import path from 'path';
 import * as fs from 'node:fs/promises';
-import path from 'node:path';
+import * as yaml from 'js-yaml';  
 import _ from 'lodash';
 
-import { Component } from './component.mts';
+import { Component } from './components/index.mts';
 import { Registry } from './registry.mts';
 import { ResolvedComponent, Result } from './result.mts';
 import { asyncFilter, Condition, constructor, DeepLazySpec, DeepPartial } from './utils/index.mts';
+import { Architect } from './index.mts';
 
 type Extract<T extends Component> = T extends Component<infer _R, infer U> ? U : never;
+
+export interface TargetModelMeta {
+  name: string;
+  namespace?: string;
+  labels?: Record<string, string>;
+}
+
+export interface TargetModel<T = unknown> {
+  apiVersion: string;
+  kind: string;
+  metadata: TargetModelMeta;
+  spec: T;
+  state: any;
+};
 
 export interface TargetParams {};
 
@@ -35,36 +51,48 @@ export abstract class BaseFact<T = unknown> {
  * Represents a location to which rendered configuration or objects is applied against
  */
 export class Target {
-  public static async collectFolder(input: string): Promise<Record<string, Target>> {
+  public static async collectFolder(parent: Architect, input: string): Promise<Target[]> {
+    try {
+      const statr = await fs.stat(input);
+      if (!statr.isDirectory()) return [];
+    } catch {
+      return [];
+    };
+
     const result = await fs.readdir(input);
+    const targetMap = parent.plugins.targetMap;
 
     // attempt to import every result as a Target instance
-    let results = await Promise.all(result.map(async (k): Promise<[string, Target | null]> => {
-      if (!k.endsWith('.mts')) return [k, null]; // ignore type definitions
-      const stripped = k.replace(/\.[^/.]+$/, ''); // strip extension
+    let results = await Promise.all(result.map(async (k): Promise<Target | null> => {
+      if (!k.endsWith('.yaml')) return null;
 
-      try {
-        const imported = await import(path.join(input, k));
-        return [stripped, imported.default];
-      } catch (exception) {
-        console.log(exception);
-        throw exception;
+      const content = await fs.readFile(path.join(input, k), 'utf-8');
+      const model = yaml.load(content) as TargetModel;
+      if (!Object.hasOwn(targetMap, model.kind)) {
+        parent.logger.error(`attempted to load target ${model.metadata.name} with unsupported kind ${model.kind}`);
+        return null;
       };
+
+      const target = new targetMap[model.kind](model, {}, parent);
+      parent.logger.debug(`loaded target ${target.model.metadata.name} of kind ${target.model.kind}`);
+
+      return target;
     }));
 
-    const targets = {} as Record<string, Target>;
-    results = results.filter(([_k, v]) => v !== null);
-    results.forEach(([k, v]) => targets[k] = v as Target);
-    return targets;
+    return results.filter(v => v !== null);
   };
 
+  public readonly model: TargetModel;
+  public readonly parent: Architect;
   public readonly params: TargetParams;
 
   public readonly components = new Registry([this]);
   protected readonly facts = new Registry();
 
-  constructor(params: TargetParams = {}) {
+  constructor(model: TargetModel, params: TargetParams = {}, parent: Architect) {
+    this.model = model;
     this.params = params;
+    this.parent = parent;
   };
 
   /**
@@ -147,6 +175,11 @@ export class Target {
   public fact<T extends BaseFact>(token: constructor<T>): T {
     return this.facts.request(token)!;
   };
+};
+
+export type TargetClass = {
+  new (model: TargetModel<any>, params: any, parent: Architect): Target
+  key: string
 };
 
 export class ValidationError extends Error {};

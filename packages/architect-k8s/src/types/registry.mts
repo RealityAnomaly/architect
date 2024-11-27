@@ -64,16 +64,8 @@ export class TypeRegistry {
     if (!gvk.isAPIModel()) {
       // CRD, try everything till we find a match
       for (const crdPath of this.crdModulePaths) {
-        let tryPath: string;
-
-        // if we're loading via ts-node ensure we append the right dir and extension
-        if (true) {
-          tryPath = `${crdPath}/src/${gvkPath}.ts`;
-        } else {
-          tryPath = `${crdPath}/lib/${gvkPath}.js`;
-        };
-
-        mod = await tryImport(tryPath);
+        const tryPath = `${crdPath}/src/generated/crds/${gvkPath}.ts`;
+        mod = await tryImport(crdPath);
         if (mod) {
           path = tryPath;
         };

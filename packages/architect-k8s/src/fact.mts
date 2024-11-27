@@ -60,7 +60,7 @@ export interface ClusterSpec {
   flavor: ClusterFlavor;
 };
 
-@Reflect.metadata('uuid', '6adbc9ab-fecc-4578-aede-1c61268bf13d')
+@Reflect.metadata('class', 'facts.k8s.architect.glassway.net/base')
 export class ClusterFact extends BaseFact<ClusterSpec> {
   constructor(instance: Partial<ClusterSpec>) {
     const defaults: Partial<ClusterSpec> = {

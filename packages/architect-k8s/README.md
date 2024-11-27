@@ -23,6 +23,14 @@ This is an extension to the [Architect framework](https://github.com/realityanom
 - **Direct apply** - apply your changes directly to the cluster
 - **Hybrid apply** - apply your changes via GitOps and watch them happen live with a connection to the target cluster
 
+## CRDs
+
+Architect has a philosophy of delegating CRD generation to you, the developer. Why? We believe that creating our own CRD packages have the potential to become outdated or break as they change, and there are too many Kubernetes applications out there to maintain an up-to-date package for all of them. CRDs will be bundled with applications [we support](https://github.com/realityanomaly/architect/packages/architect-k8s-apps), but others are up to you to manage.
+
+CRDs can be generated in any Architect project you choose. All you need to do is set the `plugins.kubernetes.crds` property of the `architect.yaml` configuration file.
+
+Then you can run `architect plugin k8s sync-crds` to download and generate CRDs.
+
 ## FAQ
 
 - **Why TypeScript?** JavaScript/TypeScript is the home of JSON, the language that YAML extends from. It provided the best working experience as WYSIWYG.

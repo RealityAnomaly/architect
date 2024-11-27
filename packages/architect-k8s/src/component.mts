@@ -101,7 +101,7 @@ export abstract class KubeComponent<
       },
       data: {
         name: this.name,
-        uuid: this.uuid,
+        class: this.clazz,
         context: JSON.stringify(this.context),
         config: JSON.stringify(resolved, null, 2),
       },
@@ -159,8 +159,7 @@ export class KubeResourceComponentOptions {
   resources: Resource[] = [];
 };
 
-@Reflect.metadata('name', 'prelude')
-@Reflect.metadata('uuid', '526f5de2-73b3-40f9-a88d-6eac3bb014b8')
+@Reflect.metadata('class', 'k8s.architect.glassway.net/prelude')
 export class KubePreludeComponent extends KubeComponent {
   private readonly resources: Resource[] = [];
 
