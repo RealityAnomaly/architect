@@ -21,7 +21,7 @@ export interface CrdsConfigHelm {
 
 export interface CrdsConfigHelmChart {
   name: string;
-  values?: any;
+  values: object;
   options: HelmChartOpts;
 };
 

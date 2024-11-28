@@ -35,7 +35,6 @@ export class Architect {
 
     await instance.plugins.resolve();
     await instance.plugins.init();
-    await instance.project.postLoad();
 
     return instance;
   };
@@ -43,7 +42,9 @@ export class Architect {
   public async compile(output: string, params: TargetResolveParams) {
     await fs.rm(output, { recursive: true, force: true });
     await fs.mkdir(output, { recursive: true });
-    await Promise.all(Object.values(this.project!.getTargets(false)).map(async (v): Promise<void> => {
+
+    const targets = await this.project!.getTargets(false);
+    await Promise.all(targets.map(async (v): Promise<void> => {
       const resolved = await v.resolve(params);
       await resolved.write(path.join(output, v.model.metadata.name));
     }));

@@ -4,9 +4,10 @@ import { App } from "../index.mts";
 export class ComponentCommand extends Command {
   private readonly app: App;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async list(options: any) {
     const libraryName = options.library as string | undefined;
-    const ourComponents = this.app.parent!.project!.getComponents(false);
+    const ourComponents = await this.app.parent!.project!.getComponents(false);
 
     if (!libraryName && ourComponents.length > 0) {
       console.log('Current project:');
@@ -20,7 +21,7 @@ export class ComponentCommand extends Command {
     for (const library of this.app.parent!.project!.libraries) {
       if (libraryName && library.moduleName !== libraryName) continue;
 
-      const components = library.getComponents(false);
+      const components = await library.getComponents(false);
       if (components.length <= 0) continue;
 
       console.log(`Library ${library.moduleName}:`)
@@ -32,10 +33,11 @@ export class ComponentCommand extends Command {
     };
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async show(options: any) {
     const clazz = options.class as string;
 
-    const components = this.app.parent!.project!.getComponents(true);
+    const components = await this.app.parent!.project!.getComponents(true);
     const component = components.find(c => Reflect.getMetadata('class', c) === clazz);
     if (!component) {
       console.log(`Unable to find any component with class ${clazz}`)

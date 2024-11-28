@@ -46,7 +46,7 @@ export class CRDFetcherGit extends CRDFetcher {
 
           try {
             await fs.stat(src);
-          } catch (exception) {
+          } catch {
             this.logger.warn(`for git CRD domain ${crd.name} repository ${repo.url}${refStr}: subpath ${p} does not exist`, { url: repo.url, ref: repo.ref, path: src });
             continue;
           };

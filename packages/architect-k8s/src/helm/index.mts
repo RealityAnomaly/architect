@@ -109,7 +109,7 @@ export class Helm {
   /**
    * Renders a Helm chart from parameters
    */
-  public async template(chart: string, values: any, config: HelmChartOpts): Promise<Resource[]> {
+  public async template(chart: string, values: object, config: HelmChartOpts): Promise<Resource[]> {
     const params: string[] = [];
 
     // template operation

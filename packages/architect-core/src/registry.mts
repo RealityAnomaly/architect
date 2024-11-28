@@ -1,14 +1,14 @@
 import { constructor } from './utils/index.mts';
 
 export class Registry {
-  public readonly data: Record<string, any> = {};
+  public readonly data: Record<string, unknown> = {};
 
   /**
     * Arguments to be passed to the constructor of registered classes
     */
-  private readonly args: any[];
+  private readonly args: unknown[];
 
-  constructor(args?: any[]) {
+  constructor(args?: unknown[]) {
     if (args != null) {
       this.args = args;
     } else {
@@ -25,7 +25,7 @@ export class Registry {
       instance = new token(...this.args);
     };
 
-    let id = Reflect.getMetadata('class', token);
+    const id = Reflect.getMetadata('class', token);
 
     // TODO: fix this
     // if (isNamed(instance) && instance.name) {
@@ -50,6 +50,6 @@ export class Registry {
     if (name) clazz += `@${name}`; // ...f38be@foobar-component
     if (!(clazz in this.data)) return undefined;
 
-    return this.data[clazz];
+    return this.data[clazz] as (T | undefined);
   };
 };

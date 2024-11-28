@@ -6,7 +6,7 @@ import objectHash from 'object-hash';
  *
  * @public
  */
-export function compositeHash(objects: any[]): string {
+export function compositeHash(objects: object[]): string {
   const hash = crypto.createHash('md5');
   objects.forEach(object => hash.update(objectHash(object)));
 

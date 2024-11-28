@@ -58,11 +58,11 @@ export class CRDModelGenerator {
 
   private async fixupModels(outDir: string) {
     for await (const file of walk(outDir)) {
-      var content = await fs.readFile(file, 'utf-8');
+      let content = await fs.readFile(file, 'utf-8');
       if (content.includes('_schemas') && !file.endsWith('.js'))
-        content = content.replaceAll(new RegExp('^(.*)(_schemas\/.[^"]*)', 'gm'), '$1$2.js');
+        content = content.replaceAll(new RegExp('^(.*)(_schemas/.[^"]*)', 'gm'), '$1$2.js');
 
-      content = content.replaceAll(new RegExp('^(export \*.*from )"(.*?)"', 'gm'), '$1"$2.js"');
+      content = content.replaceAll(new RegExp('^(export *.*from )"(.*?)"', 'gm'), '$1"$2.js"');
       await fs.writeFile(file, content);
     }
   }

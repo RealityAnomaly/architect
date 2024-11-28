@@ -25,7 +25,7 @@ export class CRDFetcherHelm extends CRDFetcher {
           if (resource instanceof api.apiextensionsK8sIo.v1.CustomResourceDefinition)
             result.push(resource);
         };
-      } catch (exception) {
+      } catch {
         this.logger.warn(`helm build failed for CRD domain ${crd.name} chart ${chart.name}`, { domain: crd.name, chart: chart.name });
       };
     };

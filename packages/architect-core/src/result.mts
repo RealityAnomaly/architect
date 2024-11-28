@@ -10,7 +10,7 @@ export interface Writer {
 export interface ResolvedComponent {
   component: Component;
   dependencies: Component[];
-  result: any;
+  result: unknown;
 };
 
 /**
@@ -35,9 +35,9 @@ export class Result {
   /**
    * Returns all merged configuration for this result
    */
-  public get all(): any {
-    return Object.values(this.components).reduce<any>((prev, cur) => {
-      return recursiveMerge(prev, cur.result);
+  public get all(): unknown {
+    return Object.values(this.components).reduce<unknown>((prev, cur) => {
+      return recursiveMerge(prev as object, cur.result as object);
     }, null);
   };
 
