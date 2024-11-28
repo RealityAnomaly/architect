@@ -6,20 +6,21 @@ import { CRDSyncOptions } from "./index.mts";
 export class CRDCommand extends Command {
   private readonly plugin: K8sPlugin;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async add(options: any) {
     const crd = {
       name: options.domain
     } as CrdsConfig;
 
     if (typeof(options.url) === 'string') {
-      const paths = (options.url as String).split(',');
+      const paths = (options.url as string).split(',');
       crd.http = {
         paths: paths,
       };
     }
 
     if (typeof(options.git) === 'string') {
-      const paths = (options.git as String).split('+');
+      const paths = (options.git as string).split('+');
 
       let ref = undefined;
       if (paths.length >= 2)
@@ -35,7 +36,7 @@ export class CRDCommand extends Command {
     }
 
     if (typeof(options.kustomize) === 'string') {
-      const paths = (options.kustomize as String).split(',');
+      const paths = (options.kustomize as string).split(',');
       crd.kustomize = {
         kustomizations: [],
       };
@@ -51,23 +52,26 @@ export class CRDCommand extends Command {
     await this.plugin.crds.commit();
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async remove(options: any) {
     await this.plugin.crds.remove(options.domain);
     await this.plugin.crds.commit();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async list(_: any) {
     const crds = this.plugin.crds.list();
     console.log(crds)
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async sync(options: any) {
     const syncOptions = {
       fetchOnly: options.fetchOnly,
     } as CRDSyncOptions;
 
     if (typeof(options.domain) === 'string') {
-      const domains = (options.domain as String).split(',')
+      const domains = (options.domain as string).split(',')
       for (const domain of domains) {
         const crd = this.plugin.crds.get(domain);
         if (crd === undefined) continue;

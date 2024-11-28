@@ -26,7 +26,7 @@ const namespaceBlacklist: string[] = [
 /**
  * Normalises a recursive list or set of potential resources into a flat list of resources.
  */
-export function normaliseResources(value: any): Resource[] {
+export function normaliseResources(value: unknown): Resource[] {
   if (value === undefined || value === null) return [];
 
   let result: Resource[];
@@ -80,7 +80,7 @@ export function fixupResource(resource: Resource): Resource {
 
   // removes null `data` on config maps (Helm will sometimes break this)
   if (resource.kind === 'ConfigMap') {
-    const obj = resource as any;
+    const obj = resource as object;
     if ('data' in obj && obj.data === null) {
       delete obj.data;
     };
@@ -117,5 +117,6 @@ interface Validator {
 };
 
 export function isValidator(value: unknown): value is Validator {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return !!value && typeof (value as any).validate === 'function';
 };

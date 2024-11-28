@@ -34,14 +34,9 @@ export class Project {
     if (!configPath) configPath = path.join(root, 'architect.yaml');
     const config = await ProjectConfigLoader.load(configPath);
     const project = new Project(parent, root, config, configPath);
-    project.loadImports();
+    await project.loadImports();
 
     return project;
-  };
-
-  public async postLoad() {
-    this._targets = await Target.collectFolder(this.parent, path.join(this.root, 'src/targets'));
-    this._components = await Component.collectPath(path.join(this.root, 'src/components'));
   };
 
   private async loadImports() {
@@ -67,8 +62,6 @@ export class Project {
         lib = await Project.load(this.parent, path);
         lib.module = mod;
         lib.moduleName = pkg;
-
-        await lib.postLoad();
       } catch (exception) {
         this.parent.logger.warn(`unable to load project ${pkg}: ${exception}`);
         continue;
@@ -84,18 +77,29 @@ export class Project {
     };
   }
 
-  public getTargets(recursive: boolean): Target[] {
+  public async getTargets(recursive: boolean): Promise<Target[]> {
+    if (!this._targets) {
+      this._targets = await Target.collectFolder(this.parent, path.join(this.root, 'src/targets'));
+    };
+
     const result = [];
     result.push(...this._targets || []);
-    if (recursive) this.libraries.forEach(l => result.push(...l.getTargets(recursive) || []));
+    if (recursive) this.libraries.forEach(async l => result.push(...await l.getTargets(recursive) || []));
 
     return result;
   };
 
-  public getComponents(recursive: boolean): ComponentClass[] {
+  public async getComponents(recursive: boolean): Promise<ComponentClass[]> {
+    if (!this._components) {
+      this._components = await Component.collectPaths(this.parent, [
+        path.join(this.root, 'src/components'),
+        path.join(this.root, 'src/modules'), // compatibility with existing project structure
+      ]);
+    };
+
     const result = [];
     result.push(...this._components || []);
-    if (recursive) this.libraries.forEach(l => result.push(...l.getComponents(recursive) || []));
+    if (recursive) this.libraries.forEach(async l => result.push(...await l.getComponents(recursive) || []));
 
     return result;
   };

@@ -14,7 +14,7 @@
   },
   "scripts": {
     "compile": "tsc --build",
-    "eslint": "eslint --ext .ts,.tsx --fix --no-error-on-unmatched-pattern src test build-tools",
+    "eslint": "eslint --fix --no-error-on-unmatched-pattern src test build-tools",
     "test": "jest --passWithNoTests --updateSnapshot && eslint",
     "test:watch": "jest --watch",
     "watch": "tsc --build -w"

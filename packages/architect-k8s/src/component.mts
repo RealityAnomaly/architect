@@ -3,13 +3,13 @@ import * as api from 'kubernetes-models';
 import _ from 'lodash';
 import { CNICapability, DNSCapability } from './capabilities/index.mts';
 
-import { ClusterFact, ClusterSpec } from './fact.mts';
 import { Helm, HelmChartOpts } from './helm/index.mts';
 import { Kustomize, KustomizeOpts } from './kustomize/index.mts';
 import { Resource } from './resource.mts';
-import { KubeTarget } from './target.mts';
+import { KubeTarget, KubeTargetModel } from './target.mts';
 import { defaultNamespace, fixupResource, normaliseResources } from './utils/index.mts';
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface KubeComponentArgs extends ComponentArgs {};
 export interface KubeComponentGenericResources {
   result?: Resource[];
@@ -22,7 +22,7 @@ export interface KubeComponentContext {
 export abstract class KubeComponent<
   TResult extends object = KubeComponentGenericResources,
   TArgs extends KubeComponentArgs = KubeComponentArgs,
-  TParent extends Component = any
+  TParent extends Component = never
 > extends Component<TResult, TArgs, TParent> {
   declare protected readonly target: KubeTarget;
 
@@ -83,7 +83,7 @@ export abstract class KubeComponent<
     return result;
   };
 
-  public async postBuild(data: any) {
+  public async postBuild(data: TResult) {
     // run post-build resource fixup at the top level
     let resources = normaliseResources(data);
 
@@ -113,11 +113,11 @@ export abstract class KubeComponent<
       return obj;
     });
 
-    return super.postBuild(resources);
+    return super.postBuild(resources as TResult);
   };
 
-  protected get cluster(): ClusterSpec {
-    return this.target.fact(ClusterFact).instance;
+  protected get cluster() {
+    return this.target.model as KubeTargetModel;
   };
 
   // helper accessors for extension fields
@@ -132,10 +132,10 @@ export abstract class KubeComponent<
   /**
    * Wrapper for Helm.template that inserts our default namespace and configuration
    */
-  protected async helmTemplate(chart: string, values: any, config: HelmChartOpts, filter?: (v: Resource) => boolean): Promise<Resource[]> {
+  protected async helmTemplate(chart: string, values: object, config: HelmChartOpts, filter?: (v: Resource) => boolean): Promise<Resource[]> {
     config = _.merge({
       namespace: this.namespace,
-      kubeVersion: `v${this.cluster.version}`,
+      kubeVersion: this.cluster.spec.version,
       includeCRDs: true,
       noHooks: true,
       skipTests: true,

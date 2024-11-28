@@ -13,7 +13,7 @@ export interface ResourceKind {
  */
 export interface Resource extends ResourceKind {
   metadata?: IObjectMeta;
-  spec?: any;
+  spec?: unknown;
 };
 
 /**
@@ -36,7 +36,7 @@ export type ResourceTree = Resource | Resource[] | Record<string, Resource>;
 /**
  * Returns whether this anonymous value is a resource
  */
-export function isResource(value: Record<string, unknown>): value is UnkResource {
+export function isResource(value: object): value is UnkResource {
   return (
     Object.hasOwn(value, 'apiVersion') &&
     Object.hasOwn(value, 'kind')
@@ -48,7 +48,7 @@ export function isResource(value: Record<string, unknown>): value is UnkResource
  */
 export function resourceId(data: Resource): string {
   const builder: string[] = [];
-  const components = [data.apiVersion, data.kind, data.metadata?.namespace, data.metadata?.name!];
+  const components = [data.apiVersion, data.kind, data.metadata?.namespace, data.metadata?.name];
   components.forEach(c => {
     if (c === undefined || c === null) return;
     builder.push(c.toLowerCase().replace('/', '_'));

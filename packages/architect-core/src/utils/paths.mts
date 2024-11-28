@@ -3,7 +3,7 @@ import _ from 'lodash';
 export type ValuePathKey = string | symbol | number;
 export type ValuePath = ValuePathKey[];
 
-export function isObjectDeepKeys(value: any): value is object {
+export function isObjectDeepKeys(value: unknown): value is object {
   // TODO: this should NOT Include classes!!!
   if (!_.isObject(value)) return false;
   if (_.isFunction(value)) return false;
@@ -28,17 +28,17 @@ export function prettifyPath(path: ValuePath): string {
 export class PathResultBuilder {
   private value?: PathResultValue = undefined;
 
-  public set(path: ValuePath, value: any, force: boolean, weight: number) {
+  public set<T>(path: ValuePath, value: T, force: boolean, weight: number) {
     this.value = this.merge(this.value, path, path, value, force, weight);
   };
 
-  public resolve() {
+  public resolve(): unknown {
     // strips weight/force metadata off our values
-    function stripMeta(value: PathResultValue): any {
+    function stripMeta(value: PathResultValue): unknown {
       if (_.isArray(value.value)) {
         return value.value.map(v => stripMeta(v));
       } else if (_.isObject(value.value)) {
-        const result: any = {};
+        const result = {} as Record<string, unknown>;
         for (const [k, v] of Object.entries(value.value)) {
           result[k] = stripMeta(v);
         };
@@ -53,10 +53,10 @@ export class PathResultBuilder {
     return stripMeta(this.value);
   };
 
-  private mergeValues(
+  private mergeValues<T>(
     target: PathResultValue | undefined,
     path: ValuePath, // not used, but useful for debugging
-    value: any,
+    value: T,
     force: boolean,
     weight: number,
   ): PathResultValue {
@@ -92,7 +92,7 @@ export class PathResultBuilder {
   /**
    * set the value at target identified by path to the specified value
    */
-  private merge(target: PathResultValue | undefined, path: ValuePath, fullPath: ValuePath, value: any, force: boolean, weight: number): any {
+  private merge<T>(target: PathResultValue | undefined, path: ValuePath, fullPath: ValuePath, value: T, force: boolean, weight: number): PathResultValue {
     if (path.length === 0) {
       return this.mergeValues(target, fullPath, value, force, weight);
     };
@@ -120,6 +120,7 @@ export class PathResultBuilder {
 
 export interface PathResultValue {
   force: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value?: any | PathResultValue[] | Record<string | symbol, PathResultValue>;
   weight: number;
 };

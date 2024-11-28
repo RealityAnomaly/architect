@@ -11,11 +11,11 @@ function gvkToPath(gvk: GVK): string {
   return path;
 };
 
-async function tryImport(path: string): Promise<any> {
+async function tryImport(path: string): Promise<object | undefined> {
   try {
     return await import(path);
   } catch {
-    return;
+    return undefined;
   };
 };
 
@@ -58,7 +58,8 @@ export class TypeRegistry {
     const gvkPath = gvkToPath(gvk);
 
     // find a matching constructor
-    let mod: any;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let mod: any | undefined;
     let path: string | null = null;
 
     if (!gvk.isAPIModel()) {

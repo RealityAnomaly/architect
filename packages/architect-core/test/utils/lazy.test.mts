@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Lazy } from '../../src/utils/lazy.mts';
 
 interface TestOptionsB {
