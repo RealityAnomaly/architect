@@ -4,7 +4,6 @@ export { Kustomize } from './kustomize/index.mts';
 export { GVK } from './types/index.mts';
 export * from './utils/index.mts';
 export * from './capabilities/index.mts';
-export * from './fact.mts';
 export * from './component.mts';
 export * from './resource.mts';
 export * from './target.mts';

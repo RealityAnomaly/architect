@@ -25,31 +25,18 @@ export function arrayStartsWith<T>(array: T[], prefix: T[]): boolean {
   return _.isEqual(array.slice(0, prefix.length), prefix);
 };
 
-// /**
-//  * Returns `code` of an error-like object.
-//  *
-//  * @public
-//  */
-// export function getErrorCode(err: unknown): string | undefined {
-//   if (isRecord(err) && typeof err.code === 'string') {
-//     return err.code;
-//   };
-
-//   return;
-// };
-
 /**
  * Recursively merges the following objects, properly handling array values
  */
-export function recursiveMerge(object: any, source: any): any {
+export function recursiveMerge<T extends object>(object: T, source: T): T {
   // if the types don't match, just return the source
   if (object === null || object.constructor !== source.constructor) return source;
 
   if (_.isArray(object)) {
-    return object.concat(source);
+    return object.concat(source) as T;
   };
 
-  function customizer(objValue: any, srcValue: any) {
+  function customizer(objValue: object, srcValue: object) {
     if (_.isArray(objValue)) {
       return objValue.concat(srcValue);
     };
@@ -63,11 +50,11 @@ export function recursiveMerge(object: any, source: any): any {
 /**
  * Recursively merges an array of values
  */
-export function recursiveMergeThese<T>(source: T[]): T {
-  return source.reduce<T>((prev, cur) => {
+export function recursiveMergeThese<T extends object>(source: T[]): T {
+  return source.reduce<T>((prev: T, cur: T) => {
     if (prev === undefined) return cur;
     return recursiveMerge(prev, cur);
-  }, undefined as any);
+  }, undefined as unknown as T);
 };
 
 /**
@@ -81,7 +68,7 @@ export function notEmpty<TValue>(value: TValue | null | undefined): value is TVa
 /**
  * Returns whether the specified object is either an empty object or an empty array
  */
-export function isEmptyObject(obj: any): boolean {
+export function isEmptyObject(obj: object): boolean {
   if (!notEmpty(obj)) return true;
   if (_.isArray(obj)) return obj.length === 0;
   return Object.keys(obj).length === 0;

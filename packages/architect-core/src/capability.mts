@@ -1,7 +1,7 @@
 import { Component, IComponentMatcher } from './components/index.mts';
 import { constructor } from './utils/index.mts';
 
-type CapabilityCondition<T extends Capability<any>> = (capability: T) => boolean;
+type CapabilityCondition<T extends Capability<unknown>> = (capability: T) => boolean;
 
 export abstract class Capability<T> {
   public readonly data: T;
@@ -15,7 +15,7 @@ export abstract class Capability<T> {
   };
 };
 
-export class CapabilityMatcher<T extends Capability<any>> implements IComponentMatcher {
+export class CapabilityMatcher<T extends Capability<unknown>> implements IComponentMatcher {
   private readonly token: constructor<T>;
   private readonly condition?: CapabilityCondition<T>;
 
@@ -31,7 +31,7 @@ export class CapabilityMatcher<T extends Capability<any>> implements IComponentM
     });
 
     if (!capability) return false;
-    if (this.condition && !this.condition(capability as any)) return false;
+    if (this.condition && !this.condition(capability as T)) return false;
 
     return true;
   };

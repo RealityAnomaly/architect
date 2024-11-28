@@ -1,10 +1,10 @@
-import { Architect, Component, Result, Target, TargetModel, TargetParams, TargetResolveParams } from '@perdition/architect-core';
+import { Architect, Component, Result, Target, TargetModel, TargetModelSpec, TargetParams, TargetResolveParams } from '@perdition/architect-core';
 import * as api from 'kubernetes-models';
+import _ from 'lodash';
 import wcmatch from 'wildcard-match';
 import { FluxCDController, FluxCDMode } from './apply/flux/index.mts';
 import { KubePreludeComponent } from './component.mts';
 import { CrdsComponent } from './components/index.mts';
-import { ClusterFact, ClusterSpec } from './fact.mts';
 import { Helm } from './helm/index.mts';
 import { Kustomize } from './kustomize/index.mts';
 import { Resource } from './resource.mts';
@@ -35,12 +35,71 @@ export interface KubeTargetParams extends TargetParams {
   };
 };
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface KubeTargetResolveParams extends TargetResolveParams {};
+
+interface ClusterClientSpec {
+  context: string;
+};
+
+interface ClusterNamespaceSpec {
+  /**
+   * The default namespace defined for cluster infrastructure
+   */
+  features?: string;
+
+  /**
+   * The default namespace defined for cluster operators
+   */
+  operators?: string;
+
+  /**
+   * The default namespace defined for cluster services
+   */
+  services?: string;
+};
+
+// "The physical cluster configuration has changed."
+// "Do you want to update the metal spec before deploying? (--auto-update-metal to bypass check)"
+interface ClusterMetalSpec {
+  /**
+   * Number of nodes in the physical cluster
+   */
+  nodes?: number;
+};
+
+export enum ClusterFlavor {
+  DockerDesktop = 'docker-desktop',
+  Kind = 'kind',
+  K3s = 'k3s',
+  Talos = 'talos',
+};
+
+// TODO: potentially move the Client and Metal specs to their own Fact, for separation purposes
+export interface ClusterSpec extends TargetModelSpec {
+  client: ClusterClientSpec;
+  dns: string;
+  platform?: string;
+  version: string;
+  metal: ClusterMetalSpec;
+  ns?: ClusterNamespaceSpec;
+
+  /**
+   * The pod network configuration
+   */
+  podNetwork: {
+    ipFamilies: string[];
+  };
+
+  flavor: ClusterFlavor;
+};
+
+export type KubeTargetModel = TargetModel<ClusterSpec>;
 
 /**
  * Version of {Target} that provides build constructs for a specific Kubernetes cluster.
  */
-export class KubeTarget extends Target {
+export class KubeTarget extends Target<KubeTargetModel> {
   public static key = 'KubeTarget';
   declare public readonly params: KubeTargetParams;
 
@@ -52,16 +111,26 @@ export class KubeTarget extends Target {
   private readonly markedCRDGVKs: GVK[] = [];
   private readonly markedCRDGroups: string[] = [];
 
-  constructor(model: TargetModel<ClusterSpec>, params: KubeTargetParams = {
+  constructor(model: KubeTargetModel, params: KubeTargetParams = {
     modes: {},
     output: {
       format: KubeTargetOutputFormat.PerComponent,
     },
   }, parent: Architect) {
-    super(model, params, parent);
+    const defaults: Partial<ClusterSpec> = {
+      ns: {
+        features: 'infra-system',
+        operators: 'operator-system',
+        services: 'services',
+      },
 
-    // register our cluster fact
-    this.facts.register(ClusterFact, new ClusterFact(model.spec));
+      podNetwork: {
+        ipFamilies: ['IPv4'],
+      },
+    };
+
+    model.spec = _.merge(defaults, model.spec);
+    super(model, params, parent);
 
     this.helm = new Helm(this.plugin);
     this.kustomize = new Kustomize(this.plugin);
@@ -78,9 +147,9 @@ export class KubeTarget extends Target {
   }
 
   private createDefaultResources() {
-    this.createNamespace(this.cluster.ns?.features!);
-    this.createNamespace(this.cluster.ns?.operators!);
-    this.createNamespace(this.cluster.ns?.services!);
+    this.createNamespace(this.model.spec.ns!.features!);
+    this.createNamespace(this.model.spec.ns!.operators!);
+    this.createNamespace(this.model.spec.ns!.services!);
   };
 
   private createCRDComponent() {
@@ -163,7 +232,7 @@ export class KubeTarget extends Target {
       });
 
       if (missing.length > 0) {
-        throw Error(`component ${k} is attempting to use resources missing from cluster ${this.cluster.name}: ${missing.join(', ')}`);
+        throw Error(`component ${k} is attempting to use resources missing from cluster ${this.model.metadata.name}: ${missing.join(', ')}`);
       };
     });
   };
@@ -197,11 +266,11 @@ export class KubeTarget extends Target {
     return obj;
   };
 
-  private processDependencies(result: Result) {
+  private processDependencies(result: Result, validate: boolean) {
     // check to see what CRDs each component exports
     // validate objects - no two components can export the same GVK
     const crds = this.buildCRDRequirements(result);
-    this.validateCRDRequirements(crds);
+    if (validate) this.validateCRDRequirements(crds);
 
     // append interdependencies
     Object.entries(crds).forEach(([k, v]) => {
@@ -239,10 +308,10 @@ export class KubeTarget extends Target {
     const result = await super.resolve(params) as Result;
 
     // process dependencies - introspect for hidden component-component dependencies involving CRDs
-    this.processDependencies(result);
+    this.processDependencies(result, params.requirements !== false);
 
     if (params.validate !== false) {
-      for (const item of result.all) {
+      for (const item of result.all as Resource[]) {
         if (!isValidator(item)) continue;
 
         try {
@@ -257,10 +326,6 @@ export class KubeTarget extends Target {
     result.writer = new KubeWriter(this);
 
     return result;
-  };
-
-  public get cluster(): ClusterSpec {
-    return this.fact(ClusterFact).instance;
   };
 
   private get prelude(): KubePreludeComponent {

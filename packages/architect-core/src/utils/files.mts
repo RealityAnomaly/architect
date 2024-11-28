@@ -1,7 +1,7 @@
 import path from 'path';
 import * as fs from 'node:fs/promises';
 
-export async function* walk(location: string): any {
+export async function* walk(location: string): AsyncGenerator<string> {
   try {
     const result = await fs.stat(location);
     if (!result.isDirectory()) {

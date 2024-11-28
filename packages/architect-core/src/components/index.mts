@@ -7,6 +7,7 @@ import { Capability } from '../capability.mts';
 import { ConfigurationContext } from '../config.mts';
 import { Target } from '../target.mts';
 import { constructor, DeepPartial, Lazy, LazyAuto, Named, setNamed, walk } from '../utils/index.mts';
+import { Architect } from '../index.mts';
 
 export interface ComponentArgs {
   /**
@@ -20,9 +21,10 @@ export interface ComponentArgs {
  * to be merged into the resultant configuration tree
  */
 export abstract class Component<
-  TResult extends object = any,
+  TResult extends object = object,
   TArgs extends ComponentArgs = ComponentArgs,
-  TParent extends Component = any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  TParent extends Component = any,
 > implements Named {
   public static ref<T extends Component>(input: T): ComponentReference<T> {
     return {
@@ -46,7 +48,7 @@ export abstract class Component<
    */
   public props: LazyAuto<TArgs>;
 
-  constructor(target: Target, props: TArgs = {} as TArgs, name?: string, parent?: TParent) {
+  constructor(target: Target, props: TArgs | undefined = {} as TArgs, name?: string, parent?: TParent) {
     this.target = target;
     this._name = name;
     this.parent = parent;
@@ -80,7 +82,7 @@ export abstract class Component<
   /**
    * Returns the context of this component
    */
-  public get context(): Record<string, any> {
+  public get context(): unknown {
     if (this.parent !== undefined) {
       return this.parent.context;
     };
@@ -91,7 +93,7 @@ export abstract class Component<
   /**
    * Returns the capabilities that this component declares
    */
-  public get capabilities(): Capability<any>[] {
+  public get capabilities(): Capability<unknown>[] {
     return [];
   };
 
@@ -149,9 +151,9 @@ export abstract class Component<
   /**
    * Constructs this component, setting properties on the Result object.
    */
-  public async build(result: TResult = {} as any): Promise<TResult> {
+  public async build(result: TResult = {} as TResult): Promise<TResult> {
     for (const c of this.children) {
-      result = await c.build(result);
+      result = await c.build(result) as TResult;
     };
 
     return result;
@@ -174,7 +176,7 @@ export abstract class Component<
   /**
    * Passthrough function that performs postprocessing on this component's build outputs
    */
-  public async postBuild(data: any): Promise<any> {
+  public async postBuild(data: TResult): Promise<TResult> {
     return data;
   };
 
@@ -206,7 +208,7 @@ export abstract class Component<
    * Returns this component's short result ID (RID)
    */
   public get rid(): string {
-    return `${this.name}-${objectHash(this.context).slice(0, 7)}`;
+    return `${this.name}-${objectHash(this.context as object).slice(0, 7)}`;
   };
 
   /**
@@ -227,45 +229,50 @@ export abstract class Component<
     };
   };
 
-  public static async collectPath(path: string): Promise<ComponentClass[]> {
-    try {
-      const statr = await fs.stat(path);
-      if (!statr.isDirectory()) return [];
-    } catch {
-      return [];
-    };
+  public static async collectPaths(parent: Architect, paths: string[]): Promise<ComponentClass[]> {
+    const results = [];
 
-    const paths = [];
-    for await (const p of walk(path)) {
-      paths.push(p);
-    };
-
-    const results = await Promise.all(paths.map(async (k: string): Promise<ComponentClass[]> => {
-      if (!k.endsWith('.mts')) return [];
-
-      let module: any;
+    for (const path of paths) {
       try {
-        module = await import(k);
-      } catch (exception) {
-        return [];
+        const statr = await fs.stat(path);
+        if (!statr.isDirectory()) return [];
+      } catch {
+        continue;
       };
-
-      return Object.values(module).filter(m => {
-        return Reflect.hasMetadata('class', m as any);
-      }) as ComponentClass[];
-    }));
+  
+      const paths = [];
+      for await (const p of walk(path)) {
+        paths.push(p);
+      };
+  
+      results.push(...await Promise.all(paths.map(async (k: string): Promise<ComponentClass[]> => {
+        if (!k.endsWith('.mts')) return [];
+  
+        let module: object;
+        try {
+          module = await import(k);
+        } catch (exception) {
+          parent.logger.warn(`Failed to load path ${k}: ${exception}`);
+          return [];
+        };
+  
+        return Object.values(module).filter(m => {
+          return Reflect.hasMetadata('class', m as object);
+        }) as ComponentClass[];
+      })));
+    }
 
     return results.flat();
   };
 };
 
 export type ComponentClass = {
-  new (target: Target, props: ComponentArgs, name?: string, parent?: Component): Component;
+  new (target: Target, props?: ComponentArgs, name?: string, parent?: Component): Component;
 };
 
 export interface ComponentReference<_T extends Component> {
   name: string;
-  context: Record<string, any>;
+  context: unknown;
 };
 
 /**

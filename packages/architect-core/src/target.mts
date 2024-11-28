@@ -7,7 +7,7 @@ import { Component } from './components/index.mts';
 import { Registry } from './registry.mts';
 import { ResolvedComponent, Result } from './result.mts';
 import { asyncFilter, Condition, constructor, DeepLazySpec, DeepPartial } from './utils/index.mts';
-import { Architect } from './index.mts';
+import { Architect, ComponentArgs } from './index.mts';
 
 type Extract<T extends Component> = T extends Component<infer _R, infer U> ? U : never;
 
@@ -15,16 +15,28 @@ export interface TargetModelMeta {
   name: string;
   namespace?: string;
   labels?: Record<string, string>;
-}
+};
 
-export interface TargetModel<T = unknown> {
+export interface TargetModelSpecComponent {
+  class: string;
+  name?: string;
+  options?: ComponentArgs;
+};
+
+export interface TargetModelSpec {
+  requirements: string[]; // TODO: not handled yet
+  components: TargetModelSpecComponent[];
+};
+
+export interface TargetModel<T extends TargetModelSpec = TargetModelSpec> {
   apiVersion: string;
   kind: string;
   metadata: TargetModelMeta;
   spec: T;
-  state: any;
+  state: unknown;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface TargetParams {};
 
 export interface TargetResolveParams {
@@ -50,7 +62,7 @@ export abstract class BaseFact<T = unknown> {
 /**
  * Represents a location to which rendered configuration or objects is applied against
  */
-export class Target {
+export class Target<TModel extends TargetModel = TargetModel> {
   public static async collectFolder(parent: Architect, input: string): Promise<Target[]> {
     try {
       const statr = await fs.stat(input);
@@ -63,7 +75,7 @@ export class Target {
     const targetMap = parent.plugins.targetMap;
 
     // attempt to import every result as a Target instance
-    let results = await Promise.all(result.map(async (k): Promise<Target | null> => {
+    const results = await Promise.all(result.map(async (k): Promise<Target | null> => {
       if (!k.endsWith('.yaml')) return null;
 
       const content = await fs.readFile(path.join(input, k), 'utf-8');
@@ -74,25 +86,39 @@ export class Target {
       };
 
       const target = new targetMap[model.kind](model, {}, parent);
-      parent.logger.debug(`loaded target ${target.model.metadata.name} of kind ${target.model.kind}`);
+      await target.init();
 
+      parent.logger.debug(`loaded target ${target.model.metadata.name} of kind ${target.model.kind}`);
       return target;
     }));
 
     return results.filter(v => v !== null);
   };
 
-  public readonly model: TargetModel;
+  public readonly model: TModel;
   public readonly parent: Architect;
   public readonly params: TargetParams;
 
   public readonly components = new Registry([this]);
   protected readonly facts = new Registry();
 
-  constructor(model: TargetModel, params: TargetParams = {}, parent: Architect) {
+  protected constructor(model: TModel, params: TargetParams = {}, parent: Architect) {
     this.model = model;
     this.params = params;
     this.parent = parent;
+  };
+
+  protected async init() {
+    const tokens = await this.parent.project!.getComponents(true);
+    for (const component of this.model.spec.components) {
+      const token = tokens.find(t => Reflect.getMetadata('class', t) === component.class);
+      if (!token) {
+        this.parent.logger.warn(`Target ${this.model.metadata.name} references unknown component ${component.class}, skipping`);
+        continue;
+      };
+
+      this.enable(token, component.options, component.name);
+    };
   };
 
   /**
@@ -101,7 +127,7 @@ export class Target {
   public async resolve(params: TargetResolveParams = {}): Promise<Result> {
     // Aggregate all enabled components
     const values: Component[] = await asyncFilter(
-      Object.values(this.components.data),
+      Object.values(this.components.data) as Component[],
       async (c: Component) => await c.props.enable.$resolve() === true,
     );
 
@@ -115,7 +141,7 @@ export class Target {
       results[v.rid].dependencies = requirements.reduce<Component[]>((prev, cur) => {
         const matches = values.filter(v2 => cur.match(v2));
         if ((matches.length <= 0) && params.requirements !== false) {
-          throw Error(`Component ${v.toString()}\nMatcher ${cur.toString()} failed`);
+          throw Error(`in component ${v.toString()}: failed to satisfy dependency ${cur.toString()}`);
         };
 
         return prev.concat(matches);
@@ -124,7 +150,7 @@ export class Target {
 
     // Execute component build async
     await Promise.all(values.map(async (v): Promise<void> => {
-      let result = await v.build();
+      const result = await v.build();
       if (result === undefined) return;
 
       results[v.rid].result = await v.postBuild(result);
@@ -178,6 +204,7 @@ export class Target {
 };
 
 export type TargetClass = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   new (model: TargetModel<any>, params: any, parent: Architect): Target
   key: string
 };

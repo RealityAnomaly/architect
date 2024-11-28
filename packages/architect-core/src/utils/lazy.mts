@@ -56,7 +56,7 @@ export interface _LazyProxy<T> {
 };
 
 class LazyProxy {
-  public static from<T>(root: Lazy<any>, path: ValuePath = []): LazyAuto<T> {
+  public static from<T>(root: Lazy<unknown>, path: ValuePath = []): LazyAuto<T> {
     const internal = {
       $__root__: root,
       $__path__: path,
@@ -73,7 +73,7 @@ class LazyProxy {
           fallback = internal.$__fallback__;
         };
 
-        let result: any;
+        let result: unknown;
         try {
           result = await root.get(path, depth);
           if (fallback !== undefined) {
@@ -92,7 +92,7 @@ class LazyProxy {
           };
         };
 
-        internal.$__cachedResult__ = result;
+        internal.$__cachedResult__ = result as T;
         return result;
       },
 
@@ -138,8 +138,9 @@ class LazyProxy {
     }) as LazyAuto<T>;
   };
 
-  public static is<T>(value: any): value is _LazyProxy<T> {
-    return (typeof(value) === 'object' && LAZY_PROXY_SYMBOL in value && value[LAZY_PROXY_SYMBOL]);
+  public static is<T>(value: unknown): value is _LazyProxy<T> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return (typeof(value) === 'object' && LAZY_PROXY_SYMBOL in (value as object) && (value as any)[LAZY_PROXY_SYMBOL]);
   };
 };
 
@@ -191,7 +192,7 @@ export class Lazy<T> {
   private matchValues(path: ValuePath): LazyValue<T>[] {
     let values: LazyValue<T>[] = [];
     {
-      let curr = _.clone(path);
+      const curr = _.clone(path);
       while (true) {
         values.push(...this.values.filter(
           v => _.isEqual(v.path, curr)),
@@ -215,10 +216,10 @@ export class Lazy<T> {
   /**
    * Gets the value at the specified ValuePath.
    */
-  public async get(path: ValuePath, depth: number): Promise<any> {
+  public async get<TValue>(path: ValuePath, depth: number): Promise<TValue> {
     const values = this.matchValues(path);
     if (values.length <= 0) {
-      throw new TypeError(`no value found at path ${path.join('.')}`);
+      throw new TypeError(`no value found at path \`${path.join('.')}\` at depth ${depth}`);
     };
 
     const builder = new PathResultBuilder();
@@ -240,10 +241,11 @@ export class Lazy<T> {
     };
 
     // traverse into the result to get the final value
-    const result = builder.resolve();
+    const result = builder.resolve() as TValue;
     if (result === undefined) return result;
 
-    let curr = result;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let curr = result as any;
     for (const key of path) {
       if (curr === undefined) {
         throw new TypeError(`attempted to read value of undefined at ${path.join('.')}`);
@@ -258,25 +260,25 @@ export class Lazy<T> {
   /**
    * Sets the value at the specified ValuePath.
    */
-  public set(path: ValuePath, value_: Value<any>, weight: number = 0, force: boolean = false, condition?: Condition) {
+  public set(path: ValuePath, _value: Value<T>, weight: number = 0, force: boolean = false, condition?: Condition) {
     // if the value is a proxy, we need to create a resolver for it
-    const value = LazyProxy.is(value_) ? async () => value_ : value_;
+    const property = LazyProxy.is(_value) ? async () => _value : _value;
 
     // do not collapse object values if we're forcing the value, treat it as atomic
-    if (!isObjectDeepKeys(value) || isEmptyObject(value) || force) {
+    if (!isObjectDeepKeys(property) || isEmptyObject(property) || force) {
       this.values.push({
         condition: condition,
         force: force,
         path: path,
-        value: value,
+        value: property,
         weight: weight,
       });
-    } else if (_.isArray(value)) {
-      for (let i = 0; i < value.length; i++) {
-        this.set(path.concat(-1), value[i], weight, force, condition);
+    } else if (_.isArray(property)) {
+      for (let i = 0; i < property.length; i++) {
+        this.set(path.concat(-1), property[i], weight, force, condition);
       };
     } else {
-      for (const [k, v] of Object.entries(value)) {
+      for (const [k, v] of Object.entries(property)) {
         this.set(path.concat(k), v, weight, force, condition);
       };
     };

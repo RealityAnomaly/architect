@@ -24,11 +24,12 @@ export class App {
     // we have to do this late because the config file is only loaded once we have the -c parameter
     if (actionCommand == this.pluginCommand!) {
       for (const plugin of Object.values(this.parent.plugins.data)) {
-        plugin.registerCommand(actionCommand);
+        await plugin.registerCommand(actionCommand);
       }
     }
-  }
+  };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async compile(options: any) {
     const params: TargetResolveParams = {
       requirements: options.requirements,
