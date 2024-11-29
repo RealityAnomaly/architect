@@ -2,17 +2,14 @@ import fs from 'node:fs/promises';
 import { isRecord } from '@perdition/architect-core';
 import { loadAll } from 'js-yaml';
 
-import { isResource, Resource } from '../resource.mts';
-import { GVK } from '../types/index.mts';
-import { K8sPlugin } from '../plugin.mts';
-
-//export interface ManifestLoadOptions {};
+import { isResource, Resource } from './resource.mts';
+import { GVK, TypeRegistry } from './types/index.mts';
 
 export class ManifestLoader {
-  private readonly plugin: K8sPlugin;
+  private readonly types: TypeRegistry;
 
-  constructor(plugin: K8sPlugin) {
-    this.plugin = plugin;
+  constructor(types: TypeRegistry) {
+    this.types = types;
   };
 
   public async loadString(
@@ -32,7 +29,7 @@ export class ManifestLoader {
       };
 
       const gvk = GVK.fromAK(object.apiVersion, object.kind);
-      const Constructor = await this.plugin.types.getConstructor(gvk);
+      const Constructor = await this.types.getConstructor(gvk);
       const resource = Constructor ? new Constructor(object) : object;
       if (!resource) continue;
 

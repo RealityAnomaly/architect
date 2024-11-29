@@ -1,3 +1,4 @@
+import { Architect } from '../../index.mts';
 import { ResourceConstructor } from '../resource.mts';
 import { GVK } from './gvk.mts';
 
@@ -25,7 +26,9 @@ async function tryImport(path: string): Promise<object | undefined> {
 export class TypeRegistry {
   private ctorCache: Record<string, ResourceConstructor | null> = {};
   private apiModulePath: string = 'kubernetes-models';
-  private crdModulePaths: string[] = [];
+  private crdModulePaths: string[] = [
+    Architect.PATH // path of the default root module
+  ];
 
   /**
    * Sets the path for Kubernetes API models.
@@ -66,9 +69,10 @@ export class TypeRegistry {
       // CRD, try everything till we find a match
       for (const crdPath of this.crdModulePaths) {
         const tryPath = `${crdPath}/src/generated/crds/${gvkPath}.ts`;
-        mod = await tryImport(crdPath);
+        mod = await tryImport(tryPath);
         if (mod) {
           path = tryPath;
+          break;
         };
       };
     } else {

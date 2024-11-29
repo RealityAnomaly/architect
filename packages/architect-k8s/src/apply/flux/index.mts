@@ -1,7 +1,7 @@
 import { Component, ResolvedComponent } from '@perdition/architect-core';
 import { kustomizeToolkitFluxcdIo } from '../../generated/crds/index.ts';
-import { KubeComponentContext } from '../../component.mts';
 import { KubeTarget } from '../../target.mts';
+import { KubeContext } from '../../context.mts';
 
 interface FluxCDSourceRef {
   apiVersion?: string | undefined;
@@ -22,12 +22,12 @@ export class FluxCDController {
   };
 
   private componentName(component: Component): string {
-    return `cid-${component.name}`;
+    return `cid-${component.context.name}`;
   };
 
   public componentObject(resolved: ResolvedComponent, mode: FluxCDMode): kustomizeToolkitFluxcdIo.v1.Kustomization {
-    const name = resolved.component.name;
-    const ctx = resolved.component.context as KubeComponentContext;
+    const ctx = resolved.component.context as KubeContext;
+    const name = ctx.name;
 
     return new kustomizeToolkitFluxcdIo.v1.Kustomization({
       metadata: {
@@ -38,7 +38,7 @@ export class FluxCDController {
         dependsOn: resolved.dependencies.map(d => {
           return {
             name: this.componentName(d),
-            namespace: (d.context as KubeComponentContext).namespace,
+            namespace: (d.context as KubeContext).namespace,
           };
         }),
         interval: '10m0s',

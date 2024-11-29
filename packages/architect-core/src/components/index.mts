@@ -6,8 +6,8 @@ import objectHash from 'object-hash';
 import { Capability } from '../capability.mts';
 import { ConfigurationContext } from '../config.mts';
 import { Target } from '../target.mts';
-import { constructor, DeepPartial, Lazy, LazyAuto, Named, setNamed, walk } from '../utils/index.mts';
-import { Architect } from '../index.mts';
+import { constructor, DeepPartial, Lazy, LazyAuto, walk } from '../utils/index.mts';
+import { Architect, Context } from '../index.mts';
 
 export interface ComponentArgs {
   /**
@@ -25,33 +25,24 @@ export abstract class Component<
   TArgs extends ComponentArgs = ComponentArgs,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TParent extends Component = any,
-> implements Named {
-  public static ref<T extends Component>(input: T): ComponentReference<T> {
-    return {
-      name: input.name,
-      context: input.context,
-    };
-  };
-
+> {
+  public context: Context;
   protected readonly target: Target;
-
+  
+  protected parent?: TParent;
   protected readonly children: Component[] = [];
-  protected readonly parent?: TParent;
-
-  /**
-   * The overridden name of the component
-   */
-  private readonly _name?: string;
+  protected readonly independent: boolean;
 
   /**
    * The configuration model of the component as a {LazyAuto}
    */
   public props: LazyAuto<TArgs>;
 
-  constructor(target: Target, props: TArgs | undefined = {} as TArgs, name?: string, parent?: TParent) {
+  constructor(target: Target, props: TArgs | undefined = {} as TArgs, context: Context, parent?: TParent) {
     this.target = target;
-    this._name = name;
-    this.parent = parent;
+    this.context = context;
+    this.independent = parent === undefined;
+    this.setParent(parent);
 
     if (!Reflect.hasMetadata('class', this.constructor) && this.parent === undefined) {
       throw Error(`${this.constructor.name}: the class metadata attribute must be set`);
@@ -69,9 +60,6 @@ export abstract class Component<
 
     this.props = Lazy.from(props);
 
-    // Component is a Named
-    setNamed(this);
-
     // Configure
     this.configure(new ConfigurationContext(target, this.props));
 
@@ -79,15 +67,8 @@ export abstract class Component<
     this.init();
   };
 
-  /**
-   * Returns the context of this component
-   */
-  public get context(): unknown {
-    if (this.parent !== undefined) {
-      return this.parent.context;
-    };
-
-    return {};
+  public get name(): string {
+    return this.context.name;
   };
 
   /**
@@ -95,6 +76,13 @@ export abstract class Component<
    */
   public get capabilities(): Capability<unknown>[] {
     return [];
+  };
+
+  /**
+   * Sets the parent in "independent" mode
+   */
+  public setParent(parent?: TParent) {
+    this.parent = parent;
   };
 
   /**
@@ -113,11 +101,13 @@ export abstract class Component<
    * Adds a child by constructing it and adding it to this component
    */
   protected addChild(child: constructor<Component>, independent = false) {
-    const instance = new child(this.target, undefined, undefined, this);
+    const context = this.target.defaultContext(child, structuredClone(this.context), true);
+    const instance = new child(this.target, undefined, context, independent ? undefined : this);
     instance.props.$set({ enable: this.props.enable });
 
     if (independent) {
-      this.target.components.register(child, instance);
+      instance.setParent(this);
+      this.target.components.register(child, instance, instance.context);
     } else {
       this.children.push(instance);
     };
@@ -126,7 +116,7 @@ export abstract class Component<
   /**
    * Creates a reference to a component with the same context
    */
-  protected localRef<T extends Component>(type: constructor<T>, name?: string): ComponentReference<T> {
+  protected localRef<T extends Component>(type: constructor<T>, name?: string): Context {
     if (name === undefined) {
       name = Component.resolveName(type);
     };
@@ -136,8 +126,8 @@ export abstract class Component<
     };
 
     return {
+      ...this.context,
       name: name,
-      context: this.context,
     };
   };
 
@@ -163,8 +153,8 @@ export abstract class Component<
    * Invoked by the target during the build phase. Sets lazy properties on other components.
    * Do not resolve configuration in this function, use references instead.
    */
-  public configure(_context: ConfigurationContext) {
-    this.children.forEach(c => c.configure);
+  public configure(context: ConfigurationContext) {
+    this.children.forEach(c => c.configure(context));
   };
 
   /**
@@ -184,38 +174,25 @@ export abstract class Component<
    * Returns this component's logical classpath
    */
   public get clazz(): string {
-    if (this.parent !== undefined) {
+    if (this.parent !== undefined && !this.independent) {
       return this.parent.clazz;
     };
 
     return Reflect.getMetadata('class', this.constructor);
   };
 
-  public get name(): string {
-    if (this._name !== undefined) {
-      return this._name;
-    } else {
-      // if the name is not present and we have a parent, use the parent's name, otherwise use the name part of the class
-      if (this.parent !== undefined) {
-        return this.parent.name;
-      } else {
-        return this.clazz.split('/')[1];
-      };
-    };
-  };
-
   /**
    * Returns this component's short result ID (RID)
    */
   public get rid(): string {
-    return `${this.name}-${objectHash(this.context as object).slice(0, 7)}`;
+    return Component.rid(this.context.name, this.context);
   };
 
   /**
    * Returns a prettified identifier of this component
    */
   public toString(): string {
-    return this.rid;
+    return this.context.name;
   };
 
   public static resolveName(type: constructor<Component>): string | undefined {
@@ -264,15 +241,14 @@ export abstract class Component<
 
     return results.flat();
   };
+
+  public static rid(name: string, context?: object): string {
+    return `${name}-${objectHash(context as object).slice(0, 7)}`;
+  };
 };
 
-export type ComponentClass = {
+export interface ComponentClass {
   new (target: Target, props?: ComponentArgs, name?: string, parent?: Component): Component;
-};
-
-export interface ComponentReference<_T extends Component> {
-  name: string;
-  context: unknown;
 };
 
 /**
@@ -314,17 +290,19 @@ export class ComponentInstanceMatcher implements IComponentMatcher {
   }
 };
 
-export class ComponentReferenceMatcher<T extends Component> implements IComponentMatcher {
+export type ComponentReference<_T> = Context;
+
+export class ComponentReferenceMatcher<T> implements IComponentMatcher {
   private readonly ref: ComponentReference<T>;
   constructor(ref: ComponentReference<T>) {
     this.ref = ref;
   };
 
   match(input: Component): boolean {
-    return input.name === this.ref.name && _.isEqual(input.context, this.ref.context);
+    return _.isEqual(input.context, this.ref);
   };
 
   toString(): string {
-    return `${this.constructor.name}(${this.ref.name}(${this.ref.context}))`;
+    return `${this.constructor.name}(${this.ref})`;
   }
 };

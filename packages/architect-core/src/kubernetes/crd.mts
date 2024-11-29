@@ -7,20 +7,22 @@ import * as os from 'os';
 import * as path from 'path';
 import * as yaml from 'js-yaml';
 //import crdGenerate from '@kubernetes-models/crd-generate'
-import { walk } from '@perdition/architect-core';
-import { CRDManager } from './index.mts';
+import { ManifestLoader } from './yaml.mts';
+import { walk } from '../index.mts';
 
 export class CRDModelGenerator {
-  private readonly parent: CRDManager;
+  private readonly loader: ManifestLoader;
 
-  constructor(parent: CRDManager) {
-    this.parent = parent;
+  constructor(loader: ManifestLoader) {
+    this.loader = loader;
   }
 
   public async generate(yamlDir: string, outDir: string) {
     fs.rm(outDir, { recursive: true, force: true });
     fs.mkdir(yamlDir, { recursive: true });
     fs.mkdir(outDir, { recursive: true });
+
+    console.log(yamlDir);
 
     // broken because of ESM bullshit...
     // await crdGenerate.generate({
@@ -33,13 +35,13 @@ export class CRDModelGenerator {
     for await (const file of walk(yamlDir)) {
       if (!file.endsWith('.yaml')) continue;
       const text = await fs.readFile(file, 'utf-8');
-      const resources = await this.parent.plugin.loader.loadString(text);
+      const resources = await this.loader.loadString(text);
 
       for (const resource of resources) {
         if (resource instanceof api.apiextensionsK8sIo.v1.CustomResourceDefinition)
           crds.push(resource);
-      }
-    }
+      };
+    };
 
     const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'architect-'))
     const tempFile = path.join(tempDir, 'crds.yaml');
@@ -49,12 +51,14 @@ export class CRDModelGenerator {
 
       const execFileAsync = util.promisify(execFile);
       await execFileAsync('npx', ['@kubernetes-models/crd-generate', '--input', tempFile, '--output', outDir], { maxBuffer: undefined });
+    } catch (exception) {
+      console.log(exception);
     } finally {
       await fs.rm(tempDir, { force: true, recursive: true });
-    }
+    };
 
     await this.fixupModels(outDir);
-  }
+  };
 
   private async fixupModels(outDir: string) {
     for await (const file of walk(outDir)) {
@@ -64,6 +68,6 @@ export class CRDModelGenerator {
 
       content = content.replaceAll(new RegExp('^(export *.*from )"(.*?)"', 'gm'), '$1"$2.js"');
       await fs.writeFile(file, content);
-    }
-  }
+    };
+  };
 }

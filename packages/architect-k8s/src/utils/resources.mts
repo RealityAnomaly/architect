@@ -1,7 +1,7 @@
 import { IObjectMeta } from '@kubernetes-models/apimachinery/apis/meta/v1/ObjectMeta';
 import _ from 'lodash';
 
-import { isResource, Resource } from '../resource.mts';
+import { isResource, Resource } from '@perdition/architect-core/k8s';
 
 /**
  * Non-exhaustive blacklist of Kubernetes resources that may not have attached namespaces

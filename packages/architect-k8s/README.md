@@ -8,6 +8,47 @@ This is an extension to the [Architect framework](https://github.com/realityanom
 
 `architect-k8s` is currently in Alpha and the **API surface may change without warning** so usage in production is strongly advised against (unless you're crazy, like me).
 
+## Example
+
+```typescript
+import 'reflect-metadata';
+
+import { k8sCniCncfIo } from '@perdition/k8s-shared/crds';
+import * as k8s from '@perdition/architect-k8s';
+
+export interface KubevirtComponentOptions extends k8s.KubeComponentArgs {};
+
+interface KubevirtComponentResources {
+  networkAttachmentDefinition?: k8sCniCncfIo.v1.NetworkAttachmentDefinition;
+};
+
+@Reflect.metadata('class', 'manifold.glassway.net/kubevirt')
+@Reflect.metadata('namespace', '$features$')
+export class KubevirtComponent extends k8s.KubeComponent<KubevirtComponentResources, KubevirtComponentOptions> {
+  public async build(resources: KubevirtComponentResources = {}) {
+    resources.networkAttachmentDefinition = new k8sCniCncfIo.v1.NetworkAttachmentDefinition({
+      metadata: {
+        name: 'host',
+        annotations: {
+          'k8s.v1.cni.cncf.io/resourceName': 'macvtap.network.kubevirt.io/bond0',
+        },
+      },
+      spec: {
+        config: JSON.stringify({
+          cniVersion: '0.3.1',
+          name: 'host',
+          type: 'macvtap',
+          mtu: 1500,
+        }, null, 2),
+      },
+    });
+
+    return super.build(resources);
+  };
+};
+
+```
+
 ## Current features
 
 - **GitOps support** (FluxCD implemented, ArgoCD planned)
