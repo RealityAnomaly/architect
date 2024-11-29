@@ -1,15 +1,24 @@
 import { Command } from "commander";
-import { App } from "../index.mts";
+import { App, AppCommandOptions } from "../index.mts";
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+interface AppCommandComponentOptions extends AppCommandOptions {};
+
+interface AppCommandComponentListOptions extends AppCommandComponentOptions {
+  library?: string;
+};
+
+interface AppComponentCommandShowOptions extends AppCommandComponentOptions {
+  class: string;
+};
 
 export class ComponentCommand extends Command {
   private readonly app: App;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private async list(options: any) {
-    const libraryName = options.library as string | undefined;
+  private async list(options: AppCommandComponentListOptions) {
     const ourComponents = await this.app.parent!.project!.getComponents(false);
 
-    if (!libraryName && ourComponents.length > 0) {
+    if (!options.library && ourComponents.length > 0) {
       console.log('Current project:');
       for (const component of ourComponents) {
         console.log('  - ' + Reflect.getMetadata('class', component));
@@ -19,7 +28,7 @@ export class ComponentCommand extends Command {
     };
 
     for (const library of this.app.parent!.project!.libraries) {
-      if (libraryName && library.moduleName !== libraryName) continue;
+      if (options.library && library.moduleName !== options.library) continue;
 
       const components = await library.getComponents(false);
       if (components.length <= 0) continue;
@@ -33,25 +42,21 @@ export class ComponentCommand extends Command {
     };
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private async show(options: any) {
-    const clazz = options.class as string;
-
-    const components = await this.app.parent!.project!.getComponents(true);
-    const component = components.find(c => Reflect.getMetadata('class', c) === clazz);
+  private async show(options: AppComponentCommandShowOptions) {
+    const component = await this.app.parent!.project!.getComponent(options.class, true);
     if (!component) {
-      console.log(`Unable to find any component with class ${clazz}`)
+      console.log(`Unable to find any component with class ${options.class}`);
       return;
     };
 
-    console.log(clazz);
+    console.log(options.class);
   };
 
   constructor(app: App) {
     super('component');
 
     this.app = app;
-    this.description('Commands for showing information about components');
+    this.description('Commands for manipulating components');
 
     this.command('list')
       .description('Lists available components')
@@ -62,4 +67,4 @@ export class ComponentCommand extends Command {
       .requiredOption('--class <class>', 'Specify the component class (required)')
       .action(this.show.bind(this));
   };
-}
+};

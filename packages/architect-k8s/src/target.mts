@@ -1,4 +1,6 @@
-import { Architect, Component, Result, Target, TargetModel, TargetModelSpec, TargetParams, TargetResolveParams } from '@perdition/architect-core';
+import { Architect, architectGlasswayNet, Component, constructor, PLUGIN_TARGET_IDENTIFIERS, recursiveMerge, Result, Target, TargetParams, TargetResolveParams } from '@perdition/architect-core';
+import { Resource, GVK } from '@perdition/architect-core/k8s';
+
 import * as api from 'kubernetes-models';
 import _ from 'lodash';
 import wcmatch from 'wildcard-match';
@@ -7,11 +9,10 @@ import { KubePreludeComponent } from './component.mts';
 import { CrdsComponent } from './components/index.mts';
 import { Helm } from './helm/index.mts';
 import { Kustomize } from './kustomize/index.mts';
-import { Resource } from './resource.mts';
-import { GVK } from './types/index.mts';
 import { isValidator } from './utils/index.mts';
 import { KubeWriter } from './writer.mts';
 import { K8sPlugin } from './plugin.mts';
+import { KubeContext } from './context.mts';
 
 export interface KubeCRDRequirement {
   exports: GVK[];
@@ -38,69 +39,16 @@ export interface KubeTargetParams extends TargetParams {
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface KubeTargetResolveParams extends TargetResolveParams {};
 
-interface ClusterClientSpec {
-  context: string;
-};
-
-interface ClusterNamespaceSpec {
-  /**
-   * The default namespace defined for cluster infrastructure
-   */
-  features?: string;
-
-  /**
-   * The default namespace defined for cluster operators
-   */
-  operators?: string;
-
-  /**
-   * The default namespace defined for cluster services
-   */
-  services?: string;
-};
-
-// "The physical cluster configuration has changed."
-// "Do you want to update the metal spec before deploying? (--auto-update-metal to bypass check)"
-interface ClusterMetalSpec {
-  /**
-   * Number of nodes in the physical cluster
-   */
-  nodes?: number;
-};
-
-export enum ClusterFlavor {
-  DockerDesktop = 'docker-desktop',
-  Kind = 'kind',
-  K3s = 'k3s',
-  Talos = 'talos',
-};
-
-// TODO: potentially move the Client and Metal specs to their own Fact, for separation purposes
-export interface ClusterSpec extends TargetModelSpec {
-  client: ClusterClientSpec;
-  dns: string;
-  platform?: string;
+export interface ClusterState {
+  nodes: number;
   version: string;
-  metal: ClusterMetalSpec;
-  ns?: ClusterNamespaceSpec;
-
-  /**
-   * The pod network configuration
-   */
-  podNetwork: {
-    ipFamilies: string[];
-  };
-
-  flavor: ClusterFlavor;
 };
-
-export type KubeTargetModel = TargetModel<ClusterSpec>;
 
 /**
  * Version of {Target} that provides build constructs for a specific Kubernetes cluster.
  */
-export class KubeTarget extends Target<KubeTargetModel> {
-  public static key = 'KubeTarget';
+export class KubeTarget extends Target {
+  public static key = PLUGIN_TARGET_IDENTIFIERS.kubernetes;
   declare public readonly params: KubeTargetParams;
 
   public helm: Helm;
@@ -111,25 +59,25 @@ export class KubeTarget extends Target<KubeTargetModel> {
   private readonly markedCRDGVKs: GVK[] = [];
   private readonly markedCRDGroups: string[] = [];
 
-  constructor(model: KubeTargetModel, params: KubeTargetParams = {
+  constructor(model: architectGlasswayNet.v1alpha1.Target, params: KubeTargetParams = {
     modes: {},
     output: {
       format: KubeTargetOutputFormat.PerComponent,
     },
   }, parent: Architect) {
-    const defaults: Partial<ClusterSpec> = {
-      ns: {
-        features: 'infra-system',
-        operators: 'operator-system',
-        services: 'services',
+    const defaults = {
+      plugins: {
+        kubernetes: {
+          ns: {
+            features: 'infra-system',
+            operators: 'operator-system',
+            services: 'services',
+          },
+        },
       },
+    } as Partial<architectGlasswayNet.v1alpha1.Target["spec"]>;
 
-      podNetwork: {
-        ipFamilies: ['IPv4'],
-      },
-    };
-
-    model.spec = _.merge(defaults, model.spec);
+    model.spec = recursiveMerge(defaults, model.spec);
     super(model, params, parent);
 
     this.helm = new Helm(this.plugin);
@@ -138,8 +86,36 @@ export class KubeTarget extends Target<KubeTargetModel> {
     this.flux = new FluxCDController(this);
 
     this.enable(KubePreludeComponent);
+    this.enable(CrdsComponent);
+
     this.createDefaultResources();
-    this.createCRDComponent();
+  };
+
+  public defaultContext<T extends Component>(token: constructor<T>, context?: Partial<KubeContext>, force?: boolean): Partial<KubeContext> {
+    context = super.defaultContext(token, context, force);
+    if (context.namespace && !force) return context;
+
+    const replacements = {
+      "$features$": this.cluster.ns!.features!,
+      "$services$": this.cluster.ns!.services!,
+      "$operators$": this.cluster.ns!.operators!,
+    };
+
+    if (!context.namespace || force) {
+      if (Reflect.hasMetadata('namespace', token)) {
+        context.namespace = Reflect.getMetadata('namespace', token);
+        for (const [k, v] of Object.entries(replacements))
+          context.namespace = context.namespace!.replace(k, v);
+      } else if (!context.namespace) {
+        context.namespace = 'default';
+      };
+    };
+
+    return context;
+  };
+
+  public get cluster(): NonNullable<NonNullable<architectGlasswayNet.v1alpha1.Target["spec"]["plugins"]>["kubernetes"]> {
+    return this.model.spec.plugins!.kubernetes!;
   };
 
   public get plugin(): K8sPlugin {
@@ -147,15 +123,9 @@ export class KubeTarget extends Target<KubeTargetModel> {
   }
 
   private createDefaultResources() {
-    this.createNamespace(this.model.spec.ns!.features!);
-    this.createNamespace(this.model.spec.ns!.operators!);
-    this.createNamespace(this.model.spec.ns!.services!);
-  };
-
-  private createCRDComponent() {
-    const component = new CrdsComponent(this, this.plugin.parent.projectPaths);
-    this.components.register(CrdsComponent, component);
-    this.components.request(CrdsComponent)!.props.$set({ enable: true });
+    this.createNamespace(this.cluster.ns!.features!);
+    this.createNamespace(this.cluster.ns!.operators!);
+    this.createNamespace(this.cluster.ns!.services!);
   };
 
   /**

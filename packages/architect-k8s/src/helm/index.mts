@@ -4,9 +4,9 @@ import * as os from 'os';
 import * as path from 'path';
 import * as util from 'util';
 import { cache, compositeHash } from '@perdition/architect-core';
-import * as yaml from 'js-yaml';
+import { Resource } from '@perdition/architect-core/k8s';
 
-import { Resource } from '../resource.mts';
+import * as yaml from 'js-yaml';
 import { K8sPlugin } from '../plugin.mts';
 
 export class Helm {
@@ -97,7 +97,7 @@ export class Helm {
 
     const decoder = new util.TextDecoder();
     const data = decoder.decode(bytes);
-    return this.plugin.loader.loadString(data);
+    return this.plugin.parent.kubeLoader.loadString(data);
   };
 
   private async storeCache(hash: string, data: string) {
@@ -139,7 +139,7 @@ export class Helm {
       const execFileAsync = util.promisify(execFile);
 
       const buf = await execFileAsync('helm', params.concat('--values', valuesFile), { maxBuffer: undefined });
-      const resources = await this.plugin.loader.loadString(buf.stdout);
+      const resources = await this.plugin.parent.kubeLoader.loadString(buf.stdout);
 
       // cache the result from the inputs
       await this.storeCache(hash, buf.stdout);

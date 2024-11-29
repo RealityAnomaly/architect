@@ -1,7 +1,7 @@
 import { execFile } from 'node:child_process';
 import * as util from 'util';
 
-import { Resource } from '../resource.mts';
+import { Resource } from '@perdition/architect-core/k8s';
 import { K8sPlugin } from '../plugin.mts';
 
 export class Kustomize {
@@ -71,7 +71,7 @@ export class Kustomize {
 
     const execFileAsync = util.promisify(execFile);
     const buf = await execFileAsync('kustomize', params, { maxBuffer: undefined });
-    const resources = await this.plugin.loader.loadString(buf.stdout);
+    const resources = await this.plugin.parent.kubeLoader.loadString(buf.stdout);
     return resources;
   };
 };

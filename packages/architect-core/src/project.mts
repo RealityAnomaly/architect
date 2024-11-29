@@ -75,21 +75,35 @@ export class Project {
       this.parent.logger.debug(`loaded project import ${pkg}`);
       this.libraries.push(lib);
     };
-  }
+  };
 
-  public async getTargets(recursive: boolean): Promise<Target[]> {
+  public async getTarget(name: string, recursive?: boolean): Promise<Target | undefined> {
+    const targets = await this.getTargets(recursive);
+    return targets.find(t => t.model.metadata.name === name);
+  };
+
+  public async getTargets(recursive?: boolean): Promise<Target[]> {
     if (!this._targets) {
       this._targets = await Target.collectFolder(this.parent, path.join(this.root, 'src/targets'));
     };
 
     const result = [];
     result.push(...this._targets || []);
-    if (recursive) this.libraries.forEach(async l => result.push(...await l.getTargets(recursive) || []));
+    if (recursive) {
+      for (const library of this.libraries) {
+        result.push(...await library.getTargets(recursive));
+      };
+    };
 
     return result;
   };
 
-  public async getComponents(recursive: boolean): Promise<ComponentClass[]> {
+  public async getComponent(clazz: string, recursive?: boolean): Promise<ComponentClass | undefined> {
+    const components = await this.getComponents(recursive);
+    return components.find(c => Reflect.getMetadata('class', c) === clazz);
+  };
+
+  public async getComponents(recursive?: boolean): Promise<ComponentClass[]> {
     if (!this._components) {
       this._components = await Component.collectPaths(this.parent, [
         path.join(this.root, 'src/components'),
@@ -99,7 +113,11 @@ export class Project {
 
     const result = [];
     result.push(...this._components || []);
-    if (recursive) this.libraries.forEach(async l => result.push(...await l.getComponents(recursive) || []));
+    if (recursive) {
+      for (const library of this.libraries) {
+        result.push(...await library.getComponents(recursive));
+      };
+    };
 
     return result;
   };

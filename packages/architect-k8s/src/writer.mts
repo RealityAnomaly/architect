@@ -1,10 +1,10 @@
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
 import { Result, Writer } from '@perdition/architect-core';
+import { Resource, resourceId } from '@perdition/architect-core/k8s';
 import * as yaml from 'js-yaml';
-import { KubeComponentContext } from './component.mts';
-import { Resource, resourceId } from './resource.mts';
 import { KubeTarget, KubeTargetOutputFormat } from './target.mts';
+import { KubeContext } from './context.mts';
 
 
 export class KubeWriter implements Writer {
@@ -33,8 +33,8 @@ export class KubeWriter implements Writer {
 
   private async writePerComponent(result: Result, dir: string, flux: boolean = false) {
     await Promise.all(Object.entries(result.components).map(async ([_, v]) => {
-      const ctx = v.component.context as KubeComponentContext;
-      const rd = path.join(dir, ctx.namespace, v.component.name);
+      const ctx = v.component.context as KubeContext;
+      const rd = path.join(dir, ctx.namespace, v.component.context.name);
       await fs.rm(rd, { recursive: true, force: true });
       await fs.mkdir(rd, { recursive: true });
 

@@ -30,7 +30,9 @@ export function arrayStartsWith<T>(array: T[], prefix: T[]): boolean {
  */
 export function recursiveMerge<T extends object>(object: T, source: T): T {
   // if the types don't match, just return the source
-  if (object === null || object.constructor !== source.constructor) return source;
+  if (object === undefined || object === null) return source;
+  if (source === undefined || source === null) return object;
+  if (object.constructor !== source.constructor) return source;
 
   if (_.isArray(object)) {
     return object.concat(source) as T;

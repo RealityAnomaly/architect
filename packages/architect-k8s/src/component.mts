@@ -1,22 +1,20 @@
-import { CapabilityMatcher, Component, ComponentArgs, ComponentMatcher, IComponentMatcher, Target } from '@perdition/architect-core';
+import { architectGlasswayNet, CapabilityMatcher, Component, ComponentArgs, ComponentClass, ComponentMatcher, IComponentMatcher, Target } from '@perdition/architect-core';
+import { Resource } from '@perdition/architect-core/k8s';
+
 import * as api from 'kubernetes-models';
 import _ from 'lodash';
 import { CNICapability, DNSCapability } from './capabilities/index.mts';
 
 import { Helm, HelmChartOpts } from './helm/index.mts';
 import { Kustomize, KustomizeOpts } from './kustomize/index.mts';
-import { Resource } from './resource.mts';
-import { KubeTarget, KubeTargetModel } from './target.mts';
+import { KubeTarget } from './target.mts';
 import { defaultNamespace, fixupResource, normaliseResources } from './utils/index.mts';
+import { KubeContext } from './context.mts';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface KubeComponentArgs extends ComponentArgs {};
 export interface KubeComponentGenericResources {
   result?: Resource[];
-};
-
-export interface KubeComponentContext {
-  namespace: string;
 };
 
 export abstract class KubeComponent<
@@ -26,23 +24,20 @@ export abstract class KubeComponent<
 > extends Component<TResult, TArgs, TParent> {
   declare protected readonly target: KubeTarget;
 
+  public context: KubeContext;
+
   /**
    * Whether to enable adding standard requirements such as CNI and DNS
    */
   protected standardRequirements = true;
 
-  constructor(target: Target, props: TArgs = {} as TArgs, name?: string, parent?: TParent) {
-    super(target, props, name, parent);
+  constructor(target: Target, props: TArgs = {} as TArgs, context: KubeContext, parent?: TParent) {
+    super(target, props, context, parent);
+    this.context = context;
   };
 
-  public get context(): KubeComponentContext {
-    if (this.parent !== undefined) {
-      return this.parent.context as KubeComponentContext;
-    };
-
-    return {
-      namespace: this.namespace,
-    };
+  public get namespace(): string {
+    return this.context.namespace;
   };
 
   /**
@@ -59,12 +54,8 @@ export abstract class KubeComponent<
     ]);
   };
 
-  /**
-   * Returns the default namespace for all resources within this Component.
-   * If not set, this will default to the "default" namespace.
-   */
-  public get namespace(): string {
-    return 'default';
+  public toString(): string {
+    return this.context.namespace + '/' + this.context.name;
   };
 
   public async build(result?: TResult): Promise<TResult> {
@@ -77,7 +68,7 @@ export abstract class KubeComponent<
         throw new Error(`in component ${this.rid}: apiVersion or kind unset on a resource passed to the build function`)
       }
 
-      defaultNamespace(r, this.namespace)
+      defaultNamespace(r, this.context.namespace)
     });
 
     return result;
@@ -97,10 +88,10 @@ export abstract class KubeComponent<
     // adds the metadata ConfigMap
     const metadata = new api.v1.ConfigMap({
       metadata: {
-        name: `${this.name}-metadata`,
+        name: `${this.context.name}-metadata`,
       },
       data: {
-        name: this.name,
+        name: this.context.name,
         class: this.clazz,
         context: JSON.stringify(this.context),
         config: JSON.stringify(resolved, null, 2),
@@ -116,8 +107,8 @@ export abstract class KubeComponent<
     return super.postBuild(resources as TResult);
   };
 
-  protected get cluster() {
-    return this.target.model as KubeTargetModel;
+  protected get cluster(): NonNullable<NonNullable<architectGlasswayNet.v1alpha1.Target["spec"]["plugins"]>["kubernetes"]> {
+    return this.target.cluster;
   };
 
   // helper accessors for extension fields
@@ -134,8 +125,8 @@ export abstract class KubeComponent<
    */
   protected async helmTemplate(chart: string, values: object, config: HelmChartOpts, filter?: (v: Resource) => boolean): Promise<Resource[]> {
     config = _.merge({
-      namespace: this.namespace,
-      kubeVersion: this.cluster.spec.version,
+      namespace: this.context.namespace,
+      kubeVersion: this.cluster.version,
       includeCRDs: true,
       noHooks: true,
       skipTests: true,
@@ -153,6 +144,10 @@ export abstract class KubeComponent<
   protected async kustomizeBuild(dir: string, config: KustomizeOpts = {}): Promise<Resource[]> {
     return this.kustomize.build(dir, config);
   };
+};
+
+export interface KubeComponentClass extends ComponentClass {
+  namespace (target: Target): string;
 };
 
 export class KubeResourceComponentOptions {

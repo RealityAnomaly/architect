@@ -19,3 +19,10 @@ export function setNamed<T>(value: T) {
 export function isNamed(value: object): value is Named {
   return (typeof(value) === 'object' && NAMED_SYMBOL in value);
 };
+
+export class ReflectionUtilities {
+  public static classToName(clazz: string): string {
+    const split = clazz.split('/');
+    return split.length === 2 ? split[1] : split[0];
+  };  
+};

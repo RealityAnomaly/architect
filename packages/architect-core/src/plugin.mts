@@ -37,7 +37,7 @@ export class PluginResolver {
   public get targetMap(): Record<string, TargetClass> {
     const results = {} as Record<string, TargetClass>;
     Object.values(this.data).forEach(p => {
-      for (const target of p.targets) results[target.name] = target;
+      for (const target of p.targets) results[target.key] = target;
     });
 
     return results;
