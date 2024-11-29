@@ -8,9 +8,9 @@ import { CRDFetcherGit } from './fetchers/git.mts';
 import { CRDFetcherHttp } from './fetchers/http.mts';
 import { CRDFetcher } from './fetchers/index.mts';
 import { CRDFetcherKustomize } from './fetchers/kustomize.mts';
-import { CRDModelGenerator } from './generator.mts';
 import { Logger } from 'winston';
 import { CRDFetcherHelm } from './fetchers/helm.mts';
+import { CRDModelGenerator } from '@perdition/architect-core/k8s';
 
 export * from './cli.mts';
 export * from './config.mts';
@@ -32,7 +32,7 @@ export class CRDManager {
   public readonly plugin: K8sPlugin;
   private readonly logger: Logger;
 
-  private readonly generator: CRDModelGenerator = new CRDModelGenerator(this);
+  private readonly generator: CRDModelGenerator;
   private readonly fetchers: CRDFetcher[] = [];
 
   private configDirty: boolean = false;
@@ -46,6 +46,8 @@ export class CRDManager {
     this.logger = plugin.logger.child({
       component: `plugin.kubernetes.CRDManager`
     })
+
+    this.generator = new CRDModelGenerator(plugin.parent.kubeLoader);
 
     for (const fetcher of CRD_FETCHER_CLASSES) {
       this.fetchers.push(new fetcher(this));

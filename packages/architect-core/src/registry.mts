@@ -1,7 +1,9 @@
-import { constructor } from './utils/index.mts';
+import objectHash from 'object-hash';
+import { Context } from './context.mts';
+import { constructor, ReflectionUtilities } from './utils/index.mts';
 
-export class Registry {
-  public readonly data: Record<string, unknown> = {};
+export class Registry<T> {
+  public readonly data: Record<string, T> = {};
 
   /**
     * Arguments to be passed to the constructor of registered classes
@@ -20,23 +22,19 @@ export class Registry {
    * Registers an instance of T with the options provided.
    * If no object is passed, a new instance of T will be instantiated and used.
    */
-  public register<T>(token: constructor<T>, instance?: T) {
+  public register<V extends T>(token: constructor<V>, instance?: V, _context?: Partial<Context>) {
     if (instance == null) {
       instance = new token(...this.args);
     };
 
-    const id = Reflect.getMetadata('class', token);
+    const context = Registry.defaultContext(token, _context);
+    const ident = Registry.ident(context);
 
-    // TODO: fix this
-    // if (isNamed(instance) && instance.name) {
-    //   id += `@${instance.name}`;
-    // };
-
-    if (id in this.data) {
-      throw Error(`${id} already exists in this Registry`);
+    if (ident in this.data) {
+      throw Error(`${ident} already exists in this Registry`);
     };
 
-    this.data[id] = instance;
+    this.data[ident] = instance;
   };
 
   /**
@@ -45,11 +43,24 @@ export class Registry {
    * @param name Optional name of the object
    * @param auto Create the object if it doesn't exist
    */
-  public request<T>(token: constructor<T>, name?: string): T | undefined {
-    let clazz = Reflect.getMetadata('class', token);
-    if (name) clazz += `@${name}`; // ...f38be@foobar-component
-    if (!(clazz in this.data)) return undefined;
+  public request<V extends T>(token: constructor<V>, _context?: Partial<Context>): T | undefined {
+    const context = Registry.defaultContext(token, _context);
+    const ident = Registry.ident(context);
 
-    return this.data[clazz] as (T | undefined);
+    if (!(ident in this.data)) return undefined;
+    return this.data[ident] as (T | undefined);
+  };
+
+  private static ident(context: Context): string {
+    return `${context.name}-${objectHash(context)}`;
+  };
+
+  private static defaultContext(token: constructor<unknown>, context?: Partial<Context>): Context {
+    if (!context) context = {};
+    if (!context.name) {
+      context.name = ReflectionUtilities.classToName(Reflect.getMetadata('class', token));
+    };
+
+    return context as Context;
   };
 };

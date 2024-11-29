@@ -1,3 +1,4 @@
+import { Context } from 'vm';
 import { Component, ComponentArgs } from './components/index.mts';
 import { Target } from './target.mts';
 import { Condition, constructor, DeepPartial, Lazy, LazyAuto, _LazyProxy, DeepLazySpec } from './utils/index.mts';
@@ -18,19 +19,19 @@ export class ConfigurationContext {
     this.enabler = enabler;
   };
 
-  public component<T extends Component>(token: constructor<T>, name?: string): LazyAuto<Extract<T>> {
-    return this.target.component(token, name, true).props as LazyAuto<Extract<T>>;
+  public component<T extends Component>(token: constructor<T>, context?: Partial<Context>): LazyAuto<Extract<T>> {
+    return this.target.component(token, context, true).props as LazyAuto<Extract<T>>;
   };
 
   public enable<T extends Component>(
     token: constructor<T>,
     config?: DeepLazySpec<DeepPartial<Extract<T>>>,
-    name?: string,
+    context?: Partial<Context>,
     weight?: number,
     force?: boolean,
     condition = this.enabler,
   ) {
-    this.target.enable(token, config, name, weight, force, condition);
+    this.target.enable(token, config, context, weight, force, condition);
   };
 
   public set<T extends Component>(

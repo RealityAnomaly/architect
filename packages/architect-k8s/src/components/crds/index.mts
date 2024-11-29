@@ -1,29 +1,25 @@
 import 'reflect-metadata';
 import * as fs from 'node:fs/promises';
 import path from 'path';
-import { notEmpty, Target } from '@perdition/architect-core';
+import { notEmpty } from '@perdition/architect-core';
 import * as fg from 'fast-glob';
 import * as api from 'kubernetes-models';
 import wcmatch from 'wildcard-match';
 import { KubeComponent, KubeComponentGenericResources } from '../../component.mts';
-import { GVK } from '../../types/index.mts';
+import { GVK } from '@perdition/architect-core/k8s';
 
 @Reflect.metadata('class', 'k8s.architect.glassway.net/crds')
 export class CrdsComponent extends KubeComponent {
-  private readonly modules: string[];
-
   private readonly enabledGroups: string[] = [];
   private readonly enabledGVKs: GVK[] = [];
 
-  constructor(target: Target, modules: string[]) {
-    super(target);
-    this.modules = modules;
+  public init(): void {
     this.standardRequirements = false;
   };
 
   public async build(resources: KubeComponentGenericResources = {}) {
     const crds: api.apiextensionsK8sIo.v1.CustomResourceDefinition[] = [];
-    for (const module of this.modules) {
+    for (const module of this.target.plugin.parent.projectPaths) {
       const dir = path.resolve(path.join(module, 'data/crds'));
 
       try {
@@ -38,7 +34,7 @@ export class CrdsComponent extends KubeComponent {
         const files = await fg.default([`${dir}/${group}/*.yaml`], {});
         const result: (api.apiextensionsK8sIo.v1.CustomResourceDefinition | null)[] = await Promise.all(files.map(
           async (file): Promise<api.apiextensionsK8sIo.v1.CustomResourceDefinition | null> => {
-            const fileResources = await this.target.plugin.loader.loadFile(file);
+            const fileResources = await this.target.parent.kubeLoader.loadFile(file);
             if (fileResources.length <= 0) return null;
 
             // this will always be a CRD as our loadFile method loads the model

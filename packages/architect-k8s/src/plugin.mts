@@ -3,9 +3,6 @@ import { Command } from "commander";
 import { CRDCommand } from "./crds/cli.mts";
 import { CrdsConfig } from "./crds/config.mts";
 import { CRDManager } from "./crds/index.mts";
-
-import { TypeRegistry } from './types/registry.mts';
-import { ManifestLoader } from './yaml/load.mts';
 import { KubeTarget } from "./target.mts";
 
 export class K8sPluginConfig {
@@ -14,23 +11,16 @@ export class K8sPluginConfig {
 
 export class K8sPlugin extends Plugin {
   public static readonly MODULE = "@perdition/architect-k8s";
-
   public readonly crds: CRDManager;
-
-  public readonly types: TypeRegistry;
-  public readonly loader: ManifestLoader;
 
   constructor(parent: Architect) {
     super(parent, 'kubernetes');
-
     this.crds = new CRDManager(this);
-    this.types = new TypeRegistry();
-    this.loader = new ManifestLoader(this);
   }
 
   public async init(): Promise<void> {
     for (const path of this.parent.projectPaths) {
-      this.types.appendCRDModule(path);
+      this.parent.kubeTypes.appendCRDModule(path);
     };
   };
 
