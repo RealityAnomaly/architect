@@ -6,6 +6,7 @@ import { PluginResolver } from './plugin.mts';
 import { Target, TargetResolveParams } from './target.mts';
 import winston from 'winston';
 import { Project } from './project.mts';
+import { DependencyGraphRenderer } from './graph/render.mts';
 
 export class Architect {
   public static PATH = path.resolve(path.join(import.meta.dirname, '..'));
@@ -53,8 +54,25 @@ export class Architect {
     await fs.rm(output, { recursive: true, force: true });
     await fs.mkdir(output, { recursive: true });
 
-    const resolved = await target.resolve(params);
+    // in validateOnly mode, only first stage validation runs
+    const validateOnly = false;
+
+    const graph = await target.resolve(params);
+    if (validateOnly) {
+      graph.assertValid();
+      return;
+    };
+
+    const resolved = await target.compile(graph);
+    if (!resolved.graph.assertValid()) return;
+
     await resolved.write(output);
+
+    if (params?.graph) {
+      await DependencyGraphRenderer.render(resolved.graph, {
+        path: output,
+      });
+    };
   };
 
   public async apply(output: string, target: Target, params?: TargetResolveParams) {
@@ -66,6 +84,7 @@ export * from './cli/index.mts';
 export * from './utils/index.mts';
 export * from './components/index.mts';
 export * from './generated/crds/index.ts';
+export * from './graph/index.mts';
 export * from './backend.mts';
 export * from './cache.mts';
 export * from './config.mts';

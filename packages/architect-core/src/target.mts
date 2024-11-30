@@ -6,9 +6,9 @@ import { architectGlasswayNet } from './generated/crds/index.ts';
 
 import { Component } from './components/index.mts';
 import { Registry } from './registry.mts';
-import { ResolvedComponent, Result } from './result.mts';
-import { asyncFilter, Condition, constructor, DeepLazySpec, DeepPartial, ReflectionUtilities } from './utils/index.mts';
-import { Architect } from './index.mts';
+import { Result } from './result.mts';
+import { Condition, constructor, DeepLazySpec, DeepPartial, isValidator, ReflectionUtilities } from './utils/index.mts';
+import { Architect, DependencyGraph } from './index.mts';
 import { Context } from 'node:vm';
 
 type Extract<T extends Component> = T extends Component<infer _R, infer U> ? U : never;
@@ -30,6 +30,11 @@ export interface TargetResolveParams {
    * Enable or disable validating configuration
    */
   validate?: boolean;
+
+  /**
+   * Write a visualised dependency graph
+   */
+  graph?: boolean;
 };
 
 export abstract class BaseFact<T = unknown> {
@@ -74,7 +79,7 @@ export class Target {
 
     await Promise.all(results.map(async t => {
       await t.init()
-      parent.logger.debug(`loaded target ${t.model.metadata.name} of kind ${t.model.kind}`);
+      parent.logger.debug(`loaded target ${t.model.metadata.name} of kind ${t.constructor.name}`);
     }));
 
     return results;
@@ -110,44 +115,42 @@ export class Target {
   };
 
   /**
-    * Invokes a build operation on all components, passing our facts
+    * Resolves the component dependency graph
     */
-  public async resolve(params: TargetResolveParams = {}): Promise<Result> {
-    // Aggregate all enabled components
-    const values: Component[] = await asyncFilter(
-      Object.values(this.components.data) as Component[],
-      async (c: Component) => await c.props.enable.$resolve() === true,
-    );
+  public async resolve(params: TargetResolveParams = {}): Promise<DependencyGraph> {
+    this.parent.logger.info(`target ${this.model.metadata.name}: building components`);
+    return await DependencyGraph.resolve(this, Object.values(this.components.data), params.requirements !== false);
+  };
 
-    const results: Record<string, Partial<ResolvedComponent>> = Object.fromEntries(values.map((v): [string, Partial<ResolvedComponent>] => {
-      return [v.rid, { component: v }];
-    }));
+  public async compile(graph: DependencyGraph): Promise<Result> {
+    const buildGraph = graph; // TODO: structured clone
+    const results: Record<string, unknown> = {};
 
-    // Ensure component inter-requirements are met
-    await Promise.all(values.map(async (v) => {
-      const requirements = await v.getRequirements();
-      results[v.rid].dependencies = requirements.reduce<Component[]>((prev, cur) => {
-        const matches = values.filter(v2 => cur.match(v2));
-        if ((matches.length <= 0) && params.requirements !== false) {
-          throw Error(`in component ${v.toString()}: failed to satisfy dependency ${cur.toString()}`);
-        };
-
-        return prev.concat(matches);
-      }, []);
-    }));
-
-    // Execute component build async
-    await Promise.all(values.map(async (v): Promise<void> => {
-      const result = await v.build();
+    await Promise.all(Object.values(graph.components).map(async (v): Promise<void> => {
+      const result = await v.component.build();
       if (result === undefined) return;
 
-      results[v.rid].result = await v.postBuild(result);
+      results[v.component.rid] = await v.component.postBuild(result);
     }));
 
-    // build returning result object
-    const result = new Result();
-    result.components = results as Record<string, ResolvedComponent>;
+    const result = new Result(buildGraph, results);
 
+    // TODO: handle objects, too
+    // TODO: add validate parameter
+    if (Array.isArray(result.all)) {
+      for (const item of result.all) {
+        if (!isValidator(item)) continue;
+
+        try {
+          await item.validate();
+        } catch (e) {
+          // TODO: better handling
+          console.log(e);
+        };
+      };
+    };
+
+    //this.parent.logger.info(`target ${this.model.metadata.name}: ${Object.values(result.components).length} components built`);
     return result;
   };
 
@@ -200,6 +203,10 @@ export class Target {
 
     return context as Context;
   };
+
+  public toString(): string {
+    return `target ${this.model.metadata.name}`;
+  };
 };
 
 export type TargetClass = {
@@ -207,5 +214,3 @@ export type TargetClass = {
   new (model: architectGlasswayNet.v1alpha1.Target, params: any, parent: Architect): Target
   key: string
 };
-
-export class ValidationError extends Error {};

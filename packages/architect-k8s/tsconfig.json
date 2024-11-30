@@ -7,7 +7,7 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.mts"
-  ],
+, "../architect-core/src/utils/validator.mts"  ],
   "exclude": [
     "node_modules"
   ]

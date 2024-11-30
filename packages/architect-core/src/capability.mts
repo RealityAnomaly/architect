@@ -36,6 +36,10 @@ export class CapabilityMatcher<T extends Capability<unknown>> implements ICompon
     return true;
   };
 
+  constraint(): string {
+    return `Capability("${Reflect.getMetadata('class', this.token)}")`;
+  };
+
   toString(): string {
     return `${this.constructor.name}(${this.token.name})`;
   };
