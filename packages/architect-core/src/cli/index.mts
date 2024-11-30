@@ -15,6 +15,7 @@ interface AppCommandCompileOptions extends AppCommandOptions {
   target?: string;
   output: string;
   components: string[];
+  graph: boolean;
   validate: boolean;
   requirements: boolean;
 };
@@ -51,6 +52,7 @@ export class App {
     const params: TargetResolveParams = {
       requirements: options.requirements,
       validate: options.validate,
+      graph: options.graph,
     };
 
     if (options.target) {
@@ -73,6 +75,7 @@ export class App {
     const params: TargetResolveParams = {
       requirements: options.requirements,
       validate: options.validate,
+      graph: options.graph,
     };
 
     if (options.target) {
@@ -106,7 +109,8 @@ export class App {
       .description('Compiles resources for the specified target or all targets')
       .option('-t, --target <target>', 'the target to compile for')
       .option('-o, --output <dir>', 'output directory', path.join(process.cwd(), 'build'))
-      .option('-c, --component [components...]', 'list of component names to apply', [])
+      .option('-c, --component [components...]', 'list of component names to compile', [])
+      .option('-g, --graph', 'render and write a dependency graph')
       .option('--no-validate', 'skips resource validation')
       .option('--no-requirements', 'skips requirement validation')
       .action(this.compile.bind(this));

@@ -14,6 +14,7 @@ import { CRDModelGenerator } from '@perdition/architect-core/k8s';
 
 export * from './cli.mts';
 export * from './config.mts';
+export * from './graph.mts';
 
 const CRD_FETCHER_CLASSES = [
   CRDFetcherGit,

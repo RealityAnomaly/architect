@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import { isRecord } from '@perdition/architect-core';
 import { loadAll } from 'js-yaml';
 
-import { isResource, Resource } from './resource.mts';
+import { Resource, ResourceUtilities } from './resource.mts';
 import { GVK, TypeRegistry } from './types/index.mts';
 
 export class ManifestLoader {
@@ -24,7 +24,7 @@ export class ManifestLoader {
         throw new Error(`The value is not an object: ${JSON.stringify(object)}`);
       };
 
-      if (!isResource(object)) {
+      if (!ResourceUtilities.isResource(object)) {
         throw new Error(`The value is not a Kubernetes API resource (apiVersion and kind required): ${JSON.stringify(object)}`);
       };
 

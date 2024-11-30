@@ -29,9 +29,9 @@ export abstract class Component<
   public context: Context;
   protected readonly target: Target;
   
-  protected parent?: TParent;
-  protected readonly children: Component[] = [];
-  protected readonly independent: boolean;
+  public parent?: TParent;
+  public readonly children: Component[] = [];
+  public readonly independent: boolean;
 
   /**
    * The configuration model of the component as a {LazyAuto}
@@ -108,9 +108,9 @@ export abstract class Component<
     if (independent) {
       instance.setParent(this);
       this.target.components.register(child, instance, instance.context);
-    } else {
-      this.children.push(instance);
     };
+
+    this.children.push(instance);
   };
 
   /**
@@ -143,6 +143,7 @@ export abstract class Component<
    */
   public async build(result: TResult = {} as TResult): Promise<TResult> {
     for (const c of this.children) {
+      if (c.independent) continue;
       result = await c.build(result) as TResult;
     };
 
@@ -154,7 +155,10 @@ export abstract class Component<
    * Do not resolve configuration in this function, use references instead.
    */
   public configure(context: ConfigurationContext) {
-    this.children.forEach(c => c.configure(context));
+    this.children.forEach(c => {
+      if (c.independent) return;
+      c.configure(context)
+    });
   };
 
   /**
@@ -192,7 +196,7 @@ export abstract class Component<
    * Returns a prettified identifier of this component
    */
   public toString(): string {
-    return this.context.name;
+    return `Component ${this.context.name}`;
   };
 
   public static resolveName(type: constructor<Component>): string | undefined {
@@ -256,6 +260,7 @@ export interface ComponentClass {
  */
 export interface IComponentMatcher {
   match(input: Component): boolean;
+  constraint(): string;
   toString(): string;
 };
 
@@ -268,6 +273,10 @@ export class ComponentMatcher implements IComponentMatcher {
   match(input: Component): boolean {
     const clazz = Reflect.getMetadata('class', this.token);
     return input.clazz === clazz;
+  };
+
+  constraint(): string {
+    return `Component("${Reflect.getMetadata('class', this.token)}")`;
   };
 
   toString(): string {
@@ -283,6 +292,10 @@ export class ComponentInstanceMatcher implements IComponentMatcher {
 
   match(input: Component): boolean {
     return input === this.instance;
+  };
+
+  constraint(): string {
+    return `ComponentInstance("${this.instance.rid}")`;
   };
 
   toString(): string {
@@ -302,7 +315,11 @@ export class ComponentReferenceMatcher<T> implements IComponentMatcher {
     return _.isEqual(input.context, this.ref);
   };
 
+  constraint(): string {
+    return `ComponentReference(${JSON.stringify(this.ref)})`;
+  };
+
   toString(): string {
     return `${this.constructor.name}(${this.ref})`;
-  }
+  };
 };

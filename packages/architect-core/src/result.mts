@@ -1,16 +1,9 @@
 import * as fs from 'node:fs/promises';
-import { Component } from './components/index.mts';
-import { ValidationError } from './target.mts';
 import { recursiveMerge } from './utils/index.mts';
+import { DependencyGraph } from './graph/index.mts';
 
 export interface Writer {
   write(result: Result, dir: string): Promise<void>;
-};
-
-export interface ResolvedComponent {
-  component: Component;
-  dependencies: Component[];
-  result: unknown;
 };
 
 /**
@@ -18,27 +11,23 @@ export interface ResolvedComponent {
  */
 export class Result {
   /**
-   * Validation errors on the configuration tree
+   * The second stage dependency graph.
    */
-  public errors: ValidationError[] = [];
+  public readonly graph: DependencyGraph;
 
   /**
-   * Component-specific resources
+   * The resultant data from each component.
    */
-  public components: Record<string, ResolvedComponent> = {};
+  public readonly components: Record<string, unknown>;
 
   /**
    * Writer that will be used to write the result
    */
   public writer?: Writer;
 
-  /**
-   * Returns all merged configuration for this result
-   */
-  public get all(): unknown {
-    return Object.values(this.components).reduce<unknown>((prev, cur) => {
-      return recursiveMerge(prev as object, cur.result as object);
-    }, null);
+  constructor(graph: DependencyGraph, components: Record<string, unknown>) {
+    this.graph = graph;
+    this.components = components;
   };
 
   /**
@@ -49,5 +38,14 @@ export class Result {
 
     await fs.mkdir(dir, { recursive: true });
     await this.writer.write(this, dir);
+  };
+
+  /**
+   * Returns all merged configuration for this result
+   */
+  public get all(): unknown {
+    return Object.values(this.components).reduce<unknown>((prev, cur) => {
+      return recursiveMerge(prev as object, cur as object);
+    }, []);
   };
 };
