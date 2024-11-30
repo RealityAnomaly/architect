@@ -1,5 +1,5 @@
 import { architectGlasswayNet, CapabilityMatcher, Component, ComponentArgs, ComponentClass, ComponentMatcher, IComponentMatcher, Target } from '@perdition/architect-core';
-import { Resource } from '@perdition/architect-core/k8s';
+import { Resource, ResourceUtilities } from '@perdition/architect-core/k8s';
 
 import * as api from 'kubernetes-models';
 import _ from 'lodash';
@@ -8,7 +8,6 @@ import { CNICapability, DNSCapability } from './capabilities/index.mts';
 import { Helm, HelmChartOpts } from './helm/index.mts';
 import { Kustomize, KustomizeOpts } from './kustomize/index.mts';
 import { KubeTarget } from './target.mts';
-import { defaultNamespace, fixupResource, normaliseResources } from './utils/index.mts';
 import { KubeContext } from './context.mts';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -55,20 +54,20 @@ export abstract class KubeComponent<
   };
 
   public toString(): string {
-    return this.context.namespace + '/' + this.context.name;
+    return `component ${this.context.namespace + '/' + this.context.name}`;
   };
 
   public async build(result?: TResult): Promise<TResult> {
     result = await super.build(result);
 
     // properly namespace resources, because postBuild doesn't run for children individually
-    const resources = normaliseResources(result);
+    const resources = ResourceUtilities.normaliseResources(result);
     resources.forEach(r => {
       if (r.apiVersion === undefined || r.kind == undefined) {
         throw new Error(`in component ${this.rid}: apiVersion or kind unset on a resource passed to the build function`)
       }
 
-      defaultNamespace(r, this.context.namespace)
+      ResourceUtilities.defaultNamespace(r, this.context.namespace)
     });
 
     return result;
@@ -76,7 +75,7 @@ export abstract class KubeComponent<
 
   public async postBuild(data: TResult) {
     // run post-build resource fixup at the top level
-    let resources = normaliseResources(data);
+    let resources = ResourceUtilities.normaliseResources(data);
 
     // TODO: a bit of a hack... might want to improve $resolve logic to add caching
     // we need to not just resolve here, because we might have default values that were added in the build phase
@@ -100,7 +99,7 @@ export abstract class KubeComponent<
     resources.push(metadata);
 
     resources = resources.map(obj => {
-      obj = fixupResource(obj);
+      obj = ResourceUtilities.fixupResource(obj);
       return obj;
     });
 

@@ -38,7 +38,7 @@ export class TargetCommand extends Command {
     console.log('Components:')
     for (const [_, v] of Object.entries(target.components.data as Record<string, Component>)) {
       const component = v as Component;
-      console.log(`  - ${component.toString()}`);
+      console.log(`  - ${component.context.name}`);
     };
   };
 

@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { arrayStartsWith, isEmptyObject, recursiveMerge } from './objects.mts';
+import { arrayStartsWith, isEmptyObject, recursiveMerge } from '../objects.mts';
 import { isObjectDeepKeys, PathResultBuilder, ValuePath, ValuePathKey } from './paths.mts';
 import { DeepPartial, Resolver, Value } from './value.mts';
 
