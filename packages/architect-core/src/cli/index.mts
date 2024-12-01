@@ -36,9 +36,20 @@ export class App {
     await command.parseAsync();
   };
 
+  private increaseVerbosity(_dummyValue: string, previous: number): number {
+    return previous + 1;
+  }
+
   private async preSubcommand(thisCommand: commander.Command, actionCommand: commander.Command): Promise<void> {
     const options = thisCommand.opts();
-    this.parent = await Architect.create(options.workspace, options.config, options.debug);
+    let logLevel = 'info';
+    if (options.verbose === 1) {
+      logLevel = 'debug';
+    } else if (options.verbose >= 2) {
+      logLevel = 'silly';
+    };
+
+    this.parent = await Architect.create(options.workspace, options.config, logLevel);
 
     // we have to do this late because the config file is only loaded once we have the -c parameter
     if (actionCommand == this.pluginCommand!) {
@@ -101,8 +112,9 @@ export class App {
     program
       .name('architect')
       .description('Architect is a framework for generating structured configuration trees in TypeScript.')
-      .option('-d, --debug', 'enable debug logging', false)
+      .option('-v, --verbose', 'increase the verbosity (can be specified up to two times)', this.increaseVerbosity.bind(this), 0)
       .option('-w, --workspace <path>', 'path to the workspace to use (default current dir)', process.cwd())
+      
       .option('--config <path>', 'configuration file (default architect.yaml)', path.join(process.cwd(), 'architect.yaml'))
 
     program.command('compile')

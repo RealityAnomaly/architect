@@ -1,5 +1,5 @@
 import { apiextensionsK8sIo } from 'kubernetes-models';
-import { Resource } from '../resource.mts';
+import { KubeResource } from '../resource.mts';
 
 /**
  * Represents a group-value-kind unique resource type identifier
@@ -8,7 +8,7 @@ export class GVK {
   /**
    * Parses a GVK from a resource model
    */
-  public static fromResource(resource: Resource): GVK {
+  public static fromResource(resource: KubeResource): GVK {
     return GVK.fromAK(resource.apiVersion, resource.kind);
   };
 
@@ -35,7 +35,7 @@ export class GVK {
   /**
    * Returns the unique GVKs present in the specified resource array
    */
-  public static uniqueGVKs(resources: Resource[]): GVK[] {
+  public static uniqueGVKs(resources: KubeResource[]): GVK[] {
     const results: GVK[] = [];
     resources.forEach(r => {
       const gvk = GVK.fromResource(r);

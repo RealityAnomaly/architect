@@ -1,14 +1,11 @@
-import { Architect, architectGlasswayNet, Component, constructor, DependencyGraph, PLUGIN_TARGET_IDENTIFIERS, recursiveMerge, Result, Target, TargetParams, TargetResolveParams } from '@perdition/architect-core';
-import { GVK } from '@perdition/architect-core/k8s';
+import { Architect, architectGlasswayNet, Component, constructor, DependencyGraph, GVK, PLUGIN_TARGET_IDENTIFIERS, recursiveMerge, Result, Target, TargetParams, TargetResolveParams } from '@perdition/architect-core';
 
 import * as api from 'kubernetes-models';
 import _ from 'lodash';
 
 import { FluxCDController, FluxCDMode } from './apply/flux/index.mts';
 import { KubePreludeComponent } from './component.mts';
-import { CrdsComponent } from './components/index.mts';
-import { Helm } from './helm/index.mts';
-import { Kustomize } from './kustomize/index.mts';
+import { CrdsComponent } from './components/crds/index.mts';
 import { KubeWriter } from './writer.mts';
 import { K8sPlugin } from './plugin.mts';
 import { KubeContext } from './context.mts';
@@ -44,9 +41,6 @@ export class KubeTarget extends Target {
   public static key = PLUGIN_TARGET_IDENTIFIERS.kubernetes;
   declare public readonly params: KubeTargetParams;
 
-  public helm: Helm;
-  public kustomize: Kustomize;
-
   public flux: FluxCDController;
 
   private readonly markedCRDGVKs: GVK[] = [];
@@ -72,9 +66,6 @@ export class KubeTarget extends Target {
 
     model.spec = recursiveMerge(defaults, model.spec);
     super(model, params, parent);
-
-    this.helm = new Helm(this.plugin);
-    this.kustomize = new Kustomize(this.plugin);
 
     this.flux = new FluxCDController(this);
 

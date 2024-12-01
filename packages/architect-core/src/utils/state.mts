@@ -37,5 +37,3 @@ export class StateProvider {
     this.dirs = dirs;
   };
 };
-
-export const defaultState = StateProvider.fromAppDirs();

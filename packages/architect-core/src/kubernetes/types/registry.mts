@@ -1,5 +1,5 @@
 import { Architect } from '../../index.mts';
-import { ResourceConstructor } from '../resource.mts';
+import { KubeResourceConstructor } from '../resource.mts';
 import { GVK } from './gvk.mts';
 
 function gvkToPath(gvk: GVK): string {
@@ -24,7 +24,7 @@ async function tryImport(path: string): Promise<object | undefined> {
  * Responsible for registering type definitions for the Kubernetes API and CRDs
  */
 export class TypeRegistry {
-  private ctorCache: Record<string, ResourceConstructor | null> = {};
+  private ctorCache: Record<string, KubeResourceConstructor | null> = {};
   private apiModulePath: string = 'kubernetes-models';
   private crdModulePaths: string[] = [
     Architect.PATH // path of the default root module
@@ -47,7 +47,7 @@ export class TypeRegistry {
   /**
    * Gets the constructor for a model GVK
    */
-  public async getConstructor(gvk: GVK): Promise<ResourceConstructor | null> {
+  public async getConstructor(gvk: GVK): Promise<KubeResourceConstructor | null> {
     const path = gvkToPath(gvk);
     const ctor = this.ctorCache[path] ?? this.getAndCacheModule(gvk);
     if (!ctor) return null;
@@ -57,7 +57,7 @@ export class TypeRegistry {
 
   private async getAndCacheModule(
     gvk: GVK,
-  ): Promise<ResourceConstructor | null> {
+  ): Promise<KubeResourceConstructor | null> {
     const gvkPath = gvkToPath(gvk);
 
     // find a matching constructor

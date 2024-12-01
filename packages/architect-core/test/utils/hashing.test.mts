@@ -1,4 +1,4 @@
-import { compositeHash } from '../../src/utils/hashing.mts';
+import { HashUtilities } from '../../src/utils/hashing.mts';
 
 test('composite hash equality', () => {
   const first = [
@@ -9,8 +9,8 @@ test('composite hash equality', () => {
     'foo', 'bar', { foo: 'bar' },
   ];
 
-  const hash = compositeHash(first);
-  expect(hash).toStrictEqual(compositeHash(second));
+  const hash = HashUtilities.compositeHash(first);
+  expect(hash).toStrictEqual(HashUtilities.compositeHash(second));
 });
 
 test('composite hash inequality', () => {
@@ -22,6 +22,6 @@ test('composite hash inequality', () => {
     'foo', 'bar', { foo: 'baz' },
   ];
 
-  const hash = compositeHash(first);
-  expect(hash).not.toStrictEqual(compositeHash(second));
+  const hash = HashUtilities.compositeHash(first);
+  expect(hash).not.toStrictEqual(HashUtilities.compositeHash(second));
 });
