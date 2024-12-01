@@ -4,6 +4,7 @@ import { CRDCommand } from "./crds/cli.mts";
 import { CrdsConfig } from "./crds/config.mts";
 import { CRDManager } from "./crds/index.mts";
 import { KubeTarget } from "./target.mts";
+import { BuilderParams, GitBuilder, Helm, HttpBuilder, Kustomize } from "./index.mts";
 
 export class K8sPluginConfig {
   crds?: CrdsConfig[];
@@ -13,9 +14,25 @@ export class K8sPlugin extends Plugin {
   public static readonly MODULE = "@perdition/architect-k8s";
   public readonly crds: CRDManager;
 
+  public helm: Helm;
+  public kustomize: Kustomize;
+  public gitBuilder: GitBuilder;
+  public httpBuilder: HttpBuilder;
+
   constructor(parent: Architect) {
     super(parent, 'kubernetes');
     this.crds = new CRDManager(this);
+
+    const builderParams: BuilderParams = {
+      loader: this.parent.kubeLoader,
+      logger: this.logger,
+      cache: this.parent.cache
+    };
+
+    this.helm = new Helm(builderParams);
+    this.kustomize = new Kustomize(builderParams);
+    this.gitBuilder = new GitBuilder(builderParams);
+    this.httpBuilder = new HttpBuilder(builderParams);
   }
 
   public async init(): Promise<void> {
@@ -39,3 +56,13 @@ export class K8sPlugin extends Plugin {
     return [KubeTarget];
   };
 }
+
+export class Kubernetes {
+  public static namespace(name: string): {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+    (target: Function): void;
+    (target: object, propertyKey: string | symbol): void;
+  } {
+    return Reflect.metadata('namespace', name);
+  };
+};

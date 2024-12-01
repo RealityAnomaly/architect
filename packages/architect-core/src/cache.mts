@@ -1,24 +1,41 @@
+import _ from 'lodash';
 import * as fs from 'node:fs/promises';
 import * as path from 'path';
 
-import { StateProvider, defaultState } from './utils/index.mts';
+import { HashUtilities, StateProvider } from './utils/index.mts';
+import objectHash from 'object-hash';
+import { Logger } from 'winston';
 
 /**
  * Target cache that caches the result of build inputs
  */
 export class TargetCache {
   readonly dir: string;
+  readonly logger: Logger;
 
-  constructor(state: StateProvider) {
+  constructor(state: StateProvider, logger: Logger) {
     this.dir = state.dirs.cache;
+    this.logger = logger;
   };
 
-  public async get(ns: string, key: string): Promise<Uint8Array | null> {
-    const file = path.join(this.dir, ns, key);
+  private hash(key: object | string): string {
+    if (Array.isArray(key)) {
+      return HashUtilities.compositeHash(key);
+    } else if (_.isString(key)) {
+      return HashUtilities.stringHash(key);
+    } else {
+      return objectHash(key);
+    };
+  };
+
+  public async get(ns: string, key: object | object[] | string): Promise<Uint8Array | null> {
+    const file = path.join(this.dir, ns, this.hash(key));
 
     try {
       await fs.stat(file);
+      this.logger.silly(`cache hit for key ${JSON.stringify(key)} in namespace ${ns}`);
     } catch {
+      this.logger.silly(`cache miss for key ${JSON.stringify(key)} in namespace ${ns}`);
       return null;
     };
 
@@ -27,13 +44,11 @@ export class TargetCache {
   };
 
   // TODO: monitor size of cache folder. Prune the oldest entries if we exceed the maximum size.
-  public async set(ns: string, key: string, value: Uint8Array) {
+  public async set(ns: string, key: object | string, value: Uint8Array) {
     const dir = path.join(this.dir, ns);
     await fs.mkdir(dir, { recursive: true });
 
-    const file = path.join(dir, key);
+    const file = path.join(dir, this.hash(key));
     await fs.writeFile(file, value);
   };
 };
-
-export const cache = new TargetCache(defaultState);

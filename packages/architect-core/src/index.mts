@@ -7,6 +7,8 @@ import { Target, TargetResolveParams } from './target.mts';
 import winston from 'winston';
 import { Project } from './project.mts';
 import { DependencyGraphRenderer } from './graph/render.mts';
+import { TargetCache } from './cache.mts';
+import { StateProvider } from './index.mts';
 
 export class Architect {
   public static PATH = path.resolve(path.join(import.meta.dirname, '..'));
@@ -15,18 +17,26 @@ export class Architect {
   public readonly plugins: PluginResolver;
   public readonly logger: winston.Logger;
 
+  public readonly state: StateProvider;
+  public readonly cache: TargetCache;
+
   public readonly kubeTypes: kubeUtils.TypeRegistry;
   public readonly kubeLoader: kubeUtils.ManifestLoader;
 
-  private constructor(debug: boolean) {
+  private constructor(logLevel: string = 'info') {
     this.plugins = new PluginResolver(this);
     this.logger = winston.createLogger({
-      level: debug ? 'debug' : 'info',
+      level: logLevel,
       format: winston.format.cli(),
       transports: [
         new winston.transports.Console(),
       ],
     });
+
+    this.logger.debug(`initialised logging with level '${logLevel}'`);
+
+    this.state = StateProvider.fromAppDirs();
+    this.cache = new TargetCache(this.state, this.logger);
 
     this.kubeTypes = new kubeUtils.TypeRegistry();
     this.kubeLoader = new kubeUtils.ManifestLoader(this.kubeTypes);
@@ -36,8 +46,8 @@ export class Architect {
     return [this.project!.root, ...this.project!.libraries.map(l => l.root)];
   };
 
-  public static async create(workspace: string, config: string, debug: boolean): Promise<Architect> {
-    const instance = new Architect(debug);
+  public static async create(workspace: string, config: string, logLevel: string = 'info'): Promise<Architect> {
+    const instance = new Architect(logLevel);
     instance.project = await Project.load(instance, workspace, config);
 
     for (const plugin of instance.project!.config.imports?.plugins || []) {
@@ -78,6 +88,14 @@ export class Architect {
   public async apply(output: string, target: Target, params?: TargetResolveParams) {
     await this.compile(output, target, params);
   };
+
+  public static class(name: string): {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+    (target: Function): void;
+    (target: object, propertyKey: string | symbol): void;
+  } {
+    return Reflect.metadata('class', name);
+  };
 }
 
 export * from './cli/index.mts';
@@ -85,6 +103,7 @@ export * from './utils/index.mts';
 export * from './components/index.mts';
 export * from './generated/crds/index.ts';
 export * from './graph/index.mts';
+export * from './kubernetes/index.mts';
 export * from './backend.mts';
 export * from './cache.mts';
 export * from './config.mts';

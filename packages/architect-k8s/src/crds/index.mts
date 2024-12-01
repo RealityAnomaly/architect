@@ -4,24 +4,12 @@ import * as fs from 'node:fs/promises';
 import * as api from 'kubernetes-models';
 import { K8sPlugin } from '../plugin.mts';
 import { CrdsConfig } from './config.mts';
-import { CRDFetcherGit } from './fetchers/git.mts';
-import { CRDFetcherHttp } from './fetchers/http.mts';
-import { CRDFetcher } from './fetchers/index.mts';
-import { CRDFetcherKustomize } from './fetchers/kustomize.mts';
 import { Logger } from 'winston';
-import { CRDFetcherHelm } from './fetchers/helm.mts';
-import { CRDModelGenerator } from '@perdition/architect-core/k8s';
+import { CRDModelGenerator, KubeResource } from '@perdition/architect-core';
 
 export * from './cli.mts';
 export * from './config.mts';
 export * from './graph.mts';
-
-const CRD_FETCHER_CLASSES = [
-  CRDFetcherGit,
-  CRDFetcherHelm,
-  CRDFetcherHttp,
-  CRDFetcherKustomize
-]
 
 export interface CRDSyncOptions {
   fetchOnly?: boolean;
@@ -34,8 +22,6 @@ export class CRDManager {
   private readonly logger: Logger;
 
   private readonly generator: CRDModelGenerator;
-  private readonly fetchers: CRDFetcher[] = [];
-
   private configDirty: boolean = false;
   private modelsDirty: boolean = false;
 
@@ -49,10 +35,6 @@ export class CRDManager {
     })
 
     this.generator = new CRDModelGenerator(plugin.parent.kubeLoader);
-
-    for (const fetcher of CRD_FETCHER_CLASSES) {
-      this.fetchers.push(new fetcher(this));
-    }
   };
 
   public async add(crd: CrdsConfig): Promise<void> {
@@ -135,12 +117,42 @@ export class CRDManager {
   };
 
   private async fetch(crd: CrdsConfig): Promise<api.apiextensionsK8sIo.v1.CustomResourceDefinition[]> {
-    const resources = [];
-    for (const fetcher of this.fetchers) {
-      resources.push(...await fetcher.fetch(crd));
+    const resources = [] as KubeResource[];
+    for (const repo of crd.git?.repos || []) {
+      const refStr = repo.ref ? `+${repo.ref}` : '';
+      try {
+        resources.push(...await this.plugin.gitBuilder.fetch(repo.url, repo.ref, { paths: repo.paths }));
+      } catch (exception) {
+        this.logger.warn(`git fetch failed for CRD domain ${crd.name} repository ${repo.url}${refStr}: ${exception}`, { url: repo.url, ref: repo.ref });
+      };
     };
 
-    this.logger.info(`completed fetch for CRD domain ${crd.name}, found ${resources.length} resources`)
-    return resources;
+    for (const chart of crd.helm?.charts || []) {
+      try {
+        resources.push(...await this.plugin.helm.template(chart.name, chart.values, chart.options));
+      } catch (exception) {
+        this.logger.warn(`helm build failed for CRD domain ${crd.name} chart ${chart.name}: ${exception}`, { domain: crd.name, chart: chart.name });
+      };
+    };
+
+    for (const path of crd.http?.paths || []) {
+      try {
+        resources.push(...await this.plugin.httpBuilder.fetch(path));
+      } catch (exception) {
+        this.logger.warn(`HTTP fetch failed for CRD domain ${crd.name}: ${exception}`);
+      };
+    };
+
+    for (const kustomization of crd.kustomize?.kustomizations || []) {
+      try {
+        resources.push(...await this.plugin.kustomize.build(kustomization.path, kustomization.config));
+      } catch (exception) {
+        this.logger.warn(`kustomize build failed for CRD domain ${crd.name} path ${kustomization.path}: ${exception}`, { domain: crd.name, path: kustomization.path });
+      };
+    };
+
+    const crds = resources.filter(r => r instanceof api.apiextensionsK8sIo.v1.CustomResourceDefinition);
+    this.logger.info(`completed fetch for CRD domain ${crd.name}, found ${crds.length} resources`)
+    return crds;
   };
 }

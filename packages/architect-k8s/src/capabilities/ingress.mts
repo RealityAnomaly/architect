@@ -1,5 +1,4 @@
-import 'reflect-metadata';
-import { Capability } from '@perdition/architect-core';
+import { Architect, Capability } from '@perdition/architect-core';
 
 export enum IngressFlavor {
   Nginx = 'nginx',
@@ -14,5 +13,5 @@ export interface IngressCapabilitySpec {
 /**
  * Represents a specific flavor of ingress controller
  */
-@Reflect.metadata('class', 'capability.k8s.architect.glassway.net/ingress')
+@Architect.class('capability.k8s.architect.glassway.net/ingress')
 export class IngressCapability extends Capability<IngressCapabilitySpec> {};

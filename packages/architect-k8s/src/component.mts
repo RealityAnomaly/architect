@@ -1,19 +1,17 @@
-import { architectGlasswayNet, CapabilityMatcher, Component, ComponentArgs, ComponentClass, ComponentMatcher, IComponentMatcher, Target } from '@perdition/architect-core';
-import { Resource, ResourceUtilities } from '@perdition/architect-core/k8s';
+import { Architect, architectGlasswayNet, CapabilityMatcher, Component, ComponentArgs, ComponentClass, ComponentMatcher, IComponentMatcher, KubeResource, KubeResourceUtilities, Target } from '@perdition/architect-core';
 
 import * as api from 'kubernetes-models';
 import _ from 'lodash';
 import { CNICapability, DNSCapability } from './capabilities/index.mts';
 
-import { Helm, HelmChartOpts } from './helm/index.mts';
-import { Kustomize, KustomizeOpts } from './kustomize/index.mts';
 import { KubeTarget } from './target.mts';
 import { KubeContext } from './context.mts';
+import { GitFetchOptions, HelmChartOpts, HttpFetchOptions, KustomizeOpts } from './index.mts';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface KubeComponentArgs extends ComponentArgs {};
 export interface KubeComponentGenericResources {
-  result?: Resource[];
+  result?: KubeResource[];
 };
 
 export abstract class KubeComponent<
@@ -61,13 +59,13 @@ export abstract class KubeComponent<
     result = await super.build(result);
 
     // properly namespace resources, because postBuild doesn't run for children individually
-    const resources = ResourceUtilities.normaliseResources(result);
+    const resources = KubeResourceUtilities.normaliseResources(result);
     resources.forEach(r => {
       if (r.apiVersion === undefined || r.kind == undefined) {
         throw new Error(`in component ${this.rid}: apiVersion or kind unset on a resource passed to the build function`)
       }
 
-      ResourceUtilities.defaultNamespace(r, this.context.namespace)
+      KubeResourceUtilities.defaultNamespace(r, this.context.namespace)
     });
 
     return result;
@@ -75,7 +73,7 @@ export abstract class KubeComponent<
 
   public async postBuild(data: TResult) {
     // run post-build resource fixup at the top level
-    let resources = ResourceUtilities.normaliseResources(data);
+    let resources = KubeResourceUtilities.normaliseResources(data);
 
     // TODO: a bit of a hack... might want to improve $resolve logic to add caching
     // we need to not just resolve here, because we might have default values that were added in the build phase
@@ -99,7 +97,7 @@ export abstract class KubeComponent<
     resources.push(metadata);
 
     resources = resources.map(obj => {
-      obj = ResourceUtilities.fixupResource(obj);
+      obj = KubeResourceUtilities.fixupResource(obj);
       return obj;
     });
 
@@ -110,19 +108,18 @@ export abstract class KubeComponent<
     return this.target.cluster;
   };
 
-  // helper accessors for extension fields
-  protected get helm(): Helm {
-    return this.target.helm;
+  protected async gitFetch(url: string, ref?: string, options?: GitFetchOptions): Promise<KubeResource[]> {
+    return this.target.plugin.gitBuilder.fetch(url, ref, options);
   };
 
-  protected get kustomize(): Kustomize {
-    return this.target.kustomize;
+  protected async httpFetch(url: string, cache?: boolean, options?: HttpFetchOptions): Promise<KubeResource[]> {
+    return this.target.plugin.httpBuilder.fetch(url, cache, options);
   };
 
   /**
    * Wrapper for Helm.template that inserts our default namespace and configuration
    */
-  protected async helmTemplate(chart: string, values: object, config: HelmChartOpts, filter?: (v: Resource) => boolean): Promise<Resource[]> {
+  protected async helmTemplate(chart: string, values: object, config: HelmChartOpts, filter?: (v: KubeResource) => boolean): Promise<KubeResource[]> {
     config = _.merge({
       namespace: this.context.namespace,
       kubeVersion: this.cluster.version,
@@ -131,7 +128,7 @@ export abstract class KubeComponent<
       skipTests: true,
     } as Partial<HelmChartOpts>, config);
 
-    let result = await this.helm.template(chart, values, config);
+    let result = await this.target.plugin.helm.template(chart, values, config);
     if (filter !== undefined) result = result.filter(filter);
 
     return result;
@@ -140,8 +137,8 @@ export abstract class KubeComponent<
   /**
    * Wrapper for Kustomize.build
    */
-  protected async kustomizeBuild(dir: string, config: KustomizeOpts = {}): Promise<Resource[]> {
-    return this.kustomize.build(dir, config);
+  protected async kustomizeBuild(dir: string, config: KustomizeOpts = {}): Promise<KubeResource[]> {
+    return this.target.plugin.kustomize.build(dir, config);
   };
 };
 
@@ -150,19 +147,19 @@ export interface KubeComponentClass extends ComponentClass {
 };
 
 export class KubeResourceComponentOptions {
-  resources: Resource[] = [];
+  resources: KubeResource[] = [];
 };
 
-@Reflect.metadata('class', 'k8s.architect.glassway.net/prelude')
+@Architect.class('k8s.architect.glassway.net/prelude')
 export class KubePreludeComponent extends KubeComponent {
-  private readonly resources: Resource[] = [];
+  private readonly resources: KubeResource[] = [];
 
   public async build(resources: KubeComponentGenericResources = {}) {
     resources.result = this.resources;
     return super.build(resources);
   };
 
-  public push(...items: Resource[]) {
+  public push(...items: KubeResource[]) {
     this.resources.push(...items);
   };
 

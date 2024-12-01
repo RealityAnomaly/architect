@@ -1,5 +1,4 @@
-import 'reflect-metadata';
-import { Capability } from '@perdition/architect-core';
+import { Architect, Capability } from '@perdition/architect-core';
 
 export enum CNIFlavor {
   Calico = 'calico',
@@ -20,5 +19,5 @@ export interface CNICapabilitySpec {
 /**
  * Represents a CNI available in the cluster
  */
-@Reflect.metadata('class', 'capability.k8s.architect.glassway.net/cni')
+@Architect.class('capability.k8s.architect.glassway.net/cni')
 export class CNICapability extends Capability<CNICapabilitySpec> {};
