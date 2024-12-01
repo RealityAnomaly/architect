@@ -6,8 +6,7 @@
     "url": "https://github.com/RealityAnomaly/architect.git"
   },
   "exports": {
-    ".": "./src/index.mts",
-    "./k8s": "./src/kubernetes/index.mts"
+    ".": "./src/index.mts"
   },
   "bin": {
     "architect": "bin/cli/index.sh",

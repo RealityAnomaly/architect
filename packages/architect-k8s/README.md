@@ -11,20 +11,19 @@ This is an extension to the [Architect framework](https://github.com/realityanom
 ## Example
 
 ```typescript
-import 'reflect-metadata';
-
+import { Architect } from '@perdition/architect';
 import { k8sCniCncfIo } from '@perdition/k8s-shared/crds';
 import * as k8s from '@perdition/architect-k8s';
 
-export interface KubevirtComponentOptions extends k8s.KubeComponentArgs {};
+export interface KubevirtComponentOptions extends KubeComponentArgs {};
 
 interface KubevirtComponentResources {
   networkAttachmentDefinition?: k8sCniCncfIo.v1.NetworkAttachmentDefinition;
 };
 
-@Reflect.metadata('class', 'manifold.glassway.net/kubevirt')
-@Reflect.metadata('namespace', '$features$')
-export class KubevirtComponent extends k8s.KubeComponent<KubevirtComponentResources, KubevirtComponentOptions> {
+@Architect.class('manifold.glassway.net/kubevirt')
+@Kubernetes.namespace('$features$')
+export class KubevirtComponent extends KubeComponent<KubevirtComponentResources, KubevirtComponentOptions> {
   public async build(resources: KubevirtComponentResources = {}) {
     resources.networkAttachmentDefinition = new k8sCniCncfIo.v1.NetworkAttachmentDefinition({
       metadata: {

@@ -1,14 +1,12 @@
 import { execFile } from 'node:child_process';
 import * as util from 'util';
 
-import { Resource } from '@perdition/architect-core/k8s';
-import { K8sPlugin } from '../plugin.mts';
+import { KubeResource } from '@perdition/architect-core';
+import { Builder, BuilderParams } from './builder.mts';
 
-export class Kustomize {
-  private readonly plugin: K8sPlugin;
-
-  constructor(plugin: K8sPlugin) {
-    this.plugin = plugin;
+export class Kustomize extends Builder {
+  constructor(params: BuilderParams) {
+    super(params, 'kustomize');
   };
 
   private buildParams(config: KustomizeOpts, params: string[]) {
@@ -60,7 +58,7 @@ export class Kustomize {
     };
   };
 
-  public async build(path: string, config: KustomizeOpts = {}): Promise<Resource[]> {
+  public async build(path: string, config: KustomizeOpts = {}): Promise<KubeResource[]> {
     const params: string[] = [];
 
     // build operation
@@ -71,7 +69,7 @@ export class Kustomize {
 
     const execFileAsync = util.promisify(execFile);
     const buf = await execFileAsync('kustomize', params, { maxBuffer: undefined });
-    const resources = await this.plugin.parent.kubeLoader.loadString(buf.stdout);
+    const resources = await this.loader.loadString(buf.stdout);
     return resources;
   };
 };

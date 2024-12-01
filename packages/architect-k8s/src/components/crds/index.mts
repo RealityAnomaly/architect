@@ -1,14 +1,12 @@
-import 'reflect-metadata';
 import * as fs from 'node:fs/promises';
 import path from 'path';
-import { notEmpty } from '@perdition/architect-core';
+import { Architect, GVK, notEmpty } from '@perdition/architect-core';
 import * as fg from 'fast-glob';
 import * as api from 'kubernetes-models';
 import wcmatch from 'wildcard-match';
 import { KubeComponent, KubeComponentGenericResources } from '../../component.mts';
-import { GVK } from '@perdition/architect-core/k8s';
 
-@Reflect.metadata('class', 'k8s.architect.glassway.net/crds')
+@Architect.class('k8s.architect.glassway.net/crds')
 export class CrdsComponent extends KubeComponent {
   private readonly enabledGroups: string[] = [];
   private readonly enabledGVKs: GVK[] = [];

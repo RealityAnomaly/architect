@@ -1,5 +1,4 @@
-import { Component, ResolvedComponent, Result, ValidationError, ValidationErrorLevel } from '@perdition/architect-core';
-import { GVK, Resource } from '@perdition/architect-core/k8s';
+import { Component, GVK, KubeResource, ResolvedComponent, Result, ValidationError, ValidationErrorLevel } from '@perdition/architect-core';
 
 import * as api from 'kubernetes-models';
 import wcmatch from 'wildcard-match';
@@ -41,7 +40,7 @@ export class KubeCRDDependencyGraph {
    * plus the GVKs declared as resources by each component, in order to establish dependencies
    */
   public static create(result: Result, options: KubeCRDDependencyOptions = {}): KubeCRDDependencyGraph {
-    function transformCRDs(resources: Resource[]): GVK[] {
+    function transformCRDs(resources: KubeResource[]): GVK[] {
       const gvks: GVK[] = [];
       resources.forEach(r => {
         if (r.kind !== 'CustomResourceDefinition') return;
@@ -53,7 +52,7 @@ export class KubeCRDDependencyGraph {
     };
 
     const data = Object.fromEntries(Object.entries(result.components).map(([k, v]): [string, KubeCRDRequirement] => {
-      const resources = v as Resource[] ?? [];
+      const resources = v as KubeResource[] ?? [];
       const requirement: KubeCRDRequirement = {
         component: result.graph.components[k],
         exports: transformCRDs(resources),

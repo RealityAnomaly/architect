@@ -3,17 +3,14 @@ import * as fs from 'node:fs/promises';
 import * as os from 'os';
 import * as path from 'path';
 import * as util from 'util';
-import { cache, compositeHash } from '@perdition/architect-core';
-import { Resource } from '@perdition/architect-core/k8s';
+import { KubeResource } from '@perdition/architect-core';
 
 import * as yaml from 'js-yaml';
-import { K8sPlugin } from '../plugin.mts';
+import { Builder, BuilderParams } from './builder.mts';
 
-export class Helm {
-  private readonly plugin: K8sPlugin;
-
-  constructor(plugin: K8sPlugin) {
-    this.plugin = plugin;
+export class Helm extends Builder {
+  constructor(params: BuilderParams) {
+    super(params, 'helm');
   };
 
   private buildParams(config: HelmChartOpts, params: string[]) {
@@ -91,25 +88,10 @@ export class Helm {
     params.push('--version', config.version);
   };
 
-  private async tryFetchCache(hash: string): Promise<Resource[] | null> {
-    const bytes = await cache.get('helm', hash);
-    if (!bytes) return null;
-
-    const decoder = new util.TextDecoder();
-    const data = decoder.decode(bytes);
-    return this.plugin.parent.kubeLoader.loadString(data);
-  };
-
-  private async storeCache(hash: string, data: string) {
-    const encoder = new util.TextEncoder();
-    const bytes = encoder.encode(data);
-    await cache.set('helm', hash, bytes);
-  };
-
   /**
    * Renders a Helm chart from parameters
    */
-  public async template(chart: string, values: object, config: HelmChartOpts): Promise<Resource[]> {
+  public async template(chart: string, values: object, config: HelmChartOpts): Promise<KubeResource[]> {
     const params: string[] = [];
 
     // template operation
@@ -127,8 +109,8 @@ export class Helm {
     this.buildParams(config, params);
 
     // consult our cache for the input values plus the params
-    const hash = compositeHash([values, params]);
-    const cacheResult = await this.tryFetchCache(hash);
+    const hashInput = [values, params];
+    const cacheResult = await this.tryFetchCache(hashInput);
     if (cacheResult) return cacheResult;
 
     const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'architect-'));
@@ -139,10 +121,10 @@ export class Helm {
       const execFileAsync = util.promisify(execFile);
 
       const buf = await execFileAsync('helm', params.concat('--values', valuesFile), { maxBuffer: undefined });
-      const resources = await this.plugin.parent.kubeLoader.loadString(buf.stdout);
+      const resources = await this.loader.loadString(buf.stdout);
 
       // cache the result from the inputs
-      await this.storeCache(hash, buf.stdout);
+      await this.storeCache(hashInput, buf.stdout);
       return resources;
     } finally {
       await fs.rm(dir, {

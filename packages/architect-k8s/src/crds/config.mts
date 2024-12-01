@@ -1,5 +1,5 @@
-import { HelmChartOpts } from "../helm/index.mts";
-import { KustomizeOpts } from "../kustomize/index.mts";
+import { HelmChartOpts } from "../builders/helm.mts";
+import { KustomizeOpts } from "../builders/kustomize.mts";
 
 export interface CrdsConfigHttp {
   paths: string[];

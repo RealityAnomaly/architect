@@ -2,8 +2,7 @@ import path from 'node:path';
 import * as yaml from 'js-yaml';
 import * as fs from 'node:fs/promises';
 
-import { Result, Writer } from '@perdition/architect-core';
-import { Resource, ResourceUtilities } from '@perdition/architect-core/k8s';
+import { Result, Writer, KubeResource, KubeResourceUtilities } from '@perdition/architect-core';
 import { KubeTarget, KubeTargetOutputFormat } from './target.mts';
 import { KubeContext } from './context.mts';
 import { KubeComponent } from './index.mts';
@@ -16,16 +15,16 @@ export class KubeWriter implements Writer {
   };
 
   private async writeSingleFile(result: Result, dir: string) {
-    const resources = result.all as Resource[] ?? [];
+    const resources = result.all as KubeResource[] ?? [];
     const resource = resources.map(r => yaml.dump(r)).join('\n---\n');
 
     await fs.writeFile(path.join(dir, 'resources.yaml'), resource);
   };
 
   private async writePerResource(result: Result, dir: string) {
-    const resources = result.all as Resource[] ?? [];
+    const resources = result.all as KubeResource[] ?? [];
     await Promise.all(resources.map(async r => {
-      const name = `${ResourceUtilities.resourceId(r)}.yaml`;
+      const name = `${KubeResourceUtilities.resourceId(r)}.yaml`;
       const resource = yaml.dump(r);
 
       await fs.writeFile(path.join(dir, name), resource);
@@ -41,12 +40,12 @@ export class KubeWriter implements Writer {
       await fs.mkdir(rd, { recursive: true });
 
       // namespaces are handled separately in flux mode
-      let resources = v as Resource[] ?? [];
+      let resources = v as KubeResource[] ?? [];
       if (flux) resources = resources.filter(r => r.kind !== 'Namespace');
       if (resources.length <= 0) return;
 
       await Promise.all(resources.map(async r => {
-        const name = `${ResourceUtilities.resourceId(r)}.yaml`;
+        const name = `${KubeResourceUtilities.resourceId(r)}.yaml`;
         const resource = yaml.dump(r);
 
         await fs.writeFile(path.join(rd, name), resource);
@@ -66,11 +65,11 @@ export class KubeWriter implements Writer {
     await Promise.all(Object.entries(result.components).map(async ([k, v]) => {
       const component = result.graph.components[k];
       const resource = this.target.flux.componentObject(component, this.target.params.modes.flux!);
-      await fs.writeFile(path.join(clusterDir, `${ResourceUtilities.resourceId(resource)}.yaml`), yaml.dump(resource));
+      await fs.writeFile(path.join(clusterDir, `${KubeResourceUtilities.resourceId(resource)}.yaml`), yaml.dump(resource));
 
       // extract and write any namespaces the component declares to the cluster dir
-      const namespaces = (v as Resource[] ?? []).filter(r => r.kind === 'Namespace');
-      await Promise.all(namespaces.map(r => fs.writeFile(path.join(clusterDir, `${ResourceUtilities.resourceId(r)}.yaml`), yaml.dump(r))));
+      const namespaces = (v as KubeResource[] ?? []).filter(r => r.kind === 'Namespace');
+      await Promise.all(namespaces.map(r => fs.writeFile(path.join(clusterDir, `${KubeResourceUtilities.resourceId(r)}.yaml`), yaml.dump(r))));
     }));
   };
 

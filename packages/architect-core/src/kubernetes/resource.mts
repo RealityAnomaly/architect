@@ -24,7 +24,7 @@ const RESOURCE_NAMESPACE_BLACKLIST: string[] = [
 /**
  * Represents the full API kind of a Kubernetes API resource
  */
-export interface ResourceKind {
+export interface KubeResourceKind {
   apiVersion: string;
   kind: string;
 };
@@ -32,7 +32,7 @@ export interface ResourceKind {
 /**
  * Represents a full Kubernetes API object
  */
-export interface Resource extends ResourceKind {
+export interface KubeResource extends KubeResourceKind {
   metadata?: IObjectMeta;
   spec?: unknown;
 };
@@ -40,25 +40,25 @@ export interface Resource extends ResourceKind {
 /**
  * Resource with unknown optional keys
  */
-export interface UnkResource extends Resource {
+export interface KubeUnkResource extends KubeResource {
   [key: string]: unknown;
 };
 
 /**
  * Represents the constructor of a resource
  */
-export type ResourceConstructor = new (data: Resource) => Resource;
+export type KubeResourceConstructor = new (data: KubeResource) => KubeResource;
 
 /**
  * Represents a recursive set or map of resources
  */
-export type ResourceTree = Resource | Resource[] | Record<string, Resource>;
+export type KubeResourceTree = KubeResource | KubeResource[] | Record<string, KubeResource>;
 
-export class ResourceUtilities {
+export class KubeResourceUtilities {
   /**
    * Returns whether this anonymous value is a resource
    */
-  static isResource(value: object): value is UnkResource {
+  static isResource(value: object): value is KubeUnkResource {
     return (
       Object.hasOwn(value, 'apiVersion') &&
       Object.hasOwn(value, 'kind')
@@ -68,7 +68,7 @@ export class ResourceUtilities {
   /**
    * Returns the cluster-unique resource identifier of the specified resource
    */
-  static resourceId(data: Resource): string {
+  static resourceId(data: KubeResource): string {
     const builder: string[] = [];
     const components = [data.apiVersion, data.kind, data.metadata?.namespace, data.metadata?.name];
     components.forEach(c => {
@@ -82,16 +82,16 @@ export class ResourceUtilities {
   /**
    * Normalises a recursive list or set of potential resources into a flat list of resources.
    */
-  static normaliseResources(value: unknown): Resource[] {
+  static normaliseResources(value: unknown): KubeResource[] {
     if (value === undefined || value === null) return [];
 
-    let result: Resource[];
+    let result: KubeResource[];
     if (Array.isArray(value)) {
-      result = value.map(v => ResourceUtilities.normaliseResources(v)).flat();
-    } else if (ResourceUtilities.isResource(value)) {
+      result = value.map(v => KubeResourceUtilities.normaliseResources(v)).flat();
+    } else if (KubeResourceUtilities.isResource(value)) {
       result = [value];
     } else {
-      result = ResourceUtilities.normaliseResources(Object.values(value));
+      result = KubeResourceUtilities.normaliseResources(Object.values(value));
     };
 
     return result;
@@ -100,7 +100,7 @@ export class ResourceUtilities {
   /**
    * Applies a default namespace to a resource if it is namespaced and does not already have one defined
    */
-  static defaultNamespace(resource: Resource, def: string): Resource {
+  static defaultNamespace(resource: KubeResource, def: string): KubeResource {
     if (RESOURCE_NAMESPACE_BLACKLIST.includes(resource.kind)) {
       return resource;
     };
@@ -118,7 +118,7 @@ export class ResourceUtilities {
   /**
    * Runs fixup actions on API objects
    */
-  static fixupResource(resource: Resource): Resource {
+  static fixupResource(resource: KubeResource): KubeResource {
     const metadata: IObjectMeta = {};
 
     // appends our identifier label
