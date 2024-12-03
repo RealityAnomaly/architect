@@ -1,0 +1,17 @@
+{
+  "kyverno": {
+    "class": "architect.glassway.net/kyverno",
+    "context": {
+      "namespace": "kyverno"
+    },
+    "inputs": {
+      "chart": {
+        "helm": {
+          "repo": "https://kyverno.github.io/kyverno",
+          "version": "v2.3.3",
+          "name": "kyverno"
+        }
+      }
+    }
+  }
+}

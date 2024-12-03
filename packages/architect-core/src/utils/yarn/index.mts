@@ -4,17 +4,27 @@ import * as yarnFsLib from '@yarnpkg/fslib';
 import { ModulePackageEntry } from '../modules.mts';
 
 export class YarnUtilities {
-  public static async getCurrentProject(dir: string): Promise<yarnCore.Project | undefined> {
+  public static async getCurrentWorkspace(dir: string): Promise<yarnCore.Workspace | null> {
     try {
       const cwd = yarnFsLib.npath.toPortablePath(dir);
       const config = await yarnCore.Configuration.find(cwd, null, { strict: false });
       const result = await yarnCore.Project.find(config, cwd);
 
-      return result.project;
+      return result.workspace;
     } catch {
-      return undefined;
+      return null;
     };
   };
+
+  public static workspaceToIdentifier(workspace: yarnCore.Workspace): string {
+    if (!workspace.manifest.name)
+      throw Error(`workspace ${workspace} does not define a name`);
+
+    let name = workspace.manifest.name.name;
+      if (workspace.manifest.name.scope)
+        name = `@${workspace.manifest.name.scope}/${name}`;
+    return name;
+  }
 
   public static projectToPackageMap(project: yarnCore.Project): Record<string, ModulePackageEntry> {
     const result = {} as Record<string, ModulePackageEntry>;
@@ -22,10 +32,8 @@ export class YarnUtilities {
       if (!workspace.manifest.name || !workspace.manifest.raw?.exports) continue;
       if (!Object.hasOwn(workspace.manifest.raw.exports, '.')) continue;
 
+      const name = this.workspaceToIdentifier(workspace);
       const target = workspace.manifest.raw.exports['.'];
-      let name = workspace.manifest.name.name;
-      if (workspace.manifest.name.scope)
-        name = `@${workspace.manifest.name.scope}/${name}`;
 
       result[name] = {
         root: workspace.cwd,

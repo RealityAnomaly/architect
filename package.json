@@ -19,6 +19,7 @@
     "npm-check-updates": "^17.1.11",
     "standard-version": "^9.5.0",
     "ts-jest": "^29.2.5",
+    "typescript": "^5.7.2",
     "typescript-eslint": "^8.16.0"
   },
   "workspaces": [

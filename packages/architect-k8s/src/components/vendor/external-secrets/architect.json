@@ -1,0 +1,17 @@
+{
+  "external-secrets": {
+    "class": "architect.glassway.net/external-secrets",
+    "context": {
+      "namespace": "$features$"
+    },
+    "inputs": {
+      "chart": {
+        "helm": {
+          "repo": "https://charts.external-secrets.io",
+          "version": "0.5.3",
+          "name": "external-secrets"
+        }
+      }
+    }
+  }
+}

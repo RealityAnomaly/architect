@@ -18,7 +18,7 @@
     "test": "jest --passWithNoTests --updateSnapshot && eslint",
     "test:watch": "jest --watch",
     "watch": "tsc --build -w",
-    "generate": "node --loader ts-node/esm utils/generate-core-crds.mts"
+    "generate": "npx json2ts -i internal/schema -o src/generated/schema && node --loader ts-node/esm utils/generate-core-crds.mts"
   },
   "author": {
     "name": "Alex XZ Cypher Zero",
@@ -89,6 +89,7 @@
     "@types/uuid": "^10.0.0",
     "@yarnpkg/core": "^4.1.6",
     "@yarnpkg/fslib": "^3.1.1",
+    "ajv": "^8.17.1",
     "appdirsjs": "^1.2.7",
     "commander": "^12.1.0",
     "fast-glob": "^3.3.2",
@@ -106,5 +107,8 @@
     "uuid": "^11.0.3",
     "wildcard-match": "^5.1.3",
     "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "json-schema-to-typescript": "^15.0.3"
   }
 }

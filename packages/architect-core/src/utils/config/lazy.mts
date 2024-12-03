@@ -25,7 +25,7 @@ export interface _LazyProxy<T> {
   /**
    * The fallback value to use if the value is undefined
    */
-  $__fallback__?: Partial<T>;
+  $__fallback__?: DeepPartial<T>;
 
   /**
     * Resolves the entire configuration tree and returns the result
@@ -52,7 +52,7 @@ export interface _LazyProxy<T> {
   /**
    * Sets the fallback value for this object
    */
-  $setFallback(value: Partial<T>): void;
+  $setFallback(value: DeepPartial<T>): void;
 };
 
 class LazyProxy {

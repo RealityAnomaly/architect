@@ -9,6 +9,12 @@ import { Project } from './project.mts';
 import { DependencyGraphRenderer } from './graph/render.mts';
 import { TargetCache } from './cache.mts';
 import { StateProvider } from './index.mts';
+import { ComponentModel } from './model/index.mts';
+import { Component } from './component.mts';
+
+export const TYPE_META_KEY = 'architect.glassway.net/type';
+export const MODEL_META_KEY = 'architect.glassway.net/model';
+export const CLASS_META_KEY = 'architect.glassway.net/class';
 
 export class Architect {
   public static PATH = path.resolve(path.join(import.meta.dirname, '..'));
@@ -48,7 +54,13 @@ export class Architect {
 
   public static async create(workspace: string, config: string, logLevel: string = 'info'): Promise<Architect> {
     const instance = new Architect(logLevel);
-    instance.project = await Project.load(instance, workspace, config);
+
+    try {
+      instance.project = await Project.load(instance, workspace, config);
+    } catch (exception) {
+      instance.logger.error(`failed to load workspace, exiting: ${exception}`);
+      throw exception;
+    };
 
     for (const plugin of instance.project!.config.imports?.plugins || []) {
       await instance.plugins.register(plugin);
@@ -94,21 +106,38 @@ export class Architect {
     (target: Function): void;
     (target: object, propertyKey: string | symbol): void;
   } {
-    return Reflect.metadata('class', name);
+    return Reflect.metadata(CLASS_META_KEY, name);
+  };
+
+  /**
+   * Marks a class as a component. This MUST be defined for all Architect components that are not dependent children.
+   * @param model The component model to use. Per the documentation, this should be imported from an `architect.json` file in the same folder as your component's code.
+   * @returns A decorator which sets the required properties.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public static component<T extends typeof Component<any, any, any>>(model: ComponentModel) {
+    function decorator(target: T) {
+      Reflect.defineMetadata(TYPE_META_KEY, 'component', target);
+      Reflect.defineMetadata(MODEL_META_KEY, model, target);
+      if (model.class) Reflect.defineMetadata(CLASS_META_KEY, model.class, target);
+    };
+
+    return decorator;
   };
 }
 
 export * from './cli/index.mts';
-export * from './utils/index.mts';
-export * from './components/index.mts';
 export * from './generated/crds/index.ts';
 export * from './graph/index.mts';
 export * from './kubernetes/index.mts';
+export * from './model/index.mts';
+export * from './utils/index.mts';
 export * from './backend.mts';
 export * from './cache.mts';
 export * from './config.mts';
 export * from './context.mts';
 export * from './capability.mts';
+export * from './component.mts';
 export * from './plugin.mts';
 export * from './project.mts';
 export * from './provider.mts';

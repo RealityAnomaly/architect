@@ -15,7 +15,7 @@ const schema9 = {
       "$ref": "KdYvqaQbNmS3aH5WnRVFYuq4ultzkLAzVATow2Bbc"
     }
   },
-  "required": ["apiVersion", "kind", "metadata", "spec", "state"],
+  "required": ["apiVersion", "kind", "metadata", "spec"],
   "$id": "architect.glassway.net.v1alpha1.Target"
 };
 const schema10 = {
@@ -1316,22 +1316,6 @@ function validate24(data, {
       }
       errors++;
     }
-    if (data.state === undefined) {
-      const err4 = {
-        instancePath,
-        schemaPath: "#/required",
-        keyword: "required",
-        params: {
-          missingProperty: "state"
-        }
-      };
-      if (vErrors === null) {
-        vErrors = [err4];
-      } else {
-        vErrors.push(err4);
-      }
-      errors++;
-    }
     if (data.apiVersion !== undefined) {
       if (!validate25(data.apiVersion, {
         instancePath: instancePath + "/apiVersion",
@@ -1377,7 +1361,7 @@ function validate24(data, {
       }
     }
   } else {
-    const err5 = {
+    const err4 = {
       instancePath,
       schemaPath: "#/type",
       keyword: "type",
@@ -1386,9 +1370,9 @@ function validate24(data, {
       }
     };
     if (vErrors === null) {
-      vErrors = [err5];
+      vErrors = [err4];
     } else {
-      vErrors.push(err5);
+      vErrors.push(err4);
     }
     errors++;
   }

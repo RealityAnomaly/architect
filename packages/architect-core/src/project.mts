@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 import path from 'path';
 import * as yaml from 'js-yaml';  
 import * as fs from 'node:fs/promises';
@@ -41,27 +43,23 @@ export class Project {
 
   private async loadImports() {
     const packageMap = {} as Record<string, ModulePackageEntry>;
-    const yarnProject = await YarnUtilities.getCurrentProject(this.root);
-    if (yarnProject) {
-      Object.assign(packageMap, YarnUtilities.projectToPackageMap(yarnProject));
+
+    const yarnWorkspace = await YarnUtilities.getCurrentWorkspace(this.root);
+    if (!yarnWorkspace) {
+      throw Error(`Non-Yarn projects are not currently supported`);
     };
 
+    Object.assign(packageMap, YarnUtilities.projectToPackageMap(yarnWorkspace.project));
+    this.moduleName = YarnUtilities.workspaceToIdentifier(yarnWorkspace);
+    this.module = await ModuleUtilities.importWithMap(this.moduleName, packageMap);
+
     for (const pkg of this.config.imports?.libraries || []) {
-      let path: string;
-      let mod: Module;
-
-      try {
-        [path, mod] = await ModuleUtilities.importWithMap(pkg, packageMap, import.meta.url);
-      } catch (exception) {
-        this.parent.logger.warn(`unable to import project ${pkg}: ${exception}`);
-        continue;
-      };
-
       let lib: Project;
       try {
+        let path = await ModuleUtilities.resolveModulePath(pkg, packageMap, import.meta.url);
+        path = await fs.realpath(path.replace('/src/index.mts', ''));
+
         lib = await Project.load(this.parent, path);
-        lib.module = mod;
-        lib.moduleName = pkg;
       } catch (exception) {
         this.parent.logger.warn(`unable to load project ${pkg}: ${exception}`);
         continue;
@@ -100,15 +98,17 @@ export class Project {
 
   public async getComponent(clazz: string, recursive?: boolean): Promise<ComponentClass | undefined> {
     const components = await this.getComponents(recursive);
-    return components.find(c => Reflect.getMetadata('class', c) === clazz);
+    return components.find(c => {
+      const model = Component.resolveModel(c);
+      if (!model) return false;
+
+      return model.class === clazz;
+    });
   };
 
   public async getComponents(recursive?: boolean): Promise<ComponentClass[]> {
-    if (!this._components) {
-      this._components = await Component.collectPaths(this.parent, [
-        path.join(this.root, 'src/components'),
-        path.join(this.root, 'src/modules'), // compatibility with existing project structure
-      ]);
+    if (!this._components && this.module) {
+      this._components = await Component.collect(this.parent, this.module);
     };
 
     const result = [];

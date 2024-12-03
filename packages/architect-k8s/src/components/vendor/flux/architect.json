@@ -1,0 +1,6 @@
+{
+  "class": "architect.glassway.net/fluxcd",
+  "context": {
+    "namespace": "flux-system"
+  }
+}
