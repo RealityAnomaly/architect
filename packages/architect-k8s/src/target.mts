@@ -4,7 +4,7 @@ import * as api from 'kubernetes-models';
 import _ from 'lodash';
 
 import { FluxCDController, FluxCDMode } from './apply/flux/index.mts';
-import { KubePreludeComponent } from './component.mts';
+import { KubeComponentModel, KubePreludeComponent } from './component.mts';
 import { CrdsComponent } from './components/crds/index.mts';
 import { KubeWriter } from './writer.mts';
 import { K8sPlugin } from './plugin.mts';
@@ -86,8 +86,9 @@ export class KubeTarget extends Target {
     };
 
     if (!context.namespace || force) {
-      if (Reflect.hasMetadata('namespace', token)) {
-        context.namespace = Reflect.getMetadata('namespace', token);
+      const model = Component.resolveModel<KubeComponentModel>(token);
+      if (model?.context?.namespace) {
+        context.namespace = model.context.namespace;
         for (const [k, v] of Object.entries(replacements))
           context.namespace = context.namespace!.replace(k, v);
       } else if (!context.namespace) {

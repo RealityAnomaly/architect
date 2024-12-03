@@ -1,6 +1,7 @@
 import objectHash from 'object-hash';
 import { Context } from './context.mts';
 import { constructor, ReflectionUtilities } from './utils/index.mts';
+import { CLASS_META_KEY } from './index.mts';
 
 export class Registry<T> {
   public readonly data: Record<string, T> = {};
@@ -58,7 +59,7 @@ export class Registry<T> {
   private static defaultContext(token: constructor<unknown>, context?: Partial<Context>): Context {
     if (!context) context = {};
     if (!context.name) {
-      context.name = ReflectionUtilities.classToName(Reflect.getMetadata('class', token));
+      context.name = ReflectionUtilities.classToName(Reflect.getMetadata(CLASS_META_KEY, token));
     };
 
     return context as Context;

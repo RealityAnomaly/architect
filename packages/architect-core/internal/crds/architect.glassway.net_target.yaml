@@ -135,7 +135,6 @@ spec:
             - kind
             - metadata
             - spec
-            - state
         served: true
         storage: false
         subresources:

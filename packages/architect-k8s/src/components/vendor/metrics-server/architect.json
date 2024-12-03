@@ -1,0 +1,17 @@
+{
+  "metrics-server": {
+    "class": "architect.glassway.net/metrics-server",
+    "context": {
+      "namespace": "kube-system"
+    },
+    "inputs": {
+      "chart": {
+        "helm": {
+          "repo": "https://kubernetes-sigs.github.io/metrics-server",
+          "version": "3.8.2",
+          "name": "metrics-server"
+        }
+      }
+    }
+  }
+}

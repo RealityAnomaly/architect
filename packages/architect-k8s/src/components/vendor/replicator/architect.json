@@ -1,0 +1,17 @@
+{
+  "replicator": {
+    "class": "architect.glassway.net/replicator",
+    "context": {
+      "namespace": "$features$"
+    },
+    "inputs": {
+      "chart": {
+        "helm": {
+          "repo": "https://helm.mittwald.de",
+          "version": "2.7.3",
+          "name": "kubernetes-replicator"
+        }
+      }
+    }
+  }
+}

@@ -1,9 +1,10 @@
 import { Context } from 'vm';
-import { Component, ComponentArgs } from './components/index.mts';
+import { Component, ComponentArgs } from './component.mts';
 import { Target } from './target.mts';
 import { Condition, constructor, DeepPartial, Lazy, LazyAuto, _LazyProxy, DeepLazySpec } from './utils/index.mts';
 
-type Extract<T extends Component> = T extends Component<infer _R, infer U> ? U : never;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Extract<T extends Component> = T extends Component<any, infer A, any> ? A : never;
 
 /**
  * Provides context for component configuration execution
@@ -31,7 +32,7 @@ export class ConfigurationContext {
     force?: boolean,
     condition = this.enabler,
   ) {
-    this.target.enable(token, config, context, weight, force, condition);
+    this.target.enable<T>(token, config, context, weight, force, condition);
   };
 
   public set<T extends Component>(

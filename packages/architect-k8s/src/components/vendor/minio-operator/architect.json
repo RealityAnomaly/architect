@@ -1,0 +1,17 @@
+{
+  "minio-operator": {
+    "class": "architect.glassway.net/minio-operator",
+    "context": {
+      "namespace": "$operators$"
+    },
+    "inputs": {
+      "chart": {
+        "helm": {
+          "repo": "https://operator.min.io",
+          "version": "4.3.7",
+          "name": "minio-operator"
+        }
+      }
+    }
+  }
+}

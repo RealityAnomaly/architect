@@ -1,0 +1,17 @@
+{
+  "secret-generator": {
+    "class": "architect.glassway.net/secret-generator",
+    "context": {
+      "namespace": "$features$"
+    },
+    "inputs": {
+      "chart": {
+        "helm": {
+          "repo": "https://helm.mittwald.de",
+          "version": "3.4.0",
+          "name": "kubernetes-secret-generator"
+        }
+      }
+    }
+  }
+}

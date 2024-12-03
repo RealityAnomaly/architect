@@ -1,5 +1,10 @@
 import { asyncFilter, Component, Target, ValidationError, ValidationErrorCount, ValidationErrorLevel } from "../index.mts";
 
+// export interface Dependency {
+//   component: Component;
+//   matcher: IComponentMatcher;
+// };
+
 export interface ResolvedComponent {
   component: Component;
   dependencies: Component[];
