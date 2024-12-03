@@ -7,27 +7,9 @@ export class Registry<T> {
   public readonly data: Record<string, T> = {};
 
   /**
-    * Arguments to be passed to the constructor of registered classes
-    */
-  private readonly args: unknown[];
-
-  constructor(args?: unknown[]) {
-    if (args != null) {
-      this.args = args;
-    } else {
-      this.args = [];
-    };
-  };
-
-  /**
    * Registers an instance of T with the options provided.
-   * If no object is passed, a new instance of T will be instantiated and used.
    */
-  public register<V extends T>(token: constructor<V>, instance?: V, _context?: Partial<Context>) {
-    if (instance == null) {
-      instance = new token(...this.args);
-    };
-
+  public register(token: constructor<unknown>, instance: T, _context?: Partial<Context>) {
     const context = Registry.defaultContext(token, _context);
     const ident = Registry.ident(context);
 
@@ -44,7 +26,7 @@ export class Registry<T> {
    * @param name Optional name of the object
    * @param auto Create the object if it doesn't exist
    */
-  public request<V extends T>(token: constructor<V>, _context?: Partial<Context>): T | undefined {
+  public request(token: constructor<unknown>, _context?: Partial<Context>): T | undefined {
     const context = Registry.defaultContext(token, _context);
     const ident = Registry.ident(context);
 

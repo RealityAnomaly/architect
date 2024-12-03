@@ -10,6 +10,8 @@ import { Architect, ComponentInputModel, ComponentModel, Context, MODEL_META_KEY
 import Module from 'node:module';
 import { ModuleUtilities } from './utils/modules.mts';
 
+export type ExtractComponentArgs<T extends Component> = T extends Component<object, infer A, never> ? A : never;
+
 export interface ComponentArgs {
   /**
    * Whether the component is enabled.
@@ -45,9 +47,13 @@ export abstract class Component<
   public props: LazyAuto<TArgs>;
 
   // TODO: allow dependent classes to call constructor in isolation. reduce coupling to Target
-  constructor(target: Target, props: TArgs | undefined = {} as TArgs, context: Context, parent?: TParent) {
+  constructor(target: Target, props: TArgs | undefined = {} as TArgs, context?: Partial<Context>, parent?: TParent) {
+    if (!context || !context.name) {
+      throw new Error(`the name property must be set on the component context`);
+    };
+
+    this.context = context as Context;
     this.target = target;
-    this.context = context;
     this.independent = parent === undefined;
     this.setParent(parent);
 
@@ -139,7 +145,7 @@ export abstract class Component<
     };
 
     return {
-      ...this.context,
+      ...this.context || {},
       name: name,
     };
   };
@@ -231,49 +237,13 @@ export abstract class Component<
     });
   };
 
-  // public static async collectPaths(parent: Architect, paths: string[]): Promise<ComponentClass[]> {
-  //   const results = [];
-
-  //   for (const path of paths) {
-  //     try {
-  //       const statr = await fs.stat(path);
-  //       if (!statr.isDirectory()) return [];
-  //     } catch {
-  //       continue;
-  //     };
-  
-  //     const paths = [];
-  //     for await (const p of walk(path)) {
-  //       paths.push(p);
-  //     };
-  
-  //     results.push(...await Promise.all(paths.map(async (k: string): Promise<ComponentClass[]> => {
-  //       if (!k.endsWith('.mts')) return [];
-  
-  //       let module: object;
-  //       try {
-  //         module = await import(k);
-  //       } catch (exception) {
-  //         parent.logger.warn(`Failed to load path ${k}: ${exception}`);
-  //         return [];
-  //       };
-  
-  //       return Object.values(module).filter(m => {
-  //         return Reflect.hasMetadata('class', m as object);
-  //       }) as ComponentClass[];
-  //     })));
-  //   }
-
-  //   return results.flat();
-  // };
-
   public static rid(name: string, context?: object): string {
     return `${name}-${objectHash(context as object).slice(0, 7)}`;
   };
 };
 
-export interface ComponentClass {
-  new (target: Target, props?: ComponentArgs, name?: string, parent?: Component): Component;
+export interface ComponentClass<T extends Component = Component> {
+  new (target: Target, props?: ComponentArgs, context?: Partial<Context>, parent?: Component): T;
 };
 
 /**
