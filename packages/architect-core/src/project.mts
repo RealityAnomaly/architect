@@ -37,6 +37,7 @@ export class Project {
     const config = await ProjectConfigLoader.load(configPath);
     const project = new Project(parent, root, config, configPath);
     await project.loadImports();
+    await project.loadComponents();
 
     return project;
   };
@@ -75,6 +76,16 @@ export class Project {
     };
   };
 
+  private async loadComponents() {
+    if (!this._components && this.module) {
+      this._components = await Component.collect(this.parent, this.module);
+    };
+
+    for (const library of this.libraries) {
+      await library.loadComponents();
+    };
+  };
+
   public async getTarget(name: string, recursive?: boolean): Promise<Target | undefined> {
     const targets = await this.getTargets(recursive);
     return targets.find(t => t.model.metadata.name === name);
@@ -96,8 +107,8 @@ export class Project {
     return result;
   };
 
-  public async getComponent(clazz: string, recursive?: boolean): Promise<ComponentClass | undefined> {
-    const components = await this.getComponents(recursive);
+  public getComponent(clazz: string, recursive?: boolean): ComponentClass | undefined {
+    const components = this.getComponents(recursive);
     return components.find(c => {
       const model = Component.resolveModel(c);
       if (!model) return false;
@@ -106,16 +117,12 @@ export class Project {
     });
   };
 
-  public async getComponents(recursive?: boolean): Promise<ComponentClass[]> {
-    if (!this._components && this.module) {
-      this._components = await Component.collect(this.parent, this.module);
-    };
-
+  public getComponents(recursive?: boolean): ComponentClass[] {
     const result = [];
     result.push(...this._components || []);
     if (recursive) {
       for (const library of this.libraries) {
-        result.push(...await library.getComponents(recursive));
+        result.push(...library.getComponents(recursive));
       };
     };
 

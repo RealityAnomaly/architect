@@ -4,14 +4,12 @@ import _ from 'lodash';
 
 import { architectGlasswayNet } from './generated/crds/index.ts';
 
-import { Component } from './component.mts';
+import { Component, ComponentClass, ExtractComponentArgs } from './component.mts';
 import { Registry } from './registry.mts';
 import { Result } from './result.mts';
-import { Condition, constructor, DeepLazySpec, DeepPartial, isValidator, ReflectionUtilities } from './utils/index.mts';
+import { Context } from './context.mts';
+import { Condition, constructor, DeepLazySpec, DeepPartial, isValidator, ReflectionUtilities, ValidationError, ValidationErrorLevel } from './utils/index.mts';
 import { Architect, CLASS_META_KEY, DependencyGraph } from './index.mts';
-import { Context } from 'node:vm';
-
-type Extract<T extends Component> = T extends Component<infer _R, infer U> ? U : never;
 
 export const PLUGIN_TARGET_IDENTIFIERS = {
   kubernetes: 'architect.glassway.net/KubeTarget',
@@ -96,7 +94,7 @@ export class Target {
   public readonly parent: Architect;
   public readonly params: TargetParams;
 
-  public readonly components = new Registry<Component>([this]);
+  public readonly components = new Registry<Component>();
   protected readonly facts = new Registry<BaseFact>();
 
   protected constructor(model: architectGlasswayNet.v1alpha1.Target, params: TargetParams = {}, parent: Architect) {
@@ -106,24 +104,14 @@ export class Target {
   };
 
   protected async init() {
-    const tokens = await this.parent.project!.getComponents(true);
-    for (const component of this.model.spec.components || []) {
-      const token = tokens.find(t => {
-        const model = Component.resolveModel(t);
-        if (!model) return false;
-
-        return model.class === component.class;
-      });
-
+    for (const def of this.model.spec.components || []) {
+      const token = this.parent.project!.getComponent(def.class, true);
       if (!token) {
-        this.parent.logger.warn(`Target ${this.model.metadata.name} references unknown component ${component.class}, skipping`);
+        this.parent.logger.warn(`Target ${this.model.metadata.name} references unknown component ${def.class}, skipping`);
         continue;
       };
 
-      this.enable(token, component.options, {
-        ...component.context || {},
-        name: component.name,
-      });
+      this.enable(token, def.options);
     };
   };
 
@@ -135,7 +123,7 @@ export class Target {
     return await DependencyGraph.resolve(this, Object.values(this.components.data), params.requirements !== false);
   };
 
-  public async compile(graph: DependencyGraph): Promise<Result> {
+  public async compile(graph: DependencyGraph, validate: boolean = true): Promise<Result> {
     const buildGraph = graph; // TODO: structured clone
     const results: Record<string, unknown> = {};
 
@@ -149,16 +137,15 @@ export class Target {
     const result = new Result(buildGraph, results);
 
     // TODO: handle objects, too
-    // TODO: add validate parameter
-    if (Array.isArray(result.all)) {
+    if (validate && Array.isArray(result.all)) {
       for (const item of result.all) {
         if (!isValidator(item)) continue;
 
         try {
           await item.validate();
         } catch (e) {
-          // TODO: better handling
-          console.log(e);
+          if (e instanceof Error)
+            buildGraph.errors.push(new ValidationError(e.message, ValidationErrorLevel.ERROR, item));
         };
       };
     };
@@ -171,8 +158,8 @@ export class Target {
    * Registers and enables the specified component
    */
   public enable<T extends Component>(
-    token: constructor<T>,
-    config?: DeepLazySpec<DeepPartial<Extract<T>>>,
+    token: ComponentClass<T>,
+    config?: DeepLazySpec<DeepPartial<ExtractComponentArgs<T>>>,
     context?: Partial<Context>,
     weight?: number,
     force?: boolean,
@@ -189,9 +176,8 @@ export class Target {
   /**
    * Requests the component identified by the specified token and context
    */
-  public component<T extends Component>(token: constructor<T>, context?: Partial<Context>, auto: boolean = false): T {
+  public component<T extends Component>(token: ComponentClass<T>, context?: Partial<Context>, auto: boolean = false): T {
     context = this.defaultContext(token, context);
-
     let result = this.components.request(token, context);
     if (result === undefined && auto) {
       result = new token(this, undefined, context);

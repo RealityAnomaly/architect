@@ -12,6 +12,11 @@ interface AppComponentCommandShowOptions extends AppCommandComponentOptions {
   class: string;
 };
 
+interface AppComponentCommandUpgradeOptions extends AppCommandComponentOptions {
+  class?: string;
+  validate: boolean;
+};
+
 export class ComponentCommand extends Command {
   private readonly app: App;
 
@@ -52,6 +57,19 @@ export class ComponentCommand extends Command {
     console.log(options.class);
   };
 
+  private async upgrade(options: AppComponentCommandUpgradeOptions) {
+    const components = options.class
+      ? [await this.app.parent!.project!.getComponent(options.class)]
+      : await this.app.parent!.project!.getComponents();
+    
+    if (components.length <= 0) {
+      console.log(`Unable to find any components to upgrade`);
+      return;
+    };
+
+    console.log(components);
+  };
+
   constructor(app: App) {
     super('component');
 
@@ -66,5 +84,10 @@ export class ComponentCommand extends Command {
       .description('Shows information about a specific component')
       .requiredOption('--class <class>', 'Specify the component class (required)')
       .action(this.show.bind(this));
+    this.command('upgrade')
+      .description('Upgrades versions of component dependencies')
+      .option('--class <class>', 'Only target the specified component class')
+      .option('--no-validate', 'Disables post-upgrade component build validation', false)
+      .action(this.upgrade.bind(this));
   };
 };

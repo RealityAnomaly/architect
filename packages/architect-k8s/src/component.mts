@@ -23,7 +23,7 @@ export interface KubeComponentModel extends ComponentModel {
 export abstract class KubeComponent<
   TResult extends object = KubeComponentGenericResources,
   TArgs extends KubeComponentArgs = KubeComponentArgs,
-  TParent extends Component = never
+  TParent extends Component = Component
 > extends Component<TResult, TArgs, TParent> {
   declare protected readonly target: KubeTarget;
 
@@ -34,9 +34,9 @@ export abstract class KubeComponent<
    */
   protected standardRequirements = true;
 
-  constructor(target: Target, props: TArgs = {} as TArgs, context: KubeContext, parent?: TParent) {
+  constructor(target: Target, props: TArgs = {} as TArgs, context?: Partial<KubeContext>, parent?: TParent) {
     super(target, props, context, parent);
-    this.context = context;
+    this.context = context as KubeContext;
   };
 
   public get namespace(): string {
