@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { App, AppCommandOptions } from "../index.mts";
+import { App, AppCommandOptions, CLASS_META_KEY } from "../index.mts";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface AppCommandComponentOptions extends AppCommandOptions {};
@@ -21,7 +21,7 @@ export class ComponentCommand extends Command {
     if (!options.library && ourComponents.length > 0) {
       console.log('Current project:');
       for (const component of ourComponents) {
-        console.log('  - ' + Reflect.getMetadata('class', component));
+        console.log('  - ' + Reflect.getMetadata(CLASS_META_KEY, component));
       };
 
       console.log('');
@@ -35,7 +35,7 @@ export class ComponentCommand extends Command {
 
       console.log(`Library ${library.moduleName}:`)
       for (const component of components) {
-        console.log('  - ' + Reflect.getMetadata('class', component));
+        console.log('  - ' + Reflect.getMetadata(CLASS_META_KEY, component));
       };
 
       console.log('');

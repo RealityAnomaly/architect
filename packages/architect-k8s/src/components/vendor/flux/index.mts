@@ -1,5 +1,6 @@
 import { Architect, KubeResourceTree } from '@perdition/architect-core';
-import { Kubernetes, KubeComponent, KubeComponentArgs } from '../../../index.mts';
+import { KubeComponent, KubeComponentArgs } from '../../../index.mts';
+import model from './architect.json' with { type: 'json' };
 
 export interface FluxCDComponentOptions extends KubeComponentArgs {
   version?: string;
@@ -9,8 +10,7 @@ interface FluxCDComponentResources {
   manifests?: KubeResourceTree;
 };
 
-@Architect.class('architect.glassway.net/fluxcd')
-@Kubernetes.namespace('flux-system')
+@Architect.component(model)
 export class FluxCDComponent extends KubeComponent<FluxCDComponentResources, FluxCDComponentOptions> {
   public async build(resources: FluxCDComponentResources = {}) {
     //const url = `https://github.com/fluxcd/flux2/releases/${this.props.version ?? "v2.4.0"}/download/install.yaml`; // "object is not a function?"

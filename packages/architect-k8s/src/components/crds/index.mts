@@ -6,7 +6,9 @@ import * as api from 'kubernetes-models';
 import wcmatch from 'wildcard-match';
 import { KubeComponent, KubeComponentGenericResources } from '../../component.mts';
 
-@Architect.class('k8s.architect.glassway.net/crds')
+import model from './architect.json' with { type: 'json' };
+
+@Architect.component(model)
 export class CrdsComponent extends KubeComponent {
   private readonly enabledGroups: string[] = [];
   private readonly enabledGVKs: GVK[] = [];

@@ -36,6 +36,6 @@
   "ts-node": {
     "esm": true,
     "swc": true,
-    "skipIgnore": true
+    "skipIgnore": true,
   }
 }

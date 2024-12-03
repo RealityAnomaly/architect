@@ -1,19 +1,25 @@
 import 'reflect-metadata';
 import _ from 'lodash';
-import * as fs from 'node:fs/promises';
 import objectHash from 'object-hash';
 
-import { Capability } from '../capability.mts';
-import { ConfigurationContext } from '../config.mts';
-import { Target } from '../target.mts';
-import { constructor, DeepPartial, Lazy, LazyAuto, walk } from '../utils/index.mts';
-import { Architect, Context } from '../index.mts';
+import { Capability } from './capability.mts';
+import { ConfigurationContext } from './config.mts';
+import { Target } from './target.mts';
+import { constructor, DeepPartial, Lazy, LazyAuto, recursiveMerge, ReflectionUtilities } from './utils/index.mts';
+import { Architect, ComponentInputModel, ComponentModel, Context, MODEL_META_KEY, TYPE_META_KEY } from './index.mts';
+import Module from 'node:module';
+import { ModuleUtilities } from './utils/modules.mts';
 
 export interface ComponentArgs {
   /**
    * Whether the component is enabled.
    */
   enable?: boolean;
+
+  /**
+   * The inputs for the component.
+   */
+  inputs?: Record<string, ComponentInputModel>;
 };
 
 /**
@@ -38,20 +44,26 @@ export abstract class Component<
    */
   public props: LazyAuto<TArgs>;
 
+  // TODO: allow dependent classes to call constructor in isolation. reduce coupling to Target
   constructor(target: Target, props: TArgs | undefined = {} as TArgs, context: Context, parent?: TParent) {
     this.target = target;
     this.context = context;
     this.independent = parent === undefined;
     this.setParent(parent);
 
-    if (!Reflect.hasMetadata('class', this.constructor) && this.parent === undefined) {
-      throw Error(`${this.constructor.name}: the class metadata attribute must be set`);
+    const model = Component.resolveModel(this.constructor as constructor<Component>);
+    if (model && model.inputs) {
+      props.inputs = recursiveMerge(model.inputs, props.inputs || {});
     };
+
+    // if (!Reflect.hasMetadata('class', this.constructor) && this.parent === undefined) {
+    //   throw Error(`${this.constructor.name}: the class metadata attribute must be set`);
+    // };
     
-    const clazzSplit = this.clazz.split('/');
-    if (clazzSplit.length != 2 || !clazzSplit[0] || !clazzSplit[1]) {
-      throw Error(`${this.constructor.name}: the class metadata attribute must contain at least one slash, and both parts must not be empty`);
-    };
+    // const clazzSplit = this.clazz.split('/');
+    // if (clazzSplit.length != 2 || !clazzSplit[0] || !clazzSplit[1]) {
+    //   throw Error(`${this.constructor.name}: the class metadata attribute must contain at least one slash, and both parts must not be empty`);
+    // };
 
     // hacky way to leave this defaultable
     if (props === undefined) {
@@ -118,7 +130,8 @@ export abstract class Component<
    */
   protected localRef<T extends Component>(type: constructor<T>, name?: string): Context {
     if (name === undefined) {
-      name = Component.resolveName(type);
+      const model = Component.resolveModel(type);
+      if (model && model.class) name = ReflectionUtilities.classToName(model.class);
     };
 
     if (name === undefined) {
@@ -178,11 +191,19 @@ export abstract class Component<
    * Returns this component's logical classpath
    */
   public get clazz(): string {
-    if (this.parent !== undefined && !this.independent) {
-      return this.parent.clazz;
+    if (!this.model || !this.model.class) {
+      throw new Error(`Unable to resolve the class for component ${this}: Undefined model`);
     };
 
-    return Reflect.getMetadata('class', this.constructor);
+    return this.model.class;
+  };
+
+  public get model(): ComponentModel | undefined {
+    if (this.parent !== undefined && !this.independent) {
+      return this.parent.model;
+    };
+
+    return Component.resolveModel(this.constructor as constructor<Component>);
   };
 
   /**
@@ -199,52 +220,52 @@ export abstract class Component<
     return `Component ${this.context.name}`;
   };
 
-  public static resolveName(type: constructor<Component>): string | undefined {
-    if (Reflect.hasMetadata('class', type)) {
-      const split = Reflect.getMetadata('class', type).split('/');
-      if (split.length != 2) return undefined;
-
-      return split[1];
-    } else {
-      return undefined;
-    };
+  public static resolveModel<TModel extends ComponentModel>(type: constructor<Component>): TModel | undefined {
+    if (!(Reflect.hasMetadata(MODEL_META_KEY, type))) return undefined;
+    return Reflect.getMetadata(MODEL_META_KEY, type);
   };
 
-  public static async collectPaths(parent: Architect, paths: string[]): Promise<ComponentClass[]> {
-    const results = [];
-
-    for (const path of paths) {
-      try {
-        const statr = await fs.stat(path);
-        if (!statr.isDirectory()) return [];
-      } catch {
-        continue;
-      };
-  
-      const paths = [];
-      for await (const p of walk(path)) {
-        paths.push(p);
-      };
-  
-      results.push(...await Promise.all(paths.map(async (k: string): Promise<ComponentClass[]> => {
-        if (!k.endsWith('.mts')) return [];
-  
-        let module: object;
-        try {
-          module = await import(k);
-        } catch (exception) {
-          parent.logger.warn(`Failed to load path ${k}: ${exception}`);
-          return [];
-        };
-  
-        return Object.values(module).filter(m => {
-          return Reflect.hasMetadata('class', m as object);
-        }) as ComponentClass[];
-      })));
-    }
-
-    return results.flat();
+  public static async collect(_parent: Architect, module: Module): Promise<ComponentClass[]> {
+    return ModuleUtilities.collectClasses(module, clazz => {
+      return _.isObject(clazz) && Reflect.hasMetadata(TYPE_META_KEY, clazz) && Reflect.getMetadata(TYPE_META_KEY, clazz) === 'component';
+    });
   };
+
+  // public static async collectPaths(parent: Architect, paths: string[]): Promise<ComponentClass[]> {
+  //   const results = [];
+
+  //   for (const path of paths) {
+  //     try {
+  //       const statr = await fs.stat(path);
+  //       if (!statr.isDirectory()) return [];
+  //     } catch {
+  //       continue;
+  //     };
+  
+  //     const paths = [];
+  //     for await (const p of walk(path)) {
+  //       paths.push(p);
+  //     };
+  
+  //     results.push(...await Promise.all(paths.map(async (k: string): Promise<ComponentClass[]> => {
+  //       if (!k.endsWith('.mts')) return [];
+  
+  //       let module: object;
+  //       try {
+  //         module = await import(k);
+  //       } catch (exception) {
+  //         parent.logger.warn(`Failed to load path ${k}: ${exception}`);
+  //         return [];
+  //       };
+  
+  //       return Object.values(module).filter(m => {
+  //         return Reflect.hasMetadata('class', m as object);
+  //       }) as ComponentClass[];
+  //     })));
+  //   }
+
+  //   return results.flat();
+  // };
 
   public static rid(name: string, context?: object): string {
     return `${name}-${objectHash(context as object).slice(0, 7)}`;
@@ -266,17 +287,19 @@ export interface IComponentMatcher {
 
 export class ComponentMatcher implements IComponentMatcher {
   private readonly token: constructor<Component>;
+  private readonly clazz: string;
+
   constructor(token: constructor<Component>) {
     this.token = token;
+    this.clazz = Component.resolveModel(this.token)!.class!;
   };
 
   match(input: Component): boolean {
-    const clazz = Reflect.getMetadata('class', this.token);
-    return input.clazz === clazz;
+    return input.clazz === this.clazz;
   };
 
   constraint(): string {
-    return `Component("${Reflect.getMetadata('class', this.token)}")`;
+    return `Component("${this.clazz}")`;
   };
 
   toString(): string {

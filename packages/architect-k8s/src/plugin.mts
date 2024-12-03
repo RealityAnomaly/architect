@@ -56,13 +56,3 @@ export class K8sPlugin extends Plugin {
     return [KubeTarget];
   };
 }
-
-export class Kubernetes {
-  public static namespace(name: string): {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-    (target: Function): void;
-    (target: object, propertyKey: string | symbol): void;
-  } {
-    return Reflect.metadata('namespace', name);
-  };
-};

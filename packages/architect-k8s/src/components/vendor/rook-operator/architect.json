@@ -1,0 +1,17 @@
+{
+  "rook-operator": {
+    "class": "architect.glassway.net/rook-operator",
+    "context": {
+      "namespace": "rook-ceph"
+    },
+    "inputs": {
+      "chart": {
+        "helm": {
+          "repo": "https://charts.rook.io/release",
+          "version": "v1.9.3",
+          "name": "rook-ceph"
+        }
+      }
+    }
+  }
+}

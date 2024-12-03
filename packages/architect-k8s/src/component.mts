@@ -1,4 +1,4 @@
-import { Architect, architectGlasswayNet, CapabilityMatcher, Component, ComponentArgs, ComponentClass, ComponentMatcher, IComponentMatcher, KubeResource, KubeResourceUtilities, Target } from '@perdition/architect-core';
+import { Architect, architectGlasswayNet, CapabilityMatcher, Component, ComponentArgs, ComponentClass, ComponentMatcher, ComponentModel, IComponentMatcher, KubeResource, KubeResourceUtilities, Target } from '@perdition/architect-core';
 
 import * as api from 'kubernetes-models';
 import _ from 'lodash';
@@ -12,6 +12,12 @@ import { GitFetchOptions, HelmChartOpts, HttpFetchOptions, KustomizeOpts } from 
 export interface KubeComponentArgs extends ComponentArgs {};
 export interface KubeComponentGenericResources {
   result?: KubeResource[];
+};
+
+export interface KubeComponentModel extends ComponentModel {
+  context?: {
+    namespace?: string,
+  };
 };
 
 export abstract class KubeComponent<
@@ -150,7 +156,7 @@ export class KubeResourceComponentOptions {
   resources: KubeResource[] = [];
 };
 
-@Architect.class('k8s.architect.glassway.net/prelude')
+@Architect.component({ class: 'architect.glassway.net/prelude' })
 export class KubePreludeComponent extends KubeComponent {
   private readonly resources: KubeResource[] = [];
 
