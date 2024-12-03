@@ -156,8 +156,8 @@ export class KubeTarget extends Target {
     return namespace;
   };
 
-  public async compile(graph: DependencyGraph): Promise<Result> {
-    const result = await super.compile(graph);
+  public async compile(graph: DependencyGraph, validate: boolean = true): Promise<Result> {
+    const result = await super.compile(graph, validate);
     result.writer = new KubeWriter(this);
 
     const crdGraph = KubeCRDDependencyGraph.create(result, {
@@ -165,7 +165,7 @@ export class KubeTarget extends Target {
       ignoredCRDGroups: this.markedCRDGroups,
     });
 
-    crdGraph.validate();
+    if (validate) crdGraph.validate();
     crdGraph.applyDependencies();
 
     return result;

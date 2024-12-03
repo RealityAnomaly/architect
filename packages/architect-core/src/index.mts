@@ -10,7 +10,6 @@ import { DependencyGraphRenderer } from './graph/render.mts';
 import { TargetCache } from './cache.mts';
 import { StateProvider } from './index.mts';
 import { ComponentModel } from './model/index.mts';
-import { Component } from './component.mts';
 
 export const TYPE_META_KEY = 'architect.glassway.net/type';
 export const MODEL_META_KEY = 'architect.glassway.net/model';
@@ -77,6 +76,7 @@ export class Architect {
     await fs.mkdir(output, { recursive: true });
 
     // in validateOnly mode, only first stage validation runs
+    const validate = params?.validate !== false;
     const validateOnly = false;
 
     const graph = await target.resolve(params);
@@ -85,8 +85,14 @@ export class Architect {
       return;
     };
 
-    const resolved = await target.compile(graph);
-    if (!resolved.graph.assertValid()) return;
+    const resolved = await target.compile(graph, validate);
+    this.logger.info(`${target.toString()}: ${Object.values(resolved.components).length} components built`);
+
+    if (validate) {
+      if (!resolved.graph.assertValid()) return;
+    } else {
+      this.logger.warn(`validation skipped for target ${target.toString()}`);
+    };
 
     await resolved.write(output);
 
@@ -114,8 +120,7 @@ export class Architect {
    * @param model The component model to use. Per the documentation, this should be imported from an `architect.json` file in the same folder as your component's code.
    * @returns A decorator which sets the required properties.
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public static component<T extends typeof Component<any, any, any>>(model: ComponentModel) {
+  public static component<T extends object>(model: ComponentModel) {
     function decorator(target: T) {
       Reflect.defineMetadata(TYPE_META_KEY, 'component', target);
       Reflect.defineMetadata(MODEL_META_KEY, model, target);
