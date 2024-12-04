@@ -1,6 +1,6 @@
-import 'reflect-metadata';
-import _ from 'lodash';
 import objectHash from 'object-hash';
+
+import { Reflect } from "@dx/reflect";
 
 import { Capability } from './capability.mts';
 import { ConfigurationContext } from './config.mts';
@@ -8,6 +8,7 @@ import { Target } from './target.mts';
 import { constructor, DeepPartial, Lazy, LazyAuto, recursiveMerge, ReflectionUtilities } from './utils/index.mts';
 import { Architect, CLASS_META_KEY, ComponentModel, ComponentModelUtilities, ComponentUpgradeState, Context, MODEL_META_KEY, TARGET_TYPE_META_KEY, TYPE_META_KEY } from './index.mts';
 import Module from 'node:module';
+import * as toolkit from '@es-toolkit/es-toolkit';
 import { ModuleUtilities } from './utils/modules.mts';
 import { ValidateFunction } from 'ajv';
 
@@ -252,7 +253,7 @@ export abstract class Component<
 
   public static async collect(_parent: Architect, module: Module): Promise<ComponentClass[]> {
     return ModuleUtilities.collectClasses(module, clazz => {
-      return _.isObject(clazz) && Reflect.hasMetadata(TYPE_META_KEY, clazz) && Reflect.getMetadata(TYPE_META_KEY, clazz) === 'component';
+      return typeof clazz === 'object' && Reflect.hasMetadata(TYPE_META_KEY, clazz) && Reflect.getMetadata(TYPE_META_KEY, clazz) === 'component';
     });
   };
 
@@ -355,7 +356,7 @@ export class ComponentReferenceMatcher<T> implements IComponentMatcher {
   };
 
   match(input: Component): boolean {
-    return _.isEqual(input.context, this.ref);
+    return toolkit.isEqual(input.context, this.ref);
   };
 
   constraint(): string {

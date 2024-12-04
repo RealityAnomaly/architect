@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import * as toolkit from '@es-toolkit/es-toolkit';
 
 /**
  * Returns true when type of `value` is `object` and is not `null`, `undefined` or
@@ -22,7 +22,7 @@ export function toArray<T>(input: T | T[]): T[] {
 };
 
 export function arrayStartsWith<T>(array: T[], prefix: T[]): boolean {
-  return _.isEqual(array.slice(0, prefix.length), prefix);
+  return toolkit.isEqual(array.slice(0, prefix.length), prefix);
 };
 
 /**
@@ -34,19 +34,19 @@ export function recursiveMerge<T extends object>(object: T, source: T): T {
   if (source === undefined || source === null) return object;
   if (object.constructor !== source.constructor) return source;
 
-  if (_.isArray(object)) {
+  if (Array.isArray(object)) {
     return object.concat(source) as T;
   };
 
   function customizer(objValue: object, srcValue: object) {
-    if (_.isArray(objValue)) {
+    if (Array.isArray(objValue)) {
       return objValue.concat(srcValue);
     };
 
     return undefined;
   };
 
-  return _.mergeWith(object, source, customizer);
+  return toolkit.mergeWith(object, source, customizer);
 };
 
 /**
@@ -72,7 +72,7 @@ export function notEmpty<TValue>(value: TValue | null | undefined): value is TVa
  */
 export function isEmptyObject(obj: object): boolean {
   if (!notEmpty(obj)) return true;
-  if (_.isArray(obj)) return obj.length === 0;
+  if (Array.isArray(obj)) return obj.length === 0;
   return Object.keys(obj).length === 0;
 };
 

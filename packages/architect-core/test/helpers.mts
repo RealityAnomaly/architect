@@ -1,6 +1,6 @@
 import * as fs from 'node:fs/promises';
-import * as os from 'os';
-import * as path from 'path';
+import * as os from 'node:os';
+import * as path from 'node:path';
 
 /**
  * Run a function in a temporary directory

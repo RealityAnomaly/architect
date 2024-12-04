@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import * as toolkit from '@es-toolkit/es-toolkit';
 import { arrayStartsWith, isEmptyObject, recursiveMerge } from '../objects.mts';
 import { isObjectDeepKeys, PathResultBuilder, ValuePath, ValuePathKey } from './paths.mts';
 import { DeepPartial, Resolver, Value } from './value.mts';
@@ -192,10 +192,10 @@ export class Lazy<T> {
   private matchValues(path: ValuePath): LazyValue<T>[] {
     let values: LazyValue<T>[] = [];
     {
-      const curr = _.clone(path);
+      const curr = toolkit.clone(path);
       while (true) {
         values.push(...this.values.filter(
-          v => _.isEqual(v.path, curr)),
+          v => toolkit.isEqual(v.path, curr)),
         );
 
         if (curr.length <= 0) break;
@@ -205,11 +205,11 @@ export class Lazy<T> {
 
     // match children and push them to the list
     values.push(...this.values.filter(
-      v => v.path.length > 0 && arrayStartsWith(v.path, path) && !_.isEqual(v.path, path)),
+      v => v.path.length > 0 && arrayStartsWith(v.path, path) && !toolkit.isEqual(v.path, path)),
     );
 
     // sort the values by weight
-    values = _.sortBy(values, v => v.weight);
+    values = toolkit.sortBy(values, ['weight']);
     return values;
   };
 
@@ -236,7 +236,7 @@ export class Lazy<T> {
         temp = value.value;
       };
 
-      const resolved = _.cloneDeep(LazyProxy.is(temp) ? await temp.$resolve(undefined, depth) : temp);
+      const resolved = toolkit.cloneDeep(LazyProxy.is(temp) ? await temp.$resolve(undefined, depth) : temp);
       builder.set(value.path, resolved, value.force, value.weight);
     };
 
@@ -273,7 +273,7 @@ export class Lazy<T> {
         value: property,
         weight: weight,
       });
-    } else if (_.isArray(property)) {
+    } else if (Array.isArray(property)) {
       for (let i = 0; i < property.length; i++) {
         this.set(path.concat(-1), property[i], weight, force, condition);
       };

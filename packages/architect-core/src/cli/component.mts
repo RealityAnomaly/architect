@@ -1,4 +1,5 @@
 import { Command } from "commander";
+import { Reflect } from "@dx/reflect";
 import { App, AppCommandOptions, CLASS_META_KEY, ComponentClass, Updater } from "../index.mts";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

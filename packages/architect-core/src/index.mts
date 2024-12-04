@@ -1,7 +1,8 @@
 import * as kubeUtils from './kubernetes/index.mts';
+import { Reflect } from "@dx/reflect";
 
 import * as fs from 'node:fs/promises';
-import path from 'path';
+import path from 'node:path';
 import { PluginResolver } from './plugin.mts';
 import { Target, TargetResolveParams } from './target.mts';
 import winston from 'winston';
@@ -18,7 +19,7 @@ export const TARGET_TYPE_META_KEY = 'architect.glassway.net/target-type';
 
 
 export class Architect {
-  public static PATH = path.resolve(path.join(import.meta.dirname, '..'));
+  public static PATH = path.resolve(path.join(import.meta.dirname!, '..'));
 
   public project?: Project;
   public readonly ajv: Ajv;
@@ -111,11 +112,7 @@ export class Architect {
     await this.compile(output, target, params);
   };
 
-  public static class(name: string): {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-    (target: Function): void;
-    (target: object, propertyKey: string | symbol): void;
-  } {
+  public static class(name: string) {
     return Reflect.metadata(CLASS_META_KEY, name);
   };
 }

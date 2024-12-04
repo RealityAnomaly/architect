@@ -1,7 +1,5 @@
-import _ from 'lodash';
-
 import Module from "node:module";
-import { createRequire } from 'module';
+import { createRequire } from 'node:module';
 import { constructor } from "./types.mts";
 
 export interface ModulePackageEntry {
@@ -27,15 +25,16 @@ export class ModuleUtilities {
     };
   };
 
-  public static async collectClasses<T>(module: unknown, matcher: (clazz: constructor<T>) => boolean): Promise<T[]> {
-    const result: T[] = [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  public static async collectClasses<T>(module: any, matcher: (clazz: constructor<T>) => boolean): Promise<constructor<T>[]> {
+    const result: constructor<T>[] = [];
 
-    if (_.isObject(module)) {
+    if (typeof module === 'object') {
       for (const value of Object.values(module)) {
         result.push(...await this.collectClasses(value, matcher));
   
-        if (!matcher(value)) continue;
-        result.push(value);
+        if (!matcher(value as constructor<T>)) continue;
+        result.push(value as constructor<T>);
       };
     };
 
