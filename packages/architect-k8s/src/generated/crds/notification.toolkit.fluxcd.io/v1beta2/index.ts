@@ -1,3 +1,3 @@
-export * from "./Receiver.js";
-export * from "./Provider.js";
-export * from "./Alert.js";
+export * from "./Receiver.ts";
+export * from "./Provider.ts";
+export * from "./Alert.ts";

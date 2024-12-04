@@ -7,7 +7,7 @@ import model from './architect.json' with { type: 'json' };
  */
 @KubeComponentHelm.decorate(model['external-secrets'])
 export class ExternalSecretsComponent extends KubeComponentHelm {
-  public init(): void {
+  public override init(): void {
     this.setDefaults({
       values: {
         installCRDs: true,

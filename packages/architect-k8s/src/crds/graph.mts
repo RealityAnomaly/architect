@@ -1,7 +1,6 @@
 import { Component, GVK, KubeResource, ResolvedComponent, Result, ValidationError, ValidationErrorLevel } from '@perdition/architect-core';
 
 import * as api from 'kubernetes-models';
-import wcmatch from 'wildcard-match';
 
 export interface KubeCRDRequirement {
   component: ResolvedComponent;
@@ -86,20 +85,20 @@ export class KubeCRDDependencyGraph {
         const both = v.exports.filter(r => v2.exports.findIndex(g => r.compare(g)) > -1);
         if (both.length <= 0) return;
 
-        this.result.graph.errors.push(new ValidationError(`both components ${k} and ${k2} export CRDs for resources ${both.join(', ')}`, ValidationErrorLevel.ERROR, this.result.graph.target));
+        this.result.graph.errors.push(new ValidationError(`both components ${k} and ${k2} export CRDs for resources ${both.join(', ')}`, ValidationErrorLevel.ERROR, this.result.graph.target.toString()));
       });
 
       // validate requirement validity
       const missing = v.requirements.filter(r => {
         if (r.isAPIModel()) return false;
-        if ((this.options.ignoredCRDGroups || []).some(g => wcmatch(g)(r.group!))) return false;
+        //if ((this.options.ignoredCRDGroups || []).some(g => wcmatch(g)(r.group!))) return false;
         if ((this.options.ignoredGVKs || []).some(g => g.compare(r))) return false;
 
         return allGVKs.findIndex(g => g.compare(r)) <= -1;
       });
 
       if (missing.length > 0) {
-        v.component.errors.push(new ValidationError(`attempted to use resources missing from cluster: ${missing.join(', ')}`, ValidationErrorLevel.ERROR, v.component.component));
+        v.component.errors.push(new ValidationError(`attempted to use resources missing from cluster: ${missing.join(', ')}`, ValidationErrorLevel.ERROR, v.component.component.toString()));
       };
     });
   };

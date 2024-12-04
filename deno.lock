@@ -3,6 +3,7 @@
   "specifiers": {
     "jsr:@dx/reflect@~0.2.14": "0.2.14",
     "jsr:@es-toolkit/es-toolkit@^1.29.0": "1.29.0",
+    "jsr:@match/match@0.1": "0.1.0",
     "npm:@docusaurus/core@3.6.3": "3.6.3_@mdx-js+react@3.1.0__@types+react@18.3.13__react@18.3.1_react@18.3.1_react-dom@18.3.1__react@18.3.1_@types+react@18.3.13_webpack@5.97.0_react-loadable@5.5.0__react@18.3.1_react-router@5.3.4__react@18.3.1_eslint@9.16.0_typescript@5.7.2",
     "npm:@docusaurus/module-type-aliases@3.6.3": "3.6.3_react@18.3.1_react-dom@18.3.1__react@18.3.1",
     "npm:@eslint/compat@^1.2.3": "1.2.3_eslint@9.16.0",
@@ -44,6 +45,7 @@
     "npm:react-dom@^18.3.1": "18.3.1_react@18.3.1",
     "npm:react-loadable@^5.5.0": "5.5.0_react@18.3.1",
     "npm:react@^18.3.1": "18.3.1",
+    "npm:semver@^7.6.3": "7.6.3",
     "npm:simple-git@^3.27.0": "3.27.0",
     "npm:standard-version@^9.5.0": "9.5.0",
     "npm:ts-graphviz@^2.1.5": "2.1.5",
@@ -59,6 +61,9 @@
     },
     "@es-toolkit/es-toolkit@1.29.0": {
       "integrity": "1f0e6d67236bab663d3c8089d815d735e2313069d9cba1741d9908081364d11f"
+    },
+    "@match/match@0.1.0": {
+      "integrity": "d98fdfe9b241c662f3b1ce2aca601a17033350fb2549e212abbe7d3c29170656"
     }
   },
   "npm": {
@@ -12215,9 +12220,12 @@
       "packages/architect-k8s": {
         "dependencies": [
           "jsr:@es-toolkit/es-toolkit@^1.29.0",
+          "jsr:@match/match@0.1",
           "npm:@kubernetes-models/apimachinery@^2.0.1",
+          "npm:@kubernetes-models/base@5",
           "npm:@kubernetes-models/crd-generate@^5.0.1",
           "npm:@kubernetes-models/generate@^2.4.0",
+          "npm:@kubernetes-models/validate@4",
           "npm:@types/js-yaml@^4.0.9",
           "npm:@types/lodash@^4.17.13",
           "npm:@types/object-hash@^3.0.6",
@@ -12229,6 +12237,7 @@
           "npm:kubernetes-models@^4.4.1",
           "npm:lodash@^4.17.21",
           "npm:object-hash@3",
+          "npm:semver@^7.6.3",
           "npm:simple-git@^3.27.0",
           "npm:ts-graphviz@^2.1.5",
           "npm:wildcard-match@^5.1.3",
