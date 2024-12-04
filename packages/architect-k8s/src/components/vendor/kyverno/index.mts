@@ -12,7 +12,7 @@ interface KyvernoComponentResources extends KubeComponentHelmResources {
 
 @KubeComponentHelm.decorate(model['kyverno'])
 export class KyvernoComponent extends KubeComponentHelm<KyvernoComponentResources> {
-  public init(): void {
+  public override init(): void {
     this.setDefaults({
       values: {
         installCRDs: true,
@@ -20,7 +20,7 @@ export class KyvernoComponent extends KubeComponentHelm<KyvernoComponentResource
     });
   };
 
-  public async build(resources: KyvernoComponentResources = {}) {
+  public override async build(resources: KyvernoComponentResources = {}) {
     resources.namespace = new api.v1.Namespace({
       metadata: { name: this.context.namespace },
     });

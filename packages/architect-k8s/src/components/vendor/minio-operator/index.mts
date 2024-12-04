@@ -8,7 +8,7 @@ import model from './architect.json' with { type: 'json' };
  */
 @KubeComponentHelm.decorate(model['minio-operator'])
 export class MinioOperatorComponent extends KubeComponentHelm {
-  public init(): void {
+  public override init(): void {
     this.setDefaults({
       values: {
         // Do not autocreate
@@ -17,7 +17,7 @@ export class MinioOperatorComponent extends KubeComponentHelm {
     });
   };
 
-  public async getRequirements() {
+  public override async getRequirements() {
     return [
       ...await super.getRequirements(),
       new CapabilityMatcher(StorageCapability),

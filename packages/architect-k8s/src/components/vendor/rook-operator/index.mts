@@ -11,7 +11,7 @@ interface RookOperatorComponentResources extends KubeComponentHelmResources {
 
 @KubeComponentHelm.decorate(model['rook-operator'])
 export class RookOperatorComponent extends KubeComponentHelm<RookOperatorComponentResources> {
-  public configure(_context: ConfigurationContext) {
+  public override configure(_context: ConfigurationContext) {
     // TODO: only if prometheus operator enabled
     this.props.$set({
       values: {
@@ -22,7 +22,7 @@ export class RookOperatorComponent extends KubeComponentHelm<RookOperatorCompone
     })
   };
 
-  public async build(resources: RookOperatorComponentResources = {}) {
+  public override async build(resources: RookOperatorComponentResources = {}) {
     resources.namespace = new api.v1.Namespace({
       metadata: { name: this.context.namespace },
     });

@@ -1,2 +1,2 @@
-export * from "./Provider.js";
-export * from "./Alert.js";
+export * from "./Provider.ts";
+export * from "./Alert.ts";
