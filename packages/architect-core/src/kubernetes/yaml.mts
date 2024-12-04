@@ -1,9 +1,9 @@
 import fs from 'node:fs/promises';
-import { isRecord } from '@perdition/architect-core';
 import { loadAll } from 'js-yaml';
 
 import { KubeResource, KubeResourceUtilities } from './resource.mts';
 import { GVK, TypeRegistry } from './types/index.mts';
+import { isRecord } from "../utils/objects.mts";
 
 export class ManifestLoader {
   private readonly types: TypeRegistry;

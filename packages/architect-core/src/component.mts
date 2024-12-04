@@ -33,7 +33,6 @@ export interface ComponentArgs<TInput = unknown> {
 export abstract class Component<
   TResult extends object = object,
   TArgs extends ComponentArgs = ComponentArgs,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TParent extends Component = any,
 > {
   public context: Context;
@@ -263,8 +262,7 @@ export abstract class Component<
 };
 
 export interface ComponentClass<T extends Component = Component> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  new (target: Target, props?: any, context?: Partial<Context>, parent?: Component): T;
+  new (target: Target, props?: unknown, context?: Partial<Context>, parent?: Component): T;
 };
 
 /**

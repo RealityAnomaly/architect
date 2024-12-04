@@ -5,8 +5,7 @@ interface Validator {
 };
 
 export function isValidator(value: unknown): value is Validator {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return !!value && typeof (value as any).validate === 'function';
+  return !!value && typeof (value as Validator).validate === 'function';
 };
 
 export enum ValidationErrorLevel {

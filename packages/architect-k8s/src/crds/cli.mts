@@ -2,25 +2,43 @@ import { Command } from "commander";
 import { K8sPlugin } from "../plugin.mts";
 import { CrdsConfig } from "./config.mts";
 import { CRDSyncOptions } from "./index.mts";
+import { AppCommandOptions } from "@perdition/architect-core";
+
+interface CRDCommandOptions extends AppCommandOptions {};
+
+interface CRDCommandAddOptions extends CRDCommandOptions {
+  domain: string;
+  url?: string;
+  git?: string;
+  kustomize?: string;
+};
+
+interface CRDCommandRemoveOptions extends CRDCommandOptions {
+  domain: string;
+};
+
+interface CRDCommandSyncOptions extends CRDCommandOptions {
+  domain?: string;
+  fetchOnly: boolean;
+};
 
 export class CRDCommand extends Command {
   private readonly plugin: K8sPlugin;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private async add(options: any) {
+  private async add(options: CRDCommandAddOptions) {
     const crd = {
       name: options.domain
     } as CrdsConfig;
 
-    if (typeof(options.url) === 'string') {
-      const paths = (options.url as string).split(',');
+    if (options.url) {
+      const paths = options.url.split(',');
       crd.http = {
         paths: paths,
       };
     }
 
-    if (typeof(options.git) === 'string') {
-      const paths = (options.git as string).split('+');
+    if (options.git) {
+      const paths = options.git.split('+');
 
       let ref = undefined;
       if (paths.length >= 2)
@@ -35,8 +53,8 @@ export class CRDCommand extends Command {
       };
     }
 
-    if (typeof(options.kustomize) === 'string') {
-      const paths = (options.kustomize as string).split(',');
+    if (options.kustomize) {
+      const paths = options.kustomize.split(',');
       crd.kustomize = {
         kustomizations: [],
       };
@@ -52,26 +70,23 @@ export class CRDCommand extends Command {
     await this.plugin.crds.commit();
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private async remove(options: any) {
+  private async remove(options: CRDCommandRemoveOptions) {
     await this.plugin.crds.remove(options.domain);
     await this.plugin.crds.commit();
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private async list(_: any) {
+  private async list(_: CRDCommandOptions) {
     const crds = this.plugin.crds.list();
     console.log(crds)
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private async sync(options: any) {
+  private async sync(options: CRDCommandSyncOptions) {
     const syncOptions = {
       fetchOnly: options.fetchOnly,
     } as CRDSyncOptions;
 
-    if (typeof(options.domain) === 'string') {
-      const domains = (options.domain as string).split(',')
+    if (options.domain) {
+      const domains = options.domain.split(',')
       for (const domain of domains) {
         const crd = this.plugin.crds.get(domain);
         if (crd === undefined) continue;

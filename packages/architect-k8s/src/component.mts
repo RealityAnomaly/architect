@@ -9,7 +9,6 @@ import { KubeTarget } from './target.mts';
 import { KubeContext } from './context.mts';
 import { GitFetchOptions, HelmChartOpts, HttpFetchOptions, KustomizeOpts } from './index.mts';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface KubeComponentArgs extends ComponentArgs<KubeComponentModelInput> {};
 
 export interface KubeComponentGenericResources {

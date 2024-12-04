@@ -2,8 +2,9 @@ import * as toolkit from '@es-toolkit/es-toolkit';
 import { arrayStartsWith, isEmptyObject, recursiveMerge } from '../objects.mts';
 import { isObjectDeepKeys, PathResultBuilder, ValuePath, ValuePathKey } from './paths.mts';
 import { DeepPartial, Resolver, Value } from './value.mts';
+import { RecursiveRecord } from "../types.mts";
 
-const LAZY_PROXY_SYMBOL = Symbol.for('vertex.architect.LazyProxy');
+const LAZY_PROXY_SYMBOL = Symbol.for('architect.LazyProxy');
 const MAX_EVALUATION_DEPTH = 100;
 
 export interface _LazyProxy<T> {
@@ -139,8 +140,7 @@ class LazyProxy {
   };
 
   public static is<T>(value: unknown): value is _LazyProxy<T> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return (typeof(value) === 'object' && LAZY_PROXY_SYMBOL in (value as object) && (value as any)[LAZY_PROXY_SYMBOL]);
+    return (value !== null && typeof(value) === 'object' && Object.hasOwn(value, LAZY_PROXY_SYMBOL));
   };
 };
 
@@ -244,17 +244,16 @@ export class Lazy<T> {
     const result = builder.resolve() as TValue;
     if (result === undefined) return result;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let curr = result as any;
+    let curr = result as RecursiveRecord<TValue>;
     for (const key of path) {
       if (curr === undefined) {
         throw new TypeError(`attempted to read value of undefined at ${path.join('.')}`);
       };
 
-      curr = curr[key];
+      curr = curr[key] as RecursiveRecord<TValue>;
     };
 
-    return curr;
+    return curr as TValue;
   };
 
   /**

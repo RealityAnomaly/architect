@@ -25,22 +25,24 @@ export function prettifyPath(path: ValuePath): string {
   return builder;
 };
 
-export class PathResultBuilder {
-  private value?: PathResultValue = undefined;
+export class PathResultBuilder<T> {
+  private value?: PathResultValue<T> = undefined;
 
-  public set<T>(path: ValuePath, value: T, force: boolean, weight: number) {
+  public set(path: ValuePath, value: T, force: boolean, weight: number) {
     this.value = this.merge(this.value, path, path, value, force, weight);
   };
 
   public resolve(): unknown {
     // strips weight/force metadata off our values
-    function stripMeta(value: PathResultValue): unknown {
+    function stripMeta(value: PathResultValue<T>): unknown {
       if (Array.isArray(value.value)) {
         return value.value.map(v => stripMeta(v));
       } else if (typeof value.value === 'object') {
         const result = {} as Record<string, unknown>;
-        for (const [k, v] of Object.entries(value.value)) {
-          result[k] = stripMeta(v as PathResultValue);
+        const obj = value.value as Record<string | symbol, PathResultValue<T>>;
+
+        for (const [k, v] of Object.entries(obj)) {
+          result[k] = stripMeta(v as PathResultValue<T>);
         };
 
         return result;
@@ -54,12 +56,12 @@ export class PathResultBuilder {
   };
 
   private mergeValues<T>(
-    target: PathResultValue | undefined,
+    target: PathResultValue<T> | undefined,
     path: ValuePath, // not used, but useful for debugging
     value: T,
     force: boolean,
     weight: number,
-  ): PathResultValue {
+  ): PathResultValue<T> {
     if (target === undefined || force) {
       target = { force: force, weight: weight };
     } else if (typeof value !== 'object' && weight <= target.weight) {
@@ -73,14 +75,16 @@ export class PathResultBuilder {
         result = [];
       };
 
-      value.forEach(v => result.push(this.mergeValues(undefined, path.concat(-1), v, force, weight)));
+      const array = result as PathResultValue<T>[];
+      value.forEach(v => array.push(this.mergeValues(undefined, path.concat(-1), v, force, weight)));
     } else if (typeof value === 'object') {
       if (typeof result !== 'object' || Array.isArray(result)) {
         result = {};
       };
 
+      const obj = result as Record<string | symbol, PathResultValue<T>>;
       for (const [k, v] of Object.entries(value as object)) {
-        result[k] = this.mergeValues(result[k], path.concat(k), v, force, weight);
+        obj[k] = this.mergeValues(obj[k], path.concat(k), v, force, weight);
       };
     } else {
       result = value;
@@ -92,7 +96,7 @@ export class PathResultBuilder {
   /**
    * set the value at target identified by path to the specified value
    */
-  private merge<T>(target: PathResultValue | undefined, path: ValuePath, fullPath: ValuePath, value: T, force: boolean, weight: number): PathResultValue {
+  private merge<T>(target: PathResultValue<T> | undefined, path: ValuePath, fullPath: ValuePath, value: T, force: boolean, weight: number): PathResultValue<T> {
     if (path.length === 0) {
       return this.mergeValues(target, fullPath, value, force, weight);
     };
@@ -108,19 +112,20 @@ export class PathResultBuilder {
     // do we have an array key or a normal key?
     if (typeof(curr) === 'number') {
       if (!Array.isArray(target.value)) target.value = [];
-      target.value.push(this.merge(undefined, next, fullPath, value, force, weight));
+      const array = target.value as PathResultValue<T>[];
+      array.push(this.merge(undefined, next, fullPath, value, force, weight));
     } else {
       if (typeof target.value !== 'object') target.value = {};
-      target.value[curr] = this.merge(target.value[curr], next, fullPath, value, force, weight);
+      const obj = target.value as Record<string | symbol, PathResultValue<T>>;
+      obj[curr] = this.merge(obj[curr], next, fullPath, value, force, weight);
     };
 
     return target;
   };
 };
 
-export interface PathResultValue {
+export interface PathResultValue<T> {
   force: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  value?: any | PathResultValue[] | Record<string | symbol, PathResultValue>;
+  value?: T | PathResultValue<T>[] | Record<string | symbol, PathResultValue<T>>;
   weight: number;
 };

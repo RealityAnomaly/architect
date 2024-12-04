@@ -30,9 +30,10 @@
   },
   "lint": {
     "include": ["src/"],
-    "exclude": ["src/testdata/", "src/fixtures/**/*.ts"],
+    "exclude": ["src/testdata/", "src/fixtures/**/*.ts", "src/generated/**/"],
     "rules": {
-      "tags": ["recommended"]
+      "tags": ["recommended"],
+      "exclude": ["require-await", "no-empty-interface"]
     }
   },
   "test": {
