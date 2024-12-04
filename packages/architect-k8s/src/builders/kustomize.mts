@@ -1,5 +1,5 @@
 import { execFile } from 'node:child_process';
-import * as util from 'util';
+import * as util from 'node:util';
 
 import { KubeResource } from '@perdition/architect-core';
 import { Builder, BuilderParams } from './builder.mts';

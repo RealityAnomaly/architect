@@ -1,6 +1,6 @@
 
-import path from 'path';
-import process from 'process';
+import path from 'node:path';
+import process from 'node:process';
 import { CRDModelGenerator, ManifestLoader, TypeRegistry } from '../src/kubernetes/index.mts';
 
 const types = new TypeRegistry();

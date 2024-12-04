@@ -1,12 +1,12 @@
-import _ from 'lodash';
+import * as toolkit from '@es-toolkit/es-toolkit';
 
 export type ValuePathKey = string | symbol | number;
 export type ValuePath = ValuePathKey[];
 
 export function isObjectDeepKeys(value: unknown): value is object {
   // TODO: this should NOT Include classes!!!
-  if (!_.isObject(value)) return false;
-  if (_.isFunction(value)) return false;
+  if (typeof value !== 'object') return false;
+  if (toolkit.isFunction(value)) return false;
 
   return true;
 };
@@ -35,12 +35,12 @@ export class PathResultBuilder {
   public resolve(): unknown {
     // strips weight/force metadata off our values
     function stripMeta(value: PathResultValue): unknown {
-      if (_.isArray(value.value)) {
+      if (Array.isArray(value.value)) {
         return value.value.map(v => stripMeta(v));
-      } else if (_.isObject(value.value)) {
+      } else if (typeof value.value === 'object') {
         const result = {} as Record<string, unknown>;
         for (const [k, v] of Object.entries(value.value)) {
-          result[k] = stripMeta(v);
+          result[k] = stripMeta(v as PathResultValue);
         };
 
         return result;
@@ -62,24 +62,24 @@ export class PathResultBuilder {
   ): PathResultValue {
     if (target === undefined || force) {
       target = { force: force, weight: weight };
-    } else if (!_.isObject(value) && weight <= target.weight) {
+    } else if (typeof value !== 'object' && weight <= target.weight) {
       throw new Error(`conflict: two atomic values with weight ${weight} at path ${prettifyPath(path)}`);
     };
 
     let result = target.value;
 
-    if (_.isArray(value)) {
-      if (!_.isArray(result)) {
+    if (Array.isArray(value)) {
+      if (!Array.isArray(result)) {
         result = [];
       };
 
       value.forEach(v => result.push(this.mergeValues(undefined, path.concat(-1), v, force, weight)));
-    } else if (_.isObject(value)) {
-      if (!_.isObject(result) || _.isArray(result)) {
+    } else if (typeof value === 'object') {
+      if (typeof result !== 'object' || Array.isArray(result)) {
         result = {};
       };
 
-      for (const [k, v] of Object.entries(value)) {
+      for (const [k, v] of Object.entries(value as object)) {
         result[k] = this.mergeValues(result[k], path.concat(k), v, force, weight);
       };
     } else {
@@ -107,10 +107,10 @@ export class PathResultBuilder {
 
     // do we have an array key or a normal key?
     if (typeof(curr) === 'number') {
-      if (!_.isArray(target.value)) target.value = [];
+      if (!Array.isArray(target.value)) target.value = [];
       target.value.push(this.merge(undefined, next, fullPath, value, force, weight));
     } else {
-      if (!_.isObject(target.value)) target.value = {};
+      if (typeof target.value !== 'object') target.value = {};
       target.value[curr] = this.merge(target.value[curr], next, fullPath, value, force, weight);
     };
 

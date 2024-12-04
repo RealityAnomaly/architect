@@ -1,6 +1,6 @@
-import _ from 'lodash';
+import * as toolkit from '@es-toolkit/es-toolkit';
 import * as fs from 'node:fs/promises';
-import * as path from 'path';
+import * as path from 'node:path';
 
 import { HashUtilities, StateProvider } from './utils/index.mts';
 import objectHash from 'object-hash';
@@ -21,7 +21,7 @@ export class TargetCache {
   private hash(key: object | string): string {
     if (Array.isArray(key)) {
       return HashUtilities.compositeHash(key);
-    } else if (_.isString(key)) {
+    } else if (toolkit.isString(key)) {
       return HashUtilities.stringHash(key);
     } else {
       return objectHash(key);

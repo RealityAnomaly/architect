@@ -1,6 +1,6 @@
-import path from 'path';
+import path from 'node:path';
 import * as fs from 'node:fs/promises';
-import _ from 'lodash';
+import { Reflect } from "@dx/reflect";
 
 import { architectGlasswayNet } from './generated/crds/index.ts';
 

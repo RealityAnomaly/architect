@@ -1,4 +1,6 @@
 import objectHash from 'object-hash';
+import { Reflect } from "@dx/reflect";
+
 import { Context } from './context.mts';
 import { constructor, ReflectionUtilities } from './utils/index.mts';
 import { CLASS_META_KEY } from './index.mts';

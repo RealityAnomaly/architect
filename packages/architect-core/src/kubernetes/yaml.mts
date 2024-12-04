@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import { isRecord } from '@perdition/architect-core';
 import { loadAll } from 'js-yaml';
 
-import { Resource, KubeResourceUtilities } from './resource.mts';
+import { KubeResource, KubeResourceUtilities } from './resource.mts';
 import { GVK, TypeRegistry } from './types/index.mts';
 
 export class ManifestLoader {
@@ -15,9 +15,9 @@ export class ManifestLoader {
   public async loadString(
     content: string,
     // options: ManifestLoadOptions = {}
-  ): Promise<Resource[]> {
-    const input = loadAll(content).filter(x => x != null);
-    const resources: Resource[] = [];
+  ): Promise<KubeResource[]> {
+    const input = loadAll(content).filter((x: KubeResource) => x != null);
+    const resources: KubeResource[] = [];
 
     for (const object of input) {
       if (!isRecord(object)) {
@@ -45,7 +45,7 @@ export class ManifestLoader {
      * @param path Path to the manifest file to load.
      * @public
      */
-  public async loadFile(path: string) {
+  public async loadFile(path: string): Promise<KubeResource[]> {
     const content = await fs.readFile(path, 'utf-8');
     //logger.log(LogLevel.Debug, `File loaded from: ${path}`);
 

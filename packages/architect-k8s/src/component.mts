@@ -2,7 +2,7 @@ import { architectGlasswayNet, CapabilityMatcher, Component, ComponentArgs, Comp
 
 import { JSONSchemaType, ValidateFunction } from "ajv";
 import * as api from 'kubernetes-models';
-import _ from 'lodash';
+import * as toolkit from '@es-toolkit/es-toolkit';
 import { CNICapability, DNSCapability } from './capabilities/index.mts';
 
 import { KubeTarget } from './target.mts';
@@ -23,7 +23,7 @@ export abstract class KubeComponent<
 > extends Component<TResult, TArgs, TParent> {
   declare protected readonly target: KubeTarget;
 
-  public context: KubeContext;
+  public override context: KubeContext;
 
   /**
    * Whether to enable adding standard requirements such as CNI and DNS
@@ -42,7 +42,7 @@ export abstract class KubeComponent<
   /**
    * Returns the default set of requirements.
    */
-  public async getRequirements(): Promise<IComponentMatcher[]> {
+  public override async getRequirements(): Promise<IComponentMatcher[]> {
     const def: IComponentMatcher[] = this.standardRequirements ? [
       new CapabilityMatcher(CNICapability),
       new CapabilityMatcher(DNSCapability),
@@ -53,11 +53,11 @@ export abstract class KubeComponent<
     ]);
   };
 
-  public toString(): string {
+  public override toString(): string {
     return `component ${this.context.namespace + '/' + this.context.name}`;
   };
 
-  public async build(result?: TResult): Promise<TResult> {
+  public override async build(result?: TResult): Promise<TResult> {
     result = await super.build(result);
 
     // properly namespace resources, because postBuild doesn't run for children individually
@@ -73,7 +73,7 @@ export abstract class KubeComponent<
     return result;
   };
 
-  public async postBuild(data: TResult) {
+  public override async postBuild(data: TResult) {
     // run post-build resource fixup at the top level
     let resources = KubeResourceUtilities.normaliseResources(data);
 
@@ -106,7 +106,7 @@ export abstract class KubeComponent<
     return super.postBuild(resources as TResult);
   };
 
-  public async upgrade(state: ComponentUpgradeState<KubeComponentModel>): Promise<boolean> {
+  public override async upgrade(state: ComponentUpgradeState<KubeComponentModel>): Promise<boolean> {
     await super.upgrade(state);
 
     let changed = false;
@@ -129,7 +129,7 @@ export abstract class KubeComponent<
     return changed;
   };
 
-  public get modelValidator(): ValidateFunction<KubeComponentModel> {
+  public override get modelValidator(): ValidateFunction<KubeComponentModel> {
     return ComponentModelUtilities.createValidator(this.target.parent.ajv, KubeComponentContextSchema, KubeComponentModelInputSchema);
   };
 
@@ -149,7 +149,7 @@ export abstract class KubeComponent<
    * Wrapper for Helm.template that inserts our default namespace and configuration
    */
   protected async helmTemplate(chart: string, values: object, config: HelmChartOpts, filter?: (v: KubeResource) => boolean): Promise<KubeResource[]> {
-    config = _.merge({
+    config = toolkit.merge({
       namespace: this.context.namespace,
       kubeVersion: this.cluster.version,
       includeCRDs: true,
@@ -269,7 +269,7 @@ export class KubeResourceComponentOptions {
 export class KubePreludeComponent extends KubeComponent {
   private readonly resources: KubeResource[] = [];
 
-  public async build(resources: KubeComponentGenericResources = {}) {
+  public override async build(resources: KubeComponentGenericResources = {}) {
     resources.result = this.resources;
     return super.build(resources);
   };
@@ -278,7 +278,7 @@ export class KubePreludeComponent extends KubeComponent {
     this.resources.push(...items);
   };
 
-  public async getRequirements(): Promise<IComponentMatcher[]> {
+  public override async getRequirements(): Promise<IComponentMatcher[]> {
     return [];
   };
 };

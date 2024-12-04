@@ -1,4 +1,4 @@
-import * as util from 'util';
+import * as util from 'node:util';
 
 import { Logger } from 'winston';
 import { KubeResource, ManifestLoader, TargetCache } from '@perdition/architect-core';
