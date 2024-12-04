@@ -7,8 +7,11 @@ import { KubeResource } from '@perdition/architect-core';
 
 import * as yaml from 'js-yaml';
 import { Builder, BuilderParams } from './builder.mts';
+import * as semver from 'semver';
 
 export class Helm extends Builder {
+  private readonly indexCache: Record<string, HelmIndex> = {};
+
   constructor(params: BuilderParams) {
     super(params, 'helm');
   };
@@ -133,7 +136,131 @@ export class Helm extends Builder {
       });
     }
   };
+
+  public async getIndex(repository: string): Promise<HelmIndex | undefined> {
+    if (repository.startsWith('oci://')) {
+      this.logger.warn(`OCI Helm repositories are not yet supported: ${repository}`);
+      return undefined;
+    };
+
+    if (Object.hasOwn(this.indexCache, repository)) {
+      return this.indexCache[repository];
+    };
+
+    const url = path.join(repository, 'index.yaml');
+    const response = await fetch(url);
+    if (response.status !== 200) {
+      this.logger.error(`HTTP fetch failed for ${url}: returned code ${response.status}`);
+      return undefined;
+    };
+
+    const text = await response.text();
+    const index = yaml.load(text) as HelmIndex;
+    this.indexCache[repository] = index;
+
+    return index;
+  };
+
+  private getLatestChartSemVer(name: string, variants: HelmIndexEntry[], constraint?: string): string | undefined {
+    let version: semver.SemVer | undefined = undefined;
+    let original: string | undefined = undefined;
+
+    for (const variant of variants) {
+      let parsed: semver.SemVer;
+
+      try {
+        parsed = new semver.SemVer(variant.version, true);
+      } catch (exception) {
+        this.logger.silly(`failed to parse version as semver for chart ${name}: ${exception}`);
+        continue;
+      };
+
+      if ((!version || parsed.compare(version) === 1) && parsed.prerelease.length <= 0) {
+        if (constraint && !semver.satisfies(parsed, constraint)) continue;
+
+        version = parsed;
+        original = variant.version;
+      }
+    };
+
+    return original;
+  };
+
+  private getLatestChartUnixTime(name: string, variants: HelmIndexEntry[]): string | undefined {
+    let date: Date | undefined = undefined;
+    let version: string | undefined = undefined;
+
+    for (const variant of variants) {
+      let parsed: Date;
+
+      try {
+        parsed = new Date(variant.created);
+      } catch (exception) {
+        this.logger.silly(`failed to parse created timestamp for chart ${name}: ${exception}`);
+        continue;
+      };
+
+      if (!date || parsed > date) {
+        date = parsed;
+        version = variant.version;
+      };
+    };
+
+    return version;
+  };
+
+  public async getLatestVersion(chart: string, repository: string, constraint?: string): Promise<string | undefined> {
+    const index = await this.getIndex(repository);
+    if (!index) return undefined;
+
+    if (!Object.hasOwn(index.entries, chart)) {
+      this.logger.error(`unable to find chart ${chart} in the repository ${repository}`);
+      return undefined;
+    };
+
+    // first, try and locate the latest version by semver
+    const variants = index.entries[chart];
+    let version = this.getLatestChartSemVer(chart, variants, constraint);
+    if (version) return version;
+
+    if (constraint) {
+      this.logger.error(`failed to find any semantic version that satisfies the constraint ${constraint} for chart ${chart}`);
+      return undefined;
+    };
+
+    // if semver fails, fall back to timestamps
+    version = this.getLatestChartUnixTime(chart, variants);
+    if (!version) {
+      this.logger.error(`failed to find any versions for chart ${chart}, fallback to timestamp comparison failed`);
+      return undefined;
+    };
+
+    return version;
+  };
 }
+
+interface HelmIndexEntry {
+  annotations: Record<string, object>;
+  apiVersion: string;
+  appVersion: string;
+  created: string;
+  description: string;
+  digest: string;
+  home: string;
+  keywords: string[];
+  maintainers: object[];
+  name: string;
+  sources: string[];
+  urls: string[];
+  version: string;
+};
+
+interface HelmIndex {
+  apiVersion: string;
+  entries: Record<string, HelmIndexEntry[]>;
+  generated: string;
+  serverInfo: object;
+};
 
 export interface HelmChartOpts {
   /**

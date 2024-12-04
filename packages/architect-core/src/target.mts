@@ -8,11 +8,11 @@ import { Component, ComponentClass, ExtractComponentArgs } from './component.mts
 import { Registry } from './registry.mts';
 import { Result } from './result.mts';
 import { Context } from './context.mts';
-import { Condition, constructor, DeepLazySpec, DeepPartial, isValidator, ReflectionUtilities, ValidationError, ValidationErrorLevel } from './utils/index.mts';
+import { Condition, constructor, DeepLazySpec, DeepPartial, ReflectionUtilities } from './utils/index.mts';
 import { Architect, CLASS_META_KEY, DependencyGraph } from './index.mts';
 
 export const PLUGIN_TARGET_IDENTIFIERS = {
-  kubernetes: 'architect.glassway.net/KubeTarget',
+  kubernetes: 'target.architect.glassway.net/kubernetes',
 };
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -119,12 +119,10 @@ export class Target {
     * Resolves the component dependency graph
     */
   public async resolve(params: TargetResolveParams = {}): Promise<DependencyGraph> {
-    this.parent.logger.info(`target ${this.model.metadata.name}: building components`);
     return await DependencyGraph.resolve(this, Object.values(this.components.data), params.requirements !== false);
   };
 
-  public async compile(graph: DependencyGraph, validate: boolean = true): Promise<Result> {
-    const buildGraph = graph; // TODO: structured clone
+  public async compile(graph: DependencyGraph, _params?: TargetResolveParams): Promise<Result> {
     const results: Record<string, unknown> = {};
 
     await Promise.all(Object.values(graph.components).map(async (v): Promise<void> => {
@@ -134,21 +132,7 @@ export class Target {
       results[v.component.rid] = await v.component.postBuild(result);
     }));
 
-    const result = new Result(buildGraph, results);
-
-    // TODO: handle objects, too
-    if (validate && Array.isArray(result.all)) {
-      for (const item of result.all) {
-        if (!isValidator(item)) continue;
-
-        try {
-          await item.validate();
-        } catch (e) {
-          if (e instanceof Error)
-            buildGraph.errors.push(new ValidationError(e.message, ValidationErrorLevel.ERROR, item));
-        };
-      };
-    };
+    const result = new Result(graph, results);
 
     //this.parent.logger.info(`target ${this.model.metadata.name}: ${Object.values(result.components).length} components built`);
     return result;
@@ -166,11 +150,7 @@ export class Target {
     condition?: Condition,
   ) {
     const result = this.component(token, context, true);
-    result.props.$set({ enable: true }, weight, force, condition);
-
-    if (config !== undefined) {
-      result.props.$set(config, weight, force, condition);
-    };
+    result.props.$set({ enable: true, ...config || {} }, weight, force, condition);
   };
 
   /**
@@ -211,5 +191,5 @@ export class Target {
 export type TargetClass = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   new (model: architectGlasswayNet.v1alpha1.Target, params: any, parent: Architect): Target
-  key: string
+  fake(): architectGlasswayNet.v1alpha1.Target;
 };

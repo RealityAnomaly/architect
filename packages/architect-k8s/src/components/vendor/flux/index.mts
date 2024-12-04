@@ -1,4 +1,4 @@
-import { Architect, KubeResourceTree } from '@perdition/architect-core';
+import { KubeResourceTree } from '@perdition/architect-core';
 import { KubeComponent, KubeComponentArgs } from '../../../index.mts';
 import model from './architect.json' with { type: 'json' };
 
@@ -10,7 +10,7 @@ interface FluxCDComponentResources {
   manifests?: KubeResourceTree;
 };
 
-@Architect.component(model)
+@KubeComponent.decorate(model)
 export class FluxCDComponent extends KubeComponent<FluxCDComponentResources, FluxCDComponentOptions> {
   public async build(resources: FluxCDComponentResources = {}) {
     //const url = `https://github.com/fluxcd/flux2/releases/${this.props.version ?? "v2.4.0"}/download/install.yaml`; // "object is not a function?"

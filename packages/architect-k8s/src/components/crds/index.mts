@@ -1,6 +1,6 @@
 import * as fs from 'node:fs/promises';
 import path from 'path';
-import { Architect, GVK, notEmpty } from '@perdition/architect-core';
+import { GVK, notEmpty } from '@perdition/architect-core';
 import * as fg from 'fast-glob';
 import * as api from 'kubernetes-models';
 import wcmatch from 'wildcard-match';
@@ -8,7 +8,7 @@ import { KubeComponent, KubeComponentGenericResources } from '../../component.mt
 
 import model from './architect.json' with { type: 'json' };
 
-@Architect.component(model)
+@KubeComponent.decorate(model)
 export class CrdsComponent extends KubeComponent {
   private readonly enabledGroups: string[] = [];
   private readonly enabledGVKs: GVK[] = [];

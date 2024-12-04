@@ -1,4 +1,4 @@
-import { Architect, recursiveMerge } from "@perdition/architect-core";
+import { recursiveMerge } from "@perdition/architect-core";
 import { KubeComponent, KubeComponentGenericResources, MetricsCapability } from "@perdition/architect-k8s";
 
 import model from './architect.json' with { type: 'json' };
@@ -6,7 +6,7 @@ import model from './architect.json' with { type: 'json' };
 /**
  * Deploys Metrics Server, a core component of Kubernetes that aggregates metrics
  */
-@Architect.component(model['metrics-server'])
+@KubeComponent.decorate(model['metrics-server'])
 export class MetricsServerComponent extends KubeComponent {
   public async build(resources: KubeComponentGenericResources = {}) {
     let values = {};

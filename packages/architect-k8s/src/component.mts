@@ -1,5 +1,6 @@
-import { Architect, architectGlasswayNet, CapabilityMatcher, Component, ComponentArgs, ComponentClass, ComponentMatcher, ComponentModel, IComponentMatcher, KubeResource, KubeResourceUtilities, Target } from '@perdition/architect-core';
+import { architectGlasswayNet, CapabilityMatcher, Component, ComponentArgs, ComponentClass, ComponentMatcher, ComponentMetadata, ComponentModel, ComponentModelUtilities, ComponentUpgradeState, IComponentMatcher, KubeResource, KubeResourceUtilities, PLUGIN_TARGET_IDENTIFIERS, Target } from '@perdition/architect-core';
 
+import { JSONSchemaType, ValidateFunction } from "ajv";
 import * as api from 'kubernetes-models';
 import _ from 'lodash';
 import { CNICapability, DNSCapability } from './capabilities/index.mts';
@@ -9,15 +10,10 @@ import { KubeContext } from './context.mts';
 import { GitFetchOptions, HelmChartOpts, HttpFetchOptions, KustomizeOpts } from './index.mts';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface KubeComponentArgs extends ComponentArgs {};
+export interface KubeComponentArgs extends ComponentArgs<KubeComponentModelInput> {};
+
 export interface KubeComponentGenericResources {
   result?: KubeResource[];
-};
-
-export interface KubeComponentModel extends ComponentModel {
-  context?: {
-    namespace?: string,
-  };
 };
 
 export abstract class KubeComponent<
@@ -110,6 +106,33 @@ export abstract class KubeComponent<
     return super.postBuild(resources as TResult);
   };
 
+  public async upgrade(state: ComponentUpgradeState<KubeComponentModel>): Promise<boolean> {
+    await super.upgrade(state);
+
+    let changed = false;
+    for (const [k, input] of Object.entries(state.model?.inputs || {})) {
+      if (input.helm) {
+        const latest = await this.target.plugin.helm.getLatestVersion(input.helm.name, input.helm.repo, input.helm.constraint);
+        if (!latest) continue;
+
+        if (input.helm.version !== latest) {
+          changed = true;
+          state.logger.info(`${this.constructor.name}: input '${k}' changed from ${input.helm.version} -> ${latest}`);
+          input.helm.version = latest;
+        };
+      } else if (input.oci) {
+        state.logger.warn(`${this.constructor.name}: input '${k}' OCI currently not supported`);
+      };
+    };
+
+    if (changed) state.file.dirty = true;
+    return changed;
+  };
+
+  public get modelValidator(): ValidateFunction<KubeComponentModel> {
+    return ComponentModelUtilities.createValidator(this.target.parent.ajv, KubeComponentContextSchema, KubeComponentModelInputSchema);
+  };
+
   protected get cluster(): NonNullable<NonNullable<architectGlasswayNet.v1alpha1.Target["spec"]["plugins"]>["kubernetes"]> {
     return this.target.cluster;
   };
@@ -146,17 +169,103 @@ export abstract class KubeComponent<
   protected async kustomizeBuild(dir: string, config: KustomizeOpts = {}): Promise<KubeResource[]> {
     return this.target.plugin.kustomize.build(dir, config);
   };
+
+  /**
+   * Marks a class as a component. This MUST be defined for all Architect components that are not dependent children.
+   * @param model The component model to use. Per the documentation, this should be imported from an `architect.json` file in the same folder as your component's code.
+   * @returns A decorator which sets the required properties.
+   */
+  public static decorate<T extends object>(model: KubeComponentModel) {
+    function decorator(target: T) {
+      new ComponentMetadata<KubeComponentModel>(model, PLUGIN_TARGET_IDENTIFIERS.kubernetes, model.class).assign(target);
+    };
+
+    return decorator;
+  };
 };
 
 export interface KubeComponentClass extends ComponentClass {
   namespace (target: Target): string;
 };
 
+export interface KubeComponentContext {
+  namespace?: string,
+};
+
+export interface KubeComponentInputOCIModel {
+  name: string,
+  version: string,
+};
+
+export interface KubeComponentInputHelmModel {
+  name: string,
+  repo: string,
+  version: string,
+  constraint?: string,
+};
+
+export interface KubeComponentModelInput {
+  oci?: KubeComponentInputOCIModel,
+  helm?: KubeComponentInputHelmModel,
+};
+
+export type KubeComponentModel = ComponentModel<KubeComponentContext, KubeComponentModelInput>;
+
+const KubeComponentContextSchema: JSONSchemaType<KubeComponentContext> = {
+  type: "object",
+  required: [],
+  properties: {
+    namespace: {
+      type: "string",
+      nullable: true
+    },
+  },
+};
+
+const KubeComponentModelInputSchema: JSONSchemaType<KubeComponentModelInput> = {
+  type: "object",
+  properties: {
+    oci: {
+      type: "object",
+      nullable: true,
+      required: ["name", "version"],
+      properties: {
+        name: {
+          type: "string",
+        },
+        version: {
+          type: "string",
+        },
+      },
+    },
+    helm: {
+      type: "object",
+      nullable: true,
+      required: ["name", "repo"],
+      properties: {
+        name: {
+          type: "string",
+        },
+        repo: {
+          type: "string",
+        },
+        version: {
+          type: "string",
+        },
+        constraint: {
+          type: "string",
+          nullable: true,
+        },
+      },
+    },
+  }
+};
+
 export class KubeResourceComponentOptions {
   resources: KubeResource[] = [];
 };
 
-@Architect.component({ class: 'architect.glassway.net/prelude' })
+@KubeComponent.decorate({ class: 'architect.glassway.net/prelude' })
 export class KubePreludeComponent extends KubeComponent {
   private readonly resources: KubeResource[] = [];
 
