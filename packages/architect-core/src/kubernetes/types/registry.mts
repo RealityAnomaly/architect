@@ -1,4 +1,3 @@
-import { Architect } from '../../index.mts';
 import { KubeResourceConstructor } from '../resource.mts';
 import { GVK } from './gvk.mts';
 
@@ -26,9 +25,7 @@ async function tryImport(path: string): Promise<object | undefined> {
 export class TypeRegistry {
   private ctorCache: Record<string, KubeResourceConstructor | null> = {};
   private apiModulePath: string = 'kubernetes-models';
-  private crdModulePaths: string[] = [
-    Architect.PATH // path of the default root module
-  ];
+  private crdModulePaths: string[] = [];
 
   /**
    * Sets the path for Kubernetes API models.
@@ -61,7 +58,6 @@ export class TypeRegistry {
     const gvkPath = gvkToPath(gvk);
 
     // find a matching constructor
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let mod: any | undefined;
     let path: string | null = null;
 

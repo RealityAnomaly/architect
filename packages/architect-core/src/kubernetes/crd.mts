@@ -8,7 +8,7 @@ import * as path from 'node:path';
 import * as yaml from 'js-yaml';
 //import crdGenerate from '@kubernetes-models/crd-generate'
 import { ManifestLoader } from './yaml.mts';
-import { walk } from '../index.mts';
+import { walk } from "../utils/files.mts";
 
 export class CRDModelGenerator {
   private readonly loader: ManifestLoader;
@@ -21,14 +21,6 @@ export class CRDModelGenerator {
     fs.rm(outDir, { recursive: true, force: true });
     fs.mkdir(yamlDir, { recursive: true });
     fs.mkdir(outDir, { recursive: true });
-
-    console.log(yamlDir);
-
-    // broken because of ESM bullshit...
-    // await crdGenerate.generate({
-    //   input: yamlDir,
-    //   outputPath: outDir
-    // });
 
     // read all files in src yaml dir
     const crds = [] as api.apiextensionsK8sIo.v1.CustomResourceDefinition[];
@@ -49,8 +41,18 @@ export class CRDModelGenerator {
     try {
       await fs.writeFile(tempFile, crds.map(r => yaml.dump(r)).join('\n---\n'));
 
+      // broken because of ESM bullshit...
+      // await crdGenerate.generate({
+      //   input: tempFile,
+      //   outputPath: outDir
+      // });
+
       const execFileAsync = util.promisify(execFile);
-      await execFileAsync('npx', ['@kubernetes-models/crd-generate', '--input', tempFile, '--output', outDir], { maxBuffer: undefined });
+      await execFileAsync('deno', [
+        'run', '--allow-env', '--allow-sys', '--allow-read', '--allow-write',
+        'npm:@kubernetes-models/crd-generate',
+        '--input', tempFile, '--output', outDir
+      ], { maxBuffer: undefined });
     } catch (exception) {
       console.log(exception);
     } finally {
@@ -64,7 +66,7 @@ export class CRDModelGenerator {
     for await (const file of walk(outDir)) {
       let content = await fs.readFile(file, 'utf-8');
       if (content.includes('_schemas') && !file.endsWith('.js'))
-        content = content.replaceAll(new RegExp('^(.*)(_schemas/.[^"]*)', 'gm'), '$1$2.ts');
+        content = content.replaceAll(new RegExp('^(.*)(_schemas/.[^"]*)', 'gm'), '$1$2.js');
 
       content = content.replaceAll(new RegExp('^(export *.*from )"(.*?)"', 'gm'), '$1"$2.ts"');
       await fs.writeFile(file, content);

@@ -1,13 +1,11 @@
 import * as fs from 'node:fs/promises';
-import * as os from 'node:os';
-import * as path from 'node:path';
 
 /**
  * Run a function in a temporary directory
  */
 export async function runInTempDir(fn: (dir: string) => Promise<void>) {
   // create a temporary directory and clean it up after use
-  const tmpdir = await fs.mkdtemp(path.join(os.tmpdir(), 'cache-test-'));
+  const tmpdir = await Deno.makeTempDir();
 
   try {
     await fn(tmpdir);

@@ -25,7 +25,6 @@ export interface KubeTargetParams extends TargetParams {
   };
 };
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface KubeTargetResolveParams extends TargetResolveParams {};
 
 export interface ClusterState {

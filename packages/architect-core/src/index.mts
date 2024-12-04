@@ -49,6 +49,8 @@ export class Architect {
     this.cache = new TargetCache(this.state, this.logger);
 
     this.kubeTypes = new kubeUtils.TypeRegistry();
+    this.kubeTypes.appendCRDModule(Architect.PATH);
+
     this.kubeLoader = new kubeUtils.ManifestLoader(this.kubeTypes);
   };
 

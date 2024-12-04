@@ -26,9 +26,10 @@
   },
   "lint": {
     "include": ["src/"],
-    "exclude": ["src/testdata/", "src/fixtures/**/*.ts"],
+    "exclude": ["src/testdata/", "src/fixtures/**/*.ts", "src/generated/**/"],
     "rules": {
-      "tags": ["recommended"]
+      "tags": ["recommended"],
+      "exclude": ["require-await", "no-empty-interface"]
     }
   },
   "test": {
@@ -36,7 +37,7 @@
     "exclude": ["src/testdata/", "src/fixtures/**/*.ts"]
   },
   "tasks": {
-    "generate": "npx json2ts -i internal/schema -o src/generated/schema && node --loader ts-node/esm utils/generate-core-crds.mts"
+    "generate": "deno --allow-env --allow-sys --allow-read --allow-run=deno --allow-write src/bin/generate-core-crds.mts"
   },
   "license": "MIT",
   "name": "@perdition/architect-core",

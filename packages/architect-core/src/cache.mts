@@ -11,9 +11,9 @@ import { Logger } from 'winston';
  */
 export class TargetCache {
   readonly dir: string;
-  readonly logger: Logger;
+  readonly logger?: Logger;
 
-  constructor(state: StateProvider, logger: Logger) {
+  constructor(state: StateProvider, logger?: Logger) {
     this.dir = state.dirs.cache;
     this.logger = logger;
   };
@@ -33,9 +33,9 @@ export class TargetCache {
 
     try {
       await fs.stat(file);
-      this.logger.silly(`cache hit for key ${JSON.stringify(key)} in namespace ${ns}`);
+      this.logger?.silly(`cache hit for key ${JSON.stringify(key)} in namespace ${ns}`);
     } catch {
-      this.logger.silly(`cache miss for key ${JSON.stringify(key)} in namespace ${ns}`);
+      this.logger?.silly(`cache miss for key ${JSON.stringify(key)} in namespace ${ns}`);
       return null;
     };
 

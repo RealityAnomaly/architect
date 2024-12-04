@@ -4,6 +4,7 @@ import { TargetResolveParams } from '../target.mts';
 import { Architect } from '../index.mts';
 import { ComponentCommand } from './component.mts';
 import { TargetCommand } from './target.mts';
+import process from "node:process";
 
 export interface AppCommandOptions {
   debug: boolean;
@@ -20,7 +21,6 @@ interface AppCommandCompileOptions extends AppCommandOptions {
   requirements: boolean;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface AppCommandApplyOptions extends AppCommandCompileOptions {};
 
 export class App {

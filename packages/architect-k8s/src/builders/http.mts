@@ -1,7 +1,6 @@
 import { KubeResource } from '@perdition/architect-core';
 import { Builder, BuilderParams } from './builder.mts';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface HttpFetchOptions {};
 
 export class HttpBuilder extends Builder {

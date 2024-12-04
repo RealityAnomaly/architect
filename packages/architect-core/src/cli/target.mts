@@ -1,12 +1,8 @@
 import { Command } from "commander";
 import { App, AppCommandOptions, Component } from "../index.mts";
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface AppCommandTargetOptions extends AppCommandOptions {};
-
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface AppCommandTargetListOptions extends AppCommandTargetOptions {};
-
 interface AppCommandTargetShowOptions extends AppCommandTargetOptions {
   name: string;
 };
