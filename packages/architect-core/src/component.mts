@@ -6,13 +6,14 @@ import { Capability } from './capability.mts';
 import { ConfigurationContext } from './config.mts';
 import { Target } from './target.mts';
 import { constructor, DeepPartial, Lazy, LazyAuto, recursiveMerge, ReflectionUtilities } from './utils/index.mts';
-import { Architect, ComponentInputModel, ComponentModel, Context, MODEL_META_KEY, TYPE_META_KEY } from './index.mts';
+import { Architect, CLASS_META_KEY, ComponentModel, ComponentModelUtilities, ComponentUpgradeState, Context, MODEL_META_KEY, TARGET_TYPE_META_KEY, TYPE_META_KEY } from './index.mts';
 import Module from 'node:module';
 import { ModuleUtilities } from './utils/modules.mts';
+import { ValidateFunction } from 'ajv';
 
 export type ExtractComponentArgs<T extends Component> = T extends Component<object, infer A, never> ? A : never;
 
-export interface ComponentArgs {
+export interface ComponentArgs<TInput = unknown> {
   /**
    * Whether the component is enabled.
    */
@@ -21,7 +22,7 @@ export interface ComponentArgs {
   /**
    * The inputs for the component.
    */
-  inputs?: Record<string, ComponentInputModel>;
+  inputs?: Record<string, TInput>;
 };
 
 /**
@@ -46,6 +47,8 @@ export abstract class Component<
    */
   public props: LazyAuto<TArgs>;
 
+  private modelValidated: boolean = false;
+
   // TODO: allow dependent classes to call constructor in isolation. reduce coupling to Target
   constructor(target: Target, props: TArgs | undefined = {} as TArgs, context?: Partial<Context>, parent?: TParent) {
     if (!context || !context.name) {
@@ -57,9 +60,8 @@ export abstract class Component<
     this.independent = parent === undefined;
     this.setParent(parent);
 
-    const model = Component.resolveModel(this.constructor as constructor<Component>);
-    if (model && model.inputs) {
-      props.inputs = recursiveMerge(model.inputs, props.inputs || {});
+    if (this.meta.model && this.meta.model.inputs) {
+      props.inputs = recursiveMerge(this.meta.model.inputs, props.inputs || {});
     };
 
     // if (!Reflect.hasMetadata('class', this.constructor) && this.parent === undefined) {
@@ -136,8 +138,8 @@ export abstract class Component<
    */
   protected localRef<T extends Component>(type: constructor<T>, name?: string): Context {
     if (name === undefined) {
-      const model = Component.resolveModel(type);
-      if (model && model.class) name = ReflectionUtilities.classToName(model.class);
+      const meta = ComponentMetadata.from(type);
+      if (meta.model && meta.model.class) name = ReflectionUtilities.classToName(meta.model.class);
     };
 
     if (name === undefined) {
@@ -194,6 +196,11 @@ export abstract class Component<
   };
 
   /**
+   * This function is implemented in plugin components to upgrade the component's inputs. It is not normally used in the standard lifecycle.
+   */
+  public async upgrade(_state: ComponentUpgradeState): Promise<boolean> { return false; };
+
+  /**
    * Returns this component's logical classpath
    */
   public get clazz(): string {
@@ -204,12 +211,29 @@ export abstract class Component<
     return this.model.class;
   };
 
+  public get meta(): ComponentMetadata {
+    return ComponentMetadata.from(this.constructor as constructor<Component>);
+  };
+
   public get model(): ComponentModel | undefined {
     if (this.parent !== undefined && !this.independent) {
       return this.parent.model;
     };
 
-    return Component.resolveModel(this.constructor as constructor<Component>);
+    if (!this.modelValidated && this.meta.model) {
+      const validator = this.modelValidator;
+      if (!validator(this.meta.model)) {
+        throw new Error(`failed to validate model for ${this.constructor.name}: ${this.target.parent.ajv.errorsText(validator.errors)}`)
+      };
+
+      this.modelValidated = true;
+    };
+
+    return this.meta.model;
+  };
+
+  public get modelValidator(): ValidateFunction<ComponentModel> {
+    return ComponentModelUtilities.createValidator(this.target.parent.ajv);
   };
 
   /**
@@ -226,11 +250,6 @@ export abstract class Component<
     return `Component ${this.context.name}`;
   };
 
-  public static resolveModel<TModel extends ComponentModel>(type: constructor<Component>): TModel | undefined {
-    if (!(Reflect.hasMetadata(MODEL_META_KEY, type))) return undefined;
-    return Reflect.getMetadata(MODEL_META_KEY, type);
-  };
-
   public static async collect(_parent: Architect, module: Module): Promise<ComponentClass[]> {
     return ModuleUtilities.collectClasses(module, clazz => {
       return _.isObject(clazz) && Reflect.hasMetadata(TYPE_META_KEY, clazz) && Reflect.getMetadata(TYPE_META_KEY, clazz) === 'component';
@@ -243,7 +262,38 @@ export abstract class Component<
 };
 
 export interface ComponentClass<T extends Component = Component> {
-  new (target: Target, props?: ComponentArgs, context?: Partial<Context>, parent?: Component): T;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  new (target: Target, props?: any, context?: Partial<Context>, parent?: Component): T;
+};
+
+/**
+ * Information exposed on components via reflection metadata
+ */
+export class ComponentMetadata<TModel extends ComponentModel = ComponentModel> {
+  public model?: TModel;
+  public target?: string;
+  public clazz?: string;
+
+  constructor(model: TModel, target: string, clazz?: string) {
+    this.model = model;
+    this.target = target;
+    this.clazz = clazz;
+  };
+
+  public assign<T extends object>(target: T) {
+    Reflect.defineMetadata(TYPE_META_KEY, 'component', target);
+    Reflect.defineMetadata(MODEL_META_KEY, this.model, target);
+    Reflect.defineMetadata(TARGET_TYPE_META_KEY, this.target, target);
+    if (this.clazz) Reflect.defineMetadata(CLASS_META_KEY, this.clazz, target);
+  };
+
+  public static from<TModel extends ComponentModel, T extends Component = Component>(clazz: ComponentClass<T>): ComponentMetadata<TModel> {
+    return new ComponentMetadata<TModel>(
+      Reflect.hasMetadata(MODEL_META_KEY, clazz) ? Reflect.getMetadata(MODEL_META_KEY, clazz) : undefined,
+      Reflect.hasMetadata(TARGET_TYPE_META_KEY, clazz) ? Reflect.getMetadata(TARGET_TYPE_META_KEY, clazz) : undefined,
+      Reflect.hasMetadata(CLASS_META_KEY, clazz) ? Reflect.getMetadata(CLASS_META_KEY, clazz) : undefined
+    );
+  };
 };
 
 /**
@@ -261,7 +311,7 @@ export class ComponentMatcher implements IComponentMatcher {
 
   constructor(token: constructor<Component>) {
     this.token = token;
-    this.clazz = Component.resolveModel(this.token)!.class!;
+    this.clazz = ComponentMetadata.from(this.token)!.model!.class!;
   };
 
   match(input: Component): boolean {

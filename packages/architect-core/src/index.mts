@@ -9,16 +9,19 @@ import { Project } from './project.mts';
 import { DependencyGraphRenderer } from './graph/render.mts';
 import { TargetCache } from './cache.mts';
 import { StateProvider } from './index.mts';
-import { ComponentModel } from './model/index.mts';
+import { Ajv } from 'ajv';
 
 export const TYPE_META_KEY = 'architect.glassway.net/type';
 export const MODEL_META_KEY = 'architect.glassway.net/model';
 export const CLASS_META_KEY = 'architect.glassway.net/class';
+export const TARGET_TYPE_META_KEY = 'architect.glassway.net/target-type';
+
 
 export class Architect {
   public static PATH = path.resolve(path.join(import.meta.dirname, '..'));
 
   public project?: Project;
+  public readonly ajv: Ajv;
   public readonly plugins: PluginResolver;
   public readonly logger: winston.Logger;
 
@@ -29,6 +32,7 @@ export class Architect {
   public readonly kubeLoader: kubeUtils.ManifestLoader;
 
   private constructor(logLevel: string = 'info') {
+    this.ajv = new Ajv();
     this.plugins = new PluginResolver(this);
     this.logger = winston.createLogger({
       level: logLevel,
@@ -85,7 +89,7 @@ export class Architect {
       return;
     };
 
-    const resolved = await target.compile(graph, validate);
+    const resolved = await target.compile(graph, params);
     this.logger.info(`${target.toString()}: ${Object.values(resolved.components).length} components built`);
 
     if (validate) {
@@ -114,24 +118,10 @@ export class Architect {
   } {
     return Reflect.metadata(CLASS_META_KEY, name);
   };
-
-  /**
-   * Marks a class as a component. This MUST be defined for all Architect components that are not dependent children.
-   * @param model The component model to use. Per the documentation, this should be imported from an `architect.json` file in the same folder as your component's code.
-   * @returns A decorator which sets the required properties.
-   */
-  public static component<T extends object>(model: ComponentModel) {
-    function decorator(target: T) {
-      Reflect.defineMetadata(TYPE_META_KEY, 'component', target);
-      Reflect.defineMetadata(MODEL_META_KEY, model, target);
-      if (model.class) Reflect.defineMetadata(CLASS_META_KEY, model.class, target);
-    };
-
-    return decorator;
-  };
 }
 
 export * from './cli/index.mts';
+export * from './dynamic/index.mts';
 export * from './generated/crds/index.ts';
 export * from './graph/index.mts';
 export * from './kubernetes/index.mts';

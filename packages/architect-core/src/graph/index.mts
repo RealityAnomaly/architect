@@ -59,7 +59,7 @@ export class DependencyGraph {
   /**
    * Logs any global or component-specific validation errors, and returns false if any are fatal
    */
-  public assertValid(): boolean {
+  public assertValid(silent: boolean = false): boolean {
     for (const error of this.errors) {
       error.assert(this.target.parent.logger);
     };
@@ -79,7 +79,7 @@ export class DependencyGraph {
       message = 'failed';
     };
 
-    this.target.parent.logger.log(level, `validation ${message} for ${this.target.toString()}: ${errors.errors} errors, ${errors.warnings} warnings, ${errors.messages} messages`);
+    if (!silent) this.target.parent.logger.log(level, `validation ${message} for ${this.target.toString()}: ${errors.errors} errors, ${errors.warnings} warnings, ${errors.messages} messages`);
     return errors.errors <= 0;
   };
 
@@ -94,7 +94,7 @@ export class DependencyGraph {
       results[v.rid].dependencies = requirements.reduce<Component[]>((prev, cur) => {
         const matches = components.filter(v2 => cur.match(v2));
         if ((matches.length <= 0) && validate) {
-          results[v.rid].errors!.push(new ValidationError(`failed to satisfy dependency on ${cur.constraint()}`, ValidationErrorLevel.ERROR, v));
+          results[v.rid].errors!.push(new ValidationError(`failed to satisfy dependency on ${cur.constraint()}`, ValidationErrorLevel.ERROR, v.toString()));
         };
 
         return prev.concat(matches);

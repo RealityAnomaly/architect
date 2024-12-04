@@ -1,5 +1,5 @@
 import { Command } from "commander";
-import { App, AppCommandOptions, CLASS_META_KEY } from "../index.mts";
+import { App, AppCommandOptions, CLASS_META_KEY, ComponentClass, Updater } from "../index.mts";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 interface AppCommandComponentOptions extends AppCommandOptions {};
@@ -14,6 +14,7 @@ interface AppComponentCommandShowOptions extends AppCommandComponentOptions {
 
 interface AppComponentCommandUpgradeOptions extends AppCommandComponentOptions {
   class?: string;
+  dryRun: boolean;
   validate: boolean;
 };
 
@@ -21,7 +22,7 @@ export class ComponentCommand extends Command {
   private readonly app: App;
 
   private async list(options: AppCommandComponentListOptions) {
-    const ourComponents = await this.app.parent!.project!.getComponents(false);
+    const ourComponents = this.app.parent!.project!.getComponents(false);
 
     if (!options.library && ourComponents.length > 0) {
       console.log('Current project:');
@@ -35,7 +36,7 @@ export class ComponentCommand extends Command {
     for (const library of this.app.parent!.project!.libraries) {
       if (options.library && library.moduleName !== options.library) continue;
 
-      const components = await library.getComponents(false);
+      const components = library.getComponents(false);
       if (components.length <= 0) continue;
 
       console.log(`Library ${library.moduleName}:`)
@@ -48,7 +49,7 @@ export class ComponentCommand extends Command {
   };
 
   private async show(options: AppComponentCommandShowOptions) {
-    const component = await this.app.parent!.project!.getComponent(options.class, true);
+    const component = this.app.parent!.project!.getComponent(options.class, true);
     if (!component) {
       console.log(`Unable to find any component with class ${options.class}`);
       return;
@@ -58,16 +59,21 @@ export class ComponentCommand extends Command {
   };
 
   private async upgrade(options: AppComponentCommandUpgradeOptions) {
-    const components = options.class
-      ? [await this.app.parent!.project!.getComponent(options.class)]
-      : await this.app.parent!.project!.getComponents();
+    let components: ComponentClass[] = [];
+    if (options.class) {
+      const component = this.app.parent!.project!.getComponent(options.class);
+      if (component) components = [component];
+    } else {
+      components = this.app.parent!.project!.getComponents();
+    };
     
     if (components.length <= 0) {
       console.log(`Unable to find any components to upgrade`);
       return;
     };
 
-    console.log(components);
+    const updater = new Updater(this.app.parent!.project!);
+    await updater.update(components, options.dryRun);
   };
 
   constructor(app: App) {
@@ -87,6 +93,7 @@ export class ComponentCommand extends Command {
     this.command('upgrade')
       .description('Upgrades versions of component dependencies')
       .option('--class <class>', 'Only target the specified component class')
+      .option('--dry-run', 'Simulates the upgrade, displaying the changes that would be made', false)
       .option('--no-validate', 'Disables post-upgrade component build validation', false)
       .action(this.upgrade.bind(this));
   };

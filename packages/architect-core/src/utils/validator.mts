@@ -23,11 +23,11 @@ export interface ValidationErrorCount {
 
 export class ValidationError extends Error {
   public readonly level: ValidationErrorLevel;
-  public readonly subject: object;
+  public readonly subject: string;
 
   private acked: boolean = false;
 
-  constructor(message: string, level: ValidationErrorLevel, subject: object) {
+  constructor(message: string, level: ValidationErrorLevel, subject: string) {
     super(message);
     this.level = level;
     this.subject = subject;
@@ -49,7 +49,7 @@ export class ValidationError extends Error {
         break;
     };
 
-    logger.log(level, `${this.subject.toString()}: ${this.message}`);
+    logger.log(level, `${this.subject}: ${this.message}`);
     this.acked = true;
   };
 };
