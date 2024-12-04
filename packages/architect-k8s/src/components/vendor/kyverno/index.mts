@@ -1,6 +1,6 @@
 import * as api from 'kubernetes-models';
 
-import { Architect, KubeResourceTree } from '@perdition/architect-core';
+import { KubeResourceTree } from '@perdition/architect-core';
 import { KubeComponentHelm, KubeComponentHelmResources } from '@perdition/architect-k8s';
 
 import model from './architect.json' with { type: 'json' };
@@ -10,7 +10,7 @@ interface KyvernoComponentResources extends KubeComponentHelmResources {
   release?: KubeResourceTree;
 };
 
-@Architect.component(model['kyverno'])
+@KubeComponentHelm.decorate(model['kyverno'])
 export class KyvernoComponent extends KubeComponentHelm<KyvernoComponentResources> {
   public init(): void {
     this.setDefaults({

@@ -37,7 +37,7 @@ export class PluginResolver {
   public get targetMap(): Record<string, TargetClass> {
     const results = {} as Record<string, TargetClass>;
     Object.values(this.data).forEach(p => {
-      for (const target of p.targets) results[target.key] = target;
+      for (const [k, v] of Object.entries(p.targets)) results[k] = v;
     });
 
     return results;
@@ -62,5 +62,5 @@ export abstract class Plugin {
 
   public abstract registerCommand(command: commander.Command): Promise<void>; 
 
-  public abstract get targets(): TargetClass[];
+  public abstract get targets(): Record<string, TargetClass>;
 }

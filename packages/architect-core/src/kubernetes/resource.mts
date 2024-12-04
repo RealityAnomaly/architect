@@ -121,11 +121,6 @@ export class KubeResourceUtilities {
   static fixupResource(resource: KubeResource): KubeResource {
     const metadata: IObjectMeta = {};
 
-    // appends our identifier label
-    // metadata.labels = {
-    //   'k8s.ark.alex0.net/defined': 'true',
-    // };
-
     // disables pruning on CRDs and PVCs (CRITICAL to not break stuff when Kustomizations are deleted)
     // TODO: only append this when FluxCD is actually being used
     if (resource.kind === 'CustomResourceDefinition' || resource.kind === 'PersistentVolumeClaim') {
@@ -155,8 +150,14 @@ export class KubeResourceUtilities {
     // removes null `data` on config maps (Helm will sometimes break this)
     if (resource.kind === 'ConfigMap') {
       const obj = resource as object;
-      if ('data' in obj && obj.data === null) {
-        delete obj.data;
+      if ('data' in obj) {
+        if (obj.data === undefined || obj.data === null) {
+          delete obj.data;
+        } else {
+          for (const [k, v] of Object.entries(obj.data as Record<string, unknown>)) {
+            if (v === undefined || v === null) delete (obj.data as Record<string, unknown>)[k];
+          };
+        }
       };
     };
 

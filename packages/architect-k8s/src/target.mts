@@ -1,4 +1,4 @@
-import { Architect, architectGlasswayNet, Component, constructor, DependencyGraph, GVK, PLUGIN_TARGET_IDENTIFIERS, recursiveMerge, Result, Target, TargetParams, TargetResolveParams } from '@perdition/architect-core';
+import { Architect, architectGlasswayNet, Component, ComponentMetadata, constructor, DependencyGraph, GVK, isValidator, KubeResource, recursiveMerge, Result, Target, TargetParams, TargetResolveParams, ValidationError, ValidationErrorLevel } from '@perdition/architect-core';
 
 import * as api from 'kubernetes-models';
 import _ from 'lodash';
@@ -38,9 +38,7 @@ export interface ClusterState {
  * Version of {Target} that provides build constructs for a specific Kubernetes cluster.
  */
 export class KubeTarget extends Target {
-  public static key = PLUGIN_TARGET_IDENTIFIERS.kubernetes;
   declare public readonly params: KubeTargetParams;
-
   public flux: FluxCDController;
 
   private readonly markedCRDGVKs: GVK[] = [];
@@ -86,9 +84,10 @@ export class KubeTarget extends Target {
     };
 
     if (!context.namespace || force) {
-      const model = Component.resolveModel<KubeComponentModel>(token);
-      if (model?.context?.namespace) {
-        context.namespace = model.context.namespace;
+      const meta = ComponentMetadata.from<KubeComponentModel>(token);
+
+      if (meta.model?.context?.namespace) {
+        context.namespace = meta.model.context.namespace;
         for (const [k, v] of Object.entries(replacements))
           context.namespace = context.namespace!.replace(k, v);
       } else if (!context.namespace) {
@@ -156,16 +155,31 @@ export class KubeTarget extends Target {
     return namespace;
   };
 
-  public async compile(graph: DependencyGraph, validate: boolean = true): Promise<Result> {
-    const result = await super.compile(graph, validate);
+  public async compile(graph: DependencyGraph, params?: TargetResolveParams): Promise<Result> {
+    const result = await super.compile(graph, params);
     result.writer = new KubeWriter(this);
+
+    // TODO: handle objects, too
+    if (params?.validate !== false && Array.isArray(result.all)) {
+      for (const item of result.all) {
+        const resource = item as KubeResource;
+        if (!isValidator(item)) continue;
+
+        try {
+          await item.validate();
+        } catch (e) {
+          if (e instanceof Error)
+            graph.errors.push(new ValidationError(e.message, ValidationErrorLevel.ERROR, `${resource.kind} ${resource.metadata?.namespace}/${resource.metadata?.name}`));
+        };
+      };
+    };
 
     const crdGraph = KubeCRDDependencyGraph.create(result, {
       ignoredGVKs: this.markedCRDGVKs,
       ignoredCRDGroups: this.markedCRDGroups,
     });
 
-    if (validate) crdGraph.validate();
+    if (params?.requirements !== false) crdGraph.validate();
     crdGraph.applyDependencies();
 
     return result;
@@ -173,5 +187,31 @@ export class KubeTarget extends Target {
 
   private get prelude(): KubePreludeComponent {
     return this.component(KubePreludeComponent);
+  };
+
+  public static fake(): architectGlasswayNet.v1alpha1.Target {
+    return new architectGlasswayNet.v1alpha1.Target({
+      metadata: {
+        name: 'fake-cluster',
+      },
+      spec: {
+        plugins: {
+          kubernetes: {
+            client: {
+              context: 'admin@fake-cluster'
+            },
+            dns: 'fake.example.com',
+            podNetwork: {
+              ipFamilies: ['IPv4', 'IPv6']
+            },
+            flavor: 'docker-desktop',
+            version: 'v1.31.3',
+            metal: {
+              nodes: 3
+            },
+          },
+        },
+      },
+    });
   };
 };

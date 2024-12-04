@@ -3,7 +3,7 @@ import _ from 'lodash';
 import path from 'path';
 import * as yaml from 'js-yaml';  
 import * as fs from 'node:fs/promises';
-import { Architect, Component, ComponentClass, Target } from './index.mts';
+import { Architect, Component, ComponentClass, ComponentMetadata, Target } from './index.mts';
 import { YarnUtilities } from './utils/yarn/index.mts';
 import { ModulePackageEntry, ModuleUtilities } from './utils/modules.mts';
 import Module from 'node:module';
@@ -110,10 +110,10 @@ export class Project {
   public getComponent(clazz: string, recursive?: boolean): ComponentClass | undefined {
     const components = this.getComponents(recursive);
     return components.find(c => {
-      const model = Component.resolveModel(c);
-      if (!model) return false;
+      const meta = ComponentMetadata.from(c);
+      if (!meta.model) return false;
 
-      return model.class === clazz;
+      return meta.model.class === clazz;
     });
   };
 

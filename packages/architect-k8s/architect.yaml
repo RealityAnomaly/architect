@@ -1,4 +1,6 @@
 library: true
+backend:
+  type: file
 plugins:
   kubernetes:
     crds:
