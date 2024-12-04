@@ -1,7 +1,7 @@
 
 import path from 'node:path';
 import process from 'node:process';
-import { CRDModelGenerator, ManifestLoader, TypeRegistry } from '../src/kubernetes/index.mts';
+import { CRDModelGenerator, ManifestLoader, TypeRegistry } from '../kubernetes/index.mts';
 
 const types = new TypeRegistry();
 const loader = new ManifestLoader(types);

@@ -15,7 +15,6 @@ export const PLUGIN_TARGET_IDENTIFIERS = {
   kubernetes: 'target.architect.glassway.net/kubernetes',
 };
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface TargetParams {};
 
 export interface TargetResolveParams {
@@ -189,7 +188,6 @@ export class Target {
 };
 
 export type TargetClass = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  new (model: architectGlasswayNet.v1alpha1.Target, params: any, parent: Architect): Target
+  new (model: architectGlasswayNet.v1alpha1.Target, params: unknown, parent: Architect): Target
   fake(): architectGlasswayNet.v1alpha1.Target;
 };

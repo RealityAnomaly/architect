@@ -4,6 +4,8 @@
     "jsr:@dx/reflect@~0.2.14": "0.2.14",
     "jsr:@es-toolkit/es-toolkit@^1.29.0": "1.29.0",
     "jsr:@match/match@0.1": "0.1.0",
+    "jsr:@std/assert@*": "1.0.8",
+    "jsr:@std/internal@^1.0.5": "1.0.5",
     "npm:@docusaurus/core@3.6.3": "3.6.3_@mdx-js+react@3.1.0__@types+react@18.3.13__react@18.3.1_react@18.3.1_react-dom@18.3.1__react@18.3.1_@types+react@18.3.13_webpack@5.97.0_react-loadable@5.5.0__react@18.3.1_react-router@5.3.4__react@18.3.1_eslint@9.16.0_typescript@5.7.2",
     "npm:@docusaurus/module-type-aliases@3.6.3": "3.6.3_react@18.3.1_react-dom@18.3.1__react@18.3.1",
     "npm:@eslint/compat@^1.2.3": "1.2.3_eslint@9.16.0",
@@ -11,6 +13,7 @@
     "npm:@eslint/js@^9.15.0": "9.16.0",
     "npm:@kubernetes-models/apimachinery@^2.0.1": "2.0.1",
     "npm:@kubernetes-models/base@5": "5.0.0",
+    "npm:@kubernetes-models/crd-generate@*": "5.0.1",
     "npm:@kubernetes-models/crd-generate@^5.0.1": "5.0.1",
     "npm:@kubernetes-models/generate@^2.4.0": "2.4.0",
     "npm:@kubernetes-models/validate@4": "4.0.0_ajv@8.17.1",
@@ -36,6 +39,7 @@
     "npm:jest-mock@^29.7.0": "29.7.0",
     "npm:jest@^29.7.0": "29.7.0",
     "npm:js-yaml@^4.1.0": "4.1.0",
+    "npm:json2ts@*": "0.0.7",
     "npm:kubernetes-models@^4.4.1": "4.4.1",
     "npm:lerna@^8.1.9": "8.1.9_nx@20.1.4_typescript@5.7.2",
     "npm:lodash@^4.17.21": "4.17.21",
@@ -64,6 +68,15 @@
     },
     "@match/match@0.1.0": {
       "integrity": "d98fdfe9b241c662f3b1ce2aca601a17033350fb2549e212abbe7d3c29170656"
+    },
+    "@std/assert@1.0.8": {
+      "integrity": "ebe0bd7eb488ee39686f77003992f389a06c3da1bbd8022184804852b2fa641b",
+      "dependencies": [
+        "jsr:@std/internal"
+      ]
+    },
+    "@std/internal@1.0.5": {
+      "integrity": "54a546004f769c1ac9e025abd15a76b6671ddc9687e2313b67376125650dc7ba"
     }
   },
   "npm": {
@@ -7387,6 +7400,12 @@
     "json-stringify-safe@5.0.1": {
       "integrity": "sha512-ZClg6AaYvamvYEE82d3Iyd3vSSIjQ+odgjaTzRuO3s7toCdFKczob2i0zCh7JE8kWn17yvAWhUVxvqGwUalsRA=="
     },
+    "json2ts@0.0.7": {
+      "integrity": "sha512-7g41Foq7xRPmZ+4o8HGCsNFBe9ar/egOpuktCdlI3OHzAY34WJh28LKrc3523sLV4wPdgZk2LjOPDs5Za1HzAg==",
+      "dependencies": [
+        "underscore"
+      ]
+    },
     "json5@1.0.2": {
       "integrity": "sha512-g1MWMLBiz8FKi1e4w0UyVL3w+iJceWAFBAaBnnGKOpNa5f8TLktkbre1+s6oICydWAm+HRUGTmI+//xv2hvXYA==",
       "dependencies": [
@@ -11505,6 +11524,9 @@
         "has-symbols",
         "which-boxed-primitive"
       ]
+    },
+    "underscore@1.13.7": {
+      "integrity": "sha512-GMXzWtsc57XAtguZgaQViUOzs0KTkk8ojr3/xAxXLITqf/3EMwxC0inyETfDFjH/Krbhuep0HNbbjI9i/q3F3g=="
     },
     "undici-types@6.19.8": {
       "integrity": "sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw=="

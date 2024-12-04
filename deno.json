@@ -4,5 +4,8 @@
     "packages/*",
     "website"
   ],
+  "tasks": {
+    "test": "deno test --allow-read --allow-write"
+  },
   "nodeModulesDir": "auto"
 }

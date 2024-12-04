@@ -25,7 +25,6 @@ export class ModuleUtilities {
     };
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public static async collectClasses<T>(module: any, matcher: (clazz: constructor<T>) => boolean): Promise<constructor<T>[]> {
     const result: constructor<T>[] = [];
 

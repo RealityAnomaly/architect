@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-expressions */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { Lazy } from '../../src/utils/lazy.mts';
+// deno-lint-ignore-file no-explicit-any
+import { Lazy } from "./lazy.mts";
+import * as assert from 'jsr:@std/assert';
 
 interface TestOptionsB {
   barA: string;
@@ -23,7 +23,7 @@ interface RecursionTestB {
   test2?: any;
 };
 
-test('assignment and resolution', async () => {
+Deno.test('assignment and resolution', async () => {
   const value: TestOptionsA = {
     foobar: {
       foo: {
@@ -35,21 +35,20 @@ test('assignment and resolution', async () => {
 
   const lazy = Lazy.from(value);
   const resolved = await lazy.$resolve();
-
-  expect(resolved).toStrictEqual(value);
+  assert.assertEquals(resolved, value);
 });
 
-test('creating lazy leaf from atomic', async () => {
+Deno.test('creating lazy leaf from atomic', async () => {
   const atom = 'foobar';
-  expect(await Lazy.from(atom).$resolve()).toStrictEqual(atom);
+  assert.assertEquals(await Lazy.from(atom).$resolve(), atom);
 });
 
-test('creating lazy leaf from function', async () => {
+Deno.test('creating lazy leaf from function', async () => {
   const atom = () => 'foobar';
-  expect(await Lazy.from(atom).$resolve()).toStrictEqual('foobar');
+  assert.assertEquals(await Lazy.from(atom).$resolve(), 'foobar' as any);
 });
 
-test('conditional values of leaf', async () => {
+Deno.test('conditional values of leaf', async () => {
   const lazy = Lazy.from({
     stuff: ['foo'],
     options: {
@@ -61,7 +60,7 @@ test('conditional values of leaf', async () => {
   stuff.$set(['bar'] as any, undefined, false, lazy.options.enable);
   stuff.$set(['barfoo'] as any, undefined, false, async () => !lazy.options.enable.$resolve());
 
-  expect(await lazy.$resolve()).toStrictEqual({
+  assert.assertEquals(await lazy.$resolve(), {
     stuff: ['foo', 'bar'],
     options: {
       enable: true,
@@ -69,7 +68,7 @@ test('conditional values of leaf', async () => {
   });
 });
 
-test('advanced conditional stuff', async () => {
+Deno.test('advanced conditional stuff', async () => {
   const lazy = Lazy.from({
     app: {
       stuff: [],
@@ -95,7 +94,7 @@ test('advanced conditional stuff', async () => {
 
   lazy.app.stuff.$set(['bar'] as any, undefined, false, lazy.app.options.enable);
 
-  expect(await lazy.$resolve()).toStrictEqual({
+  assert.assertEquals(await lazy.$resolve(), {
     app: {
       stuff: [],
       options: { enable: false },
@@ -104,7 +103,7 @@ test('advanced conditional stuff', async () => {
       stuff: [],
       options: { enable: false },
     },
-  });
+  } as any);
 
   lazy.$set({
     app2: {
@@ -112,7 +111,7 @@ test('advanced conditional stuff', async () => {
     },
   } as any, 20);
 
-  expect(await lazy.$resolve()).toStrictEqual({
+  assert.assertEquals(await lazy.$resolve(), {
     app: {
       stuff: ['bar'],
       options: { enable: true },
@@ -121,10 +120,10 @@ test('advanced conditional stuff', async () => {
       stuff: [],
       options: { enable: true },
     },
-  });
+  } as any);
 });
 
-test('conditional returns lazy value', async () => {
+Deno.test('conditional returns lazy value', async () => {
   const lazy = Lazy.from({
     stuff: ['foo'],
     options: {
@@ -135,7 +134,7 @@ test('conditional returns lazy value', async () => {
   const stuff = lazy.stuff;
   stuff.$set(['bar'] as any, undefined, false, async () => lazy.options.enable);
 
-  expect(await lazy.$resolve()).toStrictEqual({
+  assert.assertEquals(await lazy.$resolve(), {
     stuff: ['foo', 'bar'],
     options: {
       enable: true,
@@ -143,7 +142,7 @@ test('conditional returns lazy value', async () => {
   });
 });
 
-test('directly mutating properties throws error', async () => {
+Deno.test('directly mutating properties throws error', async () => {
   const value: TestOptionsA = {
     foobar: {
       foo: {
@@ -155,44 +154,44 @@ test('directly mutating properties throws error', async () => {
 
   const lazy = Lazy.from(value) as any;
 
-  expect(() => {
+  assert.assertThrows(() => {
     Reflect.defineProperty(lazy.foobar.foo, 'offf', {});
-  }).toThrow();
+  });
 
   // expected behaviour is merging in a dict with attributes forced to omit
-  expect(() => {
+  assert.assertThrows(() => {
     delete lazy.foobar.foo.barA;
-  }).toThrow();
+  });
 
-  expect(() => {
+  assert.assertThrows(() => {
     lazy.foobar.foo.off = 'dwjdjwws';
-  }).toThrow();
+  });
 });
 
-test('weight conflict on atomic property throws error', async () => {
+Deno.test('weight conflict on atomic property throws error', async () => {
   const lazy = Lazy.from({ foo: 'bar', bar2: 'bar2' });
   lazy.$set({ foo: 'bar3' });
 
-  await expect(async () => {
+  await assert.assertRejects(async () => {
     await lazy.$resolve();
-  }).rejects.toThrow('conflict: two atomic values with weight 0 at path foo');
+  }, Error, 'conflict: two atomic values with weight 0 at path foo');
 });
 
-test('internal properties cannot be mutated', async () => {
+Deno.test('internal properties cannot be mutated', async () => {
   const lazy = Lazy.from({ foo: 'bar', bar2: 'bar2' });
 
-  expect(() => {
+  assert.assertThrows(() => {
     (lazy as any).$resolve = 'bad';
-  }).toThrow();
+  });
 
-  expect(() => {
+  assert.assertThrows(() => {
     delete (lazy as any).$resolve;
-  }).toThrow();
+  });
 
-  expect(await lazy.$resolve()).toStrictEqual({ foo: 'bar', bar2: 'bar2' });
+  assert.assertEquals(await lazy.$resolve(), { foo: 'bar', bar2: 'bar2' });
 });
 
-test('merging existing objects', async () => {
+Deno.test('merging existing objects', async () => {
   const value: TestOptionsA = {
     foobar: {
       foo: {
@@ -230,7 +229,7 @@ test('merging existing objects', async () => {
   }, 30);
 
   const resolved = await lazy.$resolve();
-  expect(resolved).toStrictEqual({
+  assert.assertEquals(resolved, {
     foobar: {
       foo: {
         barA: '12212',
@@ -240,7 +239,7 @@ test('merging existing objects', async () => {
   });
 });
 
-test('merging objects with force', async () => {
+Deno.test('merging objects with force', async () => {
   const value = {
     foobar: {
       foo: {
@@ -256,7 +255,7 @@ test('merging objects with force', async () => {
     fuck: 'off',
   } as any, undefined, true);
 
-  expect(await lazy.$resolve()).toStrictEqual({
+  assert.assertEquals(await lazy.$resolve(), {
     foobar: {
       foo: { fuck: 'off' } as any,
       barfoo: 'bar',
@@ -264,20 +263,20 @@ test('merging objects with force', async () => {
   });
 
   lazy.foobar.$set({ fuck: 'you' } as any, undefined, true);
-  expect(await lazy.$resolve()).toStrictEqual({
+  assert.assertEquals(await lazy.$resolve(), {
     foobar: { fuck: 'you' },
-  });
+  } as any);
 });
 
-test('merging arrays', async () => {
+Deno.test('merging arrays', async () => {
   const lazy = Lazy.from(['foo', 'bar']);
   lazy.$set(['bar2']);
 
   const resolved = await lazy.$resolve();
-  expect(resolved).toStrictEqual(['foo', 'bar', 'bar2']);
+  assert.assertEquals(resolved, ['foo', 'bar', 'bar2']);
 }),
 
-test('merging arrays deep in objects', async () => {
+Deno.test('merging arrays deep in objects', async () => {
   const lazy = Lazy.from({
     what: {
       the: {
@@ -294,7 +293,7 @@ test('merging arrays deep in objects', async () => {
   });
 
   const resolved = await lazy.$resolve();
-  expect(resolved).toStrictEqual({
+  assert.assertEquals(resolved, {
     what: {
       the: {
         fuck: ['foobar', 'bar2'],
@@ -303,7 +302,7 @@ test('merging arrays deep in objects', async () => {
   });
 }),
 
-test('merging to undefined properties', async () => {
+Deno.test('merging to undefined properties', async () => {
   const lazy = Lazy.from({
     foo: undefined as any,
   });
@@ -312,25 +311,25 @@ test('merging to undefined properties', async () => {
     foo: 'bar',
   }, 10);
 
-  expect(await lazy.$resolve()).toStrictEqual({
+  assert.assertEquals(await lazy.$resolve(), {
     foo: 'bar',
   });
 });
 
-test('fallback resolution', async () => {
+Deno.test('fallback resolution', async () => {
   const tree = Lazy.from({ fuck: 'off' });
   const resolved1 = await tree.$resolve({
     the: 'fuck',
   } as any);
 
-  expect(resolved1).toStrictEqual({ fuck: 'off', the: 'fuck' });
+  assert.assertEquals(resolved1, { fuck: 'off', the: 'fuck' } as any);
 
   // what if result is undefined?
   const tree2 = Lazy.from(undefined);
-  expect(await tree2.$resolve({ fuck: 'off' } as any)).toStrictEqual({ fuck: 'off' });
+  assert.assertEquals(await tree2.$resolve({ fuck: 'off' } as any), { fuck: 'off' });
 });
 
-test('fallback refs', async () => {
+Deno.test('fallback refs', async () => {
   const lazy = Lazy.from({
     get: 'fucked',
     fuck: 'off',
@@ -342,7 +341,7 @@ test('fallback refs', async () => {
   }, 10);
 
   const resolved = await lazy.$resolve();
-  expect(resolved).toStrictEqual({
+  assert.assertEquals(resolved, {
     get: 'fucked',
     fuck: 'off',
     screwoff: 'nah',
@@ -352,12 +351,13 @@ test('fallback refs', async () => {
   lazy.$set({
     screwoff: async () => (lazy as any).bruh.mm,
   });
-  await expect(async () => {
+
+  await assert.assertRejects(async () => {
     await lazy.$resolve();
-  }).rejects.toThrow(TypeError);
+  });
 });
 
-test('recursive resolution stress test', async () => {
+Deno.test('recursive resolution stress test', async () => {
   for (let i = 0; i < 100; i++) {
     const value: TestOptionsA = {};
     const lazy = Lazy.from(value);
@@ -415,7 +415,7 @@ test('recursive resolution stress test', async () => {
     });
 
     const resolved = await lazy.$resolve();
-    expect(resolved).toStrictEqual({
+    assert.assertEquals(resolved, {
       barfoo: { fuck: 'no', blahaj: ['12212'] },
       test3: { fuck: { eeee: 'the' }, blahaj: ['12212', '13'] },
       blasj: ['fuck', 'why', 'the'],
@@ -428,30 +428,30 @@ test('recursive resolution stress test', async () => {
         foo6: { off: [{ barA: '12212', barB: '1221212112' }] },
         foo7: { barA: '12212', barB: 'bndbdsnd' },
       },
-    });
+    } as any);
   };
 });
 
-test('reading value of undefined throws', async () => {
+Deno.test('reading value of undefined throws', async () => {
   const lazy = Lazy.from({ foo: undefined });
-  await expect(async () => {
+  await assert.assertRejects(async () => {
     await ((lazy.foo) as any).barfoo.$resolve();
-  }).rejects.toThrow('attempted to read value of undefined at foo.barfoo');
+  }, Error, 'attempted to read value of undefined at foo.barfoo');
 });
 
-test('combining permutations of conditions', async () => {
+Deno.test('combining permutations of conditions', async () => {
   const lazy1 = Lazy.from({ foo: true });
   const lazy2 = Lazy.from({ foo: false });
   const lazy3 = Lazy.from({ foo: true });
 
   const condition1 = Lazy.combineConditions(lazy1.foo, lazy2.foo);
-  expect(await Lazy.resolveCondition(condition1)).toStrictEqual(false);
+  assert.assertEquals(await Lazy.resolveCondition(condition1), false);
 
   const condition2 = Lazy.combineConditions(lazy1.foo, lazy3.foo);
-  expect(await Lazy.resolveCondition(condition2)).toStrictEqual(true);
+  assert.assertEquals(await Lazy.resolveCondition(condition2), true);
 });
 
-test('max recursion depth throws error', async () => {
+Deno.test('max recursion depth throws error', async () => {
   const valueA: RecursionTestA = {};
   const valueB: RecursionTestB = {};
   const lazyA = Lazy.from(valueA);
@@ -465,7 +465,7 @@ test('max recursion depth throws error', async () => {
     test2: lazyA.test,
   });
 
-  await expect(async () => {
+  await assert.assertRejects(async () => {
     await lazyA.$resolve();
-  }).rejects.toThrow('Maximum evaluation depth of 100 exceeded');
+  }, Error, 'Maximum evaluation depth of 100 exceeded');
 });
