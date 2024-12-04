@@ -1,1 +1,1 @@
-export * from "./Receiver.js";
+export * from "./Receiver.ts";

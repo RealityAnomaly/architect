@@ -1,1 +1,1 @@
-export * from "./Kustomization.js";
+export * from "./Kustomization.ts";

@@ -3,7 +3,6 @@ import path from 'node:path';
 import { GVK, notEmpty } from '@perdition/architect-core';
 import * as fg from 'fast-glob';
 import * as api from 'kubernetes-models';
-import wcmatch from 'wildcard-match';
 import { KubeComponent, KubeComponentGenericResources } from '../../component.mts';
 
 import model from './architect.json' with { type: 'json' };
@@ -13,11 +12,11 @@ export class CrdsComponent extends KubeComponent {
   private readonly enabledGroups: string[] = [];
   private readonly enabledGVKs: GVK[] = [];
 
-  public init(): void {
+  public override init(): void {
     this.standardRequirements = false;
   };
 
-  public async build(resources: KubeComponentGenericResources = {}) {
+  public override async build(resources: KubeComponentGenericResources = {}) {
     const crds: api.apiextensionsK8sIo.v1.CustomResourceDefinition[] = [];
     for (const module of this.target.plugin.parent.projectPaths) {
       const dir = path.resolve(path.join(module, 'data/crds'));
@@ -41,7 +40,7 @@ export class CrdsComponent extends KubeComponent {
             const fileResource = fileResources[0] as api.apiextensionsK8sIo.v1.CustomResourceDefinition;
 
             // check to see if this is enabled, do wildcard matching
-            if (this.enabledGroups.some(g => wcmatch(g)(fileResource.spec.group))) return fileResource;
+            //if (this.enabledGroups.some(g => wcmatch(g)(fileResource.spec.group))) return fileResource;
 
             const gvk = GVK.fromCRD(fileResource);
             if (gvk.some(g => this.enabledGVKs.findIndex(g2 => g2.compare(g)) > -1)) return fileResource;

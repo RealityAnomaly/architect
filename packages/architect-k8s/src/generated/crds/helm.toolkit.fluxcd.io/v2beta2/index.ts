@@ -1,1 +1,1 @@
-export * from "./HelmRelease.js";
+export * from "./HelmRelease.ts";

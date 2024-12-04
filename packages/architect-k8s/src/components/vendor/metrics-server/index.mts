@@ -8,7 +8,7 @@ import model from './architect.json' with { type: 'json' };
  */
 @KubeComponent.decorate(model['metrics-server'])
 export class MetricsServerComponent extends KubeComponent {
-  public async build(resources: KubeComponentGenericResources = {}) {
+  public override async build(resources: KubeComponentGenericResources = {}) {
     let values = {};
 
     // talos generates certificates with the IP of the node
@@ -28,7 +28,7 @@ export class MetricsServerComponent extends KubeComponent {
     return super.build(resources);
   };
 
-  public get capabilities() {
+  public override get capabilities() {
     return [
       new MetricsCapability({}),
     ];
