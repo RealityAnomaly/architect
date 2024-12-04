@@ -1,4 +1,4 @@
-import path from 'path';
+import path from 'node:path';
 import * as commander from 'commander';
 import { TargetResolveParams } from '../target.mts';
 import { Architect } from '../index.mts';

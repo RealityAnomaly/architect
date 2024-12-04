@@ -1,1 +1,1 @@
-export * as architectGlasswayNet from "./architect.glassway.net/index.js";
+export * as architectGlasswayNet from "./architect.glassway.net/index.ts";

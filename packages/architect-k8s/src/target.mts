@@ -1,7 +1,6 @@
 import { Architect, architectGlasswayNet, Component, ComponentMetadata, constructor, DependencyGraph, GVK, isValidator, KubeResource, recursiveMerge, Result, Target, TargetParams, TargetResolveParams, ValidationError, ValidationErrorLevel } from '@perdition/architect-core';
 
 import * as api from 'kubernetes-models';
-import _ from 'lodash';
 
 import { FluxCDController, FluxCDMode } from './apply/flux/index.mts';
 import { KubeComponentModel, KubePreludeComponent } from './component.mts';
@@ -73,7 +72,7 @@ export class KubeTarget extends Target {
     this.createDefaultResources();
   };
 
-  public defaultContext<T extends Component>(token: constructor<T>, context?: Partial<KubeContext>, force?: boolean): Partial<KubeContext> {
+  public override defaultContext<T extends Component>(token: constructor<T>, context?: Partial<KubeContext>, force?: boolean): Partial<KubeContext> {
     context = super.defaultContext(token, context, force);
     if (context.namespace && !force) return context;
 
@@ -155,7 +154,7 @@ export class KubeTarget extends Target {
     return namespace;
   };
 
-  public async compile(graph: DependencyGraph, params?: TargetResolveParams): Promise<Result> {
+  public override async compile(graph: DependencyGraph, params?: TargetResolveParams): Promise<Result> {
     const result = await super.compile(graph, params);
     result.writer = new KubeWriter(this);
 

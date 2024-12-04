@@ -1,1 +1,1 @@
-export * from "./Target.js";
+export * from "./Target.ts";

@@ -1,11 +1,9 @@
-import _ from 'lodash';
-
-import path from 'path';
+import path from 'node:path';
 import * as yaml from 'js-yaml';  
 import * as fs from 'node:fs/promises';
 import { Architect, Component, ComponentClass, ComponentMetadata, Target } from './index.mts';
-import { YarnUtilities } from './utils/yarn/index.mts';
-import { ModulePackageEntry, ModuleUtilities } from './utils/modules.mts';
+//import { YarnUtilities } from './utils/yarn/index.mts';
+//import { ModulePackageEntry, ModuleUtilities } from './utils/modules.mts';
 import Module from 'node:module';
 
 export class Project {
@@ -43,37 +41,38 @@ export class Project {
   };
 
   private async loadImports() {
-    const packageMap = {} as Record<string, ModulePackageEntry>;
+    throw new Error('Not implemented for Deno');
+    // const packageMap = {} as Record<string, ModulePackageEntry>;
 
-    const yarnWorkspace = await YarnUtilities.getCurrentWorkspace(this.root);
-    if (!yarnWorkspace) {
-      throw Error(`Non-Yarn projects are not currently supported`);
-    };
+    // const yarnWorkspace = await YarnUtilities.getCurrentWorkspace(this.root);
+    // if (!yarnWorkspace) {
+    //   throw Error(`Non-Yarn projects are not currently supported`);
+    // };
 
-    Object.assign(packageMap, YarnUtilities.projectToPackageMap(yarnWorkspace.project));
-    this.moduleName = YarnUtilities.workspaceToIdentifier(yarnWorkspace);
-    this.module = await ModuleUtilities.importWithMap(this.moduleName, packageMap);
+    // Object.assign(packageMap, YarnUtilities.projectToPackageMap(yarnWorkspace.project));
+    // this.moduleName = YarnUtilities.workspaceToIdentifier(yarnWorkspace);
+    // this.module = await ModuleUtilities.importWithMap(this.moduleName, packageMap);
 
-    for (const pkg of this.config.imports?.libraries || []) {
-      let lib: Project;
-      try {
-        let path = await ModuleUtilities.resolveModulePath(pkg, packageMap, import.meta.url);
-        path = await fs.realpath(path.replace('/src/index.mts', ''));
+    // for (const pkg of this.config.imports?.libraries || []) {
+    //   let lib: Project;
+    //   try {
+    //     let path = await ModuleUtilities.resolveModulePath(pkg, packageMap, import.meta.url);
+    //     path = await fs.realpath(path.replace('/src/index.mts', ''));
 
-        lib = await Project.load(this.parent, path);
-      } catch (exception) {
-        this.parent.logger.warn(`unable to load project ${pkg}: ${exception}`);
-        continue;
-      };
+    //     lib = await Project.load(this.parent, path);
+    //   } catch (exception) {
+    //     this.parent.logger.warn(`unable to load project ${pkg}: ${exception}`);
+    //     continue;
+    //   };
       
-      if (lib.config.library !== true) {
-        this.parent.logger.warn(`unable to load project import ${pkg}: not designated as a library`);
-        continue;
-      };
+    //   if (lib.config.library !== true) {
+    //     this.parent.logger.warn(`unable to load project import ${pkg}: not designated as a library`);
+    //     continue;
+    //   };
 
-      this.parent.logger.debug(`loaded project import ${pkg}`);
-      this.libraries.push(lib);
-    };
+    //   this.parent.logger.debug(`loaded project import ${pkg}`);
+    //   this.libraries.push(lib);
+    // };
   };
 
   private async loadComponents() {

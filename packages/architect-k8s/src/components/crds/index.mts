@@ -1,5 +1,5 @@
 import * as fs from 'node:fs/promises';
-import path from 'path';
+import path from 'node:path';
 import { GVK, notEmpty } from '@perdition/architect-core';
 import * as fg from 'fast-glob';
 import * as api from 'kubernetes-models';

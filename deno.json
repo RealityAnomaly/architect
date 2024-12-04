@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "workspace": [
+    "packages/*",
+    "website"
+  ],
+  "nodeModulesDir": "auto"
+}

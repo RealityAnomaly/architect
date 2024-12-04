@@ -1,5 +1,5 @@
 import { IObjectMeta } from '@kubernetes-models/apimachinery/apis/meta/v1/ObjectMeta';
-import _ from 'lodash';
+import * as toolkit from '@es-toolkit/es-toolkit';
 
 /**
  * Non-exhaustive blacklist of Kubernetes resources that may not have attached namespaces
@@ -107,7 +107,7 @@ export class KubeResourceUtilities {
 
     const namespace = resource.metadata?.namespace;
     if (namespace === null || namespace === undefined) {
-      resource = _.merge(resource, {
+      resource = toolkit.merge(resource, {
         metadata: { namespace: def },
       });
     };
@@ -131,7 +131,7 @@ export class KubeResourceUtilities {
       metadata.annotations['kustomize.toolkit.fluxcd.io/prune'] = 'disabled';
     };
 
-    resource = _.merge(resource, { metadata: metadata });
+    resource = toolkit.merge(resource, { metadata: metadata });
 
     // removes null annotations/labels
     if (resource.metadata?.annotations !== undefined && resource.metadata.annotations === null) {

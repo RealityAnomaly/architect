@@ -1,4 +1,4 @@
-import path from 'path';
+import path from 'node:path';
 import * as yaml from 'js-yaml';
 import * as fs from 'node:fs/promises';
 import * as api from 'kubernetes-models';

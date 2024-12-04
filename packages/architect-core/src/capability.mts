@@ -1,3 +1,5 @@
+import { Reflect } from "@dx/reflect";
+
 import { Component, IComponentMatcher } from './component.mts';
 import { CLASS_META_KEY } from './index.mts';
 import { constructor } from './utils/index.mts';
