@@ -1,4 +1,5 @@
 {
+  "name": "@perdition/architect-k8s",
   "library": true,
   "backend": {
     "type": "file"

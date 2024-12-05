@@ -1,4 +1,4 @@
-import { Component, KubeResourceTree } from "@perdition/architect-core";
+import { Component, KubeResourceTree } from "jsr:@perdition/architect-core";
 import { HelmChartOpts } from "../../builders/helm.mts";
 import { KubeComponent, KubeComponentArgs, KubeComponentGenericResources } from "../../component.mts"
 

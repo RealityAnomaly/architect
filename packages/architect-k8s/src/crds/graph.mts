@@ -1,4 +1,4 @@
-import { Component, GVK, KubeResource, ResolvedComponent, Result, ValidationError, ValidationErrorLevel } from '@perdition/architect-core';
+import { Component, GVK, KubeResource, ResolvedComponent, Result, ValidationError, ValidationErrorLevel } from 'jsr:@perdition/architect-core';
 
 import * as api from 'npm:kubernetes-models';
 

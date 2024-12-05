@@ -1,15 +1,15 @@
 {
   "private": true,
   "workspace": [
-    "packages/*",
-    "website"
+    "packages/*"
   ],
   "tasks": {
-    "run": "deno run -A ./packages/architect-core/src/bin/architect.ts -w $INIT_CWD",
+    "run": "deno run --check -A ./packages/architect-core/src/bin/architect.ts -w $INIT_CWD",
     "test": "deno test --allow-read --allow-write",
-    "check": "deno check **/*.mts"
+    "check": "deno check packages/**/*.mts"
   },
   "compilerOptions": {
+    "noImplicitReturns": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   },

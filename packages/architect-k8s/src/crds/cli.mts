@@ -2,7 +2,7 @@ import { Command } from "npm:commander";
 import { K8sPlugin } from "../plugin.mts";
 import { CrdsConfig } from "./config.mts";
 import { CRDSyncOptions } from "./index.mts";
-import { AppCommandOptions } from "@perdition/architect-core";
+import { AppCommandOptions } from "jsr:@perdition/architect-core";
 
 interface CRDCommandOptions extends AppCommandOptions {};
 
