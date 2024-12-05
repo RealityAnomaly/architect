@@ -1,5 +1,5 @@
-import { Command } from "commander";
-import { Reflect } from "@dx/reflect";
+import { Command } from "npm:commander";
+import { Reflect } from "jsr:@dx/reflect";
 import { App, AppCommandOptions, CLASS_META_KEY, ComponentClass, Updater } from "../index.mts";
 
 interface AppCommandComponentOptions extends AppCommandOptions {};
@@ -72,7 +72,7 @@ export class ComponentCommand extends Command {
       return;
     };
 
-    const updater = new Updater(this.app.parent!.project!);
+    const updater = new Updater(this.app.parent!, this.app.parent!.project!);
     await updater.update(components, options.dryRun);
   };
 

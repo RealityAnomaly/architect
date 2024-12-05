@@ -1,5 +1,5 @@
-import { KubeGitOpsProvider } from "./index.mts";
+// import { KubeGitOpsProvider } from "./index.mts";
 
-export class KubeArgoCDProvider extends KubeGitOpsProvider {
+// export class KubeArgoCDProvider extends KubeGitOpsProvider {
 
-};
+// };

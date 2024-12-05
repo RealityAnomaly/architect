@@ -1,6 +1,6 @@
 import { Architect, architectGlasswayNet, Component, ComponentMetadata, constructor, DependencyGraph, GVK, isValidator, KubeResource, recursiveMerge, Result, Target, TargetParams, TargetResolveParams, ValidationError, ValidationErrorLevel } from '@perdition/architect-core';
 
-import * as api from 'kubernetes-models';
+import * as api from 'npm:kubernetes-models';
 
 import { FluxCDController, FluxCDMode } from './apply/flux/index.mts';
 import { KubeComponentModel, KubePreludeComponent } from './component.mts';
@@ -101,7 +101,7 @@ export class KubeTarget extends Target {
   };
 
   public get plugin(): K8sPlugin {
-    return this.parent.plugins.get(K8sPlugin.MODULE) as K8sPlugin;
+    return this.parent.plugins.get(K8sPlugin.id) as K8sPlugin;
   }
 
   private createDefaultResources() {

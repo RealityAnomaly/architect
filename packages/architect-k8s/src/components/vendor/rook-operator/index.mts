@@ -1,4 +1,4 @@
-import * as api from 'kubernetes-models';
+import * as api from 'npm:kubernetes-models';
 
 import { ConfigurationContext } from '@perdition/architect-core';
 import { KubeComponentHelm, KubeComponentHelmResources } from '@perdition/architect-k8s';

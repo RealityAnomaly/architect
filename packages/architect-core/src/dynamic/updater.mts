@@ -1,9 +1,9 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import { ComponentClass, ComponentMetadata, ComponentModel, ComponentModelFileInstance, ComponentModelUtilities } from "../index.mts";
+import { Architect, ComponentClass, ComponentMetadata, ComponentModel, ComponentModelFileInstance, ComponentModelUtilities } from "../index.mts";
 import { Project } from "../project.mts";
-import { Logger } from 'winston';
+import { Logger } from 'npm:winston';
 
 export interface ComponentUpgradeState<TModel extends ComponentModel = ComponentModel> {
   clazz: ComponentClass;
@@ -17,19 +17,21 @@ export interface ComponentUpgradeState<TModel extends ComponentModel = Component
  * Component updater, responsible for updating component inputs.
  */
 export class Updater {
+  private readonly parent: Architect;
   private readonly project: Project;
   private readonly logger: Logger;
 
-  constructor(project: Project) {
+  constructor(parent: Architect, project: Project) {
+    this.parent = parent;
     this.project = project;
-    this.logger = project.parent.logger.child({ component: 'updater' });
+    this.logger = this.parent.logger.child({ component: 'updater' });
   };
 
   private async updateComponent(component: ComponentUpgradeState) {
     // Create the fake target, which is used to build the component in isolation for testing
     // The fake target is an approximation and is not intended to simulate all usecases, component requirements are also disabled
-    const targetType = this.project.parent.plugins.targetMap[component.meta.target!];
-    const target = new targetType(targetType.fake(), {}, this.project.parent);
+    const targetType = this.parent.plugins.targetMap[component.meta.target!];
+    const target = new targetType(targetType.fake(), {}, this.parent);
     target.enable(component.clazz, { inputs: component.model.inputs }, undefined, 100, true);
     
     const instance = target.component(component.clazz, undefined, true);
@@ -47,7 +49,7 @@ export class Updater {
   public async update(components: ComponentClass[], dry: boolean = false) {
     this.logger.debug('updater: loading model definition files');
     const modelFiles = await ComponentModelUtilities.collect([
-      path.join(this.project.root, 'src/components')
+      path.join(this.project.root!, 'src/components')
     ]);
     
     const map: ComponentUpgradeState[] = [];

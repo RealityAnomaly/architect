@@ -1,4 +1,4 @@
-export const NAMED_SYMBOL = Symbol.for('vertex.architect.Named');
+export const NAMED_SYMBOL = Symbol.for('architect.Named');
 
 /**
  * Constructor type, ported from tsyringe

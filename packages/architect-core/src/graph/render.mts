@@ -2,7 +2,7 @@ import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import * as util from 'node:util';
-import * as graphviz from 'ts-graphviz';
+import * as graphviz from 'npm:ts-graphviz';
 import { execFile } from 'node:child_process';
 import { DependencyGraph } from "./index.mts";
 import { Component } from '../index.mts';

@@ -1,6 +1,6 @@
-import { IObjectMeta } from "@kubernetes-models/apimachinery/apis/meta/v1/ObjectMeta";
-import { Model, ModelData, setValidateFunc, createTypeMetaGuard } from "@kubernetes-models/base";
-import { ValidateFunc } from "@kubernetes-models/validate";
+import { IObjectMeta } from "npm:@kubernetes-models/apimachinery/apis/meta/v1/ObjectMeta";
+import { Model, ModelData, setValidateFunc, createTypeMetaGuard } from "npm:@kubernetes-models/base";
+import { ValidateFunc } from "npm:@kubernetes-models/validate";
 import { validate } from "../../_schemas/SourceToolkitFluxcdIoV1beta2Bucket.js";
 
 /**

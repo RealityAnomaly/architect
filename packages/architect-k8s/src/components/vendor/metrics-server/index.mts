@@ -30,7 +30,7 @@ export class MetricsServerComponent extends KubeComponent {
 
   public override get capabilities() {
     return [
-      new MetricsCapability({}),
+      new MetricsCapability(),
     ];
   };
 };

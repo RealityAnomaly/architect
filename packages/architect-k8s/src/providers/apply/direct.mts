@@ -1,5 +1,5 @@
-import { KubeProvider } from "../index.mts";
+// import { KubeProvider } from "../index.mts";
 
-export class KubeDirectProvider extends KubeProvider {
+// export class KubeDirectProvider extends KubeProvider {
 
-};
+// };

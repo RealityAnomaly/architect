@@ -1,4 +1,4 @@
-import { Reflect } from "@dx/reflect";
+import { Reflect } from "jsr:@dx/reflect";
 
 import { Component, IComponentMatcher } from './component.mts';
 import { CLASS_META_KEY } from './index.mts';
@@ -7,9 +7,9 @@ import { constructor } from './utils/index.mts';
 type CapabilityCondition<T extends Capability<unknown>> = (capability: T) => boolean;
 
 export abstract class Capability<T> {
-  public readonly data: T;
+  public readonly data?: T;
 
-  constructor(data: T) {
+  constructor(data?: T) {
     this.data = data;
   };
 

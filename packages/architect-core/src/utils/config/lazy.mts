@@ -1,4 +1,4 @@
-import * as toolkit from '@es-toolkit/es-toolkit';
+import * as toolkit from 'jsr:@es-toolkit/es-toolkit';
 import { arrayStartsWith, isEmptyObject, recursiveMerge } from '../objects.mts';
 import { isObjectDeepKeys, PathResultBuilder, ValuePath, ValuePathKey } from './paths.mts';
 import { DeepPartial, Resolver, Value } from './value.mts';
