@@ -1,4 +1,4 @@
-import { Logger } from "winston";
+import { Logger } from "npm:winston";
 
 interface Validator {
   validate(): void | Promise<void>;

@@ -1,6 +1,6 @@
-import objectHash from 'object-hash';
+import objectHash from 'npm:object-hash';
 
-import { Reflect } from "@dx/reflect";
+import { Reflect } from "jsr:@dx/reflect";
 
 import { Capability } from './capability.mts';
 import { ConfigurationContext } from './config.mts';
@@ -8,9 +8,9 @@ import { Target } from './target.mts';
 import { constructor, DeepPartial, Lazy, LazyAuto, recursiveMerge, ReflectionUtilities } from './utils/index.mts';
 import { Architect, CLASS_META_KEY, ComponentModel, ComponentModelUtilities, ComponentUpgradeState, Context, MODEL_META_KEY, TARGET_TYPE_META_KEY, TYPE_META_KEY } from './index.mts';
 import Module from 'node:module';
-import * as toolkit from '@es-toolkit/es-toolkit';
+import * as toolkit from 'jsr:@es-toolkit/es-toolkit';
 import { ModuleUtilities } from './utils/modules.mts';
-import { ValidateFunction } from 'ajv';
+import { ValidateFunction } from 'npm:ajv';
 
 export type ExtractComponentArgs<T extends Component> = T extends Component<object, infer A, never> ? A : never;
 
@@ -108,7 +108,7 @@ export abstract class Component<
   /**
    * Returns the component types required by this component
    */
-  public async getRequirements(): Promise<IComponentMatcher[]> {
+  public override async getRequirements(): Promise<IComponentMatcher[]> {
     // if we have a parent, add an automatic requirement on it
     if (this.parent !== undefined) {
       return [new ComponentInstanceMatcher(this.parent)];
@@ -252,7 +252,7 @@ export abstract class Component<
 
   public static async collect(_parent: Architect, module: Module): Promise<ComponentClass[]> {
     return ModuleUtilities.collectClasses(module, clazz => {
-      return typeof clazz === 'object' && Reflect.hasMetadata(TYPE_META_KEY, clazz) && Reflect.getMetadata(TYPE_META_KEY, clazz) === 'component';
+      return Reflect.hasMetadata(TYPE_META_KEY, clazz) && Reflect.getMetadata(TYPE_META_KEY, clazz) === 'component';
     });
   };
 
@@ -262,7 +262,8 @@ export abstract class Component<
 };
 
 export interface ComponentClass<T extends Component = Component> {
-  new (target: Target, props?: unknown, context?: Partial<Context>, parent?: Component): T;
+  // deno-lint-ignore no-explicit-any
+  new (target: Target, props?: any, context?: Partial<Context>, parent?: Component): T;
 };
 
 /**

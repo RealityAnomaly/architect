@@ -1,10 +1,6 @@
-import * as commander from 'commander';
+import * as commander from 'npm:commander';
 import { Architect, TargetClass } from './index.mts';
-import { Logger } from 'winston';
-
-const STANDARD_PLUGINS = [
-  "@perdition/architect-k8s"
-]
+import { Logger } from 'npm:winston';
 
 export class PluginResolver {
   private readonly parent: Architect;
@@ -14,15 +10,11 @@ export class PluginResolver {
     this.parent = parent;
   };
 
-  public async register(module: string): Promise<void> {
-    this.data[module] = new (await import(module)).default(this.parent) as Plugin;
+  public async register(plugin: PluginConstructor): Promise<void> {
+    this.data[plugin.id] = new plugin(this.parent);
   };
 
-  public async resolve(): Promise<void> {
-    for (const plugin of STANDARD_PLUGINS) {
-      await this.register(plugin);
-    }
-  };
+  public async resolve(): Promise<void> {};
 
   public async init(): Promise<void> {
     for (const plugin of Object.values(this.data)) {
@@ -42,7 +34,7 @@ export class PluginResolver {
 
     return results;
   };
-}
+};
 
 /**
  * Represents an extension to Architect that defines new functionality.
@@ -63,4 +55,9 @@ export abstract class Plugin {
   public abstract registerCommand(command: commander.Command): Promise<void>; 
 
   public abstract get targets(): Record<string, TargetClass>;
-}
+};
+
+export interface PluginConstructor<T extends Plugin = Plugin> {
+  id: string;
+  new (parent: Architect): T;
+};

@@ -1,5 +1,5 @@
 import path from 'node:path';
-import * as yaml from 'js-yaml';
+import * as yaml from 'npm:js-yaml';
 import * as fs from 'node:fs/promises';
 
 import { Result, Writer, KubeResource, KubeResourceUtilities } from '@perdition/architect-core';

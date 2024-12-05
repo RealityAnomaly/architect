@@ -1,6 +1,6 @@
 import path from 'node:path';
 import * as fs from 'node:fs/promises';
-import { Reflect } from "@dx/reflect";
+import { Reflect } from "jsr:@dx/reflect";
 
 import { architectGlasswayNet } from './generated/crds/index.ts';
 
@@ -188,6 +188,7 @@ export class Target {
 };
 
 export type TargetClass = {
-  new (model: architectGlasswayNet.v1alpha1.Target, params: unknown, parent: Architect): Target
+  // deno-lint-ignore no-explicit-any
+  new (model: architectGlasswayNet.v1alpha1.Target, params: any, parent: Architect): Target
   fake(): architectGlasswayNet.v1alpha1.Target;
 };

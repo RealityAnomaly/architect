@@ -1,4 +1,4 @@
-import { apiextensionsK8sIo } from 'kubernetes-models';
+import { apiextensionsK8sIo } from 'npm:kubernetes-models';
 import { KubeResource } from '../resource.mts';
 
 /**

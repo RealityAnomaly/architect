@@ -1,10 +1,10 @@
 import path from 'node:path';
-import * as yaml from 'js-yaml';
+import * as yaml from 'npm:js-yaml';
 import * as fs from 'node:fs/promises';
-import * as api from 'kubernetes-models';
+import * as api from 'npm:kubernetes-models';
 import { K8sPlugin } from '../plugin.mts';
 import { CrdsConfig } from './config.mts';
-import { Logger } from 'winston';
+import { Logger } from 'npm:winston';
 import { CRDModelGenerator, KubeResource } from '@perdition/architect-core';
 
 export * from './cli.mts';
@@ -27,8 +27,8 @@ export class CRDManager {
 
   constructor(plugin: K8sPlugin) {
     this.plugin = plugin;
-    this.srcDir = path.join(plugin.parent.project!.root, 'src/generated/crds');
-    this.dataDir = path.join(plugin.parent.project!.root, 'data/crds');
+    this.srcDir = path.join(plugin.parent.project!.root!, 'src/generated/crds');
+    this.dataDir = path.join(plugin.parent.project!.root!, 'data/crds');
 
     this.logger = plugin.logger.child({
       component: `plugin.kubernetes.CRDManager`

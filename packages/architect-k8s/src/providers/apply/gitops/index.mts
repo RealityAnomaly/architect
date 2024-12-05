@@ -1,5 +1,5 @@
-import { KubeProvider } from "../index.mts";
+// import { KubeDirectProvider } from "../direct.mts";
 
-export class KubeGitOpsProvider extends KubeProvider {
+// export class KubeGitOpsProvider extends KubeDirectProvider {
 
-};
+// };

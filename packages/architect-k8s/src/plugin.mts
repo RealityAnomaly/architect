@@ -1,5 +1,5 @@
 import { Architect, Plugin, PLUGIN_TARGET_IDENTIFIERS, TargetClass } from "@perdition/architect-core";
-import { Command } from "commander";
+import { Command } from "npm:commander";
 import { CRDCommand } from "./crds/cli.mts";
 import { CrdsConfig } from "./crds/config.mts";
 import { CRDManager } from "./crds/index.mts";
@@ -11,7 +11,7 @@ export class K8sPluginConfig {
 }
 
 export class K8sPlugin extends Plugin {
-  public static readonly MODULE = "@perdition/architect-k8s";
+  public static readonly id = 'plugin.architect.glassway.net/kubernetes';
   public readonly crds: CRDManager;
 
   public helm: Helm;

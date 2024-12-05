@@ -28,12 +28,11 @@ export class ModuleUtilities {
   public static async collectClasses<T>(module: any, matcher: (clazz: constructor<T>) => boolean): Promise<constructor<T>[]> {
     const result: constructor<T>[] = [];
 
-    if (typeof module === 'object') {
+    if (matcher(module)) {
+      result.push(module)
+    } else if (typeof module === 'object' && module[Symbol.toStringTag] === 'Module') {
       for (const value of Object.values(module)) {
         result.push(...await this.collectClasses(value, matcher));
-  
-        if (!matcher(value as constructor<T>)) continue;
-        result.push(value as constructor<T>);
       };
     };
 

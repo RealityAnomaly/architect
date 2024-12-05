@@ -1,4 +1,4 @@
-import { Command } from "commander";
+import { Command } from "npm:commander";
 import { App, AppCommandOptions, Component } from "../index.mts";
 
 interface AppCommandTargetOptions extends AppCommandOptions {};
@@ -11,7 +11,7 @@ export class TargetCommand extends Command {
   private readonly app: App;
 
   private async list(_options: AppCommandTargetListOptions) {
-    const targets = await this.app.parent!.project!.getTargets(false);
+    const targets = await this.app.parent!.project!.getTargets(this.app.parent!, false);
     if (targets.length > 0) {
       console.log(`${targets.length} targets available:`);
     };
@@ -22,7 +22,7 @@ export class TargetCommand extends Command {
   };
 
   private async show(options: AppCommandTargetShowOptions) {
-    const target = await this.app.parent!.project!.getTarget(options.name, false);
+    const target = await this.app.parent!.project!.getTarget(this.app.parent!, options.name, false);
     if (!target) {
       console.log(`Unable to find any target with name ${options.name}`);
       return;

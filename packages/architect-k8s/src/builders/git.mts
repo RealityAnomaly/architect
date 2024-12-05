@@ -3,7 +3,7 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import { KubeResource, walk } from '@perdition/architect-core';
 
-import * as simpleGit from 'simple-git';
+import * as simpleGit from 'npm:simple-git';
 import { Builder, BuilderParams } from './builder.mts';
 
 export interface GitFetchOptions {
