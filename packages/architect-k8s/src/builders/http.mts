@@ -1,4 +1,4 @@
-import { KubeResource } from '@perdition/architect-core';
+import { KubeResource } from 'jsr:@perdition/architect-core';
 import { Builder, BuilderParams } from './builder.mts';
 
 export interface HttpFetchOptions {};

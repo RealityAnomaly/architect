@@ -1,4 +1,4 @@
-import { Provider, KubeResource } from "@perdition/architect-core";
+import { Provider, KubeResource } from "jsr:@perdition/architect-core";
 
 import { KubeTarget } from "../target.mts";
 

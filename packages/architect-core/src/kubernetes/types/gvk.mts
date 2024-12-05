@@ -67,7 +67,6 @@ export class GVK {
    * Returns whether this GVK is a built-in Kubernetes type
    */
   public isAPIModel(): boolean {
-    // TODO: handle exceptions to this rule, like snapshot.storage.k8s.io
     return this.group === undefined || !this.group.includes('.') || this.group.endsWith('.k8s.io');
   };
 

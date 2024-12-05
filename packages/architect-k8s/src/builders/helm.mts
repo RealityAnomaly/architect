@@ -3,7 +3,7 @@ import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import * as util from 'node:util';
-import { KubeResource } from '@perdition/architect-core';
+import { KubeResource } from 'jsr:@perdition/architect-core';
 
 import * as yaml from 'npm:js-yaml';
 import { Builder, BuilderParams } from './builder.mts';

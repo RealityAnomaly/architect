@@ -1,3 +1,3 @@
 #!/usr/bin/env deno
-import { App } from '@perdition/architect-core';
+import { App } from 'jsr:@perdition/architect-core';
 await App.run();

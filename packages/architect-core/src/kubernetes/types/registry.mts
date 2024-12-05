@@ -1,5 +1,6 @@
 import { KubeResourceConstructor } from '../resource.mts';
 import { GVK } from './gvk.mts';
+import { Logger } from 'npm:winston';
 
 function gvkToPath(gvk: GVK): string {
   let path: string = '';
@@ -11,10 +12,11 @@ function gvkToPath(gvk: GVK): string {
   return path;
 };
 
-async function tryImport(path: string): Promise<object | undefined> {
+async function tryImport(path: string, logger?: Logger): Promise<object | undefined> {
   try {
     return await import(path);
-  } catch {
+  } catch (exception) {
+    logger?.silly(`failed to import ${path}: ${exception}`);
     return undefined;
   };
 };
@@ -23,9 +25,14 @@ async function tryImport(path: string): Promise<object | undefined> {
  * Responsible for registering type definitions for the Kubernetes API and CRDs
  */
 export class TypeRegistry {
+  private logger?: Logger;
   private ctorCache: Record<string, KubeResourceConstructor | null> = {};
-  private apiModulePath: string = 'kubernetes-models';
+  private apiModulePath: string = 'npm:kubernetes-models';
   private crdModulePaths: string[] = [];
+
+  constructor(logger?: Logger) {
+    this.logger = logger;
+  };
 
   /**
    * Sets the path for Kubernetes API models.
@@ -58,27 +65,29 @@ export class TypeRegistry {
     const gvkPath = gvkToPath(gvk);
 
     // find a matching constructor
-    let mod: any | undefined;
+    let mod: any | undefined = undefined;
     let path: string | null = null;
 
-    if (!gvk.isAPIModel()) {
-      // CRD, try everything till we find a match
+    if (gvk.isAPIModel()) {
+      path = `${this.apiModulePath}/${gvkPath}`;
+      mod = await tryImport(path, this.logger);
+    };
+
+    // if we failed to import an "API" model from the main module, fallback to CRD modules
+    if (!mod) {
       for (const crdPath of this.crdModulePaths) {
         const tryPath = `${crdPath}/src/generated/crds/${gvkPath}.ts`;
-        mod = await tryImport(tryPath);
+        mod = await tryImport(tryPath, this.logger);
         if (mod) {
           path = tryPath;
           break;
         };
       };
-    } else {
-      // API model, use the API types
-      path = `${this.apiModulePath}/${gvkPath}`;
-      mod = await tryImport(path);
     };
 
     // cache failure as well as success
     if (!mod || !mod[gvk.kind] || !path) {
+      this.logger?.warn(`failed to obtain class for GVK ${gvk}`);
       this.ctorCache[gvkPath] = null;
       return null;
     };

@@ -1,4 +1,4 @@
-import { architectGlasswayNet, CapabilityMatcher, Component, ComponentArgs, ComponentClass, ComponentMatcher, ComponentMetadata, ComponentModel, ComponentModelUtilities, ComponentUpgradeState, IComponentMatcher, KubeResource, KubeResourceUtilities, PLUGIN_TARGET_IDENTIFIERS, Target } from '@perdition/architect-core';
+import { architectGlasswayNet, CapabilityMatcher, Component, ComponentArgs, ComponentClass, ComponentMatcher, ComponentMetadata, ComponentModel, ComponentModelUtilities, ComponentUpgradeState, IComponentMatcher, KubeResource, KubeResourceUtilities, PLUGIN_TARGET_IDENTIFIERS, Target } from 'jsr:@perdition/architect-core';
 
 import { JSONSchemaType, ValidateFunction } from "npm:ajv";
 import * as api from 'npm:kubernetes-models';
@@ -174,7 +174,7 @@ export abstract class KubeComponent<
    * @param model The component model to use. Per the documentation, this should be imported from an `architect.json` file in the same folder as your component's code.
    * @returns A decorator which sets the required properties.
    */
-  public static decorate<T extends object>(model: KubeComponentModel) {
+  public static decorate<T extends object>(model: KubeComponentModel): (target: T) => void {
     function decorator(target: T) {
       new ComponentMetadata<KubeComponentModel>(model, PLUGIN_TARGET_IDENTIFIERS.kubernetes, model.class).assign(target);
     };
