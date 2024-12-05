@@ -1,5 +1,5 @@
 import fs from 'node:fs/promises';
-import { loadAll } from 'js-yaml';
+import { loadAll } from 'npm:js-yaml';
 
 import { KubeResource, KubeResourceUtilities } from './resource.mts';
 import { GVK, TypeRegistry } from './types/index.mts';

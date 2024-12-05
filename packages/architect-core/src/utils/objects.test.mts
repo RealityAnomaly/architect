@@ -1,5 +1,5 @@
 import * as assert from 'jsr:@std/assert';
-import * as toolkit from '@es-toolkit/es-toolkit';
+import * as toolkit from 'jsr:@es-toolkit/es-toolkit';
 import * as objects from './objects.mts';
 
 Deno.test('isRecord', async () => {

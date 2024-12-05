@@ -1,10 +1,10 @@
-import * as toolkit from '@es-toolkit/es-toolkit';
+import * as toolkit from 'jsr:@es-toolkit/es-toolkit';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
 
 import { HashUtilities, StateProvider } from './utils/index.mts';
-import objectHash from 'object-hash';
-import { Logger } from 'winston';
+import objectHash from 'npm:object-hash';
+import { Logger } from 'npm:winston';
 
 /**
  * Target cache that caches the result of build inputs

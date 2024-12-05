@@ -1,5 +1,5 @@
-import { IObjectMeta } from '@kubernetes-models/apimachinery/apis/meta/v1/ObjectMeta';
-import * as toolkit from '@es-toolkit/es-toolkit';
+import { IObjectMeta } from 'npm:@kubernetes-models/apimachinery/apis/meta/v1/ObjectMeta';
+import * as toolkit from 'jsr:@es-toolkit/es-toolkit';
 
 /**
  * Non-exhaustive blacklist of Kubernetes resources that may not have attached namespaces

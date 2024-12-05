@@ -1,11 +1,11 @@
 import { execFile } from 'node:child_process';
 import * as util from 'node:util';
 
-import * as api from 'kubernetes-models';
+import * as api from 'npm:kubernetes-models';
 import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
-import * as yaml from 'js-yaml';
+import * as yaml from 'npm:js-yaml';
 //import crdGenerate from '@kubernetes-models/crd-generate'
 import { ManifestLoader } from './yaml.mts';
 import { walk } from "../utils/files.mts";
@@ -69,6 +69,8 @@ export class CRDModelGenerator {
         content = content.replaceAll(new RegExp('^(.*)(_schemas/.[^"]*)', 'gm'), '$1$2.js');
 
       content = content.replaceAll(new RegExp('^(export *.*from )"(.*?)"', 'gm'), '$1"$2.ts"');
+
+      content = content.replace('@kubernetes-models', 'npm:@kubernetes-models');
       await fs.writeFile(file, content);
     };
   };

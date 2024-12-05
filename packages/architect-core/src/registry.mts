@@ -1,5 +1,5 @@
-import objectHash from 'object-hash';
-import { Reflect } from "@dx/reflect";
+import objectHash from 'npm:object-hash';
+import { Reflect } from "jsr:@dx/reflect";
 
 import { Context } from './context.mts';
 import { constructor, ReflectionUtilities } from './utils/index.mts';

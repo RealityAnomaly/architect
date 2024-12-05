@@ -24,7 +24,7 @@ interface KubevirtComponentResources {
 @Architect.class('manifold.glassway.net/kubevirt')
 @Kubernetes.namespace('$features$')
 export class KubevirtComponent extends KubeComponent<KubevirtComponentResources, KubevirtComponentOptions> {
-  public async build(resources: KubevirtComponentResources = {}) {
+  public override async build(resources: KubevirtComponentResources = {}) {
     resources.networkAttachmentDefinition = new k8sCniCncfIo.v1.NetworkAttachmentDefinition({
       metadata: {
         name: 'host',

@@ -116,7 +116,7 @@ const schema12 = {
   "nullableRef": "io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta#"
 };
 const schema13 = {};
-import { validate as validate31 } from "@kubernetes-models/apimachinery/_schemas/IoK8sApimachineryPkgApisMetaV1ObjectMeta";
+import { validate as validate31 } from "npm:@kubernetes-models/apimachinery/_schemas/IoK8sApimachineryPkgApisMetaV1ObjectMeta";
 function validate30(data, {
   instancePath = "",
   parentData,
@@ -181,7 +181,7 @@ const schema6 = {
   "type": "string",
   "nullable": true
 };
-import func2 from "@kubernetes-models/validate/runtime/ucs2length";
+import func2 from "npm:@kubernetes-models/validate/runtime/ucs2length";
 function validate21(data, {
   instancePath = "",
   parentData,
