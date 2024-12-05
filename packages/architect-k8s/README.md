@@ -13,7 +13,7 @@ This is an extension to the [Architect framework](https://github.com/realityanom
 ```typescript
 import { Architect } from '@perdition/architect';
 import { k8sCniCncfIo } from '@perdition/k8s-shared/crds';
-import * as k8s from '@perdition/architect-k8s';
+import * as k8s from 'jsr:@perdition/architect-k8s';
 
 export interface KubevirtComponentOptions extends KubeComponentArgs {};
 

@@ -5,14 +5,14 @@ import { Reflect } from "jsr:@dx/reflect";
 import { Capability } from './capability.mts';
 import { ConfigurationContext } from './config.mts';
 import { Target } from './target.mts';
-import { constructor, DeepPartial, Lazy, LazyAuto, recursiveMerge, ReflectionUtilities } from './utils/index.mts';
-import { Architect, CLASS_META_KEY, ComponentModel, ComponentModelUtilities, ComponentUpgradeState, Context, MODEL_META_KEY, TARGET_TYPE_META_KEY, TYPE_META_KEY } from './index.mts';
+import { constructor, DeepPartial, Lazy, LazyAuto, recursiveMerge, ReflectionUtilities, TypeUtilities } from './utils/index.mts';
+import { CLASS_META_KEY, ComponentModel, ComponentModelUtilities, ComponentUpgradeState, Context, MODEL_META_KEY, TARGET_TYPE_META_KEY, TYPE_META_KEY } from './index.mts';
 import Module from 'node:module';
 import * as toolkit from 'jsr:@es-toolkit/es-toolkit';
 import { ModuleUtilities } from './utils/modules.mts';
 import { ValidateFunction } from 'npm:ajv';
 
-export type ExtractComponentArgs<T extends Component> = T extends Component<object, infer A, never> ? A : never;
+export type ExtractComponentArgs<T extends Component> = T extends Component<object, infer A> ? A : never;
 
 export interface ComponentArgs<TInput = unknown> {
   /**
@@ -108,7 +108,7 @@ export abstract class Component<
   /**
    * Returns the component types required by this component
    */
-  public override async getRequirements(): Promise<IComponentMatcher[]> {
+  public async getRequirements(): Promise<IComponentMatcher[]> {
     // if we have a parent, add an automatic requirement on it
     if (this.parent !== undefined) {
       return [new ComponentInstanceMatcher(this.parent)];
@@ -250,9 +250,9 @@ export abstract class Component<
     return `Component ${this.context.name}`;
   };
 
-  public static async collect(_parent: Architect, module: Module): Promise<ComponentClass[]> {
+  public static async collect(module: Module): Promise<ComponentClass[]> {
     return ModuleUtilities.collectClasses(module, clazz => {
-      return Reflect.hasMetadata(TYPE_META_KEY, clazz) && Reflect.getMetadata(TYPE_META_KEY, clazz) === 'component';
+      return TypeUtilities.isObject(clazz) && Reflect.hasMetadata(TYPE_META_KEY, clazz) && Reflect.getMetadata(TYPE_META_KEY, clazz) === 'component';
     });
   };
 

@@ -21,6 +21,14 @@ export function isNamed(value: object): value is Named {
   return (typeof(value) === 'object' && NAMED_SYMBOL in value);
 };
 
+export class TypeUtilities {
+  public static isObject<T>(
+    x: T | undefined | null | boolean | string | symbol | number,
+  ): x is T {
+    return typeof x === 'object' ? x !== null : typeof x === 'function';
+  }
+};
+
 export class ReflectionUtilities {
   public static classToName(clazz: string): string {
     const split = clazz.split('/');

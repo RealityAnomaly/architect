@@ -104,7 +104,7 @@ export class Target {
 
   protected async init() {
     for (const def of this.model.spec.components || []) {
-      const token = this.parent.project!.getComponent(def.class, true);
+      const token = await this.parent.project!.getComponent(def.class, true);
       if (!token) {
         this.parent.logger.warn(`Target ${this.model.metadata.name} references unknown component ${def.class}, skipping`);
         continue;

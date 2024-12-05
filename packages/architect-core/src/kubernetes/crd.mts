@@ -69,8 +69,7 @@ export class CRDModelGenerator {
         content = content.replaceAll(new RegExp('^(.*)(_schemas/.[^"]*)', 'gm'), '$1$2.js');
 
       content = content.replaceAll(new RegExp('^(export *.*from )"(.*?)"', 'gm'), '$1"$2.ts"');
-
-      content = content.replace('@kubernetes-models', 'npm:@kubernetes-models');
+      content = content.replaceAll('@kubernetes-models', 'npm:@kubernetes-models');
       await fs.writeFile(file, content);
     };
   };

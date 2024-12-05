@@ -48,7 +48,7 @@ export class Architect {
     this.state = StateProvider.fromAppDirs();
     this.cache = new TargetCache(this.state, this.logger);
 
-    this.kubeTypes = new kubeUtils.TypeRegistry();
+    this.kubeTypes = new kubeUtils.TypeRegistry(this.logger);
     this.kubeTypes.appendCRDModule(Architect.PATH);
 
     this.kubeLoader = new kubeUtils.ManifestLoader(this.kubeTypes);
@@ -62,13 +62,13 @@ export class Architect {
     const instance = new Architect(logLevel);
 
     try {
-      instance.project = await Project.load(instance, path.join(workspace, 'src/index.mts'), workspace);
+      instance.project = await Project.fromWorkspace(instance, workspace);
     } catch (exception) {
       instance.logger.error(`failed to load workspace, exiting: ${exception}`);
       throw exception;
     };
 
-    for (const plugin of instance.project.getPlugins()) {
+    for (const plugin of await instance.project.getPlugins()) {
       await instance.plugins.register(plugin);
     };
 

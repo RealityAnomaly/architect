@@ -22,7 +22,7 @@ export class ComponentCommand extends Command {
   private readonly app: App;
 
   private async list(options: AppCommandComponentListOptions) {
-    const ourComponents = this.app.parent!.project!.getComponents(false);
+    const ourComponents = await this.app.parent!.project!.getComponents();
 
     if (!options.library && ourComponents.length > 0) {
       console.log('Current project:');
@@ -34,12 +34,12 @@ export class ComponentCommand extends Command {
     };
 
     for (const library of this.app.parent!.project!.libraries) {
-      if (options.library && library.moduleName !== options.library) continue;
+      if (options.library && library.config.name !== options.library) continue;
 
-      const components = library.getComponents(false);
+      const components = await library.getComponents();
       if (components.length <= 0) continue;
 
-      console.log(`Library ${library.moduleName}:`)
+      console.log(`Library ${library.config.name}:`)
       for (const component of components) {
         console.log('  - ' + Reflect.getMetadata(CLASS_META_KEY, component));
       };
@@ -49,7 +49,7 @@ export class ComponentCommand extends Command {
   };
 
   private async show(options: AppComponentCommandShowOptions) {
-    const component = this.app.parent!.project!.getComponent(options.class, true);
+    const component = await this.app.parent!.project!.getComponent(options.class, true);
     if (!component) {
       console.log(`Unable to find any component with class ${options.class}`);
       return;
@@ -61,10 +61,10 @@ export class ComponentCommand extends Command {
   private async upgrade(options: AppComponentCommandUpgradeOptions) {
     let components: ComponentClass[] = [];
     if (options.class) {
-      const component = this.app.parent!.project!.getComponent(options.class);
+      const component = await this.app.parent!.project!.getComponent(options.class);
       if (component) components = [component];
     } else {
-      components = this.app.parent!.project!.getComponents();
+      components = await this.app.parent!.project!.getComponents();
     };
     
     if (components.length <= 0) {

@@ -1,6 +1,11 @@
 import * as commander from 'npm:commander';
-import { Architect, TargetClass } from './index.mts';
+import { Reflect } from "jsr:@dx/reflect";
+
+import { Architect, CLASS_META_KEY, TargetClass, TYPE_META_KEY } from './index.mts';
 import { Logger } from 'npm:winston';
+import Module from "node:module";
+import { TypeUtilities } from "./utils/types.mts";
+import { ModuleUtilities } from "./utils/modules.mts";
 
 export class PluginResolver {
   private readonly parent: Architect;
@@ -11,7 +16,8 @@ export class PluginResolver {
   };
 
   public async register(plugin: PluginConstructor): Promise<void> {
-    this.data[plugin.id] = new plugin(this.parent);
+    const clazz = Reflect.getMetadata(CLASS_META_KEY, plugin);
+    this.data[clazz] = new plugin(this.parent);
   };
 
   public async resolve(): Promise<void> {};
@@ -55,9 +61,23 @@ export abstract class Plugin {
   public abstract registerCommand(command: commander.Command): Promise<void>; 
 
   public abstract get targets(): Record<string, TargetClass>;
+
+  public static decorate<T extends Plugin>(clazz: string): (target: PluginConstructor<T>) => void {
+    function decorator(target: PluginConstructor<T>) {
+      Reflect.defineMetadata(TYPE_META_KEY, 'plugin', target);
+      Reflect.defineMetadata(CLASS_META_KEY, clazz, target);
+    };
+
+    return decorator;
+  };
+
+  public static async collect(module: Module): Promise<PluginConstructor[]> {
+    return ModuleUtilities.collectClasses(module, clazz => {
+      return TypeUtilities.isObject(clazz) && Reflect.hasMetadata(TYPE_META_KEY, clazz) && Reflect.getMetadata(TYPE_META_KEY, clazz) === 'plugin';
+    });
+  };
 };
 
 export interface PluginConstructor<T extends Plugin = Plugin> {
-  id: string;
   new (parent: Architect): T;
 };
