@@ -65,7 +65,7 @@ export class Target {
         try {
           r.validate();
         } catch (exception: unknown) {
-          parent.logger.error(`failed to validate target ${r.metadata.name}: ${exception}`);
+          parent.logger.error(`failed to validate target ${r?.metadata?.name}: ${exception}`);
           return undefined;
         };
 
