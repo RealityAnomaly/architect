@@ -13,5 +13,12 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true
   },
-  "nodeModulesDir": "auto"
+  "nodeModulesDir": "auto",
+  "imports": {
+    "@kubernetes-models/apimachinery": "npm:@kubernetes-models/apimachinery@^2.0.2",
+    "@kubernetes-models/base": "npm:@kubernetes-models/base@^5.0.1",
+    "@kubernetes-models/crd-generate": "npm:@kubernetes-models/crd-generate@^5.0.2",
+    "@kubernetes-models/validate": "npm:@kubernetes-models/validate@^4.0.0",
+    "kubernetes-models": "npm:kubernetes-models@^4.4.2"
+  }
 }
