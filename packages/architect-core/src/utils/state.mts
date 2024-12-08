@@ -1,4 +1,4 @@
-import appDirs from 'npm:appdirsjs';
+import appDirs from 'appdirsjs';
 
 export type StateDirectories = {
   cache: string;

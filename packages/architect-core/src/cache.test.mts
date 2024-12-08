@@ -1,7 +1,7 @@
 import * as crypto from 'node:crypto';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
-import * as assert from 'jsr:@std/assert';
+import * as assert from '@std/assert';
 
 import { TargetCache } from './cache.mts';
 import { runInTempDir } from './utils/test/helpers.mts';

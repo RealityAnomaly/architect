@@ -1,4 +1,4 @@
-import { formats } from "npm:@kubernetes-models/validate";
+import { formats } from "@kubernetes-models/validate";
 export const validate = validate37;
 const schema16 = {
   "type": "object",
@@ -120,7 +120,7 @@ const schema19 = {
   "nullableRef": "io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta#"
 };
 const schema20 = {};
-import { validate as validate43 } from "npm:@kubernetes-models/apimachinery/_schemas/IoK8sApimachineryPkgApisMetaV1ObjectMeta";
+import { validate as validate43 } from "@kubernetes-models/apimachinery/_schemas/IoK8sApimachineryPkgApisMetaV1ObjectMeta";
 function validate42(data, {
   instancePath = "",
   parentData,
@@ -1818,7 +1818,7 @@ const schema37 = {
   "maxLength": 32768,
   "type": "string"
 };
-import func2 from "npm:@kubernetes-models/validate/runtime/ucs2length";
+import func2 from "@kubernetes-models/validate/runtime/ucs2length";
 function validate95(data, {
   instancePath = "",
   parentData,

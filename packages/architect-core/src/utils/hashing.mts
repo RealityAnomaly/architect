@@ -1,5 +1,5 @@
 import * as crypto from 'node:crypto';
-import objectHash from 'npm:object-hash';
+import objectHash from 'object-hash';
 
 /**
  * NON CRYPTOGRAPHICALLY SECURE hashing utilities

@@ -1,7 +1,7 @@
-import * as api from 'npm:kubernetes-models';
+import * as api from 'kubernetes-models';
 
-import { ConfigurationContext } from 'jsr:@perdition/architect-core';
-import { KubeComponentHelm, KubeComponentHelmResources } from 'jsr:@perdition/architect-k8s';
+import { ConfigurationContext } from '@perdition/architect-core';
+import { KubeComponentHelm, KubeComponentHelmResources } from '@perdition/architect-k8s';
 
 import model from './architect.json' with { type: 'json' };
 

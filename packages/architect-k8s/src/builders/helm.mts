@@ -3,11 +3,11 @@ import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import * as util from 'node:util';
-import { KubeResource } from 'jsr:@perdition/architect-core';
+import { KubeResource } from '@perdition/architect-core';
 
-import * as yaml from 'npm:js-yaml';
+import * as yaml from 'js-yaml';
 import { Builder, BuilderParams } from './builder.mts';
-import * as semver from 'npm:semver';
+import * as semver from 'semver';
 
 export class Helm extends Builder {
   private readonly indexCache: Record<string, HelmIndex> = {};

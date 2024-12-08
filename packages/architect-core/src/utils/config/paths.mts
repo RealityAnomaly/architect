@@ -1,4 +1,4 @@
-import * as toolkit from 'jsr:@es-toolkit/es-toolkit';
+import * as toolkit from '@es-toolkit/es-toolkit';
 
 export type ValuePathKey = string | symbol | number;
 export type ValuePath = ValuePathKey[];

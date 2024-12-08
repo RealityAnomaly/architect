@@ -1,4 +1,4 @@
-import { Architect, Capability } from 'jsr:@perdition/architect-core';
+import { Architect, Capability } from '@perdition/architect-core';
 
 /**
  * Represents the Kubernetes Metrics Server

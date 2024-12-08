@@ -1,5 +1,5 @@
-import { Architect, Plugin, PLUGIN_TARGET_IDENTIFIERS, TargetClass } from "jsr:@perdition/architect-core";
-import { Command } from "npm:commander";
+import { Architect, Plugin, PLUGIN_TARGET_IDENTIFIERS, TargetClass } from "@perdition/architect-core";
+import { Command } from "commander";
 import { CRDCommand } from "./crds/cli.mts";
 import { CrdsConfig } from "./crds/config.mts";
 import { CRDManager } from "./crds/index.mts";

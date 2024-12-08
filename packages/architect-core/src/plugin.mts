@@ -1,8 +1,8 @@
-import * as commander from 'npm:commander';
-import { Reflect } from "jsr:@dx/reflect";
+import * as commander from 'commander';
+import { Reflect } from "@dx/reflect";
 
 import { Architect, CLASS_META_KEY, TargetClass, TYPE_META_KEY } from './index.mts';
-import { Logger } from 'npm:winston';
+import { Logger } from 'winston';
 import Module from "node:module";
 import { TypeUtilities } from "./utils/types.mts";
 import { ModuleUtilities } from "./utils/modules.mts";
