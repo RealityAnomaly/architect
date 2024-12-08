@@ -8,13 +8,9 @@
     "jsr:@match/match@0.1": "0.1.0",
     "jsr:@std/assert@*": "1.0.8",
     "jsr:@std/internal@^1.0.5": "1.0.5",
-    "npm:@kubernetes-models/apimachinery@*": "2.0.2",
     "npm:@kubernetes-models/apimachinery@^2.0.2": "2.0.2",
-    "npm:@kubernetes-models/base@*": "5.0.1",
     "npm:@kubernetes-models/base@^5.0.1": "5.0.1",
     "npm:@kubernetes-models/crd-generate@^5.0.2": "5.0.2",
-    "npm:@kubernetes-models/generate@^2.4.0": "2.4.0",
-    "npm:@kubernetes-models/validate@*": "4.0.0_ajv@8.17.1",
     "npm:@kubernetes-models/validate@4": "4.0.0_ajv@8.17.1",
     "npm:@ltd/j-toml@*": "1.38.0",
     "npm:@types/js-yaml@^4.0.9": "4.0.9",
@@ -121,6 +117,18 @@
         "globals"
       ]
     },
+    "@babel/traverse@7.26.4": {
+      "integrity": "sha512-fH+b7Y4p3yqvApJALCPJcwb0/XaOSgtK4pzV6WVjPR5GLFQBRI7pfoX2V2iM48NXvX07NUxxm1Vw98YjqTcU5w==",
+      "dependencies": [
+        "@babel/code-frame",
+        "@babel/generator",
+        "@babel/parser",
+        "@babel/template",
+        "@babel/types",
+        "debug",
+        "globals"
+      ]
+    },
     "@babel/types@7.26.3": {
       "integrity": "sha512-vN5p+1kl59GVKMvTHt55NzzmYVxprfJD+ql7U9NFIfKCBkYE55LYtS+WtPlaYOyzydrKI8Nezd+aZextrd+FMA==",
       "dependencies": [
@@ -199,7 +207,7 @@
       "dependencies": [
         "@babel/generator",
         "@babel/parser",
-        "@babel/traverse",
+        "@babel/traverse@7.26.4",
         "@babel/types",
         "@kubernetes-models/string-util",
         "@kubernetes-models/validate",
@@ -1400,16 +1408,18 @@
     "https://deno.land/x/reflect_metadata@v0.1.12/mod.ts": "8b5e3b20f1e604c118df433e84a409b1d5116e885001047134cc42ecf84fa2cd"
   },
   "workspace": {
+    "dependencies": [
+      "npm:@kubernetes-models/apimachinery@^2.0.2",
+      "npm:@kubernetes-models/base@^5.0.1",
+      "npm:@kubernetes-models/crd-generate@^5.0.2",
+      "npm:@kubernetes-models/validate@4",
+      "npm:kubernetes-models@^4.4.2"
+    ],
     "members": {
       "packages/architect-core": {
         "dependencies": [
           "jsr:@dx/reflect@~0.2.14",
           "jsr:@es-toolkit/es-toolkit@^1.29.0",
-          "npm:@kubernetes-models/apimachinery@^2.0.2",
-          "npm:@kubernetes-models/base@^5.0.1",
-          "npm:@kubernetes-models/crd-generate@^5.0.2",
-          "npm:@kubernetes-models/generate@^2.4.0",
-          "npm:@kubernetes-models/validate@4",
           "npm:@types/js-yaml@^4.0.9",
           "npm:@types/lodash@^4.17.13",
           "npm:@types/object-hash@^3.0.6",
@@ -1417,7 +1427,6 @@
           "npm:appdirsjs@^1.2.7",
           "npm:commander@^12.1.0",
           "npm:js-yaml@^4.1.0",
-          "npm:kubernetes-models@^4.4.2",
           "npm:lodash@^4.17.21",
           "npm:object-hash@3",
           "npm:ts-graphviz@^2.1.5",
@@ -1429,11 +1438,6 @@
         "dependencies": [
           "jsr:@es-toolkit/es-toolkit@^1.29.0",
           "jsr:@match/match@0.1",
-          "npm:@kubernetes-models/apimachinery@^2.0.2",
-          "npm:@kubernetes-models/base@^5.0.1",
-          "npm:@kubernetes-models/crd-generate@^5.0.2",
-          "npm:@kubernetes-models/generate@^2.4.0",
-          "npm:@kubernetes-models/validate@4",
           "npm:@types/js-yaml@^4.0.9",
           "npm:@types/lodash@^4.17.13",
           "npm:@types/object-hash@^3.0.6",
@@ -1442,7 +1446,6 @@
           "npm:commander@^12.1.0",
           "npm:fast-glob@^3.3.2",
           "npm:js-yaml@^4.1.0",
-          "npm:kubernetes-models@^4.4.2",
           "npm:lodash@^4.17.21",
           "npm:object-hash@3",
           "npm:semver@^7.6.3",

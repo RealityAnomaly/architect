@@ -1,11 +1,6 @@
 {
   "imports": {
     "@es-toolkit/es-toolkit": "jsr:@es-toolkit/es-toolkit@^1.29.0",
-    "@kubernetes-models/apimachinery": "npm:@kubernetes-models/apimachinery@^2.0.2",
-    "@kubernetes-models/base": "npm:@kubernetes-models/base@^5.0.1",
-    "@kubernetes-models/crd-generate": "npm:@kubernetes-models/crd-generate@^5.0.2",
-    "@kubernetes-models/generate": "npm:@kubernetes-models/generate@^2.4.0",
-    "@kubernetes-models/validate": "npm:@kubernetes-models/validate@^4.0.0",
     "@match/match": "jsr:@match/match@^0.1.0",
     "@types/js-yaml": "npm:@types/js-yaml@^4.0.9",
     "@types/lodash": "npm:@types/lodash@^4.17.13",
@@ -15,7 +10,6 @@
     "commander": "npm:commander@^12.1.0",
     "fast-glob": "npm:fast-glob@^3.3.2",
     "js-yaml": "npm:js-yaml@^4.1.0",
-    "kubernetes-models": "npm:kubernetes-models@^4.4.2",
     "lodash": "npm:lodash@^4.17.21",
     "object-hash": "npm:object-hash@^3.0.0",
     "semver": "npm:semver@^7.6.3",

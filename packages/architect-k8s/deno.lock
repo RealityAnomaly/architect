@@ -2,7 +2,6 @@
   "version": "4",
   "specifiers": {
     "npm:@kubernetes-models/apimachinery@^2.0.1": "2.0.1",
-    "npm:@kubernetes-models/crd-generate@^5.0.1": "5.0.1",
     "npm:@kubernetes-models/generate@^2.4.0": "2.4.0",
     "npm:@types/js-yaml@^4.0.9": "4.0.9",
     "npm:@types/lodash@^4.17.13": "4.17.13",
@@ -129,18 +128,6 @@
         "@kubernetes-models/validate",
         "is-plain-object",
         "tslib"
-      ]
-    },
-    "@kubernetes-models/crd-generate@5.0.1": {
-      "integrity": "sha512-n9q8ZXpdwtgyZYuhqr+XZoU1VrPA2l0vB0qAdTywC37eBOGI7LV4hu1Jq7r+4g3HOKosAzlatzQZntNxyzqu+Q==",
-      "dependencies": [
-        "@kubernetes-models/generate",
-        "@kubernetes-models/read-input",
-        "@kubernetes-models/string-util",
-        "lodash",
-        "tslib",
-        "yaml",
-        "yargs"
       ]
     },
     "@kubernetes-models/generate@2.4.0": {
@@ -1189,7 +1176,6 @@
   "workspace": {
     "dependencies": [
       "npm:@kubernetes-models/apimachinery@^2.0.1",
-      "npm:@kubernetes-models/crd-generate@^5.0.1",
       "npm:@kubernetes-models/generate@^2.4.0",
       "npm:@types/js-yaml@^4.0.9",
       "npm:@types/lodash@^4.17.13",
