@@ -8,6 +8,6 @@ export * from './component.mts';
 export * from './plugin.mts';
 export * from './target.mts';
 
-import { ProjectModule } from 'jsr:@perdition/architect-core';
+import { ProjectModule } from '@perdition/architect-core';
 import model from './../architect.json' with { type: 'json' };
 export default new ProjectModule(model, import.meta.url);

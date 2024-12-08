@@ -1,4 +1,4 @@
-import { Command } from "npm:commander";
+import { Command } from "commander";
 import { App, AppCommandOptions, Component } from "../index.mts";
 
 interface AppCommandTargetOptions extends AppCommandOptions {};

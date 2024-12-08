@@ -1,4 +1,4 @@
-import * as assert from 'jsr:@std/assert';
+import * as assert from '@std/assert';
 import { PathResultBuilder, prettifyPath, ValuePath } from './paths.mts';
 
 Deno.test('prettifyPath works for all cases', async () => {

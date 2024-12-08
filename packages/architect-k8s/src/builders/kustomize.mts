@@ -1,7 +1,7 @@
 import { execFile } from 'node:child_process';
 import * as util from 'node:util';
 
-import { KubeResource } from 'jsr:@perdition/architect-core';
+import { KubeResource } from '@perdition/architect-core';
 import { Builder, BuilderParams } from './builder.mts';
 
 export class Kustomize extends Builder {

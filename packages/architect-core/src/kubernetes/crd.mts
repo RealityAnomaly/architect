@@ -1,11 +1,11 @@
 import { execFile } from 'node:child_process';
 import * as util from 'node:util';
 
-import * as api from 'npm:kubernetes-models';
+import * as api from 'kubernetes-models';
 import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
-import * as yaml from 'npm:js-yaml';
+import * as yaml from 'js-yaml';
 //import crdGenerate from '@kubernetes-models/crd-generate'
 import { ManifestLoader } from './yaml.mts';
 import { walk } from "../utils/files.mts";

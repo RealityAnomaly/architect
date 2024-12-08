@@ -1,8 +1,8 @@
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
-import { GVK, notEmpty } from 'jsr:@perdition/architect-core';
-import * as fg from 'npm:fast-glob';
-import * as api from 'npm:kubernetes-models';
+import { GVK, notEmpty } from '@perdition/architect-core';
+import * as fg from 'fast-glob';
+import * as api from 'kubernetes-models';
 import { KubeComponent, KubeComponentGenericResources } from '../../component.mts';
 
 import model from './architect.json' with { type: 'json' };

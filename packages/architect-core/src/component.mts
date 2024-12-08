@@ -1,6 +1,6 @@
-import objectHash from 'npm:object-hash';
+import objectHash from 'object-hash';
 
-import { Reflect } from "jsr:@dx/reflect";
+import { Reflect } from "@dx/reflect";
 
 import { Capability } from './capability.mts';
 import { ConfigurationContext } from './config.mts';
@@ -8,9 +8,9 @@ import { Target } from './target.mts';
 import { constructor, DeepPartial, Lazy, LazyAuto, recursiveMerge, ReflectionUtilities, TypeUtilities } from './utils/index.mts';
 import { CLASS_META_KEY, ComponentModel, ComponentModelUtilities, ComponentUpgradeState, Context, MODEL_META_KEY, TARGET_TYPE_META_KEY, TYPE_META_KEY } from './index.mts';
 import Module from 'node:module';
-import * as toolkit from 'jsr:@es-toolkit/es-toolkit';
+import * as toolkit from '@es-toolkit/es-toolkit';
 import { ModuleUtilities } from './utils/modules.mts';
-import { ValidateFunction } from 'npm:ajv';
+import { ValidateFunction } from 'ajv';
 
 export type ExtractComponentArgs<T extends Component> = T extends Component<object, infer A> ? A : never;
 

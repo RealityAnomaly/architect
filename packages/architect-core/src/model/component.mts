@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 
-import { Ajv, JSONSchemaType, ValidateFunction } from "npm:ajv";
+import { Ajv, JSONSchemaType, ValidateFunction } from "ajv";
 import { walk } from "../index.mts";
 
 

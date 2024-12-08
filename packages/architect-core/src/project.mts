@@ -1,6 +1,6 @@
 import path from 'node:path';
 import * as fs from 'node:fs/promises';
-import { Ajv, JSONSchemaType } from "npm:ajv";
+import { Ajv, JSONSchemaType } from "ajv";
 import { Architect, Component, ComponentClass, ComponentMetadata, Plugin, Target } from './index.mts';
 import Module from 'node:module';
 import { PluginConstructor } from "./plugin.mts";

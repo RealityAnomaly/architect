@@ -1,4 +1,4 @@
-import * as toolkit from 'jsr:@es-toolkit/es-toolkit';
+import * as toolkit from '@es-toolkit/es-toolkit';
 
 /**
  * Returns true when type of `value` is `object` and is not `null`, `undefined` or

@@ -3,7 +3,7 @@ import path from 'node:path';
 
 import { Architect, ComponentClass, ComponentMetadata, ComponentModel, ComponentModelFileInstance, ComponentModelUtilities } from "../index.mts";
 import { Project } from "../project.mts";
-import { Logger } from 'npm:winston';
+import { Logger } from 'winston';
 
 export interface ComponentUpgradeState<TModel extends ComponentModel = ComponentModel> {
   clazz: ComponentClass;

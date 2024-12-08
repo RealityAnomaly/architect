@@ -1,8 +1,8 @@
 import path from 'node:path';
-import * as yaml from 'npm:js-yaml';
+import * as yaml from 'js-yaml';
 import * as fs from 'node:fs/promises';
 
-import { Result, Writer, KubeResource, KubeResourceUtilities } from 'jsr:@perdition/architect-core';
+import { Result, Writer, KubeResource, KubeResourceUtilities } from '@perdition/architect-core';
 import { KubeTarget, KubeTargetOutputFormat } from './target.mts';
 import { KubeContext } from './context.mts';
 import { KubeComponent } from './index.mts';

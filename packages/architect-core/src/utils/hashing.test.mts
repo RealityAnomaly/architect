@@ -1,5 +1,5 @@
 import { HashUtilities } from './hashing.mts';
-import * as assert from 'jsr:@std/assert';
+import * as assert from '@std/assert';
 
 Deno.test('composite hash equality', () => {
   const first = [
