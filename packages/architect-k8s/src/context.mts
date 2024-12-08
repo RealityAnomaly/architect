@@ -1,4 +1,4 @@
-import { Context } from "jsr:@perdition/architect-core";
+import { Context } from "@perdition/architect-core";
 
 export interface KubeContext extends Context {
   namespace: string;

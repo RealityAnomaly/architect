@@ -1,4 +1,4 @@
-import * as assert from 'jsr:@std/assert';
+import * as assert from '@std/assert';
 import * as types from './types.mts';
 
 Deno.test('setNamed', async () => {

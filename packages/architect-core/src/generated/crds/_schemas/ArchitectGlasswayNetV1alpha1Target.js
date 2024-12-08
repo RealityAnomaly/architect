@@ -116,7 +116,7 @@ const schema12 = {
   "$ref": "io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta#"
 };
 const schema13 = {};
-import { validate as validate30 } from "npm:@kubernetes-models/apimachinery/_schemas/IoK8sApimachineryPkgApisMetaV1ObjectMeta";
+import { validate as validate30 } from "@kubernetes-models/apimachinery/_schemas/IoK8sApimachineryPkgApisMetaV1ObjectMeta";
 function validate29(data, {
   instancePath = "",
   parentData,

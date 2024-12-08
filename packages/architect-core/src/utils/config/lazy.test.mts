@@ -1,6 +1,6 @@
 // deno-lint-ignore-file no-explicit-any
 import { Lazy } from "./lazy.mts";
-import * as assert from 'jsr:@std/assert';
+import * as assert from '@std/assert';
 
 interface TestOptionsB {
   barA: string;

@@ -1,8 +1,8 @@
-import { architectGlasswayNet, CapabilityMatcher, Component, ComponentArgs, ComponentClass, ComponentMatcher, ComponentMetadata, ComponentModel, ComponentModelUtilities, ComponentUpgradeState, IComponentMatcher, KubeResource, KubeResourceUtilities, PLUGIN_TARGET_IDENTIFIERS, Target } from 'jsr:@perdition/architect-core';
+import { architectGlasswayNet, CapabilityMatcher, Component, ComponentArgs, ComponentClass, ComponentMatcher, ComponentMetadata, ComponentModel, ComponentModelUtilities, ComponentUpgradeState, IComponentMatcher, KubeResource, KubeResourceUtilities, PLUGIN_TARGET_IDENTIFIERS, Target } from '@perdition/architect-core';
 
-import { JSONSchemaType, ValidateFunction } from "npm:ajv";
-import * as api from 'npm:kubernetes-models';
-import * as toolkit from 'jsr:@es-toolkit/es-toolkit';
+import { JSONSchemaType, ValidateFunction } from "ajv";
+import * as api from 'kubernetes-models';
+import * as toolkit from '@es-toolkit/es-toolkit';
 import { CNICapability, DNSCapability } from './capabilities/index.mts';
 
 import { KubeTarget } from './target.mts';

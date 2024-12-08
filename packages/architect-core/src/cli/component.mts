@@ -1,5 +1,5 @@
-import { Command } from "npm:commander";
-import { Reflect } from "jsr:@dx/reflect";
+import { Command } from "commander";
+import { Reflect } from "@dx/reflect";
 import { App, AppCommandOptions, CLASS_META_KEY, ComponentClass, Updater } from "../index.mts";
 
 interface AppCommandComponentOptions extends AppCommandOptions {};

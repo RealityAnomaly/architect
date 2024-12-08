@@ -1,6 +1,6 @@
 import { KubeResourceConstructor } from '../resource.mts';
 import { GVK } from './gvk.mts';
-import { Logger } from 'npm:winston';
+import { Logger } from 'winston';
 
 function gvkToPath(gvk: GVK): string {
   let path: string = '';

@@ -1,5 +1,5 @@
-import { CapabilityMatcher } from 'jsr:@perdition/architect-core';
-import { StorageCapability, KubeComponentHelm } from 'jsr:@perdition/architect-k8s';
+import { CapabilityMatcher } from '@perdition/architect-core';
+import { StorageCapability, KubeComponentHelm } from '@perdition/architect-k8s';
 
 import model from './architect.json' with { type: 'json' };
 

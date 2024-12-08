@@ -1,16 +1,16 @@
 import * as kubeUtils from './kubernetes/index.mts';
-import { Reflect } from "jsr:@dx/reflect";
+import { Reflect } from "@dx/reflect";
 
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
 import { PluginResolver } from './plugin.mts';
 import { Target, TargetResolveParams } from './target.mts';
-import winston from 'npm:winston';
+import winston from 'winston';
 import { Project } from './project.mts';
 import { DependencyGraphRenderer } from './graph/render.mts';
 import { TargetCache } from './cache.mts';
 import { StateProvider } from './index.mts';
-import { Ajv } from 'npm:ajv';
+import { Ajv } from 'ajv';
 
 export const TYPE_META_KEY = 'architect.glassway.net/type';
 export const MODEL_META_KEY = 'architect.glassway.net/model';
