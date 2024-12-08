@@ -68,17 +68,9 @@ export class Project {
 
   private async loadImports(parent: Architect) {
     for (const pkg of this.config.imports || []) {
-      let lib: Project;
-      try {
-        lib = await Project.fromModule(parent, pkg);
-      } catch (exception) {
-        parent.logger.warn(`unable to load project ${pkg}: ${exception}`);
-        continue;
-      };
-
+      const lib = await Project.fromModule(parent, pkg);
       if (lib.config.library !== true) {
-        parent.logger.warn(`unable to load project import ${pkg}: not designated as a library`);
-        continue;
+        throw new Error(`unable to load project import ${pkg}: not designated as a library`);
       };
 
       parent.logger.debug(`loaded project import ${pkg}`);

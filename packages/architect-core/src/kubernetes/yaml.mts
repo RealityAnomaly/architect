@@ -47,8 +47,6 @@ export class ManifestLoader {
      */
   public async loadFile(path: string): Promise<KubeResource[]> {
     const content = await fs.readFile(path, 'utf-8');
-    //logger.log(LogLevel.Debug, `File loaded from: ${path}`);
-
     return this.loadString(content);
   };
 };
