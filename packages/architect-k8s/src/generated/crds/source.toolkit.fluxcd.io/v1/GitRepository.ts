@@ -364,7 +364,9 @@ static kind: IGitRepository["kind"] = "GitRepository";
 static is = createTypeMetaGuard<IGitRepository>(GitRepository);
 
 constructor(data?: ModelData<IGitRepository>) {
-  super({
+  super();
+
+  this.setDefinedProps({
     apiVersion: GitRepository.apiVersion,
     kind: GitRepository.kind,
     ...data

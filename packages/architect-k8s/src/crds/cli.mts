@@ -19,6 +19,7 @@ interface CRDCommandRemoveOptions extends CRDCommandOptions {
 
 interface CRDCommandSyncOptions extends CRDCommandOptions {
   domain?: string;
+  dryRun: boolean;
   fetchOnly: boolean;
 };
 
@@ -97,7 +98,9 @@ export class CRDCommand extends Command {
       await this.plugin.crds.syncAll(syncOptions);
     }
 
-    await this.plugin.crds.commit();
+    if (!options.dryRun) {
+      await this.plugin.crds.commit();
+    };
   };
 
   constructor(plugin: K8sPlugin) {
@@ -122,8 +125,10 @@ export class CRDCommand extends Command {
       .action(this.list.bind(this));
     this.command('sync')
       .description('Fetch CRDs and generate TypeScript models')
-      .option('-d, --domain <domain>', 'Only fetch these CRD domains')
+      .option('-d, --dry-run', 'Simulate only, do not generate or commit changes', false)
       .option('-f, --fetch-only', 'Skip model generation and only fetch YAML definitions', false)
+      .option('--domain <domain>', 'Only fetch these CRD domains')
+      
       .action(this.sync.bind(this));
   };
 }

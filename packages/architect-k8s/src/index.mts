@@ -8,6 +8,21 @@ export * from './component.mts';
 export * from './plugin.mts';
 export * from './target.mts';
 
-import { ProjectModule } from '@perdition/architect-core';
+import { Project, PluginClass } from "@perdition/architect-core";
+import * as components from "./components/index.mts";
+
 import model from './../architect.json' with { type: 'json' };
-export default new ProjectModule(model, import.meta.url);
+import { K8sPlugin } from "./plugin.mts";
+
+@Project.decorate(model)
+export class ArchitectK8SProject extends Project {
+  public override get plugins(): PluginClass[] {
+    return [K8sPlugin, ...super.plugins];
+  }
+
+  public override get modules(): unknown[] {
+    return [components, ...super.modules];
+  };
+};
+
+await Project.runIfMain(ArchitectK8SProject, import.meta.url);

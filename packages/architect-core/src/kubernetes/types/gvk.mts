@@ -75,4 +75,14 @@ export class GVK {
     if (this.group !== undefined) builder = `${this.group}_` + builder;
     return builder;
   };
+
+  public toPath(): string {
+    let path: string = '';
+    if (this.group) {
+      path += `${this.group}/`;
+    };
+  
+    path += `${this.version}/${this.kind}`;
+    return path;
+  };
 };

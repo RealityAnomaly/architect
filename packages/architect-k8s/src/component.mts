@@ -1,4 +1,4 @@
-import { architectGlasswayNet, CapabilityMatcher, Component, ComponentArgs, ComponentClass, ComponentMatcher, ComponentMetadata, ComponentModel, ComponentModelUtilities, ComponentUpgradeState, IComponentMatcher, KubeResource, KubeResourceUtilities, PLUGIN_TARGET_IDENTIFIERS, Target } from '@perdition/architect-core';
+import { architectGlasswayNet, CapabilityMatcher, Component, ComponentArgs, ComponentClass, ComponentMatcher, ComponentMetadata, ComponentModel, ComponentModelUtilities, ComponentUpgradeState, IComponentMatcher, KubeResource, KubeResourceUtilities, Plugin, Target } from '@perdition/architect-core';
 
 import { JSONSchemaType, ValidateFunction } from "ajv";
 import * as api from 'kubernetes-models';
@@ -176,7 +176,7 @@ export abstract class KubeComponent<
    */
   public static decorate<T extends object>(model: KubeComponentModel): (target: T) => void {
     function decorator(target: T) {
-      new ComponentMetadata<KubeComponentModel>(model, PLUGIN_TARGET_IDENTIFIERS.kubernetes, model.class).assign(target);
+      new ComponentMetadata<KubeComponentModel>(model, Plugin.TARGET_IDENTIFIERS.kubernetes, model.class).assign(target);
     };
 
     return decorator;
