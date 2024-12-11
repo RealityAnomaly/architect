@@ -4,7 +4,7 @@ import * as fs from 'node:fs/promises';
 import { Ajv, JSONSchemaType } from "ajv";
 import { Reflect } from "@dx/reflect";
 
-import { App, Architect, ComponentClass, ComponentMetadata, Target, ArchitectCoreProject } from './index.mts';
+import { Architect, ComponentClass, ComponentMetadata, Target, ArchitectCoreProject } from './index.mts';
 import { PluginClass } from "./plugin.mts";
 import { Component } from "./component.mts";
 import Module from "node:module";
