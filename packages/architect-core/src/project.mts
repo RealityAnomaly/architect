@@ -109,10 +109,6 @@ export abstract class Project {
   public static decorate<T extends object>(model: ProjectConfig): (target: T) => void {
     return (target: T) => { new ProjectMetadata(model).assign(target); };
   };
-
-  public static async run(ctor: ProjectClass): Promise<void> {
-    await App.run(ctor);
-  };
 }
 
 export class ProjectMetadata<TModel extends ProjectConfig = ProjectConfig> {
