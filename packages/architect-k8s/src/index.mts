@@ -8,7 +8,7 @@ export * from './component.mts';
 export * from './plugin.mts';
 export * from './target.mts';
 
-import { Project, PluginClass } from "@perdition/architect-core";
+import { App, Project, PluginClass } from "@perdition/architect-core";
 import * as components from "./components/index.mts";
 
 import model from './../architect.json' with { type: 'json' };
@@ -26,5 +26,5 @@ export class ArchitectK8sProject extends Project {
 };
 
 if (import.meta.main) {
-  await Project.run(ArchitectK8sProject);
+  await App.run(ArchitectK8sProject);
 };
