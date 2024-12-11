@@ -6,6 +6,7 @@ export interface ModulePackageEntry {
 }
 
 export class ModuleUtilities {
+  // deno-lint-ignore no-explicit-any
   public static collectClasses<T>(module: any, matcher: (clazz: constructor<T>) => boolean): constructor<T>[] {
     const result: constructor<T>[] = [];
 

@@ -4,6 +4,7 @@ export const NAMED_SYMBOL = Symbol.for('architect.Named');
  * Constructor type, ported from tsyringe
  */
 export type constructor<T> = {
+  // deno-lint-ignore no-explicit-any
   new (...args: any[]): T;
 };
 
