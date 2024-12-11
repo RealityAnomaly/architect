@@ -290,7 +290,9 @@ static kind: IBucket["kind"] = "Bucket";
 static is = createTypeMetaGuard<IBucket>(Bucket);
 
 constructor(data?: ModelData<IBucket>) {
-  super({
+  super();
+
+  this.setDefinedProps({
     apiVersion: Bucket.apiVersion,
     kind: Bucket.kind,
     ...data

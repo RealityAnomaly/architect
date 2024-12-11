@@ -469,7 +469,9 @@ static kind: IKustomization["kind"] = "Kustomization";
 static is = createTypeMetaGuard<IKustomization>(Kustomization);
 
 constructor(data?: ModelData<IKustomization>) {
-  super({
+  super();
+
+  this.setDefinedProps({
     apiVersion: Kustomization.apiVersion,
     kind: Kustomization.kind,
     ...data

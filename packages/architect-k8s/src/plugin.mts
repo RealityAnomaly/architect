@@ -1,4 +1,4 @@
-import { Architect, Plugin, PLUGIN_TARGET_IDENTIFIERS, TargetClass } from "@perdition/architect-core";
+import { Architect, Plugin, TargetClass } from "@perdition/architect-core";
 import { Command } from "commander";
 import { CRDCommand } from "./crds/cli.mts";
 import { CrdsConfig } from "./crds/config.mts";
@@ -37,11 +37,7 @@ export class K8sPlugin extends Plugin {
     this.httpBuilder = new HttpBuilder(builderParams);
   };
 
-  public async init(): Promise<void> {
-    for (const path of this.parent.projectPaths) {
-      this.parent.kubeTypes.appendCRDModule(path);
-    };
-  };
+  public async init(): Promise<void> {};
 
   public async registerCommand(cmd: Command): Promise<void> {
     const command = cmd.command('k8s')
@@ -55,6 +51,6 @@ export class K8sPlugin extends Plugin {
   };
 
   public get targets(): Record<string, TargetClass> {
-    return { [PLUGIN_TARGET_IDENTIFIERS.kubernetes]: KubeTarget };
+    return { [Plugin.TARGET_IDENTIFIERS.kubernetes]: KubeTarget };
   };
 }

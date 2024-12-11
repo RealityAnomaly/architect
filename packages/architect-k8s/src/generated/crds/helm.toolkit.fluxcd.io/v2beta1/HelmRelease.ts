@@ -1067,7 +1067,9 @@ static kind: IHelmRelease["kind"] = "HelmRelease";
 static is = createTypeMetaGuard<IHelmRelease>(HelmRelease);
 
 constructor(data?: ModelData<IHelmRelease>) {
-  super({
+  super();
+
+  this.setDefinedProps({
     apiVersion: HelmRelease.apiVersion,
     kind: HelmRelease.kind,
     ...data

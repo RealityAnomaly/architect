@@ -20,6 +20,7 @@
   },
   "exports": {
     ".": "./src/index.mts",
+    "./components": "./src/components/index.mts",
     "./crds": "./src/generated/crds/index.ts"
   },
   "lint": {

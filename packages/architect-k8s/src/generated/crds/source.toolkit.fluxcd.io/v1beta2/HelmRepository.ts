@@ -252,7 +252,9 @@ static kind: IHelmRepository["kind"] = "HelmRepository";
 static is = createTypeMetaGuard<IHelmRepository>(HelmRepository);
 
 constructor(data?: ModelData<IHelmRepository>) {
-  super({
+  super();
+
+  this.setDefinedProps({
     apiVersion: HelmRepository.apiVersion,
     kind: HelmRepository.kind,
     ...data

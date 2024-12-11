@@ -6,7 +6,7 @@ import { Capability } from './capability.mts';
 import { ConfigurationContext } from './config.mts';
 import { Target } from './target.mts';
 import { constructor, DeepPartial, Lazy, LazyAuto, recursiveMerge, ReflectionUtilities, TypeUtilities } from './utils/index.mts';
-import { CLASS_META_KEY, ComponentModel, ComponentModelUtilities, ComponentUpgradeState, Context, MODEL_META_KEY, TARGET_TYPE_META_KEY, TYPE_META_KEY } from './index.mts';
+import { Architect, ComponentModel, ComponentModelUtilities, ComponentUpgradeState, Context } from './index.mts';
 import Module from 'node:module';
 import * as toolkit from '@es-toolkit/es-toolkit';
 import { ModuleUtilities } from './utils/modules.mts';
@@ -64,26 +64,12 @@ export abstract class Component<
       props.inputs = recursiveMerge(this.meta.model.inputs, props.inputs || {});
     };
 
-    // if (!Reflect.hasMetadata('class', this.constructor) && this.parent === undefined) {
-    //   throw Error(`${this.constructor.name}: the class metadata attribute must be set`);
-    // };
-    
-    // const clazzSplit = this.clazz.split('/');
-    // if (clazzSplit.length != 2 || !clazzSplit[0] || !clazzSplit[1]) {
-    //   throw Error(`${this.constructor.name}: the class metadata attribute must contain at least one slash, and both parts must not be empty`);
-    // };
-
-    // hacky way to leave this defaultable
     if (props === undefined) {
       props = {} as TArgs;
     };
 
     this.props = Lazy.from(props);
-
-    // Configure
     this.configure(new ConfigurationContext(target, this.props));
-
-    // Run initialiser
     this.init();
   };
 
@@ -252,7 +238,8 @@ export abstract class Component<
 
   public static async collect(module: Module): Promise<ComponentClass[]> {
     return ModuleUtilities.collectClasses(module, clazz => {
-      return TypeUtilities.isObject(clazz) && Reflect.hasMetadata(TYPE_META_KEY, clazz) && Reflect.getMetadata(TYPE_META_KEY, clazz) === 'component';
+      return TypeUtilities.isObject(clazz) && Reflect.hasMetadata(Architect.TYPE_META_KEY, clazz)
+        && Reflect.getMetadata(Architect.TYPE_META_KEY, clazz) === 'component';
     });
   };
 
@@ -281,17 +268,17 @@ export class ComponentMetadata<TModel extends ComponentModel = ComponentModel> {
   };
 
   public assign<T extends object>(target: T) {
-    Reflect.defineMetadata(TYPE_META_KEY, 'component', target);
-    Reflect.defineMetadata(MODEL_META_KEY, this.model, target);
-    Reflect.defineMetadata(TARGET_TYPE_META_KEY, this.target, target);
-    if (this.clazz) Reflect.defineMetadata(CLASS_META_KEY, this.clazz, target);
+    Reflect.defineMetadata(Architect.TYPE_META_KEY, 'component', target);
+    Reflect.defineMetadata(Architect.MODEL_META_KEY, this.model, target);
+    Reflect.defineMetadata(Architect.TARGET_TYPE_META_KEY, this.target, target);
+    if (this.clazz) Reflect.defineMetadata(Architect.CLASS_META_KEY, this.clazz, target);
   };
 
   public static from<TModel extends ComponentModel, T extends Component = Component>(clazz: ComponentClass<T>): ComponentMetadata<TModel> {
     return new ComponentMetadata<TModel>(
-      Reflect.hasMetadata(MODEL_META_KEY, clazz) ? Reflect.getMetadata(MODEL_META_KEY, clazz) : undefined,
-      Reflect.hasMetadata(TARGET_TYPE_META_KEY, clazz) ? Reflect.getMetadata(TARGET_TYPE_META_KEY, clazz) : undefined,
-      Reflect.hasMetadata(CLASS_META_KEY, clazz) ? Reflect.getMetadata(CLASS_META_KEY, clazz) : undefined
+      Reflect.hasMetadata(Architect.MODEL_META_KEY, clazz) ? Reflect.getMetadata(Architect.MODEL_META_KEY, clazz) : undefined,
+      Reflect.hasMetadata(Architect.TARGET_TYPE_META_KEY, clazz) ? Reflect.getMetadata(Architect.TARGET_TYPE_META_KEY, clazz) : undefined,
+      Reflect.hasMetadata(Architect.CLASS_META_KEY, clazz) ? Reflect.getMetadata(Architect.CLASS_META_KEY, clazz) : undefined
     );
   };
 };

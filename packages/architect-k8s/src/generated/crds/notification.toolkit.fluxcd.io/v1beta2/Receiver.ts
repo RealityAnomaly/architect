@@ -168,7 +168,9 @@ static kind: IReceiver["kind"] = "Receiver";
 static is = createTypeMetaGuard<IReceiver>(Receiver);
 
 constructor(data?: ModelData<IReceiver>) {
-  super({
+  super();
+
+  this.setDefinedProps({
     apiVersion: Receiver.apiVersion,
     kind: Receiver.kind,
     ...data

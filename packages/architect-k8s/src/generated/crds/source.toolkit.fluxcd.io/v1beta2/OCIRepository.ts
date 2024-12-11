@@ -348,7 +348,9 @@ static kind: IOCIRepository["kind"] = "OCIRepository";
 static is = createTypeMetaGuard<IOCIRepository>(OCIRepository);
 
 constructor(data?: ModelData<IOCIRepository>) {
-  super({
+  super();
+
+  this.setDefinedProps({
     apiVersion: OCIRepository.apiVersion,
     kind: OCIRepository.kind,
     ...data

@@ -1,8 +1,8 @@
 import { Reflect } from "@dx/reflect";
 
 import { Component, IComponentMatcher } from './component.mts';
-import { CLASS_META_KEY } from './index.mts';
 import { constructor } from './utils/index.mts';
+import { Architect } from "./index.mts";
 
 type CapabilityCondition<T extends Capability<unknown>> = (capability: T) => boolean;
 
@@ -14,7 +14,7 @@ export abstract class Capability<T> {
   };
 
   public get clazz(): string {
-    return Reflect.getMetadata(CLASS_META_KEY, this.constructor);
+    return Reflect.getMetadata(Architect.CLASS_META_KEY, this.constructor);
   };
 };
 
@@ -28,7 +28,7 @@ export class CapabilityMatcher<T extends Capability<unknown>> implements ICompon
   };
 
   match(input: Component): boolean {
-    const clazz = Reflect.getMetadata(CLASS_META_KEY, this.token);
+    const clazz = Reflect.getMetadata(Architect.CLASS_META_KEY, this.token);
     const capability = input.capabilities.find(object => {
       return object.clazz === clazz;
     });
@@ -40,7 +40,7 @@ export class CapabilityMatcher<T extends Capability<unknown>> implements ICompon
   };
 
   constraint(): string {
-    return `Capability("${Reflect.getMetadata(CLASS_META_KEY, this.token)}")`;
+    return `Capability("${Reflect.getMetadata(Architect.CLASS_META_KEY, this.token)}")`;
   };
 
   toString(): string {

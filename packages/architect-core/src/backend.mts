@@ -22,6 +22,6 @@ export class FileBackend extends Backend {
   };
 
   public async targets(): Promise<Target[]> {
-    return await this.project.getTargets(this.parent, false);
+    return await this.project.getTargets(this.parent);
   };
 };

@@ -218,7 +218,9 @@ static kind: IImageRepository["kind"] = "ImageRepository";
 static is = createTypeMetaGuard<IImageRepository>(ImageRepository);
 
 constructor(data?: ModelData<IImageRepository>) {
-  super({
+  super();
+
+  this.setDefinedProps({
     apiVersion: ImageRepository.apiVersion,
     kind: ImageRepository.kind,
     ...data

@@ -1,13 +1,13 @@
 import * as commander from 'commander';
 import { Reflect } from "@dx/reflect";
 
-import { Architect, CLASS_META_KEY, TargetClass, TYPE_META_KEY } from './index.mts';
+import { Architect, TargetClass } from './index.mts';
 import { Logger } from 'winston';
 import Module from "node:module";
 import { TypeUtilities } from "./utils/types.mts";
 import { ModuleUtilities } from "./utils/modules.mts";
 
-export class PluginResolver {
+export class PluginRegistry {
   private readonly parent: Architect;
   public readonly data: Record<string, Plugin> = {};
 
@@ -15,8 +15,8 @@ export class PluginResolver {
     this.parent = parent;
   };
 
-  public async register(plugin: PluginConstructor): Promise<void> {
-    const clazz = Reflect.getMetadata(CLASS_META_KEY, plugin);
+  public async register(plugin: PluginClass): Promise<void> {
+    const clazz = Reflect.getMetadata(Architect.CLASS_META_KEY, plugin);
     this.data[clazz] = new plugin(this.parent);
   };
 
@@ -46,6 +46,10 @@ export class PluginResolver {
  * Represents an extension to Architect that defines new functionality.
  */
 export abstract class Plugin {
+  public static TARGET_IDENTIFIERS = {
+    kubernetes: 'target.architect.glassway.net/kubernetes',
+  };
+
   public readonly name: string;
   public readonly parent: Architect;
   public readonly logger: Logger;
@@ -62,22 +66,23 @@ export abstract class Plugin {
 
   public abstract get targets(): Record<string, TargetClass>;
 
-  public static decorate<T extends Plugin>(clazz: string): (target: PluginConstructor<T>) => void {
-    function decorator(target: PluginConstructor<T>) {
-      Reflect.defineMetadata(TYPE_META_KEY, 'plugin', target);
-      Reflect.defineMetadata(CLASS_META_KEY, clazz, target);
+  public static decorate<T extends Plugin>(clazz: string): (target: PluginClass<T>) => void {
+    function decorator(target: PluginClass<T>) {
+      Reflect.defineMetadata(Architect.TYPE_META_KEY, 'plugin', target);
+      Reflect.defineMetadata(Architect.CLASS_META_KEY, clazz, target);
     };
 
     return decorator;
   };
 
-  public static async collect(module: Module): Promise<PluginConstructor[]> {
+  public static async collect(module: Module): Promise<PluginClass[]> {
     return ModuleUtilities.collectClasses(module, clazz => {
-      return TypeUtilities.isObject(clazz) && Reflect.hasMetadata(TYPE_META_KEY, clazz) && Reflect.getMetadata(TYPE_META_KEY, clazz) === 'plugin';
+      return TypeUtilities.isObject(clazz) && Reflect.hasMetadata(Architect.TYPE_META_KEY, clazz)
+        && Reflect.getMetadata(Architect.TYPE_META_KEY, clazz) === 'plugin';
     });
   };
 };
 
-export interface PluginConstructor<T extends Plugin = Plugin> {
+export interface PluginClass<T extends Plugin = Plugin> {
   new (parent: Architect): T;
 };

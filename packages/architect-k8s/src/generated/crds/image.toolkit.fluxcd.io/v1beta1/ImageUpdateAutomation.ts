@@ -271,7 +271,9 @@ static kind: IImageUpdateAutomation["kind"] = "ImageUpdateAutomation";
 static is = createTypeMetaGuard<IImageUpdateAutomation>(ImageUpdateAutomation);
 
 constructor(data?: ModelData<IImageUpdateAutomation>) {
-  super({
+  super();
+
+  this.setDefinedProps({
     apiVersion: ImageUpdateAutomation.apiVersion,
     kind: ImageUpdateAutomation.kind,
     ...data

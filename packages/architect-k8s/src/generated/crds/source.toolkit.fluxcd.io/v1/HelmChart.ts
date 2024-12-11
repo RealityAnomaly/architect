@@ -263,7 +263,9 @@ static kind: IHelmChart["kind"] = "HelmChart";
 static is = createTypeMetaGuard<IHelmChart>(HelmChart);
 
 constructor(data?: ModelData<IHelmChart>) {
-  super({
+  super();
+
+  this.setDefinedProps({
     apiVersion: HelmChart.apiVersion,
     kind: HelmChart.kind,
     ...data

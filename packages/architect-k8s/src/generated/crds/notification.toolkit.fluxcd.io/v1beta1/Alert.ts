@@ -144,7 +144,9 @@ static kind: IAlert["kind"] = "Alert";
 static is = createTypeMetaGuard<IAlert>(Alert);
 
 constructor(data?: ModelData<IAlert>) {
-  super({
+  super();
+
+  this.setDefinedProps({
     apiVersion: Alert.apiVersion,
     kind: Alert.kind,
     ...data
