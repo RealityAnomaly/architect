@@ -19,6 +19,7 @@
     "@kubernetes-models/base": "npm:@kubernetes-models/base@^5.0.1",
     "@kubernetes-models/crd-generate": "npm:@kubernetes-models/crd-generate@^5.0.2",
     "@kubernetes-models/validate": "npm:@kubernetes-models/validate@^4.0.0",
+    "@std/assert": "jsr:@std/assert@^1.0.9",
     "kubernetes-models": "npm:kubernetes-models@^4.4.2"
   }
 }

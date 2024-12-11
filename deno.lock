@@ -7,6 +7,7 @@
     "jsr:@es-toolkit/es-toolkit@^1.29.0": "1.29.0",
     "jsr:@match/match@0.1": "0.1.0",
     "jsr:@std/assert@*": "1.0.8",
+    "jsr:@std/assert@^1.0.9": "1.0.9",
     "jsr:@std/internal@^1.0.5": "1.0.5",
     "jsr:@std/path@*": "1.0.8",
     "npm:@kubernetes-models/apimachinery@*": "2.0.2",
@@ -63,6 +64,12 @@
     },
     "@std/assert@1.0.8": {
       "integrity": "ebe0bd7eb488ee39686f77003992f389a06c3da1bbd8022184804852b2fa641b",
+      "dependencies": [
+        "jsr:@std/internal"
+      ]
+    },
+    "@std/assert@1.0.9": {
+      "integrity": "a9f0c611a869cc791b26f523eec54c7e187aab7932c2c8e8bea0622d13680dcd",
       "dependencies": [
         "jsr:@std/internal"
       ]
@@ -1417,6 +1424,7 @@
   },
   "workspace": {
     "dependencies": [
+      "jsr:@std/assert@^1.0.9",
       "npm:@kubernetes-models/apimachinery@^2.0.2",
       "npm:@kubernetes-models/base@^5.0.1",
       "npm:@kubernetes-models/crd-generate@^5.0.2",
