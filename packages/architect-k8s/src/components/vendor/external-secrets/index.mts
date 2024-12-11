@@ -1,4 +1,4 @@
-import { KubeComponentHelm } from "@perdition/architect-k8s";
+import { KubeComponentHelm } from '../../builders/helm.mts';
 
 import model from './architect.json' with { type: 'json' };
 

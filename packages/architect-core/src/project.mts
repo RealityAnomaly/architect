@@ -1,31 +1,65 @@
 import path from 'node:path';
+import url from 'node:url';
+import process from 'node:process';
+
 import * as fs from 'node:fs/promises';
 import { Ajv, JSONSchemaType } from "ajv";
-import { Architect, Component, ComponentClass, ComponentMetadata, Plugin, Target } from './index.mts';
-import Module from 'node:module';
-import { PluginConstructor } from "./plugin.mts";
+import { Reflect } from "@dx/reflect";
 
-export class Project {
-  public readonly libraries: Project[] = [];
+import { App, Architect, ComponentClass, ComponentMetadata, Target, ArchitectCoreProject } from './index.mts';
+import { PluginClass } from "./plugin.mts";
+import { Component } from "./component.mts";
+import Module from "node:module";
+
+export abstract class Project {
+  /**
+   * The root path of the project. Only set if this project is the currently active workspace.
+   */
   public root?: string;
+  private loaded?: boolean = false;
 
-  public config: ProjectConfig;
-  
-  private _targets?: Target[];
   private _components?: ComponentClass[];
-  private _plugins?: PluginConstructor[];
-  private _module?: Module;
+  private _targets?: Target[];
 
-  constructor(config: ProjectConfig, root?: string) {
-    this.config = config;
-    this.root = root;
+  /**
+   * Returns a list of project classes to import as dependencies for this project
+   */
+  public get imports(): ProjectClass[] { return [ArchitectCoreProject]; };
+
+  /**
+   * Returns a list of plugin classes to expose from this project
+   */
+  public get plugins(): PluginClass[] { return []; }
+
+  /**
+   * Returns a list of modules within this project that should be scanned for components and file-based targets
+   */
+  public get modules(): unknown[] { return []; };
+
+  public get config(): ProjectConfig {
+    return ProjectMetadata.from(this.constructor as ProjectClass).model;
   };
 
-  public async getModule(): Promise<Module | undefined> {
-    if (this._module || !this.root) return this._module;
-    
-    this._module = await import(path.join(this.root, 'src/index.mts'));
-    return this._module;
+  /**
+   * Loads and registers the imports of this and all descendent imports
+   */
+  public async load(parent: Architect) {
+    if (this.loaded) return;
+
+    parent.logger.debug(`loading project ${this.constructor.name}`);
+    for (const plugin of this.plugins) {
+      await parent.plugins.register(plugin);
+    };
+
+    for (const _import of parent.projects.resolveAll(this.imports)) {
+      if (_import === this) {
+        throw new Error(`Project ${this.constructor.name} references itself as a dependency`);
+      };
+
+      await _import.load(parent);
+    };
+
+    this.loaded = true;
   };
 
   public async saveConfig() {
@@ -33,74 +67,21 @@ export class Project {
     await ProjectConfigLoader.save(path.join(this.root, 'architect.json'), this.config!);
   };
 
-  public async init(parent: Architect): Promise<void> {
-    await this.loadImports(parent);
-  };
-
-  /**
-   * Loads a {Project} from a local folder, allowing configuration file access
-   */
-  public static async fromWorkspace(parent: Architect, root: string): Promise<Project> {
-    const config = await ProjectConfigLoader.load(path.join(root, 'architect.json'), parent.ajv);
-    const project = new Project(config, root);
-    await project.init(parent);
-
-    return project;
-  };
-
-  /**
-   * Loads a {Project} from the default export of an ECMAScript module
-   */
-  public static async fromModule(parent: Architect, modulePath: string): Promise<Project> {
-    const module = await import(modulePath);
-    const moduleClazz = module.default as ProjectModule;
-
-    // remove /src/*.mts suffix from config root
-    const root = moduleClazz.root?.replace('/src/index.mts', '');
-
-    ProjectConfigLoader.validate(moduleClazz.config, parent.ajv);
-    
-    const project = new Project(moduleClazz.config, root);
-    await project.init(parent);
-
-    return project;
-  };
-
-  private async loadImports(parent: Architect) {
-    for (const pkg of this.config.imports || []) {
-      const lib = await Project.fromModule(parent, pkg);
-      if (lib.config.library !== true) {
-        throw new Error(`unable to load project import ${pkg}: not designated as a library`);
-      };
-
-      parent.logger.debug(`loaded project import ${pkg}`);
-      this.libraries.push(lib);
-    };
-  };
-
-  public async getTarget(parent: Architect, name: string, recursive?: boolean): Promise<Target | undefined> {
-    const targets = await this.getTargets(parent, recursive);
+  public async getTarget(parent: Architect, name: string): Promise<Target | undefined> {
+    const targets = await this.getTargets(parent);
     return targets.find(t => t.model.metadata.name === name);
   };
 
-  public async getTargets(parent: Architect, recursive?: boolean): Promise<Target[]> {
+  public async getTargets(parent: Architect): Promise<Target[]> {
     if (!this._targets && this.root) {
       this._targets = await Target.collectFolder(parent, path.join(this.root, 'src/targets'));
     };
 
-    const result = [];
-    result.push(...this._targets || []);
-    if (recursive) {
-      for (const library of this.libraries) {
-        result.push(...await library.getTargets(parent, recursive));
-      };
-    };
-
-    return result;
+    return this._targets || [];
   };
 
-  public async getComponent(clazz: string, recursive?: boolean): Promise<ComponentClass | undefined> {
-    const components = await this.getComponents(recursive);
+  public async getComponent(parent: Architect, clazz: string, recursive: boolean = false): Promise<ComponentClass | undefined> {
+    const components = await this.getComponents(parent, recursive);
     return components.find(c => {
       const meta = ComponentMetadata.from(c);
       if (!meta.model) return false;
@@ -109,57 +90,68 @@ export class Project {
     });
   };
 
-  public async getComponents(recursive?: boolean): Promise<ComponentClass[]> {
-    const module = await this.getModule();
-    if (!this._components && module) {
-      this._components = await Component.collect(module);
-    };
-
-    const result = [];
-    result.push(...this._components || []);
-    if (recursive) {
-      for (const library of this.libraries) {
-        result.push(...await library.getComponents(recursive));
+  public async getComponents(parent: Architect, recursive: boolean = false): Promise<ComponentClass[]> {
+    if (!this._components) {
+      this._components = [];
+      for (const mod of this.modules) {
+        this._components.push(...await Component.collect(mod as Module));
       };
     };
 
-    return result;
+    const copy = this._components.slice();
+    if (recursive) {
+      for (const _import of parent.projects.resolveAll(this.imports)) {
+        copy.push(...await _import.getComponents(parent, true));
+      };
+    };
+
+    return copy;
   };
 
-  public async getPlugins(): Promise<PluginConstructor[]> {
-    if (this.config.name !== '@perdition/k8s-shared') {
-      const module = await this.getModule();
-      if (!this._plugins && module) {
-        this._plugins = await Plugin.collect(module);
-      };
-    };
-    
+  public static decorate<T extends object>(model: ProjectConfig): (target: T) => void {
+    return (target: T) => { new ProjectMetadata(model).assign(target); };
+  };
 
-    const result = [];
-    result.push(...this._plugins || []);
-    for (const library of this.libraries) {
-      result.push(...await library.getPlugins());
-    };
+  public static async runIfMain(ctor: ProjectClass, path: string): Promise<void> {
+    if (!path.startsWith('file:')) return;
 
-    return result;
+    const modulePath = url.fileURLToPath(path);
+    if (process.argv[1] !== modulePath) return;
+
+    await App.run(ctor);
   };
 }
+
+export class ProjectMetadata<TModel extends ProjectConfig = ProjectConfig> {
+  public model: TModel;
+  constructor(model: TModel) {
+    this.model = model;
+  };
+
+  // deno-lint-ignore no-explicit-any
+  public assign(target: any) {
+    ProjectConfigLoader.validate(this.model, target.name);
+
+    Reflect.defineMetadata(Architect.TYPE_META_KEY, 'project', target);
+    Reflect.defineMetadata(Architect.MODEL_META_KEY, this.model, target);
+    Reflect.defineMetadata(Architect.CLASS_META_KEY, this.model.name, target);
+  };
+
+  public static from<TModel extends ProjectConfig, T extends Project = Project>(clazz: T | ProjectClass<T>): ProjectMetadata<TModel> {
+    const model = Reflect.getMetadata(Architect.MODEL_META_KEY, clazz);
+    return new ProjectMetadata<TModel>(model);
+  };
+};
+
+export interface ProjectClass<T extends Project = Project> {
+  new (): T;
+};
 
 export interface ProjectConfig {
   name: string;
   library?: boolean;
-  imports?: string[];
+  backend?: object;
   plugins?: Record<string, object>;
-};
-
-export class ProjectModule {
-  public readonly config: ProjectConfig;
-  public readonly root?: string;
-
-  public constructor(config: ProjectConfig, root?: string) {
-    this.config = config;
-    this.root = root;
-  };
 };
 
 const ProjectConfigSchema: JSONSchemaType<ProjectConfig> = {
@@ -173,12 +165,9 @@ const ProjectConfigSchema: JSONSchemaType<ProjectConfig> = {
       type: "boolean",
       nullable: true,
     },
-    imports: {
-      type: "array",
+    backend: {
+      type: "object",
       nullable: true,
-      items: {
-        type: "string"
-      },
     },
     plugins: {
       type: "object",
@@ -192,10 +181,10 @@ const ProjectConfigSchema: JSONSchemaType<ProjectConfig> = {
 };
 
 class ProjectConfigLoader {
-  public static async load(path: string, ajv: Ajv): Promise<ProjectConfig> {
+  public static async load(path: string, ajv: Ajv = new Ajv()): Promise<ProjectConfig> {
     const content = await fs.readFile(path, 'utf-8');
     const config = JSON.parse(content) as ProjectConfig;
-    ProjectConfigLoader.validate(config, ajv);
+    ProjectConfigLoader.validate(config, path, ajv);
 
     return config;
   };
@@ -204,10 +193,10 @@ class ProjectConfigLoader {
     await fs.writeFile(path, JSON.stringify(config, undefined, 2));
   };
 
-  public static validate(config: ProjectConfig, ajv: Ajv) {
+  public static validate(config: ProjectConfig, ctx?: string, ajv: Ajv = new Ajv()) {
     const validator = ajv.compile(ProjectConfigSchema);
     if (!validator(config)) {
-      throw new Error(`failed to validate project config: ${ajv.errorsText(validator.errors)}`);
+      throw new Error(`failed to validate configuration model for project ${ctx || 'unknown'}: ${ajv.errorsText(validator.errors)}`);
     };
   };
 };

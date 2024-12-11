@@ -1,5 +1,6 @@
 import { recursiveMerge } from "@perdition/architect-core";
-import { KubeComponent, KubeComponentGenericResources, MetricsCapability } from "@perdition/architect-k8s";
+import { KubeComponent, KubeComponentGenericResources } from './../../../component.mts'; 
+import { MetricsCapability } from '../../../capabilities/metrics.mts';
 
 import model from './architect.json' with { type: 'json' };
 

@@ -162,7 +162,9 @@ static kind: IImagePolicy["kind"] = "ImagePolicy";
 static is = createTypeMetaGuard<IImagePolicy>(ImagePolicy);
 
 constructor(data?: ModelData<IImagePolicy>) {
-  super({
+  super();
+
+  this.setDefinedProps({
     apiVersion: ImagePolicy.apiVersion,
     kind: ImagePolicy.kind,
     ...data

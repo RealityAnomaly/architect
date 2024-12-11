@@ -3,27 +3,51 @@ import { Reflect } from "@dx/reflect";
 
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
-import { PluginResolver } from './plugin.mts';
+import { PluginRegistry } from './plugin.mts';
 import { Target, TargetResolveParams } from './target.mts';
 import winston from 'winston';
-import { Project } from './project.mts';
+import { Project, ProjectClass } from './project.mts';
 import { DependencyGraphRenderer } from './graph/render.mts';
 import { TargetCache } from './cache.mts';
-import { StateProvider } from './index.mts';
 import { Ajv } from 'ajv';
 
-export const TYPE_META_KEY = 'architect.glassway.net/type';
-export const MODEL_META_KEY = 'architect.glassway.net/model';
-export const CLASS_META_KEY = 'architect.glassway.net/class';
-export const TARGET_TYPE_META_KEY = 'architect.glassway.net/target-type';
+import model from './../architect.json' with { type: 'json' };
+import { TypeRegistry } from "./registry.mts";
+import { StateProvider } from "./utils/state.mts";
 
+export * from './cli/index.mts';
+export * from './dynamic/index.mts';
+export * from './generated/crds/index.ts';
+export * from './graph/index.mts';
+export * from './kubernetes/index.mts';
+export * from './model/index.mts';
+export * from './utils/index.mts';
+export * from './backend.mts';
+export * from './cache.mts';
+export * from './config.mts';
+export * from './context.mts';
+export * from './capability.mts';
+export * from './component.mts';
+export * from './plugin.mts';
+export * from './project.mts';
+export * from './provider.mts';
+export * from './result.mts';
+export * from './target.mts';
 
 export class Architect {
   public static PATH = path.resolve(path.join(import.meta.dirname!, '..'));
 
+  public static readonly TYPE_META_KEY = 'architect.glassway.net/type';
+  public static readonly MODEL_META_KEY = 'architect.glassway.net/model';
+  public static readonly CLASS_META_KEY = 'architect.glassway.net/class';
+  public static readonly TARGET_TYPE_META_KEY = 'architect.glassway.net/target-type';
+
   public project?: Project;
+
   public readonly ajv: Ajv;
-  public readonly plugins: PluginResolver;
+  public readonly projects: TypeRegistry<Project>;
+  public readonly plugins: PluginRegistry;
+
   public readonly logger: winston.Logger;
 
   public readonly state: StateProvider;
@@ -34,7 +58,10 @@ export class Architect {
 
   private constructor(logLevel: string = 'info') {
     this.ajv = new Ajv();
-    this.plugins = new PluginResolver(this);
+
+    this.projects = new TypeRegistry();
+    this.plugins = new PluginRegistry(this);
+
     this.logger = winston.createLogger({
       level: logLevel,
       format: winston.format.cli(),
@@ -49,27 +76,23 @@ export class Architect {
     this.cache = new TargetCache(this.state, this.logger);
 
     this.kubeTypes = new kubeUtils.TypeRegistry(this.logger);
-    this.kubeTypes.appendCRDModule(Architect.PATH);
-
     this.kubeLoader = new kubeUtils.ManifestLoader(this.kubeTypes);
   };
 
-  public get projectPaths(): string[] {
-    return [this.project!.root!];
-  };
-
-  public static async create(workspace: string, logLevel: string = 'info'): Promise<Architect> {
+  public static async create(project?: Project, logLevel: string = 'info'): Promise<Architect> {
     const instance = new Architect(logLevel);
+    instance.project = project;
 
-    try {
-      instance.project = await Project.fromWorkspace(instance, workspace);
-    } catch (exception) {
-      instance.logger.error(`failed to load workspace, exiting: ${exception}`);
-      throw exception;
+    if (instance.project && !instance.project.root) {
+      instance.logger.error(`couldn't automatically detect the project root. either pass -w, or ensure an architect.json folder is present in a parent folder`);
+      instance.logger.error(`because project root detection failed, actions that write to configuration files will be unavailable`);
     };
 
-    for (const plugin of await instance.project.getPlugins()) {
-      await instance.plugins.register(plugin);
+    await instance.project?.load(instance);
+    for (const project of instance.projects.data) {
+      for (const plugin of project.instance.plugins) {
+        await instance.plugins.register(plugin);
+      }
     };
 
     await instance.plugins.resolve();
@@ -115,25 +138,13 @@ export class Architect {
   };
 
   public static class(name: string) {
-    return Reflect.metadata(CLASS_META_KEY, name);
+    return Reflect.metadata(Architect.CLASS_META_KEY, name);
   };
-}
+};
 
-export * from './cli/index.mts';
-export * from './dynamic/index.mts';
-export * from './generated/crds/index.ts';
-export * from './graph/index.mts';
-export * from './kubernetes/index.mts';
-export * from './model/index.mts';
-export * from './utils/index.mts';
-export * from './backend.mts';
-export * from './cache.mts';
-export * from './config.mts';
-export * from './context.mts';
-export * from './capability.mts';
-export * from './component.mts';
-export * from './plugin.mts';
-export * from './project.mts';
-export * from './provider.mts';
-export * from './result.mts';
-export * from './target.mts';
+@Project.decorate(model)
+export class ArchitectCoreProject extends Project {
+  public override get imports(): ProjectClass<Project>[] { return [] };
+};
+
+await Project.runIfMain(ArchitectCoreProject, import.meta.url);

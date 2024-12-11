@@ -1,5 +1,6 @@
 import { KubeResourceTree } from '@perdition/architect-core';
-import { KubeComponent, KubeComponentArgs } from '../../../index.mts';
+
+import { KubeComponent, KubeComponentArgs } from '../../../component.mts';
 import model from './architect.json' with { type: 'json' };
 
 export interface FluxCDComponentOptions extends KubeComponentArgs {

@@ -104,7 +104,9 @@ static kind: IProvider["kind"] = "Provider";
 static is = createTypeMetaGuard<IProvider>(Provider);
 
 constructor(data?: ModelData<IProvider>) {
-  super({
+  super();
+
+  this.setDefinedProps({
     apiVersion: Provider.apiVersion,
     kind: Provider.kind,
     ...data

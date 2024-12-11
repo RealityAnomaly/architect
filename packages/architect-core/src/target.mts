@@ -5,15 +5,12 @@ import { Reflect } from "@dx/reflect";
 import { architectGlasswayNet } from './generated/crds/index.ts';
 
 import { Component, ComponentClass, ExtractComponentArgs } from './component.mts';
-import { Registry } from './registry.mts';
+import { TokenRegistry } from './registry.mts';
 import { Result } from './result.mts';
 import { Context } from './context.mts';
 import { Condition, constructor, DeepLazySpec, DeepPartial, ReflectionUtilities } from './utils/index.mts';
-import { Architect, CLASS_META_KEY, DependencyGraph } from './index.mts';
-
-export const PLUGIN_TARGET_IDENTIFIERS = {
-  kubernetes: 'target.architect.glassway.net/kubernetes',
-};
+import { Architect, DependencyGraph } from './index.mts';
+import { Plugin } from "./plugin.mts";
 
 export interface TargetParams {};
 
@@ -71,7 +68,7 @@ export class Target {
 
         // pick target type from plugin property
         if (r.spec.plugins?.kubernetes) {
-          return new targetMap[PLUGIN_TARGET_IDENTIFIERS.kubernetes](r, {}, parent);
+          return new targetMap[Plugin.TARGET_IDENTIFIERS.kubernetes](r, {}, parent);
         } else {
           parent.logger.error(`attempted to load target ${r.metadata.name} with unconfigured plugins`);
           return undefined;
@@ -93,8 +90,8 @@ export class Target {
   public readonly parent: Architect;
   public readonly params: TargetParams;
 
-  public readonly components = new Registry<Component>();
-  protected readonly facts = new Registry<BaseFact>();
+  public readonly components = new TokenRegistry<Component>();
+  protected readonly facts = new TokenRegistry<BaseFact>();
 
   protected constructor(model: architectGlasswayNet.v1alpha1.Target, params: TargetParams = {}, parent: Architect) {
     this.model = model;
@@ -104,7 +101,7 @@ export class Target {
 
   protected async init() {
     for (const def of this.model.spec.components || []) {
-      const token = await this.parent.project!.getComponent(def.class, true);
+      const token = await this.parent.project!.getComponent(this.parent, def.class, true);
       if (!token) {
         this.parent.logger.warn(`Target ${this.model.metadata.name} references unknown component ${def.class}, skipping`);
         continue;
@@ -175,8 +172,8 @@ export class Target {
 
   public defaultContext<T extends Component>(token: constructor<T>, context?: Partial<Context>, force?: boolean): Partial<Context> {
     if (!context) context = {};
-    if ((!context.name || force) && Reflect.hasMetadata(CLASS_META_KEY, token)) {
-      context.name = ReflectionUtilities.classToName(Reflect.getMetadata(CLASS_META_KEY, token));
+    if ((!context.name || force) && Reflect.hasMetadata(Architect.CLASS_META_KEY, token)) {
+      context.name = ReflectionUtilities.classToName(Reflect.getMetadata(Architect.CLASS_META_KEY, token));
     };
 
     return context as Context;

@@ -11,9 +11,12 @@ export class TargetCommand extends Command {
   private readonly app: App;
 
   private async list(_options: AppCommandTargetListOptions) {
-    const targets = await this.app.parent!.project!.getTargets(this.app.parent!, false);
+    const context = this.app.parent!;
+    const targets = await context.project!.getTargets(context);
     if (targets.length > 0) {
       console.log(`${targets.length} targets available:`);
+    } else {
+      console.log('No targets were found in the current project. Is your backend set up correctly?');
     };
 
     for (const target of targets) {
@@ -22,7 +25,8 @@ export class TargetCommand extends Command {
   };
 
   private async show(options: AppCommandTargetShowOptions) {
-    const target = await this.app.parent!.project!.getTarget(this.app.parent!, options.name, false);
+    const context = this.app.parent!;
+    const target = await context.project!.getTarget(context, options.name);
     if (!target) {
       console.log(`Unable to find any target with name ${options.name}`);
       return;
