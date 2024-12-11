@@ -33,6 +33,7 @@ export interface ComponentArgs<TInput = unknown> {
 export abstract class Component<
   TResult extends object = object,
   TArgs extends ComponentArgs = ComponentArgs,
+  // deno-lint-ignore no-explicit-any
   TParent extends Component = any,
 > {
   public context: Context;
