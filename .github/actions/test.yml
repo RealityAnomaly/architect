@@ -1,0 +1,29 @@
+name: Test
+on:
+  push: true
+  pull_request: true
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Install dependencies
+        run: deno install
+      - name: Lint files
+        run: deno lint
+      - name: Typecheck files
+        run: deno task check
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Install dependencies
+        run: deno install
+      - name: Run tests
+        run: deno task test
