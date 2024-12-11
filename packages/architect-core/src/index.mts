@@ -3,6 +3,7 @@ import { Reflect } from "@dx/reflect";
 
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
+import { App } from './cli/index.mts';
 import { PluginRegistry } from './plugin.mts';
 import { Target, TargetResolveParams } from './target.mts';
 import winston from 'winston';
@@ -148,5 +149,5 @@ export class ArchitectCoreProject extends Project {
 };
 
 if (import.meta.main) {
-  await Project.run(ArchitectCoreProject);
+  await App.run(ArchitectCoreProject);
 };
