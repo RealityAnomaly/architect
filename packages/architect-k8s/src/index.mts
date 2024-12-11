@@ -25,4 +25,6 @@ export class ArchitectK8SProject extends Project {
   };
 };
 
-await Project.runIfMain(ArchitectK8SProject, import.meta.url);
+if (import.meta.main) {
+  await Project.run(ArchitectK8SProject);
+};
