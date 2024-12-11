@@ -15,7 +15,7 @@ import model from './../architect.json' with { type: 'json' };
 import { K8sPlugin } from "./plugin.mts";
 
 @Project.decorate(model)
-export class ArchitectK8SProject extends Project {
+export class ArchitectK8sProject extends Project {
   public override get plugins(): PluginClass[] {
     return [K8sPlugin, ...super.plugins];
   }
@@ -26,5 +26,5 @@ export class ArchitectK8SProject extends Project {
 };
 
 if (import.meta.main) {
-  await App.run(ArchitectK8SProject);
+  await App.run(ArchitectK8sProject);
 };
