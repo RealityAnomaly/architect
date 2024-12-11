@@ -147,4 +147,6 @@ export class ArchitectCoreProject extends Project {
   public override get imports(): ProjectClass<Project>[] { return [] };
 };
 
-await Project.runIfMain(ArchitectCoreProject, import.meta.url);
+if (import.meta.main) {
+  await Project.run(ArchitectCoreProject);
+};

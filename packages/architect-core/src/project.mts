@@ -1,6 +1,4 @@
 import path from 'node:path';
-import url from 'node:url';
-import process from 'node:process';
 
 import * as fs from 'node:fs/promises';
 import { Ajv, JSONSchemaType } from "ajv";
@@ -112,12 +110,7 @@ export abstract class Project {
     return (target: T) => { new ProjectMetadata(model).assign(target); };
   };
 
-  public static async runIfMain(ctor: ProjectClass, path: string): Promise<void> {
-    if (!path.startsWith('file:')) return;
-
-    const modulePath = url.fileURLToPath(path);
-    if (process.argv[1] !== modulePath) return;
-
+  public static async run(ctor: ProjectClass): Promise<void> {
     await App.run(ctor);
   };
 }
