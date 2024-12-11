@@ -1,7 +1,7 @@
 name: Test
 on:
-  push: true
-  pull_request: true
+  push: {}
+  pull_request: {}
 jobs:
   lint:
     runs-on: ubuntu-latest
