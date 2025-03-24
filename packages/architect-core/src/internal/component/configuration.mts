@@ -1,5 +1,5 @@
 import { Component,  } from './component.mts';
-import { Context } from '../../utils/registry/context.mts';
+import { Context } from '../../utils/index.mts';
 import { Target } from '../target/index.mts';
 import { _LazyProxy, Condition, Constructor, DeepLazySpec, DeepPartial, Lazy, LazyAuto, } from '../../utils/index.mts';
 import { ComponentArgs, ExtractComponentArgs } from './arguments.mts';

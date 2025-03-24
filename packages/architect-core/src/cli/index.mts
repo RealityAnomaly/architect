@@ -26,7 +26,7 @@ interface AppCommandApplyOptions extends AppCommandCompileOptions {
 }
 
 export class App {
-  public app?: Architect;
+  public instance?: Architect;
   private readonly _projectClass?: ProjectClass;
   private pluginCommand?: commander.Command;
 
@@ -45,8 +45,8 @@ export class App {
   }
 
   protected instanceAsserted(): Architect {
-    if (!this.app) throw new Error('parent not initialised');
-    return this.app;
+    if (!this.instance) throw new Error('parent not initialised');
+    return this.instance;
   }
 
   protected async build(): Promise<commander.Command> {
@@ -129,11 +129,11 @@ export class App {
       logLevel = 'silly';
     }
 
-    this.app = await Architect.create(this._projectClass, logLevel);
+    this.instance = await Architect.create(this._projectClass, logLevel);
 
     // we have to do this late because the config file is only loaded once we have the -c parameter
     if (actionCommand == this.pluginCommand!) {
-      for (const plugin of Object.values(this.app.pluginRegistry.data)) {
+      for (const plugin of Object.values(this.instance.pluginRegistry.data)) {
         await plugin.registerCommand(actionCommand);
       }
     }
@@ -157,10 +157,11 @@ export class App {
     // currently the bar only works when we're not rendering multiple targets in parallel
     //const bar = targets.length == 1 ? new CompileProgressBar() : undefined;
 
+    const architect = this.instanceAsserted();
     await Promise.all(targets.map(async (v): Promise<void> => {
       if (!v) return;
 
-      const result = await v.compile(params, undefined);
+      const result = await v.compile(params, architect.logger);
       if (result == null) return;
 
       const output = path.join(options.output, v.model.metadata.name!);
@@ -194,10 +195,11 @@ export class App {
       return;
     }
 
+    const architect = this.instanceAsserted();
     await Promise.all(targets.map(async (v): Promise<void> => {
       if (!v) return;
 
-      await v.apply(params);
+      await v.apply(params, architect.logger);
     }));
   }
 }

@@ -18,6 +18,7 @@ import {
 } from '@perdition/architect-core';
 
 import * as api from 'kubernetes-models';
+import { Logger } from 'winston';
 
 import { FluxCDController, FluxCDMode } from './apply/flux/index.mts';
 import { KubeComponentModel, KubePreludeComponent } from './component.mts';
@@ -206,9 +207,10 @@ export class KubeTarget extends Target {
 
   public override async compile(
     params?: TargetResolveParams,
+    logger?: Logger,
     listener?: ICompileListener,
   ): Promise<Result | undefined> {
-    const result = await super.compile(params, listener);
+    const result = await super.compile(params, logger, listener);
     if (!result) return result;
 
     result.writer = new KubeWriter(this);

@@ -31,11 +31,11 @@ export class Architect {
   public readonly kubeTypes: kubeUtils.KubeTypeRegistry;
   public readonly kubeLoader: kubeUtils.ManifestLoader;
 
-  private constructor(logLevel: string = 'info') {
+  private constructor(project?: ProjectClass, logLevel: string = 'info') {
     this.ajv = new Ajv();
 
     this.projectRegistry = new TypeRegistry(this);
-    this.pluginRegistry = new PluginRegistry(this);
+    this.pluginRegistry = new PluginRegistry();
 
     this.logger = winston.createLogger({
       level: logLevel,
@@ -52,31 +52,35 @@ export class Architect {
 
     this.kubeTypes = new kubeUtils.KubeTypeRegistry(this.logger);
     this.kubeLoader = new kubeUtils.ManifestLoader(this.kubeTypes);
+
+    if (project) this.project = new project(this);
+  }
+
+  public async init() {
+    if (this.project) await this.project.load(true);
+
+    for (const project of this.getProjects()) {
+      // register plugins for all projects
+      for (const plugin of project.getPlugins()) {
+        await this.pluginRegistry.register(plugin, this);
+      }
+
+      // register project modules against CRD registry
+      for (const module of project.getModules()) {
+        this.kubeTypes.appendModule(module as object);
+      }
+    }
+
+    await this.pluginRegistry.resolve();
+    await this.pluginRegistry.init();
   }
 
   public static async create(
     project?: ProjectClass,
     logLevel: string = 'info',
   ): Promise<Architect> {
-    const instance = new Architect(logLevel);
-    if (project) instance.project = new project(instance);
-    await instance.project?.load(true);
-
-    for (const project of instance.getProjects()) {
-      // register project plugins
-      for (const plugin of project.getPlugins()) {
-        await instance.pluginRegistry.register(plugin);
-      }
-
-      // register project modules against CRD registry
-      // TODO: maybe instead have the registry do this?
-      for (const module of project.getModules()) {
-        instance.kubeTypes.appendModule(module as object);
-      }
-    }
-
-    await instance.pluginRegistry.resolve();
-    await instance.pluginRegistry.init();
+    const instance = new Architect(project, logLevel);
+    await instance.init();
 
     return instance;
   }

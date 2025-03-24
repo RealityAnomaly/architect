@@ -20,12 +20,12 @@ interface AppComponentCommandUpgradeOptions extends AppCommandComponentOptions {
 }
 
 export class ComponentCommand extends Command {
-  private readonly app: App;
+  private readonly cli: App;
 
-  constructor(app: App) {
+  constructor(cli: App) {
     super('component');
 
-    this.app = app;
+    this.cli = cli;
     this.description('Commands for manipulating components');
 
     this.command('list')
@@ -56,7 +56,7 @@ export class ComponentCommand extends Command {
   }
 
   private async list(options: AppCommandComponentListOptions) {
-    const context = this.app.app!;
+    const context = this.cli.instance!;
     const ourComponents = await context.project!.getComponents();
 
     if (!options.library && ourComponents.length > 0) {
@@ -88,8 +88,8 @@ export class ComponentCommand extends Command {
   }
 
   private async show(options: AppComponentCommandShowOptions) {
-    const context = this.app.app!;
-    const component = await context.project!.getComponent(options.class);
+    const context = this.cli.instance!;
+    const component = await context.project!.getComponent(options.class, true);
     if (!component) {
       console.log(`Unable to find any component with class ${options.class}`);
       return;
@@ -99,7 +99,7 @@ export class ComponentCommand extends Command {
   }
 
   private async upgrade(options: AppComponentCommandUpgradeOptions) {
-    const context = this.app.app!;
+    const context = this.cli.instance!;
     let components: ComponentClass[] = [];
     if (options.class) {
       const component = await context.project!.getComponent(options.class);

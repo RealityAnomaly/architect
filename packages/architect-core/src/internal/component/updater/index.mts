@@ -47,13 +47,6 @@ export class Updater {
         continue;
       }
 
-      if (!meta.model.inputs || Object.values(meta.model.inputs).length <= 0) {
-        this.logger.info(
-          `updater: skipping ${component.name}, no inputs to update`,
-        );
-        continue;
-      }
-
       let foundModel: ComponentModel | undefined;
       let fileInstance: ComponentModelFileInstance | undefined;
       for (const file of modelFiles) {
@@ -119,7 +112,7 @@ export class Updater {
       const params = {requirements: false};
       const resolved = await target.compile(params);
 
-      if (resolved && !resolved.graph.assertValid(true)) {
+      if (resolved && !resolved.graph.assertValid()) {
         throw new Error(
           `failed to validate component ${component.clazz.name} after input upgrade`,
         );
