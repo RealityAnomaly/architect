@@ -1,7 +1,7 @@
 import { Reflect } from '@dx/reflect';
 
 import { Architect } from '../../../app.mts';
-import { constructor } from '../../../index.mts';
+import { Constructor } from '../../../index.mts';
 import { Component } from '../index.mts';
 import { Capability } from '../capability.mts';
 import { IComponentMatcher } from './index.mts';
@@ -12,10 +12,10 @@ type CapabilityCondition<T extends Capability<unknown>> = (
 
 export class CapabilityMatcher<T extends Capability<unknown>>
   implements IComponentMatcher {
-  private readonly token: constructor<T>;
+  private readonly token: Constructor<T>;
   private readonly condition?: CapabilityCondition<T>;
 
-  constructor(token: constructor<T>, condition?: CapabilityCondition<T>) {
+  constructor(token: Constructor<T>, condition?: CapabilityCondition<T>) {
     this.token = token;
     this.condition = condition;
   }

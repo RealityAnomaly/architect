@@ -1,7 +1,8 @@
-import { ComponentModel } from './model.mts';
+import { ComponentModel, ComponentModelUtilities } from './model.mts';
 import { Architect } from '../../app.mts';
 import { Component, ComponentClass } from './component.mts';
 
+import { Ajv, ValidateFunction } from 'ajv';
 import { Reflect } from '@dx/reflect';
 
 /**
@@ -11,6 +12,8 @@ export class ComponentMetadata<TModel extends ComponentModel = ComponentModel> {
   public model?: TModel;
   public target?: string;
   public clazz?: string;
+
+  private validated = false;
 
   constructor(model: TModel, target: string, clazz?: string) {
     this.model = model;
@@ -42,5 +45,22 @@ export class ComponentMetadata<TModel extends ComponentModel = ComponentModel> {
     if (this.clazz) {
       Reflect.defineMetadata(Architect.CLASS_META_KEY, this.clazz, target);
     }
+  }
+
+  public validate(parent: string, ajv: Ajv, validator?: ValidateFunction) {
+    if (this.validated) return;
+
+    if (this.model) {
+      validator = validator ? validator : ComponentModelUtilities.createValidator(ajv);
+      if (!validator(this.model)) {
+        throw new Error(
+          `failed to validate model for ${parent}: ${
+            ajv.errorsText(validator.errors)
+          }`,
+        );
+      }
+    }
+
+    this.validated = true;
   }
 }

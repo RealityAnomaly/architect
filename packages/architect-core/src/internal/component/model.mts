@@ -7,7 +7,7 @@ export interface ComponentModel<
   TContext = unknown,
   TInput = unknown,
 > {
-  class?: string;
+  class?: string; // not required for child components
   context?: TContext;
   inputs?: Record<string, TInput>;
 }

@@ -1,42 +1,22 @@
 import objectHash from 'object-hash';
 
-import { Reflect } from '@dx/reflect';
-
 import { Capability } from './capability.mts';
 import { ConfigurationContext } from './configuration.mts';
-import { ComponentModel, ComponentModelUtilities, ComponentUpgradeState, Context, } from './index.mts';
-import Module from 'node:module';
+import { ComponentArgs, ComponentModel, ComponentUpgradeState } from './index.mts';
 import { ValidateFunction } from 'ajv';
 import { Target } from '../index.mts';
 import {
-  Architect,
-  constructor,
+  CollectionUtilities,
+  Constructor,
+  Context,
   DeepPartial,
   Lazy,
   LazyAuto,
-  recursiveMerge,
   ReflectionUtilities,
-  TypeUtilities,
 } from '../../index.mts';
-import { ModuleUtilities } from '../../utils/modules.mts';
 import { ComponentInstanceMatcher } from './matchers/instance.mts';
 import { IComponentMatcher } from './matchers/index.mts';
 import { ComponentMetadata } from './metadata.mts';
-
-export type ExtractComponentArgs<T extends Component> = T extends
-  Component<object, infer A> ? A : never;
-
-export interface ComponentArgs<TInput = unknown> {
-  /**
-   * Whether the component is enabled.
-   */
-  enable?: boolean;
-
-  /**
-   * The inputs for the component.
-   */
-  inputs?: Record<string, TInput>;
-}
 
 /**
  * Base unit of resource management that produces objects
@@ -52,35 +32,34 @@ export abstract class Component<
   public parent?: TParent;
   public readonly children: Component[] = [];
   public readonly independent: boolean;
+
   /**
    * The configuration model of the component as a {LazyAuto}
    */
   public props: LazyAuto<TArgs>;
   protected readonly target: Target;
-  private modelValidated: boolean = false;
+
+  private _metadata?: ComponentMetadata;
+  protected _validator?: ValidateFunction<unknown>;
 
   // TODO: allow dependent classes to call constructor in isolation. reduce coupling to Target
   protected constructor(
     target: Target,
-    props: TArgs | undefined = {} as TArgs,
-    context?: Partial<Context>,
+    context: Context,
+    props?: TArgs,
     parent?: TParent,
   ) {
-    if (!context || !context.name) {
-      throw new Error(`the name property must be set on the component context`);
-    }
-
     this.context = context as Context;
     this.target = target;
     this.independent = parent === undefined;
     this.setParent(parent);
 
+    if (!props) props = {} as TArgs;
     if (this.meta.model && this.meta.model.inputs) {
-      props.inputs = recursiveMerge(this.meta.model.inputs, props.inputs || {});
-    }
-
-    if (props === undefined) {
-      props = {} as TArgs;
+      props.inputs = CollectionUtilities.recursiveMerge(
+        this.meta.model.inputs,
+        props.inputs || {},
+      );
     }
 
     this.props = Lazy.from(props);
@@ -102,42 +81,24 @@ export abstract class Component<
    * Returns this component's logical classpath
    */
   public get clazz(): string {
-    if (!this.model || !this.model.class) {
-      throw new Error(
-        `Unable to resolve the class for component ${this}: Undefined model`,
-      );
-    }
-
-    return this.model.class;
+    return this.model.class!;
   }
 
   public get meta(): ComponentMetadata {
-    return ComponentMetadata.from(this.constructor as constructor<Component>);
+    if (!this._metadata) {
+      this._metadata = ComponentMetadata.from(this.constructor as Constructor<Component>);
+      this._metadata.validate(this.constructor.name, this.target.app.ajv, this._validator);
+    }
+
+    return this._metadata;
   }
 
-  public get model(): ComponentModel | undefined {
-    if (this.parent !== undefined && !this.independent) {
+  public get model(): ComponentModel {
+    if (this.parent && !this.independent) {
       return this.parent.model;
     }
 
-    if (!this.modelValidated && this.meta.model) {
-      const validator = this.modelValidator;
-      if (!validator(this.meta.model)) {
-        throw new Error(
-          `failed to validate model for ${this.constructor.name}: ${
-            this.target.app.ajv.errorsText(validator.errors)
-          }`,
-        );
-      }
-
-      this.modelValidated = true;
-    }
-
-    return this.meta.model;
-  }
-
-  public get modelValidator(): ValidateFunction<ComponentModel> {
-    return ComponentModelUtilities.createValidator(this.target.app.ajv);
+    return this.meta.model!;
   }
 
   /**
@@ -145,14 +106,6 @@ export abstract class Component<
    */
   public get rid(): string {
     return Component.rid(this.context.name, this.context);
-  }
-
-  public static async collect(module: Module): Promise<ComponentClass[]> {
-    return ModuleUtilities.collectClasses(module, (clazz) => {
-      return TypeUtilities.isObject(clazz) &&
-        Reflect.hasMetadata(Architect.TYPE_META_KEY, clazz) &&
-        Reflect.getMetadata(Architect.TYPE_META_KEY, clazz) === 'component';
-    });
   }
 
   public static rid(name: string, context?: object): string {
@@ -231,18 +184,20 @@ export abstract class Component<
   /**
    * Adds a child by constructing it and adding it to this component
    */
-  protected addChild(child: constructor<Component>, independent = false) {
+  protected addChild(child: Constructor<Component>, independent = false) {
     const context = this.target.defaultContext(
       child,
       structuredClone(this.context),
       true,
     );
+
     const instance = new child(
       this.target,
-      undefined,
       context,
+      undefined,
       independent ? undefined : this,
     );
+
     instance.props.$set({ enable: this.props.enable });
 
     if (independent) {
@@ -257,7 +212,7 @@ export abstract class Component<
    * Creates a reference to a component with the same context
    */
   protected localRef<T extends Component>(
-    type: constructor<T>,
+    type: Constructor<T>,
     name?: string,
   ): Context {
     if (name === undefined) {
@@ -288,11 +243,9 @@ export abstract class Component<
 export interface ComponentClass<T extends Component = Component> {
   new (
     target: Target,
+    context: Context,
     // deno-lint-ignore no-explicit-any
     props?: any,
-    context?: Partial<Context>,
     parent?: Component,
   ): T;
 }
-
-export type ComponentReference<_T> = Context;
