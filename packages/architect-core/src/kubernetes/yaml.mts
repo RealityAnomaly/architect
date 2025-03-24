@@ -2,31 +2,36 @@ import fs from 'node:fs/promises';
 import { loadAll } from 'js-yaml';
 
 import { KubeResource, KubeResourceUtilities } from './resource.mts';
-import { GVK, TypeRegistry } from './types/index.mts';
-import { isRecord } from "../utils/objects.mts";
+import { GVK, KubeTypeRegistry } from './types/index.mts';
+import { isRecord } from '../utils/objects.mts';
 
 export class ManifestLoader {
-  private readonly types: TypeRegistry;
+  private readonly types: KubeTypeRegistry;
 
-  constructor(types: TypeRegistry) {
+  constructor(types: KubeTypeRegistry) {
     this.types = types;
-  };
+  }
 
-  public async loadString(
-    content: string,
-    // options: ManifestLoadOptions = {}
-  ): Promise<KubeResource[]> {
-    const input = loadAll(content).filter((x: KubeResource) => x != null);
+  public loadArray(
+    content: unknown[],
+  ): KubeResource[] {
+    content = content.filter((x: unknown) => x != null);
     const resources: KubeResource[] = [];
 
-    for (const object of input) {
+    for (const object of content) {
       if (!isRecord(object)) {
-        throw new Error(`The value is not an object: ${JSON.stringify(object)}`);
-      };
+        throw new Error(
+          `The value is not an object: ${JSON.stringify(object)}`,
+        );
+      }
 
       if (!KubeResourceUtilities.isResource(object)) {
-        throw new Error(`The value is not a Kubernetes API resource (apiVersion and kind required): ${JSON.stringify(object)}`);
-      };
+        throw new Error(
+          `The value is not a Kubernetes API resource (apiVersion and kind required): ${
+            JSON.stringify(object)
+          }`,
+        );
+      }
 
       const gvk = GVK.fromAK(object.apiVersion, object.kind);
       const Constructor = this.types.getConstructor(gvk);
@@ -34,19 +39,26 @@ export class ManifestLoader {
       if (!resource) continue;
 
       resources.push(resource);
-    };
+    }
 
     return resources;
-  };
+  }
+
+  public loadString(
+    content: string,
+    // options: ManifestLoadOptions = {}
+  ): KubeResource[] {
+    return this.loadArray(loadAll(content));
+  }
 
   /**
-     * Loads a YAML manifest from the specified path.
-     *
-     * @param path Path to the manifest file to load.
-     * @public
-     */
+   * Loads a YAML manifest from the specified path.
+   *
+   * @param path Path to the manifest file to load.
+   * @public
+   */
   public async loadFile(path: string): Promise<KubeResource[]> {
     const content = await fs.readFile(path, 'utf-8');
     return this.loadString(content);
-  };
-};
+  }
+}

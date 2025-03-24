@@ -1,4 +1,4 @@
-import * as fs from 'node:fs/promises';
+import * as fs from "node:fs/promises";
 
 /**
  * Run a function in a temporary directory

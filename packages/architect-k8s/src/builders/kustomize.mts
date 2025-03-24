@@ -6,83 +6,88 @@ import { Builder, BuilderParams } from './builder.mts';
 
 export class Kustomize extends Builder {
   constructor(params: BuilderParams) {
-    super(params, 'kustomize');
-  };
+    super(params, "kustomize");
+  }
 
-  private buildParams(config: KustomizeOpts, params: string[]) {
-    if (config.asCurrentUser === true) {
-      params.push('--as-current-user');
-    };
-
-    if (config.enableAlphaPlugins === true) {
-      params.push('--enable-alpha-plugins');
-    };
-
-    if (config.enableExec === true) {
-      params.push('--enable-exec');
-    };
-
-    if (config.enableStar === true) {
-      params.push('--enable-star');
-    };
-
-    if (config.env !== undefined) {
-      params.push(
-        Object.entries(config.env)
-          .map(([k, v]) => `${k}=${v}`).join(','),
-      );
-    };
-
-    if (config.helmCommand !== undefined) {
-      params.push('--helm-command', config.helmCommand);
-    };
-
-    if (config.loadRestrictor !== undefined) {
-      params.push('--load-restrictor', config.loadRestrictor);
-    };
-
-    if (config.mount !== undefined) {
-      params.push('--mount', config.mount.join(','));
-    };
-
-    if (config.network === true) {
-      params.push('--network');
-    };
-
-    if (config.networkName !== undefined) {
-      params.push('--network-name', config.networkName);
-    };
-
-    if (config.reorder !== undefined) {
-      params.push('--reorder', config.reorder);
-    };
-  };
-
-  public async build(path: string, config: KustomizeOpts = {}): Promise<KubeResource[]> {
+  public async build(
+    path: string,
+    config: KustomizeOpts = {},
+  ): Promise<KubeResource[]> {
     const params: string[] = [];
 
     // build operation
-    params.push('build');
+    params.push("build");
     params.push(path);
 
     this.buildParams(config, params);
 
     const execFileAsync = util.promisify(execFile);
-    const buf = await execFileAsync('kustomize', params, { maxBuffer: undefined });
-    const resources = await this.loader.loadString(buf.stdout);
-    return resources;
-  };
-};
+    const buf = await execFileAsync("kustomize", params, {
+      maxBuffer: undefined,
+    });
+
+    return await this.loader.loadString(buf.stdout);
+  }
+
+  private buildParams(config: KustomizeOpts, params: string[]) {
+    if (config.asCurrentUser === true) {
+      params.push("--as-current-user");
+    }
+
+    if (config.enableAlphaPlugins === true) {
+      params.push("--enable-alpha-plugins");
+    }
+
+    if (config.enableExec === true) {
+      params.push("--enable-exec");
+    }
+
+    if (config.enableStar === true) {
+      params.push("--enable-star");
+    }
+
+    if (config.env !== undefined) {
+      params.push(
+        Object.entries(config.env)
+          .map(([k, v]) => `${k}=${v}`).join(","),
+      );
+    }
+
+    if (config.helmCommand !== undefined) {
+      params.push("--helm-command", config.helmCommand);
+    }
+
+    if (config.loadRestrictor !== undefined) {
+      params.push("--load-restrictor", config.loadRestrictor);
+    }
+
+    if (config.mount !== undefined) {
+      params.push("--mount", config.mount.join(","));
+    }
+
+    if (config.network === true) {
+      params.push("--network");
+    }
+
+    if (config.networkName !== undefined) {
+      params.push("--network-name", config.networkName);
+    }
+
+    if (config.reorder !== undefined) {
+      params.push("--reorder", config.reorder);
+    }
+  }
+}
 
 export enum KustomizeLoadRestrictions {
-  None = 'LoadRestrictionsNone',
-  RootOnly = 'LoadRestrictionsRootOnly',
-};
+  None = "LoadRestrictionsNone",
+  RootOnly = "LoadRestrictionsRootOnly",
+}
 
 export enum KustomizeReorder {
-  None = 'none',
-  Legacy = 'legacy',
-};
+  None = "none",
+  Legacy = "legacy",
+}
 
 export interface KustomizeOpts {
   /**
@@ -148,4 +153,4 @@ export interface KustomizeOpts {
    * @default Legacy
    */
   reorder?: KustomizeReorder;
-};
+}

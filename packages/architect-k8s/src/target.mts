@@ -1,20 +1,37 @@
-import { Architect, architectGlasswayNet, Component, ComponentMetadata, constructor, DependencyGraph, GVK, isValidator, KubeResource, recursiveMerge, Result, Target, TargetParams, TargetResolveParams, ValidationError, ValidationErrorLevel } from '@perdition/architect-core';
+import {
+  architectGlasswayNet,
+  Component,
+  ComponentMetadata,
+  constructor,
+  GVK,
+  isValidator,
+  KubeResource,
+  Project,
+  recursiveMerge,
+  Result,
+  Target,
+  TargetParams,
+  TargetResolveParams,
+  ValidationError,
+  ValidationErrorLevel,
+} from '@perdition/architect-core';
 
 import * as api from 'kubernetes-models';
 
 import { FluxCDController, FluxCDMode } from './apply/flux/index.mts';
 import { KubeComponentModel, KubePreludeComponent } from './component.mts';
-import { CrdsComponent } from './components/crds/index.mts';
+import { CrdsComponent } from './components/index.mts';
 import { KubeWriter } from './writer.mts';
 import { K8S_PLUGIN_CLASS, K8sPlugin } from './plugin.mts';
 import { KubeContext } from './context.mts';
 import { KubeCRDDependencyGraph } from './crds/graph.mts';
+import { ICompileListener } from '../../architect-core/src/index.mts';
 
 export enum KubeTargetOutputFormat {
   SingleFile,
   PerResource,
-  PerComponent
-};
+  PerComponent,
+}
 
 export interface KubeTargetParams extends TargetParams {
   modes: {
@@ -23,14 +40,7 @@ export interface KubeTargetParams extends TargetParams {
   output?: {
     format?: KubeTargetOutputFormat;
   };
-};
-
-export interface KubeTargetResolveParams extends TargetResolveParams {};
-
-export interface ClusterState {
-  nodes: number;
-  version: string;
-};
+}
 
 /**
  * Version of {Target} that provides build constructs for a specific Kubernetes cluster.
@@ -42,12 +52,16 @@ export class KubeTarget extends Target {
   private readonly markedCRDGVKs: GVK[] = [];
   private readonly markedCRDGroups: string[] = [];
 
-  constructor(model: architectGlasswayNet.v1alpha1.Target, params: KubeTargetParams = {
-    modes: {},
-    output: {
-      format: KubeTargetOutputFormat.PerComponent,
+  constructor(
+    model: architectGlasswayNet.v1alpha1.Target,
+    params: KubeTargetParams = {
+      modes: {},
+      output: {
+        format: KubeTargetOutputFormat.PerComponent,
+      },
     },
-  }, parent: Architect) {
+    project: Project,
+  ) {
     const defaults = {
       plugins: {
         kubernetes: {
@@ -58,10 +72,10 @@ export class KubeTarget extends Target {
           },
         },
       },
-    } as Partial<architectGlasswayNet.v1alpha1.Target["spec"]>;
+    } as Partial<architectGlasswayNet.v1alpha1.Target['spec']>;
 
     model.spec = recursiveMerge(defaults, model.spec);
-    super(model, params, parent);
+    super(model, params, project);
 
     this.flux = new FluxCDController(this);
 
@@ -69,16 +83,62 @@ export class KubeTarget extends Target {
     this.enable(CrdsComponent);
 
     this.createDefaultResources();
-  };
+  }
 
-  public override defaultContext<T extends Component>(token: constructor<T>, context?: Partial<KubeContext>, force?: boolean): Partial<KubeContext> {
+  public get cluster(): NonNullable<
+    NonNullable<
+      architectGlasswayNet.v1alpha1.Target['spec']['plugins']
+    >['kubernetes']
+  > {
+    return this.model.spec.plugins!.kubernetes!;
+  }
+
+  public get plugin(): K8sPlugin {
+    return this.app.pluginRegistry.get(K8S_PLUGIN_CLASS) as K8sPlugin;
+  }
+
+  private get prelude(): KubePreludeComponent {
+    return this.component(KubePreludeComponent);
+  }
+
+  public static fake(): architectGlasswayNet.v1alpha1.Target {
+    return new architectGlasswayNet.v1alpha1.Target({
+      metadata: {
+        name: 'fake-cluster',
+      },
+      spec: {
+        plugins: {
+          kubernetes: {
+            client: {
+              context: 'admin@fake-cluster',
+            },
+            dns: 'fake.example.com',
+            podNetwork: {
+              ipFamilies: ['IPv4', 'IPv6'],
+            },
+            flavor: 'docker-desktop',
+            version: 'v1.31.3',
+            metal: {
+              nodes: 3,
+            },
+          },
+        },
+      },
+    });
+  }
+
+  public override defaultContext<T extends Component>(
+    token: constructor<T>,
+    context?: Partial<KubeContext>,
+    force?: boolean,
+  ): Partial<KubeContext> {
     context = super.defaultContext(token, context, force);
     if (context.namespace && !force) return context;
 
     const replacements = {
-      "$features$": this.cluster.ns!.features!,
-      "$services$": this.cluster.ns!.services!,
-      "$operators$": this.cluster.ns!.operators!,
+      '$features$': this.cluster.ns!.features!,
+      '$services$': this.cluster.ns!.services!,
+      '$operators$': this.cluster.ns!.operators!,
     };
 
     if (!context.namespace || force) {
@@ -86,29 +146,16 @@ export class KubeTarget extends Target {
 
       if (meta.model?.context?.namespace) {
         context.namespace = meta.model.context.namespace;
-        for (const [k, v] of Object.entries(replacements))
+        for (const [k, v] of Object.entries(replacements)) {
           context.namespace = context.namespace!.replace(k, v);
+        }
       } else if (!context.namespace) {
         context.namespace = 'default';
-      };
-    };
+      }
+    }
 
     return context;
-  };
-
-  public get cluster(): NonNullable<NonNullable<architectGlasswayNet.v1alpha1.Target["spec"]["plugins"]>["kubernetes"]> {
-    return this.model.spec.plugins!.kubernetes!;
-  };
-
-  public get plugin(): K8sPlugin {
-    return this.parent.plugins.get(K8S_PLUGIN_CLASS) as K8sPlugin;
   }
-
-  private createDefaultResources() {
-    this.createNamespace(this.cluster.ns!.features!);
-    this.createNamespace(this.cluster.ns!.operators!);
-    this.createNamespace(this.cluster.ns!.services!);
-  };
 
   /**
    * Installs the CRD specified by the GVK, or just marks it as installed.
@@ -120,8 +167,8 @@ export class KubeTarget extends Target {
       this.markedCRDGVKs.push(gvk);
     } else {
       this.component(CrdsComponent).enableGVK(gvk);
-    };
-  };
+    }
+  }
 
   /**
    * Installs the CRDs specified by the group, or just marks them as installed.
@@ -129,15 +176,19 @@ export class KubeTarget extends Target {
    * @param subgroups Whether to add a wildcard rule to match subgroups
    * @param mark Just mark the CRDs as present in the cluster, and don't install them
    */
-  public enableCRDGroup(group: string, subgroups: boolean = true, mark: boolean = false) {
+  public enableCRDGroup(
+    group: string,
+    subgroups: boolean = true,
+    mark: boolean = false,
+  ) {
     if (mark === true) {
       this.markedCRDGroups.push(group);
     } else {
       this.component(CrdsComponent).enableGroup(group);
-    };
+    }
 
     if (subgroups) this.enableCRDGroup(`*.${group}`, false, mark);
-  };
+  }
 
   /**
    * Creates a new namespace and returns it
@@ -151,10 +202,15 @@ export class KubeTarget extends Target {
 
     this.prelude.push(namespace);
     return namespace;
-  };
+  }
 
-  public override async compile(graph: DependencyGraph, params?: TargetResolveParams): Promise<Result> {
-    const result = await super.compile(graph, params);
+  public override async compile(
+    params?: TargetResolveParams,
+    listener?: ICompileListener,
+  ): Promise<Result | undefined> {
+    const result = await super.compile(params, listener);
+    if (!result) return result;
+
     result.writer = new KubeWriter(this);
 
     // TODO: handle objects, too
@@ -166,11 +222,18 @@ export class KubeTarget extends Target {
         try {
           await item.validate();
         } catch (e) {
-          if (e instanceof Error)
-            graph.errors.push(new ValidationError(e.message, ValidationErrorLevel.ERROR, `${resource.kind} ${resource.metadata?.namespace}/${resource.metadata?.name}`));
-        };
-      };
-    };
+          if (e instanceof Error) {
+            result.graph.errors.push(
+              new ValidationError(
+                e.message,
+                ValidationErrorLevel.ERROR,
+                `${resource.kind} ${resource.metadata?.namespace}/${resource.metadata?.name}`,
+              ),
+            );
+          }
+        }
+      }
+    }
 
     const crdGraph = KubeCRDDependencyGraph.create(result, {
       ignoredGVKs: this.markedCRDGVKs,
@@ -181,35 +244,11 @@ export class KubeTarget extends Target {
     crdGraph.applyDependencies();
 
     return result;
-  };
+  }
 
-  private get prelude(): KubePreludeComponent {
-    return this.component(KubePreludeComponent);
-  };
-
-  public static fake(): architectGlasswayNet.v1alpha1.Target {
-    return new architectGlasswayNet.v1alpha1.Target({
-      metadata: {
-        name: 'fake-cluster',
-      },
-      spec: {
-        plugins: {
-          kubernetes: {
-            client: {
-              context: 'admin@fake-cluster'
-            },
-            dns: 'fake.example.com',
-            podNetwork: {
-              ipFamilies: ['IPv4', 'IPv6']
-            },
-            flavor: 'docker-desktop',
-            version: 'v1.31.3',
-            metal: {
-              nodes: 3
-            },
-          },
-        },
-      },
-    });
-  };
-};
+  private createDefaultResources() {
+    this.createNamespace(this.cluster.ns!.features!);
+    this.createNamespace(this.cluster.ns!.operators!);
+    this.createNamespace(this.cluster.ns!.services!);
+  }
+}

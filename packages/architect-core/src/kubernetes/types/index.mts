@@ -1,2 +1,2 @@
-export * from './gvk.mts';
-export { TypeRegistry } from './registry.mts';
+export * from "./gvk.mts";
+export { KubeTypeRegistry } from "./registry.mts";

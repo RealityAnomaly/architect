@@ -1,5 +1,6 @@
 {
   "imports": {
+    "@deno-library/progress": "jsr:@deno-library/progress@^1.5.1",
     "@dx/reflect": "jsr:@dx/reflect@^0.2.14",
     "@es-toolkit/es-toolkit": "jsr:@es-toolkit/es-toolkit@^1.29.0",
     "@types/js-yaml": "npm:@types/js-yaml@^4.0.9",
@@ -19,16 +20,37 @@
     ".": "./src/index.mts"
   },
   "lint": {
-    "include": ["src/"],
-    "exclude": ["src/testdata/", "src/fixtures/**/*.ts", "src/generated/**/"],
+    "include": [
+      "src/"
+    ],
+    "exclude": [
+      "src/testdata/",
+      "src/fixtures/**/*.ts",
+      "src/generated/**/"
+    ],
     "rules": {
-      "tags": ["recommended"],
-      "exclude": ["require-await", "no-empty-interface"]
+      "tags": [
+        "recommended"
+      ],
+      "exclude": [
+        "require-await",
+        "no-empty-interface"
+      ]
+    }
+  },
+  "fmt": {
+    "options": {
+      "singleQuote": true
     }
   },
   "test": {
-    "include": ["src/"],
-    "exclude": ["src/testdata/", "src/fixtures/**/*.ts"]
+    "include": [
+      "src/"
+    ],
+    "exclude": [
+      "src/testdata/",
+      "src/fixtures/**/*.ts"
+    ]
   },
   "tasks": {
     "generate": "deno --allow-env --allow-sys --allow-read --allow-run=deno --allow-write src/bin/generate-core-crds.mts"

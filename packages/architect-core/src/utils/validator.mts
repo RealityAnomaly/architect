@@ -1,18 +1,18 @@
-import { Logger } from "winston";
+import { Logger } from 'winston';
 
 interface Validator {
   validate(): void | Promise<void>;
-};
+}
 
 export function isValidator(value: unknown): value is Validator {
   return !!value && typeof (value as Validator).validate === 'function';
-};
+}
 
 export enum ValidationErrorLevel {
   INFO = 'info',
   WARNING = 'warning',
-  ERROR = 'error'
-};
+  ERROR = 'error',
+}
 
 export interface ValidationErrorCount {
   messages: number;
@@ -30,13 +30,13 @@ export class ValidationError extends Error {
     super(message);
     this.level = level;
     this.subject = subject;
-  };
+  }
 
   public assert(logger: Logger) {
     if (this.acked) return;
 
     let level: string;
-    switch(this.level) {
+    switch (this.level) {
       case ValidationErrorLevel.INFO:
         level = 'info';
         break;
@@ -46,9 +46,9 @@ export class ValidationError extends Error {
       case ValidationErrorLevel.ERROR:
         level = 'error';
         break;
-    };
+    }
 
     logger.log(level, `${this.subject}: ${this.message}`);
     this.acked = true;
-  };
-};
+  }
+}
