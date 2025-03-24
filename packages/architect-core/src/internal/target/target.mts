@@ -2,10 +2,10 @@ import { Reflect } from '@dx/reflect';
 
 import { architectGlasswayNet } from '../../generated/crds/index.ts';
 
-import { Component, ComponentClass, ExtractComponentArgs, } from '../component/component.mts';
+import { Component, ComponentClass,  } from '../component/component.mts';
 import {
   Condition,
-  constructor,
+  Constructor,
   DeepLazySpec,
   DeepPartial,
   ReflectionUtilities,
@@ -14,12 +14,12 @@ import {
   ValidationErrorLevel,
 } from '../../utils/index.mts';
 import { Result } from '../result/index.mts';
-import { Context } from '../component/context.mts';
+import { Context } from '../../utils/index.mts';
 import {
   Architect,
   Capability,
   CompilePhase,
-  DependencyGraph,
+  DependencyGraph, ExtractComponentArgs,
   ICompileListener,
   VirtualCapability,
 } from '../../index.mts';
@@ -198,7 +198,7 @@ export class Target {
     context = this.defaultContext(token, context);
     let result = this.components.request(token, context);
     if (result === undefined && auto) {
-      result = new token(this, undefined, context);
+      result = new token(this, context as Context);
       result.init();
 
       this.components.register(token, result, context);
@@ -215,7 +215,7 @@ export class Target {
   }
 
   public defaultContext<T extends Component>(
-    token: constructor<T>,
+    token: Constructor<T>,
     context?: Partial<Context>,
     force?: boolean,
   ): Partial<Context> {

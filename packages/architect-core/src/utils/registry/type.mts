@@ -1,11 +1,11 @@
-import { constructor } from '../types.mts';
+import { Constructor } from '../types.mts';
 
 /**
  * Registry that does a simple instance comparison based on the constructor of a class.
  */
 export class TypeRegistry<T> {
   public readonly data: {
-    ctor: constructor<T>;
+    ctor: Constructor<T>;
     instance: T;
   }[] = [];
 
@@ -19,7 +19,7 @@ export class TypeRegistry<T> {
    * Requests an entry from the registry
    * @param token The constructor token to request
    */
-  public resolve<TValue extends T>(token: constructor<TValue>): TValue {
+  public resolve<TValue extends T>(token: Constructor<TValue>): TValue {
     const value = this.data.find((v) => v.ctor === token);
     if (value) return value.instance as TValue;
 
@@ -28,7 +28,7 @@ export class TypeRegistry<T> {
     return instance;
   }
 
-  public resolveAll<TValue extends T>(tokens: constructor<TValue>[]): TValue[] {
+  public resolveAll<TValue extends T>(tokens: Constructor<TValue>[]): TValue[] {
     return tokens.map(this.resolve.bind(this));
   }
 }

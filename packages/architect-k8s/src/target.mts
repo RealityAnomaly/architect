@@ -1,13 +1,14 @@
 import {
   architectGlasswayNet,
+  CollectionUtilities,
   Component,
   ComponentMetadata,
-  constructor,
+  Constructor,
   GVK,
+  ICompileListener,
   isValidator,
   KubeResource,
   Project,
-  recursiveMerge,
   Result,
   Target,
   TargetParams,
@@ -25,7 +26,6 @@ import { KubeWriter } from './writer.mts';
 import { K8S_PLUGIN_CLASS, K8sPlugin } from './plugin.mts';
 import { KubeContext } from './context.mts';
 import { KubeCRDDependencyGraph } from './crds/graph.mts';
-import { ICompileListener } from '../../architect-core/src/index.mts';
 
 export enum KubeTargetOutputFormat {
   SingleFile,
@@ -74,7 +74,7 @@ export class KubeTarget extends Target {
       },
     } as Partial<architectGlasswayNet.v1alpha1.Target['spec']>;
 
-    model.spec = recursiveMerge(defaults, model.spec);
+    model.spec = CollectionUtilities.recursiveMerge(defaults, model.spec);
     super(model, params, project);
 
     this.flux = new FluxCDController(this);
@@ -128,7 +128,7 @@ export class KubeTarget extends Target {
   }
 
   public override defaultContext<T extends Component>(
-    token: constructor<T>,
+    token: Constructor<T>,
     context?: Partial<KubeContext>,
     force?: boolean,
   ): Partial<KubeContext> {

@@ -6,6 +6,9 @@ import {
   ComponentClass,
   ComponentMatcher,
   ComponentMetadata,
+  ComponentModel,
+  ComponentModelUtilities,
+  ComponentUpgradeState,
   IComponentMatcher,
   KubeResource,
   KubeResourceUtilities,
@@ -13,7 +16,7 @@ import {
   Target,
 } from '@perdition/architect-core';
 
-import { JSONSchemaType, ValidateFunction } from 'ajv';
+import { JSONSchemaType } from 'ajv';
 import * as api from 'kubernetes-models';
 import * as toolkit from '@es-toolkit/es-toolkit';
 import { CNICapability, DNSCapability } from './capabilities/index.mts';
@@ -21,7 +24,6 @@ import { CNICapability, DNSCapability } from './capabilities/index.mts';
 import { KubeTarget } from './target.mts';
 import { KubeContext } from './context.mts';
 import { GitFetchOptions, HelmChartOpts, HttpFetchOptions, KustomizeOpts, } from './index.mts';
-import { ComponentModel, ComponentModelUtilities, ComponentUpgradeState, } from '../../architect-core/src/index.mts';
 
 export interface KubeComponentArgs
   extends ComponentArgs<KubeComponentModelInput> {
@@ -47,24 +49,22 @@ export abstract class KubeComponent<
 
   constructor(
     target: Target,
-    props: TArgs = {} as TArgs,
-    context?: Partial<KubeContext>,
+    context: KubeContext,
+    props?: TArgs,
     parent?: TParent,
   ) {
-    super(target, props, context, parent);
-    this.context = context as KubeContext;
-  }
+    super(target, context, props, parent);
+    this.context = context;
 
-  public get namespace(): string {
-    return this.context.namespace;
-  }
-
-  public override get modelValidator(): ValidateFunction<KubeComponentModel> {
-    return ComponentModelUtilities.createValidator(
+    this._validator = ComponentModelUtilities.createValidator(
       this.target.app.ajv,
       KubeComponentContextSchema,
       KubeComponentModelInputSchema,
     );
+  }
+
+  public get namespace(): string {
+    return this.context.namespace ?? 'default';
   }
 
   protected get cluster(): NonNullable<
@@ -136,14 +136,8 @@ export abstract class KubeComponent<
     // run post-build resource fixup at the top level
     let resources = KubeResourceUtilities.normaliseResources(data);
 
-    // TODO: a bit of a hack... might want to improve $resolve logic to add caching
-    // we need to not just resolve here, because we might have default values that were added in the build phase
-    let resolved = this.props.$__cachedResult__;
-    if (resolved === undefined) {
-      resolved = await this.props.$resolve();
-    }
-
     // adds the metadata ConfigMap
+    const resolved = await this.props.$resolve();
     const metadata = new api.v1.ConfigMap({
       metadata: {
         name: `${this.context.name}-metadata`,
@@ -329,7 +323,7 @@ const KubeComponentModelInputSchema: JSONSchemaType<KubeComponentModelInput> = {
   },
 };
 
-@KubeComponent.decorate({class: 'architect.glassway.net/prelude'})
+@KubeComponent.decorate({ class: 'architect.glassway.net/prelude' })
 export class KubePreludeComponent extends KubeComponent {
   private readonly resources: KubeResource[] = [];
 

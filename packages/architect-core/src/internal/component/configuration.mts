@@ -1,7 +1,8 @@
-import { Component, ComponentArgs, ExtractComponentArgs, } from './component.mts';
-import { Context } from './context.mts';
+import { Component,  } from './component.mts';
+import { Context } from '../../utils/registry/context.mts';
 import { Target } from '../target/index.mts';
-import { _LazyProxy, Condition, constructor, DeepLazySpec, DeepPartial, Lazy, LazyAuto, } from '../../utils/index.mts';
+import { _LazyProxy, Condition, Constructor, DeepLazySpec, DeepPartial, Lazy, LazyAuto, } from '../../utils/index.mts';
+import { ComponentArgs, ExtractComponentArgs } from './arguments.mts';
 
 /**
  * Provides context for component configuration execution
@@ -22,7 +23,7 @@ export class ConfigurationContext {
   }
 
   public component<T extends Component>(
-    token: constructor<T>,
+    token: Constructor<T>,
     context?: Partial<Context>,
   ): LazyAuto<ExtractComponentArgs<T>> {
     return this.target.component(token, context, true).props as LazyAuto<
@@ -31,7 +32,7 @@ export class ConfigurationContext {
   }
 
   public enable<T extends Component>(
-    token: constructor<T>,
+    token: Constructor<T>,
     config?: DeepLazySpec<DeepPartial<ExtractComponentArgs<T>>>,
     context?: Partial<Context>,
     weight?: number,
@@ -42,7 +43,7 @@ export class ConfigurationContext {
   }
 
   public set<T extends Component>(
-    token: constructor<T>,
+    token: Constructor<T>,
     value: DeepLazySpec<DeepPartial<ExtractComponentArgs<T>>>,
     weight?: number,
     force?: boolean,

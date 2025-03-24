@@ -21,7 +21,6 @@ export * from './internal/project/index.mts';
 
 @Project.decorate({
   name: '@perdition/architect-core',
-  library: true,
 })
 export class ArchitectCoreProject extends Project {
   public override async configure(): Promise<void> {

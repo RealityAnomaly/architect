@@ -1,5 +1,5 @@
 import { Component } from '../component.mts';
-import { constructor } from '../../../utils/index.mts';
+import { Constructor } from '../../../utils/index.mts';
 import { ComponentMetadata } from '../metadata.mts';
 
 export * from './capability.mts';
@@ -18,10 +18,10 @@ export interface IComponentMatcher {
 }
 
 export class ComponentMatcher implements IComponentMatcher {
-  private readonly token: constructor<Component>;
+  private readonly token: Constructor<Component>;
   private readonly clazz: string;
 
-  constructor(token: constructor<Component>) {
+  constructor(token: Constructor<Component>) {
     this.token = token;
     this.clazz = ComponentMetadata.from(this.token)!.model!.class!;
   }

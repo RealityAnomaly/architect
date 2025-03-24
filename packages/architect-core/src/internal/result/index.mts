@@ -1,5 +1,5 @@
 import * as fs from 'node:fs/promises';
-import { recursiveMerge } from '../../utils/index.mts';
+import { CollectionUtilities } from '../../utils/index.mts';
 import { DependencyGraph } from '../graph/index.mts';
 
 export interface Writer {
@@ -35,7 +35,7 @@ export class Result {
    */
   public get all(): unknown {
     return Object.values(this.components).reduce<unknown>((prev, cur) => {
-      return recursiveMerge(prev as object, cur as object);
+      return CollectionUtilities.recursiveMerge(prev as object, cur as object);
     }, []);
   }
 

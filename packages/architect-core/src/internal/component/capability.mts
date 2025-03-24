@@ -14,10 +14,10 @@ export abstract class Capability<T> {
   }
 }
 
-export class VirtualCapability extends Capability<any> {
+export class VirtualCapability extends Capability<object> {
   protected readonly _clazz;
 
-  constructor(clazz: string, data?: any) {
+  constructor(clazz: string, data?: object) {
     super(data);
 
     this._clazz = clazz;

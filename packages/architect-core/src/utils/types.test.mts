@@ -1,27 +1,27 @@
-import * as assert from "@std/assert";
-import * as types from "./types.mts";
+// noinspection SpellCheckingInspection
+import * as assert from '@std/assert';
+import { TypeUtilities } from './types.mts';
 
-Deno.test("setNamed", async () => {
-  const obj = {
-    foo: "bar",
-  };
-
-  types.setNamed(obj);
-  assert.assertEquals(types.NAMED_SYMBOL in obj, true);
+Deno.test('isRecord', async () => {
+  assert.assertEquals(TypeUtilities.isRecord({ foo: 'bar' }), true);
+  assert.assertEquals(TypeUtilities.isRecord(['bar']), false);
+  assert.assertEquals(TypeUtilities.isRecord('blah'), false);
+  assert.assertEquals(TypeUtilities.isRecord(null), false);
+  assert.assertEquals(TypeUtilities.isRecord(undefined), false);
 });
 
-Deno.test("isNamed", async () => {
-  const obj1 = {
-    foo: "bar",
-  };
-  assert.assertEquals(types.isNamed(obj1), false);
+Deno.test('notEmpty', async () => {
+  assert.assertEquals(TypeUtilities.notEmpty({ foo: 'bar' }), true);
+  assert.assertEquals(TypeUtilities.notEmpty({}), true);
+  assert.assertEquals(TypeUtilities.notEmpty(null), false);
+  assert.assertEquals(TypeUtilities.notEmpty(undefined), false);
+});
 
-  const obj2 = {
-    foo: "bar",
-  };
-  Object.defineProperty(obj2, types.NAMED_SYMBOL, {
-    value: true,
-    enumerable: true,
-  });
-  assert.assertEquals(types.isNamed(obj2), true);
+Deno.test('isEmptyObject', async () => {
+  assert.assertEquals(TypeUtilities.isEmptyObject({ foo: 'bar' }), false);
+  assert.assertEquals(TypeUtilities.isEmptyObject({}), true);
+  // deno-lint-ignore no-explicit-any
+  assert.assertEquals(TypeUtilities.isEmptyObject(null as any), true);
+  // deno-lint-ignore no-explicit-any
+  assert.assertEquals(TypeUtilities.isEmptyObject(undefined as any), true);
 });

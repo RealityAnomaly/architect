@@ -3,32 +3,31 @@ import { Ajv, JSONSchemaType } from 'ajv';
 
 export interface ProjectConfig {
   name: string;
-  library?: boolean;
   backend?: object;
   plugins?: Record<string, object>;
 }
 
 const ProjectConfigSchema: JSONSchemaType<ProjectConfig> = {
-  type: "object",
-  required: ["name"],
+  type: 'object',
+  required: ['name'],
   properties: {
     name: {
-      type: "string",
+      type: 'string',
     },
     library: {
-      type: "boolean",
+      type: 'boolean',
       nullable: true,
     },
     backend: {
-      type: "object",
+      type: 'object',
       nullable: true,
     },
     plugins: {
-      type: "object",
+      type: 'object',
       required: [],
       nullable: true,
       additionalProperties: {
-        type: "object",
+        type: 'object',
       },
     },
   },
@@ -48,7 +47,7 @@ export class ProjectConfigLoader {
     if (!validator(config)) {
       throw new Error(
         `failed to validate configuration model for project ${
-          ctx || "unknown"
+          ctx || 'unknown'
         }: ${ajv.errorsText(validator.errors)}`,
       );
     }

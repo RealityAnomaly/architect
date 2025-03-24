@@ -1,9 +1,8 @@
-import { GVK } from '@perdition/architect-core';
+import { CRDModelGenerator, GVK, TypeUtilities } from '@perdition/architect-core';
 import * as api from 'kubernetes-models';
 import { KubeComponent, KubeComponentGenericResources, } from '../../component.mts';
 
 import model from './architect.json' with { type: 'json' };
-import { CRDModelGenerator, notEmpty } from '../../../../architect-core/src/index.mts';
 
 @KubeComponent.decorate(model)
 export class CrdsComponent extends KubeComponent {
@@ -50,7 +49,7 @@ export class CrdsComponent extends KubeComponent {
           },
         ));
 
-      crds.push(...result.filter(notEmpty));
+      crds.push(...result.filter(TypeUtilities.notEmpty));
     }
 
     resources.result = crds;

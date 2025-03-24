@@ -1,8 +1,7 @@
 import objectHash from 'object-hash';
 import { Reflect } from '@dx/reflect';
 
-import { Context } from '../../internal/index.mts';
-import { constructor, ReflectionUtilities } from '../index.mts';
+import { Constructor, Context, ReflectionUtilities } from '../index.mts';
 import { Architect } from '../../index.mts';
 
 /**
@@ -16,7 +15,7 @@ export class TokenRegistry<T> {
   }
 
   private static defaultContext(
-    token: constructor<unknown>,
+    token: Constructor<unknown>,
     context?: Partial<Context>,
   ): Context {
     if (!context) context = {};
@@ -33,7 +32,7 @@ export class TokenRegistry<T> {
    * Registers an instance of T with the options provided.
    */
   public register(
-    token: constructor<unknown>,
+    token: Constructor<unknown>,
     instance: T,
     _context?: Partial<Context>,
   ) {
@@ -53,7 +52,7 @@ export class TokenRegistry<T> {
    * @param _context Optional context of the object
    */
   public request(
-    token: constructor<unknown>,
+    token: Constructor<unknown>,
     _context?: Partial<Context>,
   ): T | undefined {
     const context = TokenRegistry.defaultContext(token, _context);

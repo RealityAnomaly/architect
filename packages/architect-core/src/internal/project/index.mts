@@ -1,9 +1,8 @@
 import path from 'node:path';
 import { Reflect } from '@dx/reflect';
 
-import { ArchitectCoreProject, ComponentClass, ComponentMetadata, Target, TargetLoader, } from '../../index.mts';
+import { ArchitectCoreProject, ComponentClass, ComponentLoader, ComponentMetadata, Target, TargetLoader, } from '../../index.mts';
 import { PluginClass } from '../../plugin.mts';
-import { Component } from '../component/component.mts';
 import Module from 'node:module';
 import { Architect } from '../../app.mts';
 import { ProjectConfig, ProjectConfigLoader } from './config.mts';
@@ -124,7 +123,7 @@ export abstract class Project {
     if (!this.components) {
       this.components = [];
       for (const mod of this.modules) {
-        this.components.push(...await Component.collect(mod as Module));
+        this.components.push(...await ComponentLoader.fromModule(mod as Module));
       }
     }
 

@@ -3,7 +3,7 @@ import { loadAll } from 'js-yaml';
 
 import { KubeResource, KubeResourceUtilities } from './resource.mts';
 import { GVK, KubeTypeRegistry } from './types/index.mts';
-import { isRecord } from '../utils/objects.mts';
+import { TypeUtilities } from '../utils/index.mts';
 
 export class ManifestLoader {
   private readonly types: KubeTypeRegistry;
@@ -19,7 +19,7 @@ export class ManifestLoader {
     const resources: KubeResource[] = [];
 
     for (const object of content) {
-      if (!isRecord(object)) {
+      if (!TypeUtilities.isRecord(object)) {
         throw new Error(
           `The value is not an object: ${JSON.stringify(object)}`,
         );
