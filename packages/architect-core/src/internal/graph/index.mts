@@ -8,10 +8,7 @@ import {
   ValidationErrorLevel,
 } from '../../index.mts';
 
-// export interface Dependency {
-//   component: Component;
-//   matcher: IComponentMatcher;
-// };
+import { Logger } from 'winston';
 
 export interface ResolvedComponent {
   component: Component;
@@ -121,14 +118,16 @@ export class DependencyGraph {
   /**
    * Logs any global or component-specific validation errors, and returns false if any are fatal
    */
-  public assertValid(silent: boolean = false): boolean {
-    for (const error of this.errors) {
-      error.assert(this.target.app.logger);
-    }
+  public assertValid(logger?: Logger): boolean {
+    if (logger) {
+      for (const error of this.errors) {
+        error.assert(logger);
+      }
 
-    for (const component of Object.values(this.components)) {
-      for (const error of component.errors) {
-        error.assert(this.target.app.logger);
+      for (const component of Object.values(this.components)) {
+        for (const error of component.errors) {
+          error.assert(logger);
+        }
       }
     }
 
@@ -141,12 +140,11 @@ export class DependencyGraph {
       message = 'failed';
     }
 
-    if (!silent) {
-      this.target.app.logger.log(
-        level,
-        `validation ${message} for ${this.target.toString()}: ${errors.errors} errors, ${errors.warnings} warnings, ${errors.messages} messages`,
-      );
-    }
+    logger?.log(
+      level,
+      `validation ${message} for ${this.target.toString()}: ${errors.errors} errors, ${errors.warnings} warnings, ${errors.messages} messages`,
+    );
+
     return errors.errors <= 0;
   }
 }

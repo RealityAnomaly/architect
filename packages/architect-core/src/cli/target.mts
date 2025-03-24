@@ -26,7 +26,7 @@ export class TargetCommand extends Command {
   }
 
   private async list(_options: AppCommandTargetListOptions) {
-    const context = this.app.app!;
+    const context = this.app.instance!;
     const targets = await context.project!.getTargets();
     if (targets.length > 0) {
       console.log(`${targets.length} targets available:`);
@@ -42,7 +42,7 @@ export class TargetCommand extends Command {
   }
 
   private async show(options: AppCommandTargetShowOptions) {
-    const context = this.app.app!;
+    const context = this.app.instance!;
     const target = await context.project!.getTarget(options.name);
     if (!target) {
       console.log(`Unable to find any target with name ${options.name}`);
