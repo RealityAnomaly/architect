@@ -59,7 +59,7 @@ export class KubeWriter implements Writer {
       Object.entries(result.components).map(async ([k, v]) => {
         const component = result.graph.components[k].component as KubeComponent;
         const ctx = component.context as KubeContext;
-        const rd = path.join(dir, ctx.namespace, component.context.name);
+        const rd = path.join(dir, ctx.namespace ?? 'default', component.context.name);
         await fs.rm(rd, { recursive: true, force: true });
         await fs.mkdir(rd, { recursive: true });
 

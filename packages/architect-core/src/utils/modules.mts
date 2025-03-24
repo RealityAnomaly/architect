@@ -1,12 +1,12 @@
-import { constructor } from './types.mts';
+import { Constructor } from './types.mts';
 
 export class ModuleUtilities {
   // deno-lint-ignore no-explicit-any
   public static collectClasses<T>(
     module: any,
-    matcher: (clazz: constructor<T>) => boolean,
-  ): constructor<T>[] {
-    const result: constructor<T>[] = [];
+    matcher: (clazz: Constructor<T>) => boolean,
+  ): Constructor<T>[] {
+    const result: Constructor<T>[] = [];
 
     if (matcher(module)) {
       result.push(module);

@@ -1,6 +1,6 @@
 import {
-  asyncFilter,
   CapabilityMatcher,
+  CollectionUtilities,
   Component,
   Target,
   ValidationError,
@@ -48,7 +48,7 @@ export class DependencyGraph {
     components: Component[],
     validate: boolean = true,
   ): Promise<DependencyGraph> {
-    components = await asyncFilter(
+    components = await CollectionUtilities.asyncFilter(
       components,
       async (c: Component) => await c.props.enable.$resolve() === true,
     );

@@ -1,13 +1,5 @@
-import * as toolkit from "@es-toolkit/es-toolkit";
-
 export type ValuePathKey = string | symbol | number;
 export type ValuePath = ValuePathKey[];
-
-export function isObjectDeepKeys(value: unknown): value is object {
-  // TODO: this should NOT Include classes!!!
-  if (typeof value !== "object") return false;
-  return !toolkit.isFunction(value);
-}
 
 export function prettifyPath(path: ValuePath): string {
   let builder = "";

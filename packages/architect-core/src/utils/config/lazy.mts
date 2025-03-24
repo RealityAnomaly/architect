@@ -1,15 +1,10 @@
-import * as toolkit from "@es-toolkit/es-toolkit";
-import { arrayStartsWith, isEmptyObject, recursiveMerge } from "../objects.mts";
-import {
-  isObjectDeepKeys,
-  PathResultBuilder,
-  ValuePath,
-  ValuePathKey,
-} from "./paths.mts";
-import { DeepPartial, Resolver, Value } from "./value.mts";
-import { RecursiveRecord } from "../types.mts";
+import * as toolkit from '@es-toolkit/es-toolkit';
+import { PathResultBuilder, ValuePath, ValuePathKey } from './paths.mts';
+import { DeepPartial, Resolver, Value } from './value.mts';
+import { RecursiveRecord, TypeUtilities } from '../types.mts';
+import { CollectionUtilities } from '../collections.mts';
 
-const LAZY_PROXY_SYMBOL = Symbol.for("architect.LazyProxy");
+const LAZY_PROXY_SYMBOL = Symbol.for('architect.LazyProxy');
 const MAX_EVALUATION_DEPTH = 100;
 
 export interface _LazyProxy<T> {
@@ -26,7 +21,7 @@ export interface _LazyProxy<T> {
   /**
    * The result of the last evaluation attempt
    */
-  $__cachedResult__: T;
+  $__cache__: T;
 
   /**
    * The fallback value to use if the value is undefined
@@ -37,9 +32,10 @@ export interface _LazyProxy<T> {
    * Resolves the entire configuration tree and returns the result
    * @param fallback Default value to be merged if the value does not exist
    * @param depth The current evaluation depth
+   * @param force Whether to ignore any currently cached result
    * @returns The result of the evaluation
    */
-  $resolve(fallback?: Partial<T>, depth?: number): Promise<T>;
+  $resolve(fallback?: Partial<T>, depth?: number, force?: boolean): Promise<T>;
 
   /**
    * Transforms this proxy using the specified function and wraps it in a Resolver<T>
@@ -75,9 +71,13 @@ class LazyProxy {
     const internal = {
       $__root__: root,
       $__path__: path,
-      $__cachedResult__: undefined,
+      $__cache__: undefined,
 
-      $resolve: async (fallback?: Partial<T>, depth: number = 0) => {
+      $resolve: async (fallback?: Partial<T>, depth: number = 0, force: boolean = false) => {
+        if (!force && internal.$__cache__ !== undefined) {
+          return internal.$__cache__;
+        }
+
         depth += 1;
         if (depth > MAX_EVALUATION_DEPTH) {
           throw new Error(
@@ -94,9 +94,11 @@ class LazyProxy {
         try {
           result = await root.get(path, depth);
           if (fallback !== undefined) {
-            if (result !== undefined && isObjectDeepKeys(result)) {
+            if (
+              result !== undefined && TypeUtilities.isObjectDeepKeys(result)
+            ) {
               // we can only do this safely if we have an object
-              result = recursiveMerge(fallback, result);
+              result = CollectionUtilities.recursiveMerge(fallback, result);
             } else {
               result = fallback;
             }
@@ -109,7 +111,7 @@ class LazyProxy {
           }
         }
 
-        internal.$__cachedResult__ = result as T;
+        internal.$__cache__ = result as T;
         return result;
       },
 
@@ -142,13 +144,13 @@ class LazyProxy {
     return new Proxy(internal, {
       defineProperty(_target, _property, _attributes) {
         throw new Error(
-          "cannot mutate properties of lazy object with dot notation, use the .$set() function instead",
+          'cannot mutate properties of lazy object with dot notation, use the .$set() function instead',
         );
       },
 
       deleteProperty(_target, _p) {
         throw new Error(
-          "cannot mutate properties of lazy object with dot notation, use the .$set() function instead",
+          'cannot mutate properties of lazy object with dot notation, use the .$set() function instead',
         );
       },
 
@@ -163,7 +165,7 @@ class LazyProxy {
   }
 
   public static is<T>(value: unknown): value is _LazyProxy<T> {
-    return (value !== null && typeof value === "object" &&
+    return (value !== null && typeof value === 'object' &&
       Object.hasOwn(value, LAZY_PROXY_SYMBOL));
   }
 }
@@ -226,7 +228,7 @@ export class Lazy<T> {
     const values = this.matchValues(path);
     if (values.length <= 0) {
       throw new TypeError(
-        `no value found at path \`${path.join(".")}\` at depth ${depth}`,
+        `no value found at path \`${path.join('.')}\` at depth ${depth}`,
       );
     }
 
@@ -238,7 +240,7 @@ export class Lazy<T> {
       }
 
       let temp: T;
-      if (typeof value.value === "function") {
+      if (typeof value.value === 'function') {
         temp = await (value.value as Resolver<T>)();
       } else {
         temp = value.value;
@@ -258,7 +260,7 @@ export class Lazy<T> {
     for (const key of path) {
       if (curr === undefined) {
         throw new TypeError(
-          `attempted to read value of undefined at ${path.join(".")}`,
+          `attempted to read value of undefined at ${path.join('.')}`,
         );
       }
 
@@ -282,7 +284,7 @@ export class Lazy<T> {
     const property = LazyProxy.is(_value) ? async () => _value : _value;
 
     // do not collapse object values if we're forcing the value, treat it as atomic
-    if (!isObjectDeepKeys(property) || isEmptyObject(property) || force) {
+    if (!TypeUtilities.isObjectDeepKeys(property) || TypeUtilities.isEmptyObject(property) || force) {
       this.values.push({
         condition: condition,
         force: force,
@@ -318,12 +320,12 @@ export class Lazy<T> {
     // match children and push them to the list
     values.push(...this.values.filter(
       (v) =>
-        v.path.length > 0 && arrayStartsWith(v.path, path) &&
+        v.path.length > 0 && CollectionUtilities.arrayStartsWith(v.path, path) &&
         !toolkit.isEqual(v.path, path),
     ));
 
     // sort the values by weight
-    values = toolkit.sortBy(values, ["weight"]);
+    values = toolkit.sortBy(values, ['weight']);
     return values;
   }
 }

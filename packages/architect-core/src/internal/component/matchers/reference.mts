@@ -1,7 +1,8 @@
 import * as toolkit from '@es-toolkit/es-toolkit';
 
 import { IComponentMatcher } from './index.mts';
-import { Component, ComponentReference } from '../component.mts';
+import { Component } from '../component.mts';
+import { ComponentReference } from '../types.mts';
 
 export class ComponentReferenceMatcher<T> implements IComponentMatcher {
   private readonly ref: ComponentReference<T>;

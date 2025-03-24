@@ -145,7 +145,7 @@ export class KubeResourceUtilities {
   /**
    * Applies a default namespace to a resource if it is namespaced and does not already have one defined
    */
-  static defaultNamespace(resource: KubeResource, def: string): KubeResource {
+  static defaultNamespace(resource: KubeResource, def?: string): KubeResource {
     if (RESOURCE_NAMESPACE_BLACKLIST.includes(resource.kind)) {
       return resource;
     }
@@ -153,7 +153,7 @@ export class KubeResourceUtilities {
     const namespace = resource.metadata?.namespace;
     if (namespace === null || namespace === undefined) {
       resource = toolkit.merge(resource, {
-        metadata: { namespace: def },
+        metadata: { namespace: def ?? 'default' },
       });
     }
 

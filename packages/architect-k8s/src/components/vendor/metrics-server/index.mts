@@ -1,4 +1,4 @@
-import { recursiveMerge } from '@perdition/architect-core';
+import { CollectionUtilities } from '@perdition/architect-core';
 import { KubeComponent, KubeComponentGenericResources } from './../../../component.mts';
 import { MetricsCapability } from '../../../capabilities/metrics.mts';
 
@@ -21,7 +21,7 @@ export class MetricsServerComponent extends KubeComponent {
     // talos generates certificates with the IP of the node
     // this should really be fixed in the future
     if (this.cluster.flavor === "talos") {
-      values = recursiveMerge(values, {
+      values = CollectionUtilities.recursiveMerge(values, {
         args: ["--kubelet-insecure-tls"],
       });
     }
