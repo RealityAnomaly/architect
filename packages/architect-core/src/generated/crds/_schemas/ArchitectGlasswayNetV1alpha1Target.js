@@ -12,7 +12,7 @@ const schema9 = {
       "$ref": "F8UXVl2B8ROl9kb045E2at1pE3IVL8xPdYnpnYIkb0"
     },
     "spec": {
-      "$ref": "KdYvqaQbNmS3aH5WnRVFYuq4ultzkLAzVATow2Bbc"
+      "$ref": "qtC6W4vjWN7UojRnu4eu745ehcyr7Esr8c74G3zpPs"
     }
   },
   "required": ["apiVersion", "kind", "metadata", "spec"],
@@ -142,8 +142,8 @@ const schema14 = {
     "plugins": {
       "$ref": "bLN4DmuSvasE82BRe2tS3f1zBT7VkpSTocDlzhWOXzU"
     },
-    "requirements": {
-      "$ref": "aRQtgAls8PT3219P8mxz6PPEAVWN1SvmCHi6z12UM"
+    "capabilities": {
+      "$ref": "bSeMMpfBBIwjxKeAjsPaelE7DfBrxskLP7agid2TAk"
     },
     "components": {
       "$ref": "jrYujLw4RhGkshASgNW8t8PEE1liPlavRGooSVp1NyU"
@@ -949,76 +949,22 @@ function validate34(data, {
 }
 const schema25 = {
   "items": {
-    "$ref": "jdFtv6DGtroqVatkuk8ipQtGFLMzfSuVek97sB0uauQ"
+    "$ref": "wW9hyWyQy5PRJLPSHEp6EX97qKGc7uKTn6JBNyKH7PM"
   },
   "type": "array",
   "nullable": true
 };
-function validate60(data, {
-  instancePath = "",
-  parentData,
-  parentDataProperty,
-  rootData = data
-} = {}) {
-  let vErrors = null;
-  let errors = 0;
-  if (!Array.isArray(data) && data !== null) {
-    const err0 = {
-      instancePath,
-      schemaPath: "#/type",
-      keyword: "type",
-      params: {
-        type: "array"
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err0];
-    } else {
-      vErrors.push(err0);
-    }
-    errors++;
-  }
-  if (Array.isArray(data)) {
-    const len0 = data.length;
-    for (let i0 = 0; i0 < len0; i0++) {
-      if (!validate21(data[i0], {
-        instancePath: instancePath + "/" + i0,
-        parentData: data,
-        parentDataProperty: i0,
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate21.errors : vErrors.concat(validate21.errors);
-        errors = vErrors.length;
-      }
-    }
-  }
-  validate60.errors = vErrors;
-  return errors === 0;
-}
 const schema26 = {
-  "items": {
-    "$ref": "908R0Mwfe6REGO8538L3P9IIITPDHtPJlXmJGlrwPOE"
-  },
-  "type": "array",
-  "nullable": true
-};
-const schema27 = {
+  "type": "object",
   "properties": {
     "class": {
       "$ref": "jdFtv6DGtroqVatkuk8ipQtGFLMzfSuVek97sB0uauQ"
     },
-    "name": {
-      "$ref": "GlcYMJF0EagTzhTCQIbCB22J377Z87wRm00IC2Ss2g"
-    },
     "options": {
-      "$ref": "wnCl8zCvz1PLbyEivJTcktRgDZuzOGT9FYulvrA2T8w"
-    },
-    "context": {
       "$ref": "wnCl8zCvz1PLbyEivJTcktRgDZuzOGT9FYulvrA2T8w"
     }
   },
-  "required": ["class"],
-  "type": "object"
+  "required": ["class"]
 };
 const schema8 = {
   "type": "object",
@@ -1052,7 +998,139 @@ function validate23(data, {
   validate23.errors = vErrors;
   return errors === 0;
 }
-function validate64(data, {
+function validate61(data, {
+  instancePath = "",
+  parentData,
+  parentDataProperty,
+  rootData = data
+} = {}) {
+  let vErrors = null;
+  let errors = 0;
+  if (data && typeof data == "object" && !Array.isArray(data)) {
+    if (data.class === undefined) {
+      const err0 = {
+        instancePath,
+        schemaPath: "#/required",
+        keyword: "required",
+        params: {
+          missingProperty: "class"
+        }
+      };
+      if (vErrors === null) {
+        vErrors = [err0];
+      } else {
+        vErrors.push(err0);
+      }
+      errors++;
+    }
+    if (data.class !== undefined) {
+      if (!validate21(data.class, {
+        instancePath: instancePath + "/class",
+        parentData: data,
+        parentDataProperty: "class",
+        rootData
+      })) {
+        vErrors = vErrors === null ? validate21.errors : vErrors.concat(validate21.errors);
+        errors = vErrors.length;
+      }
+    }
+    if (data.options !== undefined) {
+      if (!validate23(data.options, {
+        instancePath: instancePath + "/options",
+        parentData: data,
+        parentDataProperty: "options",
+        rootData
+      })) {
+        vErrors = vErrors === null ? validate23.errors : vErrors.concat(validate23.errors);
+        errors = vErrors.length;
+      }
+    }
+  } else {
+    const err1 = {
+      instancePath,
+      schemaPath: "#/type",
+      keyword: "type",
+      params: {
+        type: "object"
+      }
+    };
+    if (vErrors === null) {
+      vErrors = [err1];
+    } else {
+      vErrors.push(err1);
+    }
+    errors++;
+  }
+  validate61.errors = vErrors;
+  return errors === 0;
+}
+function validate60(data, {
+  instancePath = "",
+  parentData,
+  parentDataProperty,
+  rootData = data
+} = {}) {
+  let vErrors = null;
+  let errors = 0;
+  if (!Array.isArray(data) && data !== null) {
+    const err0 = {
+      instancePath,
+      schemaPath: "#/type",
+      keyword: "type",
+      params: {
+        type: "array"
+      }
+    };
+    if (vErrors === null) {
+      vErrors = [err0];
+    } else {
+      vErrors.push(err0);
+    }
+    errors++;
+  }
+  if (Array.isArray(data)) {
+    const len0 = data.length;
+    for (let i0 = 0; i0 < len0; i0++) {
+      if (!validate61(data[i0], {
+        instancePath: instancePath + "/" + i0,
+        parentData: data,
+        parentDataProperty: i0,
+        rootData
+      })) {
+        vErrors = vErrors === null ? validate61.errors : vErrors.concat(validate61.errors);
+        errors = vErrors.length;
+      }
+    }
+  }
+  validate60.errors = vErrors;
+  return errors === 0;
+}
+const schema27 = {
+  "items": {
+    "$ref": "908R0Mwfe6REGO8538L3P9IIITPDHtPJlXmJGlrwPOE"
+  },
+  "type": "array",
+  "nullable": true
+};
+const schema28 = {
+  "properties": {
+    "class": {
+      "$ref": "jdFtv6DGtroqVatkuk8ipQtGFLMzfSuVek97sB0uauQ"
+    },
+    "name": {
+      "$ref": "GlcYMJF0EagTzhTCQIbCB22J377Z87wRm00IC2Ss2g"
+    },
+    "options": {
+      "$ref": "wnCl8zCvz1PLbyEivJTcktRgDZuzOGT9FYulvrA2T8w"
+    },
+    "context": {
+      "$ref": "wnCl8zCvz1PLbyEivJTcktRgDZuzOGT9FYulvrA2T8w"
+    }
+  },
+  "required": ["class"],
+  "type": "object"
+};
+function validate67(data, {
   instancePath = "",
   parentData,
   parentDataProperty,
@@ -1137,10 +1215,10 @@ function validate64(data, {
     }
     errors++;
   }
-  validate64.errors = vErrors;
+  validate67.errors = vErrors;
   return errors === 0;
 }
-function validate63(data, {
+function validate66(data, {
   instancePath = "",
   parentData,
   parentDataProperty,
@@ -1167,18 +1245,18 @@ function validate63(data, {
   if (Array.isArray(data)) {
     const len0 = data.length;
     for (let i0 = 0; i0 < len0; i0++) {
-      if (!validate64(data[i0], {
+      if (!validate67(data[i0], {
         instancePath: instancePath + "/" + i0,
         parentData: data,
         parentDataProperty: i0,
         rootData
       })) {
-        vErrors = vErrors === null ? validate64.errors : vErrors.concat(validate64.errors);
+        vErrors = vErrors === null ? validate67.errors : vErrors.concat(validate67.errors);
         errors = vErrors.length;
       }
     }
   }
-  validate63.errors = vErrors;
+  validate66.errors = vErrors;
   return errors === 0;
 }
 function validate33(data, {
@@ -1201,11 +1279,11 @@ function validate33(data, {
         errors = vErrors.length;
       }
     }
-    if (data.requirements !== undefined) {
-      if (!validate60(data.requirements, {
-        instancePath: instancePath + "/requirements",
+    if (data.capabilities !== undefined) {
+      if (!validate60(data.capabilities, {
+        instancePath: instancePath + "/capabilities",
         parentData: data,
-        parentDataProperty: "requirements",
+        parentDataProperty: "capabilities",
         rootData
       })) {
         vErrors = vErrors === null ? validate60.errors : vErrors.concat(validate60.errors);
@@ -1213,13 +1291,13 @@ function validate33(data, {
       }
     }
     if (data.components !== undefined) {
-      if (!validate63(data.components, {
+      if (!validate66(data.components, {
         instancePath: instancePath + "/components",
         parentData: data,
         parentDataProperty: "components",
         rootData
       })) {
-        vErrors = vErrors === null ? validate63.errors : vErrors.concat(validate63.errors);
+        vErrors = vErrors === null ? validate66.errors : vErrors.concat(validate66.errors);
         errors = vErrors.length;
       }
     }

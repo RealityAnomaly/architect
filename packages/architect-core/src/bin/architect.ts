@@ -1,3 +1,4 @@
 #!/usr/bin/env deno
-import { App } from '@perdition/architect-core';
+import { App } from '../app.mts';
+
 await App.run();

@@ -83,14 +83,14 @@ spec:
                             ipFamilies:
                               items:
                                 type: string
-                                enum: ["IPv4", "IPv6"]
+                                enum: [ "IPv4", "IPv6" ]
                               type: array
                           required:
                             - ipFamilies
                           type: object
                         flavor:
                           type: string
-                          enum: ["docker-desktop", "kind", "k3s", "talos"]
+                          enum: [ "docker-desktop", "kind", "k3s", "talos" ]
                         version:
                           type: string
                         metal:
@@ -98,7 +98,7 @@ spec:
                           properties:
                             nodes:
                               type: integer
-                          required: ["nodes"]
+                          required: [ "nodes" ]
                       required:
                         - client
                         - dns
@@ -106,12 +106,17 @@ spec:
                         - flavor
                         - version
                         - metal
-                requirements:
+                capabilities:
                   description: >-
-                    Requirements is a list of requirements that must be met by
-                    the target
+                    Capabilities is a list of capability identifiers that this target exposes but are not created by components within the build tree.
                   items:
-                    type: string
+                    type: object
+                    properties:
+                      class:
+                        type: string
+                      options:
+                        type: object
+                    required: [ "class" ]
                   type: array
                 components:
                   description: >-
@@ -127,7 +132,7 @@ spec:
                         type: object
                       context:
                         type: object
-                    required: ["class"]
+                    required: [ "class" ]
                     type: object
                   type: array
           required:
@@ -135,7 +140,5 @@ spec:
             - kind
             - metadata
             - spec
-        served: true
-        storage: false
-        subresources:
-          status: {}
+      served: true
+      storage: false

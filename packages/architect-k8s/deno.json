@@ -24,16 +24,37 @@
     "./crds": "./src/generated/crds/index.ts"
   },
   "lint": {
-    "include": ["src/"],
-    "exclude": ["src/testdata/", "src/fixtures/**/*.ts", "src/generated/**/"],
+    "include": [
+      "src/"
+    ],
+    "exclude": [
+      "src/testdata/",
+      "src/fixtures/**/*.ts",
+      "src/generated/**/"
+    ],
     "rules": {
-      "tags": ["recommended"],
-      "exclude": ["require-await", "no-empty-interface"]
+      "tags": [
+        "recommended"
+      ],
+      "exclude": [
+        "require-await",
+        "no-empty-interface"
+      ]
+    }
+  },
+  "fmt": {
+    "options": {
+      "singleQuote": true
     }
   },
   "test": {
-    "include": ["src/"],
-    "exclude": ["src/testdata/", "src/fixtures/**/*.ts"]
+    "include": [
+      "src/"
+    ],
+    "exclude": [
+      "src/testdata/",
+      "src/fixtures/**/*.ts"
+    ]
   },
   "license": "MIT",
   "name": "@perdition/architect-k8s",
