@@ -55,9 +55,13 @@ export interface ITarget {
       };
     };
     /**
-     * Requirements is a list of requirements that must be met by the target
+     * Capabilities is a list of capability identifiers that this target exposes but are not created by components within the build tree.
      */
-    "requirements"?: Array<string>;
+    "capabilities"?: Array<{
+      "class": string;
+      "options"?: {
+      };
+    }>;
     /**
      * Components is a list of components that must be deployed in the target
      */
@@ -86,7 +90,9 @@ static kind: ITarget["kind"] = "Target";
 static is = createTypeMetaGuard<ITarget>(Target);
 
 constructor(data?: ModelData<ITarget>) {
-  super({
+  super();
+
+  this.setDefinedProps({
     apiVersion: Target.apiVersion,
     kind: Target.kind,
     ...data

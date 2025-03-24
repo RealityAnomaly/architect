@@ -1,26 +1,34 @@
-import { HashUtilities } from './hashing.mts';
-import * as assert from '@std/assert';
+import { HashUtilities } from "./hashing.mts";
+import * as assert from "@std/assert";
 
-Deno.test('composite hash equality', () => {
+Deno.test("composite hash equality", () => {
   const first = [
-    'foo', 'bar', { foo: 'bar' },
+    "foo",
+    "bar",
+    { foo: "bar" },
   ];
 
   const second = [
-    'foo', 'bar', { foo: 'bar' },
+    "foo",
+    "bar",
+    { foo: "bar" },
   ];
 
   const hash = HashUtilities.compositeHash([first]);
   assert.assertStrictEquals(hash, HashUtilities.compositeHash([second]));
 });
 
-Deno.test('composite hash inequality', () => {
+Deno.test("composite hash inequality", () => {
   const first = [
-    'foo', 'bar', { foo: 'bar' },
+    "foo",
+    "bar",
+    { foo: "bar" },
   ];
 
   const second = [
-    'foo', 'bar', { foo: 'baz' },
+    "foo",
+    "bar",
+    { foo: "baz" },
   ];
 
   const hash = HashUtilities.compositeHash([first]);
