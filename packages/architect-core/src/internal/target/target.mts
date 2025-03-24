@@ -1,4 +1,5 @@
 import { Reflect } from '@dx/reflect';
+import { Logger } from 'winston';
 
 import { architectGlasswayNet } from '../../generated/crds/index.ts';
 
@@ -85,10 +86,12 @@ export class Target {
   /**
    * Compiles all output resources
    * @param params The parameters to use for resolution
+   * @param logger A logger to use for the invocation
    * @param listener
    */
   public async compile(
     params?: TargetResolveParams,
+    logger?: Logger,
     listener?: ICompileListener,
   ): Promise<Result | undefined> {
     listener?.setTotal(this.components.length());
@@ -100,7 +103,7 @@ export class Target {
 
     const graph = await this.resolve(params);
     if (validateOnly) {
-      graph.assertValid();
+      graph.assertValid(logger);
       listener?.setCompleted();
       return undefined;
     }
@@ -135,7 +138,7 @@ export class Target {
     );
 
     const result = new Result(graph, results);
-    this.app.logger.info(
+    logger?.info(
       `${this.toString()}: ${
         Object.values(result.components).length
       } components built`,
@@ -143,12 +146,12 @@ export class Target {
 
     if (validate) {
       listener?.onPhaseChange(CompilePhase.Validate);
-      if (!result.graph.assertValid()) {
+      if (!result.graph.assertValid(logger)) {
         listener?.setCompleted();
         return result;
       }
     } else {
-      this.app.logger.warn(
+      logger?.warn(
         `validation skipped for target ${this.toString()}`,
       );
     }
@@ -160,11 +163,15 @@ export class Target {
   /**
    * Applies the result of a compile operation
    * @param params
+   * @param logger
+   * @param listener
    */
   public async apply(
     params?: TargetResolveParams,
+    logger?: Logger,
+    listener?: ICompileListener,
   ) {
-    await this.compile(params);
+    await this.compile(params, logger, listener);
   }
 
   /**

@@ -9,11 +9,6 @@ import { ModuleUtilities } from './utils/modules.mts';
 
 export class PluginRegistry {
   public readonly data: Record<string, Plugin> = {};
-  private readonly parent: Architect;
-
-  constructor(parent: Architect) {
-    this.parent = parent;
-  }
 
   public get targetMap(): Record<string, TargetClass> {
     const results = {} as Record<string, TargetClass>;
@@ -24,9 +19,9 @@ export class PluginRegistry {
     return results;
   }
 
-  public async register(plugin: PluginClass): Promise<void> {
+  public async register(plugin: PluginClass, parent: Architect): Promise<void> {
     const clazz = Reflect.getMetadata(Architect.CLASS_META_KEY, plugin);
-    this.data[clazz] = new plugin(this.parent);
+    this.data[clazz] = new plugin(parent);
   }
 
   public async resolve(): Promise<void> {}

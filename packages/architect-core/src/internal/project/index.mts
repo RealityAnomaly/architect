@@ -96,8 +96,11 @@ export abstract class Project {
   public async getTargets(): Promise<Target[]> {
     if (!this.targets && this.root) {
       this.targets = await TargetLoader.collectFolder(
-        this.app,
+        this,
+        this.app.pluginRegistry,
+        this.app.kubeLoader,
         path.join(this.root, 'src/targets'),
+        this.app.logger
       );
     }
 

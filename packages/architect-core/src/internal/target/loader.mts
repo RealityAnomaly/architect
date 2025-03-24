@@ -1,15 +1,20 @@
-import { Architect } from '../../app.mts';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { Plugin } from '../../plugin.mts';
+import { Logger } from 'winston';
+import { Plugin, PluginRegistry } from '../../plugin.mts';
 import { Target } from './target.mts';
+import { Project } from '../project/index.mts';
 
 import { architectGlasswayNet } from '../../generated/crds/index.ts';
+import { ManifestLoader } from '../../kubernetes/index.mts';
 
 export class TargetLoader {
   public static async collectFolder(
-    parent: Architect,
+    project: Project,
+    plugins: PluginRegistry,
+    loader: ManifestLoader,
     input: string,
+    logger?: Logger,
   ): Promise<Target[]> {
     try {
       const stat = await fs.stat(input);
@@ -19,20 +24,18 @@ export class TargetLoader {
     }
 
     const result = await fs.readdir(input);
-    const targetMap = parent.pluginRegistry.targetMap;
-
     const results =
       (await Promise.all(result.map(async (k): Promise<Target[]> => {
         if (!k.endsWith('.yaml')) return [];
 
-        const resources = await parent.kubeLoader.loadFile(path.join(input, k));
+        const resources = await loader.loadFile(path.join(input, k));
         return resources.filter((r) =>
           r instanceof architectGlasswayNet.v1alpha1.Target
         ).map((r) => {
           try {
             r.validate();
           } catch (exception: unknown) {
-            parent.logger.error(
+            logger?.error(
               `failed to validate target ${r?.metadata?.name}: ${exception}`,
             );
             return undefined;
@@ -40,13 +43,13 @@ export class TargetLoader {
 
           // pick target type from plugin property
           if (r.spec.plugins?.kubernetes) {
-            return new targetMap[Plugin.TARGET_IDENTIFIERS.kubernetes](
+            return new plugins.targetMap[Plugin.TARGET_IDENTIFIERS.kubernetes](
               r,
               {},
-              parent.project!,
+              project,
             );
           } else {
-            parent.logger.error(
+            logger?.error(
               `attempted to load target ${r.metadata.name} with un-configured plugins`,
             );
             return undefined;
@@ -56,7 +59,7 @@ export class TargetLoader {
 
     await Promise.all(results.map(async (t) => {
       await t.init();
-      parent.logger.debug(
+      logger?.debug(
         `loaded target ${t.model.metadata.name} of kind ${t.constructor.name}`,
       );
     }));

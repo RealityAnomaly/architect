@@ -178,13 +178,13 @@ export abstract class KubeComponent<
         if (input.helm.version !== latest) {
           changed = true;
           state.logger.info(
-            `${this.constructor.name}: input '${k}' changed from ${input.helm.version} -> ${latest}`,
+            `${this.constructor.name}: input '${k}': changed from ${input.helm.version} -> ${latest}`,
           );
           input.helm.version = latest;
         }
       } else if (input.oci) {
         state.logger.warn(
-          `${this.constructor.name}: input '${k}' OCI currently not supported`,
+          `${this.constructor.name}: input '${k}': sources of type OCI are not yet supported`,
         );
       }
     }
