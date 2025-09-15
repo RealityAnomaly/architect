@@ -2,7 +2,7 @@ import path from 'node:path';
 import * as yaml from 'js-yaml';
 import * as fs from 'node:fs/promises';
 
-import { KubeResource, KubeResourceUtilities, Result, Writer, } from '@perdition/architect-core';
+import { KubeResource, KubeResourceUtilities, Result, Writer, } from '@glassway/architect-core';
 import { KubeTarget, KubeTargetOutputFormat } from './target.mts';
 import { KubeContext } from './context.mts';
 import { KubeComponent } from './index.mts';

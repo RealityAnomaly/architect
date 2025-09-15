@@ -57,6 +57,6 @@
     ]
   },
   "license": "GPL-3.0-or-later",
-  "name": "@perdition/architect-k8s",
+  "name": "@glassway/architect-k8s",
   "version": "1.0.7"
 }

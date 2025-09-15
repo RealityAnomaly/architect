@@ -1,4 +1,4 @@
-import { KubeResourceTree } from '@perdition/architect-core';
+import { KubeResourceTree } from '@glassway/architect-core';
 
 import { KubeComponent, KubeComponentArgs } from '../../../component.mts';
 import model from './architect.json' with { type: 'json' };

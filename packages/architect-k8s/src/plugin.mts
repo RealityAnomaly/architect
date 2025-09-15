@@ -1,4 +1,4 @@
-import { Architect, Plugin, TargetClass } from '@perdition/architect-core';
+import { Architect, Plugin, TargetClass } from '@glassway/architect-core';
 import { Command } from 'commander';
 import { CRDCommand } from './crds/cli.mts';
 import { CrdsConfig } from './crds/config.mts';

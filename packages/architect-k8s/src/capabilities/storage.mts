@@ -1,4 +1,4 @@
-import { Architect, Capability } from '@perdition/architect-core';
+import { Architect, Capability } from '@glassway/architect-core';
 
 /**
  * Represents an available cluster CSI driver

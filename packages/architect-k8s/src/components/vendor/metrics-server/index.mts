@@ -1,4 +1,4 @@
-import { CollectionUtilities } from '@perdition/architect-core';
+import { CollectionUtilities } from '@glassway/architect-core';
 import { KubeComponent, KubeComponentGenericResources } from './../../../component.mts';
 import { MetricsCapability } from '../../../capabilities/metrics.mts';
 

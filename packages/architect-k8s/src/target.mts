@@ -15,7 +15,7 @@ import {
   TargetResolveParams,
   ValidationError,
   ValidationErrorLevel,
-} from '@perdition/architect-core';
+} from '@glassway/architect-core';
 
 import * as api from 'kubernetes-models';
 import { Logger } from 'winston';

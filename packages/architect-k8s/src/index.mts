@@ -8,7 +8,7 @@ export * from "./component.mts";
 export * from "./plugin.mts";
 export * from "./target.mts";
 
-import { App, Project } from '@perdition/architect-core';
+import { App, Project } from '@glassway/architect-core';
 import * as components from './components/index.mts';
 import * as crds from './generated/crds/index.ts';
 

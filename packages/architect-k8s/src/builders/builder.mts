@@ -1,7 +1,7 @@
 import * as util from 'node:util';
 
 import { Logger } from 'winston';
-import { KubeResource, ManifestLoader, TargetCache } from '@perdition/architect-core';
+import { KubeResource, ManifestLoader, TargetCache } from '@glassway/architect-core';
 
 export interface BuilderParams {
   logger: Logger;

@@ -20,7 +20,7 @@ export * from './plugin.mts';
 export * from './internal/project/index.mts';
 
 @Project.decorate({
-  name: '@perdition/architect-core',
+  name: '@glassway/architect-core',
 })
 export class ArchitectCoreProject extends Project {
   public override async configure(): Promise<void> {

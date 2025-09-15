@@ -1,5 +1,5 @@
 {
-  "name": "@perdition/architect-k8s",
+  "name": "@glassway/architect-k8s",
   "library": true,
   "backend": {
     "type": "file"

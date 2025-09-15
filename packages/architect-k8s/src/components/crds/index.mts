@@ -1,4 +1,4 @@
-import { CRDModelGenerator, GVK, TypeUtilities } from '@perdition/architect-core';
+import { CRDModelGenerator, GVK, TypeUtilities } from '@glassway/architect-core';
 import * as api from 'kubernetes-models';
 import { KubeComponent, KubeComponentGenericResources, } from '../../component.mts';
 
