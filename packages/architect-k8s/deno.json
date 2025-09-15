@@ -56,6 +56,9 @@
       "src/fixtures/**/*.ts"
     ]
   },
+  "tasks": {
+    "run": "deno run --check -A ./src/index.mts"
+  },
   "license": "GPL-3.0-or-later",
   "name": "@glassway/architect-k8s",
   "version": "1.0.7"
