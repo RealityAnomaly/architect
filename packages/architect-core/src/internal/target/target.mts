@@ -53,7 +53,7 @@ export class Target {
   public readonly project: Project;
   public readonly model: architectGlasswayNet.v1alpha1.Target;
   public readonly params: TargetParams;
-  public readonly components = new TokenRegistry<Component>();
+  public readonly components: TokenRegistry<Component> = new TokenRegistry<Component>();
   public readonly capabilities: Capability<unknown>[] = [];
 
   protected constructor(

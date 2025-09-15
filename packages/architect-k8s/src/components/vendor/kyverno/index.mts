@@ -21,7 +21,7 @@ export class KyvernoComponent
     });
   }
 
-  public override async build(resources: KyvernoComponentResources = {}) {
+  public override async build(resources: KyvernoComponentResources = {}): Promise<KyvernoComponentResources> {
     resources.namespace = new api.v1.Namespace({
       metadata: { name: this.context.namespace },
     });

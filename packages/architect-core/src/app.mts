@@ -12,7 +12,7 @@ import { StateProvider } from './utils/state.mts';
 import { ProjectClass } from './index.mts';
 
 export class Architect {
-  public static PATH = path.resolve(path.join(import.meta.dirname!, '..'));
+  public static PATH: string = path.resolve(path.join(import.meta.dirname!, '..'));
 
   public static readonly TYPE_META_KEY = 'architect.glassway.net/type';
   public static readonly MODEL_META_KEY = 'architect.glassway.net/model';
@@ -85,7 +85,7 @@ export class Architect {
     return instance;
   }
 
-  public static class(name: string) {
+  public static class(name: string): any {
     return Reflect.metadata(Architect.CLASS_META_KEY, name);
   }
 

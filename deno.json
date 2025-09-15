@@ -4,7 +4,7 @@
     "packages/*"
   ],
   "tasks": {
-    "run": "deno run --check -A ./packages/architect-core/src/bin/architect.ts -w $INIT_CWD",
+    "run": "deno run --check -A ./packages/architect-core/src/bin/architect.ts",
     "test": "deno test --allow-read --allow-write",
     "check": "deno check packages/**/*.mts"
   },

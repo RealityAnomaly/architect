@@ -15,7 +15,7 @@ export abstract class Capability<T> {
 }
 
 export class VirtualCapability extends Capability<object> {
-  protected readonly _clazz;
+  protected readonly _clazz: string;
 
   constructor(clazz: string, data?: object) {
     super(data);
