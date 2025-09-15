@@ -23,7 +23,7 @@ export class RookOperatorComponent
     });
   }
 
-  public override async build(resources: RookOperatorComponentResources = {}) {
+  public override async build(resources: RookOperatorComponentResources = {}): Promise<RookOperatorComponentResources> {
     resources.namespace = new api.v1.Namespace({
       metadata: { name: this.context.namespace },
     });

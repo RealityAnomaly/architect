@@ -13,7 +13,7 @@ export class CrdsComponent extends KubeComponent {
     this.standardRequirements = false;
   }
 
-  public override async build(resources: KubeComponentGenericResources = {}) {
+  public override async build(resources: KubeComponentGenericResources = {}): Promise<any> {
     const crds: api.apiextensionsK8sIo.v1.CustomResourceDefinition[] = [];
     const projects = this.target.project.app.getProjects();
     const modules = projects.reduce((v, p) => v.concat(p.getModules()), [] as object[]);

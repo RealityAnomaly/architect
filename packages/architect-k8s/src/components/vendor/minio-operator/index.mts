@@ -18,7 +18,7 @@ export class MinioOperatorComponent extends KubeComponentHelm {
     });
   }
 
-  public override async getRequirements() {
+  public override async getRequirements(): Promise<any> {
     return [
       ...await super.getRequirements(),
       new CapabilityMatcher(StorageCapability),

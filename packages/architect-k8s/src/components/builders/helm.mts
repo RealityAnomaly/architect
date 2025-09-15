@@ -17,7 +17,7 @@ export abstract class KubeComponentHelm<
   TArgs extends KubeComponentHelmOptions = KubeComponentHelmOptions,
   TParent extends Component = Component,
 > extends KubeComponent<TResult, TArgs, TParent> {
-  public override async build(resources: TResult = {} as TResult) {
+  public override async build(resources: TResult = {} as TResult): Promise<TResult> {
     const props = await this.props.$resolve();
     const chart = props.inputs!.chart.helm!;
 

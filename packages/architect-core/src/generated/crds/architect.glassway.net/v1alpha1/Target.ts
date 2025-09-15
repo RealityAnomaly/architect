@@ -1,5 +1,5 @@
 import { IObjectMeta } from "@kubernetes-models/apimachinery/apis/meta/v1/ObjectMeta";
-import { Model, ModelData, setValidateFunc, createTypeMetaGuard } from "@kubernetes-models/base";
+import { Model, ModelData, setValidateFunc, createTypeMetaGuard, TypeMetaGuard } from "@kubernetes-models/base";
 import { ValidateFunc } from "@kubernetes-models/validate";
 import { validate } from "../../_schemas/ArchitectGlasswayNetV1alpha1Target.js";
 
@@ -87,7 +87,7 @@ export class Target extends Model<ITarget> implements ITarget {
 
 static apiVersion: ITarget["apiVersion"] = "architect.glassway.net/v1alpha1";
 static kind: ITarget["kind"] = "Target";
-static is = createTypeMetaGuard<ITarget>(Target);
+static is: TypeMetaGuard<ITarget> = createTypeMetaGuard<ITarget>(Target);
 
 constructor(data?: ModelData<ITarget>) {
   super();

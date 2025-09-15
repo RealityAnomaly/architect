@@ -76,7 +76,7 @@ export class CRDManager {
     return undefined;
   }
 
-  public exists(name: string) {
+  public exists(name: string): boolean {
     return this.get(name) !== undefined;
   }
 

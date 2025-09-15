@@ -132,7 +132,7 @@ export abstract class KubeComponent<
     return result;
   }
 
-  public override async postBuild(data: TResult) {
+  public override async postBuild(data: TResult): Promise<TResult> {
     // run post-build resource fixup at the top level
     let resources = KubeResourceUtilities.normaliseResources(data);
 
@@ -327,7 +327,7 @@ const KubeComponentModelInputSchema: JSONSchemaType<KubeComponentModelInput> = {
 export class KubePreludeComponent extends KubeComponent {
   private readonly resources: KubeResource[] = [];
 
-  public override async build(resources: KubeComponentGenericResources = {}) {
+  public override async build(resources: KubeComponentGenericResources = {}): Promise<any> {
     resources.result = this.resources;
     return super.build(resources);
   }

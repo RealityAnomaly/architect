@@ -82,7 +82,8 @@ export class CRDModelGenerator {
   private async fixupModels(outDir: string) {
     for await (const file of walk(outDir)) {
       let content = await fs.readFile(file, 'utf-8');
-      if (content.includes('_schemas') && !file.endsWith('.js')) {
+      let schema = content.includes('_schemas');
+      if (schema && !file.endsWith('.js')) {
         content = content.replaceAll(
           new RegExp('^(.*)(_schemas/.[^"]*)', 'gm'),
           '$1$2.js',
@@ -93,6 +94,15 @@ export class CRDModelGenerator {
         new RegExp('^(export *.*from )"(.*?)"', 'gm'),
         '$1"$2.ts"',
       );
+
+      if (schema) {
+        let name = path.parse(file).name;
+        content = content.replaceAll(
+          "static is = createTypeMetaGuard",
+          `static is: TypeMetaGuard<I${name}> = createTypeMetaGuard`);
+        content = content.replaceAll("setValidateFunc, createTypeMetaGuard", "setValidateFunc, createTypeMetaGuard, TypeMetaGuard");
+      }
+
       await fs.writeFile(file, content);
     }
   }
