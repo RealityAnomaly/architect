@@ -5,7 +5,7 @@ import * as api from 'kubernetes-models';
 import { K8sPlugin } from '../plugin.mts';
 import { CrdsConfig } from './config.mts';
 import { Logger } from 'winston';
-import { CRDModelGenerator, KubeResource } from '@perdition/architect-core';
+import { CRDModelGenerator, KubeResource } from '@glassway/architect-core';
 
 export * from './cli.mts';
 export * from './config.mts';

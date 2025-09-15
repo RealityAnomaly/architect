@@ -1,7 +1,7 @@
 # Kubernetes module for Architect
 
 <p align="center">
-  <img src="https://img.shields.io/jsr/v/@perdition/architect-k8s" />
+  <img src="https://img.shields.io/jsr/v/@glassway/architect-k8s" />
 </p>
 
 This is an extension to the [Architect framework](https://github.com/realityanomaly/architect) which allows you to

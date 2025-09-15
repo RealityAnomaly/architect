@@ -1,4 +1,4 @@
-import { CapabilityMatcher } from '@perdition/architect-core';
+import { CapabilityMatcher } from '@glassway/architect-core';
 
 import { KubeComponentHelm } from '../../builders/helm.mts';
 import { StorageCapability } from '../../../capabilities/storage.mts';

@@ -1,4 +1,4 @@
-import { KubeResource, Provider } from '@perdition/architect-core';
+import { KubeResource, Provider } from '@glassway/architect-core';
 
 import { KubeTarget } from '../target.mts';
 

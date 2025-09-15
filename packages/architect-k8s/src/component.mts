@@ -14,7 +14,7 @@ import {
   KubeResourceUtilities,
   Plugin,
   Target,
-} from '@perdition/architect-core';
+} from '@glassway/architect-core';
 
 import { JSONSchemaType } from 'ajv';
 import * as api from 'kubernetes-models';

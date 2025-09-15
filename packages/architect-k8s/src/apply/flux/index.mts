@@ -1,4 +1,4 @@
-import { Component, ResolvedComponent } from '@perdition/architect-core';
+import { Component, ResolvedComponent } from '@glassway/architect-core';
 import { kustomizeToolkitFluxcdIo } from '../../generated/crds/index.ts';
 import { KubeTarget } from '../../target.mts';
 import { KubeContext } from '../../context.mts';

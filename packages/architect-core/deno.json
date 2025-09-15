@@ -56,6 +56,6 @@
     "generate": "deno --allow-env --allow-sys --allow-read --allow-run=deno --allow-write src/bin/generate-core-crds.mts"
   },
   "license": "GPL-3.0-or-later",
-  "name": "@perdition/architect-core",
+  "name": "@glassway/architect-core",
   "version": "1.0.7"
 }
