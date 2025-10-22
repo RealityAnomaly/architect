@@ -6,7 +6,7 @@
   "tasks": {
     "run": "deno run --check -A ./packages/architect-core/src/bin/architect.ts",
     "test": "deno test --allow-read --allow-write",
-    "check": "deno check packages/**/*.mts"
+    "check": "deno check packages/**/*.ts"
   },
   "compilerOptions": {
     "noImplicitReturns": true,
