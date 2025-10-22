@@ -17,7 +17,7 @@
     "winston": "npm:winston@^3.17.0"
   },
   "exports": {
-    ".": "./src/index.mts"
+    ".": "./src/index.ts"
   },
   "lint": {
     "include": [
@@ -53,7 +53,7 @@
     ]
   },
   "tasks": {
-    "generate": "deno --allow-env --allow-sys --allow-read --allow-run=deno --allow-write src/bin/generate-core-crds.mts"
+    "generate": "deno --allow-env --allow-sys --allow-read --allow-run=deno --allow-write src/bin/generate-core-crds.ts"
   },
   "license": "GPL-3.0-or-later",
   "name": "@glassway/architect-core",

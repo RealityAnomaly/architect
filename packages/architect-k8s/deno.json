@@ -19,8 +19,8 @@
     "winston": "npm:winston@^3.17.0"
   },
   "exports": {
-    ".": "./src/index.mts",
-    "./components": "./src/components/index.mts",
+    ".": "./src/index.ts",
+    "./components": "./src/components/index.ts",
     "./crds": "./src/generated/crds/index.ts"
   },
   "lint": {
@@ -57,7 +57,7 @@
     ]
   },
   "tasks": {
-    "run": "deno run --check -A ./src/index.mts"
+    "run": "deno run --check -A ./src/index.ts"
   },
   "license": "GPL-3.0-or-later",
   "name": "@glassway/architect-k8s",
