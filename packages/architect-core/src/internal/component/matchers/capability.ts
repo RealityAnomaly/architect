@@ -1,4 +1,4 @@
-import { Reflect } from '@dx/reflect';
+import 'reflect-metadata';
 
 import { Architect } from '../../../app.ts';
 import { Constructor } from '../../../index.ts';

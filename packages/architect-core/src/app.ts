@@ -1,5 +1,5 @@
 import * as kubeUtils from './kubernetes/index.ts';
-import { Reflect } from '@dx/reflect';
+import 'reflect-metadata';
 import path from 'node:path';
 import { PluginRegistry } from './plugin.ts';
 import { TargetCache } from './internal/index.ts';
@@ -11,6 +11,9 @@ import { TypeRegistry } from './utils/index.ts';
 import { StateProvider } from './utils/state.ts';
 import { ProjectClass } from './index.ts';
 
+/**
+ * The main class of the application.
+ */
 export class Architect {
   public static PATH: string = path.resolve(path.join(import.meta.dirname!, '..'));
 

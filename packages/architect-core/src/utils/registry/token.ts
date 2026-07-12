@@ -1,5 +1,5 @@
 import objectHash from 'object-hash';
-import { Reflect } from '@dx/reflect';
+import "reflect-metadata";
 
 import { Constructor, Context, ReflectionUtilities } from '../index.ts';
 import { Architect } from '../../index.ts';

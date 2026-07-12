@@ -3,7 +3,7 @@ import { Architect } from '../../app.ts';
 import { Component, ComponentClass } from './component.ts';
 
 import { Ajv, ValidateFunction } from 'ajv';
-import { Reflect } from '@dx/reflect';
+import 'reflect-metadata';
 
 /**
  * Information exposed on components via reflection metadata

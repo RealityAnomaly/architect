@@ -1,4 +1,4 @@
-import { Reflect } from '@dx/reflect';
+import 'reflect-metadata';
 import { Architect } from '../../app.ts';
 
 export abstract class Capability<T> {

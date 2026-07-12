@@ -1,4 +1,4 @@
-import { Reflect } from '@dx/reflect';
+import 'reflect-metadata';
 
 import Module from 'node:module';
 import { ModuleUtilities } from '../../utils/modules.ts';
