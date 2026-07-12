@@ -5,8 +5,11 @@
       <excludeFolder url="file://$MODULE_DIR$/.tmp" />
       <excludeFolder url="file://$MODULE_DIR$/temp" />
       <excludeFolder url="file://$MODULE_DIR$/tmp" />
-      <excludeFolder url="file://$MODULE_DIR$/packages/architect-core/src/generated" />
       <excludeFolder url="file://$MODULE_DIR$/packages/architect-k8s/src/generated" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/architect/src/generated" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/architect/src/kubernetes/apimachinery" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/architect/src/kubernetes/crds" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/architect/src/kubernetes/models" />
     </content>
     <content url="file://$MODULE_DIR$/../kubernetes">
       <excludeFolder url="file://$MODULE_DIR$/../kubernetes/packages/k8s-internal/build" />

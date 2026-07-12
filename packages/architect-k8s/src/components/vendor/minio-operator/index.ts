@@ -1,4 +1,4 @@
-import { CapabilityMatcher } from '@glassway/architect-core';
+import { CapabilityMatcher } from '@glassway/architect';
 
 import { KubeComponentHelm } from '../../builders/helm.ts';
 import { StorageCapability } from '../../../capabilities/storage.ts';

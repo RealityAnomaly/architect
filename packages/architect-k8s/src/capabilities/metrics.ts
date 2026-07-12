@@ -1,4 +1,4 @@
-import { Architect, Capability } from '@glassway/architect-core';
+import { Architect, Capability } from '@glassway/architect';
 
 /**
  * Represents the Kubernetes Metrics Server

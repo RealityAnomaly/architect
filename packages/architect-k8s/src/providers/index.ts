@@ -1,4 +1,4 @@
-import { KubeResource, Provider } from '@glassway/architect-core';
+import { KubeResource, Provider } from '@glassway/architect';
 
 import { KubeTarget } from '../target.ts';
 

@@ -1,4 +1,4 @@
-import { Context } from '@glassway/architect-core';
+import { Context } from '@glassway/architect';
 
 export interface KubeContext extends Context {
   namespace?: string;

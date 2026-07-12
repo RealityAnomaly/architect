@@ -1,11 +1,11 @@
 import path from 'node:path';
-import * as yaml from 'js-yaml';
+import * as yaml from '@std/yaml';
 import * as fs from 'node:fs/promises';
-import * as api from 'kubernetes-models';
+import * as api from '@glassway/architect/kubernetes/models';
 import { K8sPlugin } from '../plugin.ts';
 import { CrdsConfig } from './config.ts';
 import { Logger } from 'winston';
-import { CRDModelGenerator, KubeResource } from '@glassway/architect-core';
+import { CRDModelGenerator, KubeResource } from '@glassway/architect';
 
 export * from './cli.ts';
 export * from './config.ts';
@@ -93,7 +93,7 @@ export class CRDManager {
 
       await Promise.all(resources.map(async (r) => {
         const name = `${r.spec.group}_${r.spec.names.singular!}.yaml`;
-        await fs.writeFile(path.join(dir, name), yaml.dump(r));
+        await fs.writeFile(path.join(dir, name), yaml.stringify(r));
       }));
     }
 

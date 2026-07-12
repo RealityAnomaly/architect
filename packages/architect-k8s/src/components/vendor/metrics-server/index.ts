@@ -1,4 +1,4 @@
-import { CollectionUtilities } from '@glassway/architect-core';
+import { CollectionUtilities } from '@glassway/architect';
 import { KubeComponent, KubeComponentGenericResources } from './../../../component.ts';
 import { MetricsCapability } from '../../../capabilities/metrics.ts';
 

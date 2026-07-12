@@ -3,9 +3,9 @@ import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import * as util from 'node:util';
-import { KubeResource } from '@glassway/architect-core';
+import * as yaml from '@std/yaml';
+import { KubeResource } from '@glassway/architect';
 
-import * as yaml from 'js-yaml';
 import { Builder, BuilderParams } from './builder.ts';
 import * as semver from 'semver';
 
@@ -49,7 +49,7 @@ export class Helm extends Builder {
     const valuesFile = path.join(dir, "values.yaml");
 
     try {
-      await fs.writeFile(valuesFile, yaml.dump(values));
+      await fs.writeFile(valuesFile, yaml.stringify(values));
       const execFileAsync = util.promisify(execFile);
 
       const buf = await execFileAsync(
@@ -92,7 +92,7 @@ export class Helm extends Builder {
     }
 
     const text = await response.text();
-    const index = yaml.load(text) as HelmIndex;
+    const index = yaml.parse(text) as HelmIndex;
     this.indexCache[repository] = index;
 
     return index;

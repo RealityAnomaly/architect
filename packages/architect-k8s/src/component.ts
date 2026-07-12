@@ -14,10 +14,10 @@ import {
   KubeResourceUtilities,
   Plugin,
   Target,
-} from '@glassway/architect-core';
+} from '@glassway/architect';
 
 import { JSONSchemaType } from 'ajv';
-import * as api from 'kubernetes-models';
+import * as api from '@glassway/architect/kubernetes/models';
 import * as toolkit from '@es-toolkit/es-toolkit';
 import { CNICapability, DNSCapability } from './capabilities/index.ts';
 

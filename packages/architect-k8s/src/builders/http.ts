@@ -1,4 +1,4 @@
-import { KubeResource } from '@glassway/architect-core';
+import { KubeResource } from '@glassway/architect';
 import { Builder, BuilderParams } from './builder.ts';
 
 export interface HttpFetchOptions {}

@@ -1,4 +1,4 @@
-import { KubeResourceTree } from '@glassway/architect-core';
+import { KubeResourceTree } from '@glassway/architect';
 
 import { KubeComponent, KubeComponentArgs } from '../../../component.ts';
 import model from './architect.json' with { type: 'json' };

@@ -1,4 +1,4 @@
-import { Component, KubeResourceTree } from '@glassway/architect-core';
+import { Component, KubeResourceTree } from '@glassway/architect';
 import { HelmChartOpts } from '../../builders/helm.ts';
 import { KubeComponent, KubeComponentArgs, KubeComponentGenericResources, } from '../../component.ts';
 

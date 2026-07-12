@@ -6,9 +6,9 @@ import {
   Result,
   ValidationError,
   ValidationErrorLevel,
-} from '@glassway/architect-core';
+} from '@glassway/architect';
 
-import * as api from 'kubernetes-models';
+import * as api from '@glassway/architect/kubernetes/models';
 
 export interface KubeCRDRequirement {
   component: ResolvedComponent;
