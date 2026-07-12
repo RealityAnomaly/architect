@@ -1,4 +1,4 @@
-import { Reflect } from '@dx/reflect';
+import 'reflect-metadata';
 import { Logger } from 'winston';
 
 import { architectGlasswayNet } from '../../generated/crds/index.ts';

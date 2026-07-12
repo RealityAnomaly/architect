@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { Reflect } from '@dx/reflect';
+import 'reflect-metadata';
 
 import { ArchitectCoreProject, ComponentClass, ComponentLoader, ComponentMetadata, Target, TargetLoader, } from '../../index.ts';
 import { PluginClass } from '../../plugin.ts';

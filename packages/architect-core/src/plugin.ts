@@ -1,5 +1,5 @@
 import * as commander from 'commander';
-import { Reflect } from '@dx/reflect';
+import 'reflect-metadata';
 
 import { Architect, TargetClass } from './index.ts';
 import { Logger } from 'winston';

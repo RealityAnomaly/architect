@@ -1,7 +1,7 @@
 import { Command } from 'commander';
-import { Reflect } from '@dx/reflect';
 import { App, AppCommandOptions, Architect, ComponentClass, } from '../index.ts';
 import { Updater } from '../internal/index.ts';
+import "reflect-metadata";
 
 interface AppCommandComponentOptions extends AppCommandOptions {}
 
