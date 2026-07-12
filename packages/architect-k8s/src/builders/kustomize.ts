@@ -1,7 +1,7 @@
 import { execFile } from 'node:child_process';
 import * as util from 'node:util';
 
-import { KubeResource } from '@glassway/architect-core';
+import { KubeResource } from '@glassway/architect';
 import { Builder, BuilderParams } from './builder.ts';
 
 export class Kustomize extends Builder {

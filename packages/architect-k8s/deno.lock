@@ -1,8 +1,6 @@
 {
   "version": "4",
   "specifiers": {
-    "npm:@kubernetes-models/apimachinery@^2.0.1": "2.0.1",
-    "npm:@kubernetes-models/generate@^2.4.0": "2.4.0",
     "npm:@types/js-yaml@^4.0.9": "4.0.9",
     "npm:@types/lodash@^4.17.13": "4.17.13",
     "npm:@types/object-hash@^3.0.6": "3.0.6",
@@ -112,67 +110,6 @@
       "dependencies": [
         "@jridgewell/resolve-uri",
         "@jridgewell/sourcemap-codec"
-      ]
-    },
-    "@kubernetes-models/apimachinery@2.0.1": {
-      "integrity": "sha512-sXYCgEQhLP2ox0WhJ59MADHrXPm3eYFmmLZa9qf9YVcaLT2pqpTeUC08kJX7yoUdbxOOesUijdoBXXZcBTWjnQ==",
-      "dependencies": [
-        "@kubernetes-models/base",
-        "@kubernetes-models/validate",
-        "@swc/helpers"
-      ]
-    },
-    "@kubernetes-models/base@5.0.0": {
-      "integrity": "sha512-b+pVrlF1691ft/nc/tJ/v0DEPq9NK5gKWO1OHuTEBRRk/z1inH30svoqrqQL90VZhthVJNi8L7rQRQBUWuxZiw==",
-      "dependencies": [
-        "@kubernetes-models/validate",
-        "is-plain-object",
-        "tslib"
-      ]
-    },
-    "@kubernetes-models/generate@2.4.0": {
-      "integrity": "sha512-ox18FZCxDTNmI6p1alvXGQtXDVSLqh4B2pTAUXD4tw2jRR2uhtFUc8kzjLzHPVCABSC+G5jtnsq+GWFDAk0Lvg==",
-      "dependencies": [
-        "@babel/generator",
-        "@babel/parser",
-        "@babel/traverse",
-        "@babel/types",
-        "@kubernetes-models/string-util",
-        "@kubernetes-models/validate",
-        "ajv",
-        "fs-extra",
-        "indent-string",
-        "lodash",
-        "ohash",
-        "re2-wasm",
-        "tslib"
-      ]
-    },
-    "@kubernetes-models/read-input@3.1.1": {
-      "integrity": "sha512-DVc7ZpfPHyvxamyKmEAZ9fqf6jFKhaeACPIDe3aTaGgtcDWnrd3QQSrvnTDtWvcYkhvc7KEwX8rR+YKFueJ2dA==",
-      "dependencies": [
-        "find-cache-dir",
-        "get-stdin",
-        "make-fetch-happen",
-        "tslib"
-      ]
-    },
-    "@kubernetes-models/string-util@3.0.1": {
-      "integrity": "sha512-rRtgYoGzxLzahYWtpguEp59mWEjmkuVehquUo0ekPbXdMpgmM3sl/1fsIUpsv1L92lgt48VfTkuwgHAtOEqm4Q==",
-      "dependencies": [
-        "tslib"
-      ]
-    },
-    "@kubernetes-models/validate@4.0.0_ajv@8.17.1": {
-      "integrity": "sha512-rsfF5t3sd5c+3ejUgcy8q0cVG2/BxT064L4Xz+CuKEe014u8T4MtFZiWjWZFpfMXSGKzFYEA6DJYm9CqjmIfZg==",
-      "dependencies": [
-        "ajv",
-        "ajv-formats",
-        "ajv-formats-draft2019",
-        "ajv-i18n",
-        "is-cidr",
-        "re2-wasm",
-        "tslib"
       ]
     },
     "@kwsites/file-exists@1.1.1": {
@@ -1175,8 +1112,6 @@
   },
   "workspace": {
     "dependencies": [
-      "npm:@kubernetes-models/apimachinery@^2.0.1",
-      "npm:@kubernetes-models/generate@^2.4.0",
       "npm:@types/js-yaml@^4.0.9",
       "npm:@types/lodash@^4.17.13",
       "npm:@types/object-hash@^3.0.6",

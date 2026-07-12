@@ -8,7 +8,7 @@ export * from "./component.ts";
 export * from "./plugin.ts";
 export * from "./target.ts";
 
-import { App, Project } from '@glassway/architect-core';
+import { App, Project } from '@glassway/architect';
 import * as components from './components/index.ts';
 import * as crds from './generated/crds/index.ts';
 

@@ -1,4 +1,4 @@
-import { Architect, Plugin, TargetClass } from '@glassway/architect-core';
+import { Architect, Plugin, TargetClass } from '@glassway/architect';
 import { Command } from 'commander';
 import { CRDCommand } from './crds/cli.ts';
 import { CrdsConfig } from './crds/config.ts';

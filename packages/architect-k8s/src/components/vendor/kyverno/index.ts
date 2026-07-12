@@ -1,6 +1,6 @@
-import * as api from 'kubernetes-models';
+import * as api from '@glassway/architect/kubernetes/models';
 
-import { KubeResourceTree } from '@glassway/architect-core';
+import { KubeResourceTree } from '@glassway/architect';
 import { KubeComponentHelm, KubeComponentHelmResources } from '../../builders/helm.ts';
 
 import model from './architect.json' with { type: 'json' };

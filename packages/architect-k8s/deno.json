@@ -1,27 +1,25 @@
 {
   "imports": {
-    "@es-toolkit/es-toolkit": "jsr:@es-toolkit/es-toolkit@^1.29.0",
+    "@es-toolkit/es-toolkit": "jsr:@es-toolkit/es-toolkit@^1.49.0",
     "@match/match": "jsr:@match/match@^0.1.0",
     "@types/js-yaml": "npm:@types/js-yaml@^4.0.9",
-    "@types/lodash": "npm:@types/lodash@^4.17.13",
+    "@types/lodash": "npm:@types/lodash@^4.17.24",
     "@types/object-hash": "npm:@types/object-hash@^3.0.6",
-    "ajv": "npm:ajv@^8.17.1",
+    "ajv": "npm:ajv@^8.20.0",
     "appdirsjs": "npm:appdirsjs@^1.2.7",
     "commander": "npm:commander@^12.1.0",
-    "fast-glob": "npm:fast-glob@^3.3.2",
-    "js-yaml": "npm:js-yaml@^4.1.0",
-    "lodash": "npm:lodash@^4.17.21",
+    "fast-glob": "npm:fast-glob@^3.3.3",
+    "js-yaml": "npm:js-yaml@^4.3.0",
+    "lodash": "npm:lodash@^4.18.1",
     "object-hash": "npm:object-hash@^3.0.0",
-    "semver": "npm:semver@^7.6.3",
-    "simple-git": "npm:simple-git@^3.27.0",
-    "ts-graphviz": "npm:ts-graphviz@^2.1.5",
-    "wildcard-match": "npm:wildcard-match@^5.1.3",
-    "winston": "npm:winston@^3.17.0"
+    "semver": "npm:semver@^7.8.5",
+    "simple-git": "npm:simple-git@^3.36.0",
+    "ts-graphviz": "npm:ts-graphviz@^2.1.6",
+    "wildcard-match": "npm:wildcard-match@^5.1.4",
+    "winston": "npm:winston@^3.19.0"
   },
   "exports": {
-    ".": "./src/index.ts",
-    "./components": "./src/components/index.ts",
-    "./crds": "./src/generated/crds/index.ts"
+    ".": "./src/index.ts"
   },
   "lint": {
     "include": [

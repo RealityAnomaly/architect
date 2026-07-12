@@ -8,7 +8,7 @@
       "request": "launch",
       "name": "Launch Program",
       "type": "node",
-      "program": "${workspaceFolder}/packages/architect-core/src/bin/architect.ts",
+      "program": "${workspaceFolder}/packages/architect/src/bin/architect.ts",
       "cwd": "${workspaceFolder}/packages/architect-k8s",
       "args": ["component", "list", "-v"],
       "env": {},

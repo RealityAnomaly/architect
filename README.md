@@ -1,7 +1,7 @@
 # Architect
 
 <p align="center">
-  <img src="https://img.shields.io/jsr/v/@glassway/architect-core" />
+  <img src="https://img.shields.io/jsr/v/@glassway/architect" />
   <img src="https://img.shields.io/github/actions/workflow/status/RealityAnomaly/architect/test.yml?label=tests" />
 </p>
 

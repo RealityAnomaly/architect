@@ -1,4 +1,4 @@
-import { Component, ResolvedComponent } from '@glassway/architect-core';
+import { Component, ResolvedComponent } from '@glassway/architect';
 import { kustomizeToolkitFluxcdIo } from '../../generated/crds/index.ts';
 import { KubeTarget } from '../../target.ts';
 import { KubeContext } from '../../context.ts';

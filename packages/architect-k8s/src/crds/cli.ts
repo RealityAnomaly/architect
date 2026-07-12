@@ -2,7 +2,7 @@ import { Command } from 'commander';
 import { K8sPlugin } from '../plugin.ts';
 import { CrdsConfig } from './config.ts';
 import { CRDSyncOptions } from './index.ts';
-import { AppCommandOptions } from '@glassway/architect-core';
+import { AppCommandOptions } from '@glassway/architect';
 
 interface CRDCommandOptions extends AppCommandOptions {}
 
