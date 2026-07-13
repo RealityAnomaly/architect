@@ -209,7 +209,7 @@ export interface IImageRepository {
 /**
  * ObservedExclusionList is a list of observed exclusion list. It reflects
  * the exclusion rules used for the observed scan result in
- * spec.lastScanResult.
+ * status.lastScanResult.
  */
 "observedExclusionList"?: Array<string>;
 /**

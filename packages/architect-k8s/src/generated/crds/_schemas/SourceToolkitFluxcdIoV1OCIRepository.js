@@ -66,7 +66,7 @@ return errors === 0;
 const schema11 = {"nullableRef":"io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta#"};
 const schema12 = {};
 
-import { validate as validate17 } from "@glassway/architect/kubernetes/apimachinery/_schemas/IoK8sApimachineryPkgApisMetaV1ObjectMeta";
+import { validate as validate17 } from "@glassway/architect/kubernetes/apimachinery/_schemas/ObjectMeta";
 
 
 function validate16(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){

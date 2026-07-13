@@ -395,7 +395,7 @@ spec:
 
                     the exclusion rules used for the observed scan result in
 
-                    spec.lastScanResult.
+                    status.lastScanResult.
                   items:
                     type: string
                   type: array

@@ -35,7 +35,7 @@
     "./kubernetes/models": "./src/kubernetes/models/index.ts",
     "./kubernetes/apimachinery": "./src/kubernetes/apimachinery/index.ts",
     "./kubernetes/apimachinery/apis/meta/v1/ObjectMeta": "./src/kubernetes/apimachinery/apis/meta/v1/ObjectMeta.ts",
-    "./kubernetes/apimachinery/_schemas/IoK8sApimachineryPkgApisMetaV1ObjectMeta": "./src/kubernetes/apimachinery/_schemas/IoK8sApimachineryPkgApisMetaV1ObjectMeta.js"
+    "./kubernetes/apimachinery/_schemas/ObjectMeta": "./src/kubernetes/apimachinery/_schemas/IoK8sApimachineryPkgApisMetaV1ObjectMeta.js"
   },
   "lint": {
     "include": [

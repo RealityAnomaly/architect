@@ -590,9 +590,6 @@ spec:
                   type: object
                 observedSourceRevision:
                   description: >-
-                    ObservedPolicies []ObservedPolicy
-                    `json:"observedPolicies,omitempty"`
-
                     ObservedSourceRevision is the last observed source revision.
                     This can be
 
