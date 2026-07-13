@@ -1,0 +1,42 @@
+import { IIoK8sApiExtensionsV1beta1NetworkPolicyPort } from "./NetworkPolicyPort.ts";
+import { IIoK8sApiExtensionsV1beta1NetworkPolicyPeer } from "./NetworkPolicyPeer.ts";
+import { ModelData, Model, setValidateFunc } from "@glassway/kubernetes-types/model";
+import { ValidateFunc } from "@glassway/kubernetes-types/validate";
+import { validate } from "../../_schemas/extensions/v1beta1/NetworkPolicyEgressRule.js";
+
+/**
+ * DEPRECATED 1.9 - This group version of NetworkPolicyEgressRule is deprecated by networking/v1/NetworkPolicyEgressRule. NetworkPolicyEgressRule describes a particular set of traffic that is allowed out of pods matched by a NetworkPolicySpec's podSelector. The traffic must match both ports and to. This type is beta-level in 1.8
+ * @deprecated
+ */
+export interface INetworkPolicyEgressRule {
+  /**
+ * List of destination ports for outgoing traffic. Each item in this list is combined using a logical OR. If this field is empty or missing, this rule matches all ports (traffic not restricted by port). If this field is present and contains at least one item, then this rule allows traffic only if the traffic matches at least one port in the list.
+ */
+"ports"?: Array<IIoK8sApiExtensionsV1beta1NetworkPolicyPort>;
+/**
+ * List of destinations for outgoing traffic of pods selected for this rule. Items in this list are combined using a logical OR operation. If this field is empty or missing, this rule matches all destinations (traffic not restricted by destination). If this field is present and contains at least one item, this rule allows traffic only if the traffic matches at least one item in the to list.
+ */
+"to"?: Array<IIoK8sApiExtensionsV1beta1NetworkPolicyPeer>;
+}
+
+/**
+ * DEPRECATED 1.9 - This group version of NetworkPolicyEgressRule is deprecated by networking/v1/NetworkPolicyEgressRule. NetworkPolicyEgressRule describes a particular set of traffic that is allowed out of pods matched by a NetworkPolicySpec's podSelector. The traffic must match both ports and to. This type is beta-level in 1.8
+ * @deprecated
+ */
+export class NetworkPolicyEgressRule extends Model<INetworkPolicyEgressRule> implements INetworkPolicyEgressRule {
+  "ports"?: Array<IIoK8sApiExtensionsV1beta1NetworkPolicyPort>;
+"to"?: Array<IIoK8sApiExtensionsV1beta1NetworkPolicyPeer>;
+
+constructor(data?: ModelData<INetworkPolicyEgressRule>) {
+  super();
+
+  this.setDefinedProps(data);
+}
+}
+
+setValidateFunc(NetworkPolicyEgressRule, validate as ValidateFunc<INetworkPolicyEgressRule>);
+
+export type {
+  INetworkPolicyEgressRule as IIoK8sApiExtensionsV1beta1NetworkPolicyEgressRule,
+  NetworkPolicyEgressRule as IoK8sApiExtensionsV1beta1NetworkPolicyEgressRule
+};

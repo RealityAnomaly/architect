@@ -1,7 +1,7 @@
 import path from 'node:path';
 import * as yaml from '@std/yaml';
 import * as fs from 'node:fs/promises';
-import * as api from '@glassway/architect/kubernetes/models';
+import * as api from '@glassway/kubernetes-models/models';
 import { K8sPlugin } from '../plugin.ts';
 import { CrdsConfig } from './config.ts';
 import { Logger } from 'winston';

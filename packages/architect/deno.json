@@ -6,36 +6,16 @@
     "@types/lodash": "npm:@types/lodash@^4.17.24",
     "@types/object-hash": "npm:@types/object-hash@^3.0.6",
     "ajv": "npm:ajv@^8.20.0",
-    "ajv-formats": "npm:ajv-formats@^3.0.1",
-    "ajv-formats-draft2019": "npm:ajv-formats-draft2019@^1.6.1",
-    "ajv-i18n": "npm:ajv-i18n@^4.2.0",
     "appdirsjs": "npm:appdirsjs@^1.2.7",
-    "is-cidr": "npm:is-cidr@^7.0.0",
     "js-yaml": "npm:js-yaml@^4.3.0",
     "object-hash": "npm:object-hash@^3.0.0",
-    "openapi-types": "npm:openapi-types@^12.1.3",
     "reflect-metadata": "npm:reflect-metadata@^0.2.2",
     "ts-graphviz": "npm:ts-graphviz@^2.1.6",
     "wildcard-match": "npm:wildcard-match@^5.1.4",
     "winston": "npm:winston@^3.19.0"
   },
   "exports": {
-    ".": "./src/index.ts",
-    "./kubernetes/validate": "./src/kubernetes/validate/index.ts",
-    "./kubernetes/validate/runtime/equal": "./src/kubernetes/validate/runtime/equal.ts",
-    "./kubernetes/validate/runtime/parseJson": "./src/kubernetes/validate/runtime/parseJson.ts",
-    "./kubernetes/validate/runtime/quote": "./src/kubernetes/validate/runtime/quote.ts",
-    "./kubernetes/validate/runtime/re2": "./src/kubernetes/validate/runtime/re2.ts",
-    "./kubernetes/validate/runtime/timestamp": "./src/kubernetes/validate/runtime/timestamp.ts",
-    "./kubernetes/validate/runtime/ucs2length": "./src/kubernetes/validate/runtime/ucs2length.ts",
-    "./kubernetes/validate/runtime/uri": "./src/kubernetes/validate/runtime/uri.ts",
-    "./kubernetes/validate/runtime/validation_error": "./src/kubernetes/validate/runtime/validation_error.ts",
-    "./kubernetes/types/meta": "./src/kubernetes/types/meta.ts",
-    "./kubernetes/types/model": "./src/kubernetes/types/model.ts",
-    "./kubernetes/models": "./src/kubernetes/models/index.ts",
-    "./kubernetes/apimachinery": "./src/kubernetes/apimachinery/index.ts",
-    "./kubernetes/apimachinery/apis/meta/v1/ObjectMeta": "./src/kubernetes/apimachinery/apis/meta/v1/ObjectMeta.ts",
-    "./kubernetes/apimachinery/_schemas/ObjectMeta": "./src/kubernetes/apimachinery/_schemas/IoK8sApimachineryPkgApisMetaV1ObjectMeta.js"
+    ".": "./src/index.ts"
   },
   "lint": {
     "include": [

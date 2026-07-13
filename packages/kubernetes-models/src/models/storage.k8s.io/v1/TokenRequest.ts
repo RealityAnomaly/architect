@@ -1,0 +1,38 @@
+import { ModelData, Model, setValidateFunc } from "@glassway/kubernetes-types/model";
+import { ValidateFunc } from "@glassway/kubernetes-types/validate";
+import { validate } from "../../_schemas/storage.k8s.io/v1/TokenRequest.js";
+
+/**
+ * TokenRequest contains parameters of a service account token.
+ */
+export interface ITokenRequest {
+  /**
+ * audience is the intended audience of the token in "TokenRequestSpec". It will default to the audiences of kube apiserver.
+ */
+"audience": string;
+/**
+ * expirationSeconds is the duration of validity of the token in "TokenRequestSpec". It has the same default value of "ExpirationSeconds" in "TokenRequestSpec".
+ */
+"expirationSeconds"?: number;
+}
+
+/**
+ * TokenRequest contains parameters of a service account token.
+ */
+export class TokenRequest extends Model<ITokenRequest> implements ITokenRequest {
+  "audience": string;
+"expirationSeconds"?: number;
+
+constructor(data?: ModelData<ITokenRequest>) {
+  super();
+
+  this.setDefinedProps(data);
+}
+}
+
+setValidateFunc(TokenRequest, validate as ValidateFunc<ITokenRequest>);
+
+export type {
+  ITokenRequest as IIoK8sApiStorageV1TokenRequest,
+  TokenRequest as IoK8sApiStorageV1TokenRequest
+};

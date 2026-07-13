@@ -1,4 +1,4 @@
-import * as api from '@glassway/architect/kubernetes/models';
+import * as api from '@glassway/kubernetes-models/models';
 
 import { ConfigurationContext } from '@glassway/architect';
 import { KubeComponentHelm, KubeComponentHelmResources, } from '../../builders/helm.ts';

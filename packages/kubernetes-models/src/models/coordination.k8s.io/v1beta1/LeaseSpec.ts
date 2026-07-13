@@ -1,0 +1,54 @@
+import { IIoK8sApimachineryPkgApisMetaV1MicroTime } from "../../../apimachinery/apis/meta/v1/MicroTime.ts";
+import { ModelData, Model, setValidateFunc } from "@glassway/kubernetes-types/model";
+import { ValidateFunc } from "@glassway/kubernetes-types/validate";
+import { validate } from "../../_schemas/coordination.k8s.io/v1beta1/LeaseSpec.js";
+
+/**
+ * LeaseSpec is a specification of a Lease.
+ */
+export interface ILeaseSpec {
+  /**
+ * acquireTime is a time when the current lease was acquired.
+ */
+"acquireTime"?: IIoK8sApimachineryPkgApisMetaV1MicroTime;
+/**
+ * holderIdentity contains the identity of the holder of a current lease.
+ */
+"holderIdentity"?: string;
+/**
+ * leaseDurationSeconds is a duration that candidates for a lease need to wait to force acquire it. This is measure against time of last observed RenewTime.
+ */
+"leaseDurationSeconds"?: number;
+/**
+ * leaseTransitions is the number of transitions of a lease between holders.
+ */
+"leaseTransitions"?: number;
+/**
+ * renewTime is a time when the current holder of a lease has last updated the lease.
+ */
+"renewTime"?: IIoK8sApimachineryPkgApisMetaV1MicroTime;
+}
+
+/**
+ * LeaseSpec is a specification of a Lease.
+ */
+export class LeaseSpec extends Model<ILeaseSpec> implements ILeaseSpec {
+  "acquireTime"?: IIoK8sApimachineryPkgApisMetaV1MicroTime;
+"holderIdentity"?: string;
+"leaseDurationSeconds"?: number;
+"leaseTransitions"?: number;
+"renewTime"?: IIoK8sApimachineryPkgApisMetaV1MicroTime;
+
+constructor(data?: ModelData<ILeaseSpec>) {
+  super();
+
+  this.setDefinedProps(data);
+}
+}
+
+setValidateFunc(LeaseSpec, validate as ValidateFunc<ILeaseSpec>);
+
+export type {
+  ILeaseSpec as IIoK8sApiCoordinationV1beta1LeaseSpec,
+  LeaseSpec as IoK8sApiCoordinationV1beta1LeaseSpec
+};

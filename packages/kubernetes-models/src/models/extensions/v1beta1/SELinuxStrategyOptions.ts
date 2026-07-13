@@ -1,0 +1,41 @@
+import { IIoK8sApiCoreV1SELinuxOptions } from "../../v1/SELinuxOptions.ts";
+import { ModelData, Model, setValidateFunc } from "@glassway/kubernetes-types/model";
+import { ValidateFunc } from "@glassway/kubernetes-types/validate";
+import { validate } from "../../_schemas/extensions/v1beta1/SELinuxStrategyOptions.js";
+
+/**
+ * SELinuxStrategyOptions defines the strategy type and any options used to create the strategy. Deprecated: use SELinuxStrategyOptions from policy API Group instead.
+ * @deprecated
+ */
+export interface ISELinuxStrategyOptions {
+  /**
+ * rule is the strategy that will dictate the allowable labels that may be set.
+ */
+"rule": string;
+/**
+ * seLinuxOptions required to run as; required for MustRunAs More info: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+ */
+"seLinuxOptions"?: IIoK8sApiCoreV1SELinuxOptions;
+}
+
+/**
+ * SELinuxStrategyOptions defines the strategy type and any options used to create the strategy. Deprecated: use SELinuxStrategyOptions from policy API Group instead.
+ * @deprecated
+ */
+export class SELinuxStrategyOptions extends Model<ISELinuxStrategyOptions> implements ISELinuxStrategyOptions {
+  "rule": string;
+"seLinuxOptions"?: IIoK8sApiCoreV1SELinuxOptions;
+
+constructor(data?: ModelData<ISELinuxStrategyOptions>) {
+  super();
+
+  this.setDefinedProps(data);
+}
+}
+
+setValidateFunc(SELinuxStrategyOptions, validate as ValidateFunc<ISELinuxStrategyOptions>);
+
+export type {
+  ISELinuxStrategyOptions as IIoK8sApiExtensionsV1beta1SELinuxStrategyOptions,
+  SELinuxStrategyOptions as IoK8sApiExtensionsV1beta1SELinuxStrategyOptions
+};

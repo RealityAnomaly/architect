@@ -568,15 +568,10 @@
           "npm:@types/js-yaml@^4.0.9",
           "npm:@types/lodash@^4.17.24",
           "npm:@types/object-hash@^3.0.6",
-          "npm:ajv-formats-draft2019@^1.6.1",
-          "npm:ajv-formats@^3.0.1",
-          "npm:ajv-i18n@^4.2.0",
           "npm:ajv@^8.20.0",
           "npm:appdirsjs@^1.2.7",
-          "npm:is-cidr@7",
           "npm:js-yaml@^4.3.0",
           "npm:object-hash@3",
-          "npm:openapi-types@^12.1.3",
           "npm:reflect-metadata@~0.2.2",
           "npm:ts-graphviz@^2.1.6",
           "npm:wildcard-match@^5.1.4",
@@ -602,6 +597,23 @@
           "npm:ts-graphviz@^2.1.6",
           "npm:wildcard-match@^5.1.4",
           "npm:winston@^3.19.0"
+        ]
+      },
+      "packages/kubernetes-models": {
+        "dependencies": [
+          "jsr:@glassway/kubernetes-types@1",
+          "jsr:@std/yaml@^1.1.2",
+          "npm:ajv@^8.20.0",
+          "npm:openapi-types@^12.1.3"
+        ]
+      },
+      "packages/kubernetes-types": {
+        "dependencies": [
+          "npm:ajv-formats-draft2019@^1.6.1",
+          "npm:ajv-formats@^3.0.1",
+          "npm:ajv-i18n@^4.2.0",
+          "npm:ajv@^8.20.0",
+          "npm:is-cidr@7"
         ]
       }
     }

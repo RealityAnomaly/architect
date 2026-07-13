@@ -1,0 +1,43 @@
+import { ModelData, Model, setValidateFunc } from "@glassway/kubernetes-types/model";
+import { ValidateFunc } from "@glassway/kubernetes-types/validate";
+import { validate } from "../../_schemas/autoscaling/v2/CrossVersionObjectReference.js";
+
+/**
+ * CrossVersionObjectReference contains enough information to let you identify the referred resource.
+ */
+export interface ICrossVersionObjectReference {
+  /**
+ * apiVersion is the API version of the referent
+ */
+"apiVersion"?: string;
+/**
+ * kind is the kind of the referent; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+ */
+"kind": string;
+/**
+ * name is the name of the referent; More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
+ */
+"name": string;
+}
+
+/**
+ * CrossVersionObjectReference contains enough information to let you identify the referred resource.
+ */
+export class CrossVersionObjectReference extends Model<ICrossVersionObjectReference> implements ICrossVersionObjectReference {
+  "apiVersion"?: ICrossVersionObjectReference["apiVersion"];
+"kind": ICrossVersionObjectReference["kind"];
+"name": string;
+
+constructor(data?: ModelData<ICrossVersionObjectReference>) {
+  super();
+
+  this.setDefinedProps(data);
+}
+}
+
+setValidateFunc(CrossVersionObjectReference, validate as ValidateFunc<ICrossVersionObjectReference>);
+
+export type {
+  ICrossVersionObjectReference as IIoK8sApiAutoscalingV2CrossVersionObjectReference,
+  CrossVersionObjectReference as IoK8sApiAutoscalingV2CrossVersionObjectReference
+};

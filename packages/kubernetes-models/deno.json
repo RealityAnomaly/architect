@@ -1,0 +1,33 @@
+{
+  "imports": {
+    "@glassway/kubernetes-types": "jsr:@glassway/kubernetes-types@^1.0.0",
+    "@std/yaml": "jsr:@std/yaml@^1.1.2",
+    "ajv": "npm:ajv@^8.20.0",
+    "openapi-types": "npm:openapi-types@^12.1.3"
+  },
+  "exports": {
+    ".": "./src/models/index.ts",
+    "./apimachinery/apis/meta/v1/ObjectMeta": "./src/apimachinery/apis/meta/v1/ObjectMeta.ts",
+    "./apimachinery/_schemas/ObjectMeta": "./src/apimachinery/_schemas/apis/meta/v1/ObjectMeta.js"
+  },
+  "lint": {
+    "include": [
+      "src/"
+    ],
+    "exclude": [
+      "src/models/**/",
+      "src/apimachinery/**/"
+    ]
+  },
+  "fmt": {
+    "options": {
+      "singleQuote": true
+    }
+  },
+  "tasks": {
+    "generate": "deno --allow-net --allow-env --allow-sys --allow-read --allow-run=deno --allow-write scripts/generate.ts"
+  },
+  "license": "GPL-3.0-or-later",
+  "name": "@glassway/kubernetes-models",
+  "version": "1.36.0"
+}
