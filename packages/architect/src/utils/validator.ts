@@ -1,4 +1,4 @@
-import { Logger } from 'winston';
+import * as logtape from '@logtape/logtape';
 
 interface Validator {
   validate(): void | Promise<void>;
@@ -32,23 +32,22 @@ export class ValidationError extends Error {
     this.subject = subject;
   }
 
-  public assert(logger: Logger) {
+  public assert(logger: logtape.Logger) {
     if (this.acked) return;
+    const message = `${this.subject}: ${this.message}`;
 
-    let level: string;
     switch (this.level) {
       case ValidationErrorLevel.INFO:
-        level = 'info';
+        logger.info(message);
         break;
       case ValidationErrorLevel.WARNING:
-        level = 'warning';
+        logger.warn(message);
         break;
       case ValidationErrorLevel.ERROR:
-        level = 'error';
+        logger.error(message);
         break;
     }
 
-    logger.log(level, `${this.subject}: ${this.message}`);
     this.acked = true;
   }
 }

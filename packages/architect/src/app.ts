@@ -3,7 +3,7 @@ import 'reflect-metadata';
 import path from 'node:path';
 import { PluginRegistry } from './plugin.ts';
 import { TargetCache } from './internal/index.ts';
-import winston from 'winston';
+import * as logtape from '@logtape/logtape';
 import { Project } from './internal/project/index.ts';
 import { Ajv } from 'ajv';
 
@@ -28,25 +28,26 @@ export class Architect {
   public readonly ajv: Ajv;
   public readonly pluginRegistry: PluginRegistry;
   public readonly projectRegistry: TypeRegistry<Project>;
-  public readonly logger: winston.Logger;
+  public readonly logger: logtape.Logger;
   public readonly state: StateProvider;
   public readonly cache: TargetCache;
   public readonly kubeTypes: kubeUtils.KubeTypeRegistry;
   public readonly kubeLoader: kubeUtils.ManifestLoader;
 
-  private constructor(project?: ProjectClass, logLevel: string = 'info') {
+  private constructor(project?: ProjectClass, logLevel: logtape.LogLevel = 'info') {
     this.ajv = new Ajv();
 
     this.projectRegistry = new TypeRegistry(this);
     this.pluginRegistry = new PluginRegistry();
 
-    this.logger = winston.createLogger({
-      level: logLevel,
-      format: winston.format.cli(),
-      transports: [
-        new winston.transports.Console(),
-      ],
+    logtape.configure({
+      sinks: { console: logtape.getConsoleSink() },
+      loggers: [
+        { category: "architect", lowestLevel: logLevel, sinks: ["console"] }
+      ]
     });
+
+    this.logger = logtape.getLogger(["architect"]);
 
     this.logger.debug(`initialised logging with level '${logLevel}'`);
 
@@ -80,7 +81,7 @@ export class Architect {
 
   public static async create(
     project?: ProjectClass,
-    logLevel: string = 'info',
+    logLevel: logtape.LogLevel = 'info',
   ): Promise<Architect> {
     const instance = new Architect(project, logLevel);
     await instance.init();

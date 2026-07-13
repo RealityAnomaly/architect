@@ -18,7 +18,7 @@ import {
 } from '@glassway/architect';
 
 import * as api from '@glassway/kubernetes-models';
-import { Logger } from 'winston';
+import * as logtape from '@logtape/logtape';
 
 import { FluxCDController, FluxCDMode } from './apply/flux/index.ts';
 import { KubeComponentModel, KubePreludeComponent } from './component.ts';
@@ -208,7 +208,7 @@ export class KubeTarget extends Target {
 
   public override async compile(
     params?: TargetResolveParams,
-    logger?: Logger,
+    logger?: logtape.Logger,
     listener?: ICompileListener,
   ): Promise<Result | undefined> {
     const result = await super.compile(params, logger, listener);

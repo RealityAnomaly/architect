@@ -2,9 +2,9 @@ import path from 'node:path';
 import * as yaml from '@std/yaml';
 import * as fs from 'node:fs/promises';
 import * as api from '@glassway/kubernetes-models';
+import * as logtape from '@logtape/logtape';
 import { K8sPlugin } from '../plugin.ts';
 import { CrdsConfig } from './config.ts';
-import { Logger } from 'winston';
 import { CRDModelGenerator, KubeResource } from '@glassway/architect';
 
 export * from './cli.ts';
@@ -19,7 +19,7 @@ export class CRDManager {
   public readonly plugin: K8sPlugin;
   private readonly srcDir: string;
   private readonly dataDir: string;
-  private readonly logger: Logger;
+  private readonly logger: logtape.Logger;
 
   private readonly generator: CRDModelGenerator;
   private configDirty: boolean = false;
@@ -29,11 +29,7 @@ export class CRDManager {
     this.plugin = plugin;
     this.srcDir = path.join(plugin.parent.project!.root!, 'src/generated/crds');
     this.dataDir = path.join(plugin.parent.project!.root!, 'data/crds');
-
-    this.logger = plugin.logger.child({
-      component: `plugin.kubernetes.CRDManager`,
-    });
-
+    this.logger = logtape.getLogger(['architect', 'plugin', 'kubernetes', 'CRDManager']);
     this.generator = new CRDModelGenerator(plugin.parent.kubeLoader);
   }
 

@@ -7,6 +7,7 @@ import { TargetCommand } from './target.ts';
 import process from 'node:process';
 import { ProjectClass } from '../internal/project/index.ts';
 import { DependencyGraphRenderer } from '../internal/graph/render.ts';
+import * as logtape from '@logtape/logtape';
 import fs from 'node:fs/promises';
 
 export interface AppCommandOptions {
@@ -122,11 +123,11 @@ export class App {
     actionCommand: commander.Command,
   ): Promise<void> {
     const options = thisCommand.opts();
-    let logLevel = 'info';
+    let logLevel: logtape.LogLevel = 'info';
     if (options.verbose === 1) {
       logLevel = 'debug';
     } else if (options.verbose >= 2) {
-      logLevel = 'silly';
+      logLevel = 'trace';
     }
 
     this.instance = await Architect.create(this._projectClass, logLevel);

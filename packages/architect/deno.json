@@ -12,8 +12,7 @@
     "object-hash": "npm:object-hash@^3.0.0",
     "reflect-metadata": "npm:reflect-metadata@^0.2.2",
     "ts-graphviz": "npm:ts-graphviz@^2.1.6",
-    "wildcard-match": "npm:wildcard-match@^5.1.4",
-    "winston": "npm:winston@^3.19.0"
+    "wildcard-match": "npm:wildcard-match@^5.1.4"
   },
   "exports": {
     ".": "./src/index.ts"

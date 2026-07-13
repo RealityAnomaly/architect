@@ -1,6 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { Logger } from 'winston';
+import * as logtape from '@logtape/logtape';
 import { Plugin, PluginRegistry } from '../../plugin.ts';
 import { Target } from './target.ts';
 import { Project } from '../project/index.ts';
@@ -14,7 +14,7 @@ export class TargetLoader {
     plugins: PluginRegistry,
     loader: ManifestLoader,
     input: string,
-    logger?: Logger,
+    logger?: logtape.Logger,
   ): Promise<Target[]> {
     try {
       const stat = await fs.stat(input);
