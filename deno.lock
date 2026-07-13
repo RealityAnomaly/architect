@@ -570,7 +570,6 @@
           "npm:commander@^12.1.0",
           "npm:is-cidr@7",
           "npm:js-yaml@^4.3.0",
-          "npm:lodash@^4.18.1",
           "npm:object-hash@3",
           "npm:openapi-types@^12.1.3",
           "npm:reflect-metadata@~0.2.2",

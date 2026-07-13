@@ -88,7 +88,9 @@ Deno.test("advanced conditional stuff", async () => {
   lazy.$set({
     app: {
       options: {
-        enable: (lazy as any).app2.options.enable,
+        // TODO: this is being captured here and cached... prohibit direct, function only?
+        // or we could also save properties for reuse and track them somehow
+        enable: () => (lazy as any).app2.options.enable,
       },
     },
     app2: {

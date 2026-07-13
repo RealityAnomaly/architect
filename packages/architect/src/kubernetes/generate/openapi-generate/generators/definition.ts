@@ -138,18 +138,23 @@ export default function ({
 
         imports.push({
           name: "ModelData",
-          path: "@glassway/architect/kubernetes/types",
+          path: "@glassway/architect/kubernetes/types/model",
         });
 
         if (gvk) {
           imports.push({
             name: "TypeMeta",
-            path: "@glassway/architect/kubernetes/types",
+            path: "@glassway/architect/kubernetes/types/meta",
+          });
+
+          imports.push({
+            name: "TypeMetaGuard",
+            path: "@glassway/architect/kubernetes/types/meta",
           });
 
           imports.push({
             name: "createTypeMetaGuard",
-            path: "@glassway/architect/kubernetes/types",
+            path: "@glassway/architect/kubernetes/types/meta",
           });
 
           classContent = `${trimSuffix(classContent, "}")}
@@ -179,10 +184,10 @@ constructor(data?: ModelData<${shortInterfaceName}>) {
 }`;
         }
 
-        imports.push({ name: "Model", path: "@glassway/architect/kubernetes/types" });
+        imports.push({ name: "Model", path: "@glassway/architect/kubernetes/types/model" });
         imports.push({
           name: "setValidateFunc",
-          path: "@glassway/architect/kubernetes/types",
+          path: "@glassway/architect/kubernetes/types/model",
         });
         imports.push({
           name: "ValidateFunc",
