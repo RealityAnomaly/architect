@@ -14,7 +14,7 @@ const generateSchemas: Generator = async (definitions) => {
     schema: { ...transformSchema(def.schema), $id: def.schemaId },
     refs: {
       "io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta":
-        "@glassway/architect/kubernetes/apimachinery/_schemas/IoK8sApimachineryPkgApisMetaV1ObjectMeta",
+        "@glassway/architect/kubernetes/apimachinery/_schemas/ObjectMeta",
     },
   }));
   const schemas = await compileSchemas(tasks);
