@@ -1,4 +1,4 @@
-import { Command } from 'commander';
+import { Command } from 'npm:commander@15.0.0'
 import { K8sPlugin } from '../plugin.ts';
 import { CrdsConfig } from './config.ts';
 import { CRDSyncOptions } from './index.ts';

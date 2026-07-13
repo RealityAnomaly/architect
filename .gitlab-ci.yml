@@ -17,6 +17,7 @@ build-job:
   script:
     - deno install
 
+# TODO: eventually deno lint here?
 unit-test-job:
   stage: test
   script:
@@ -31,5 +32,9 @@ lint-test-job:
 deploy-job:
   stage: deploy
   script:
-    - deno pack --no-deno-shim --output result.tgz
+    - cd packages
+    - cd architect && deno pack --output result.tgz
+    - npm publish ./result.tgz
+    - cd ./../
+    - cd architect-k8s && deno pack --output result.tgz
     - npm publish ./result.tgz

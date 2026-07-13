@@ -93,6 +93,7 @@ export class Architect {
   }
 
   public getProjects(): Project[] {
-    return this.projectRegistry.data.map((p) => p.instance);
+    const projects = this.project !== undefined ? [this.project] : [];
+    return projects.concat(...this.projectRegistry.data.map((p) => p.instance));
   }
 }

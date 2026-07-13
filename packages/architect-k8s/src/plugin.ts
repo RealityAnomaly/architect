@@ -1,9 +1,9 @@
 import { Architect, Plugin, TargetClass } from '@glassway/architect';
-import { Command } from 'commander';
 import { CRDCommand } from './crds/cli.ts';
 import { CrdsConfig } from './crds/config.ts';
 import { CRDManager } from './crds/index.ts';
 import { KubeTarget } from './target.ts';
+import { Command } from 'npm:commander@15.0.0'
 import { BuilderParams, GitBuilder, Helm, HttpBuilder, Kustomize, } from './index.ts';
 
 export const K8S_PLUGIN_CLASS = "plugin.architect.glassway.net/kubernetes";

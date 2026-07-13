@@ -2,7 +2,8 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    controller-gen.kubebuilder.io/version: v0.16.1
+    controller-gen.kubebuilder.io/version: v0.21.0
+    kustomize.toolkit.fluxcd.io/substitute: disabled
   labels:
     app.kubernetes.io/component: source-controller
     app.kubernetes.io/instance: flux-system
@@ -11,6 +12,10 @@ metadata:
 spec:
   group: source.toolkit.fluxcd.io
   names:
+    categories:
+      - all
+      - fluxcd
+      - fluxcd-sources
     kind: OCIRepository
     listKind: OCIRepositoryList
     plural: ocirepositories
@@ -23,16 +28,16 @@ spec:
         - jsonPath: .spec.url
           name: URL
           type: string
-        - jsonPath: .status.conditions[?(@.type=="Ready")].status
+        - jsonPath: '.status.conditions[?(@.type=="Ready")].status'
           name: Ready
           type: string
-        - jsonPath: .status.conditions[?(@.type=="Ready")].message
+        - jsonPath: '.status.conditions[?(@.type=="Ready")].message'
           name: Status
           type: string
         - jsonPath: .metadata.creationTimestamp
           name: Age
           type: date
-      name: v1beta2
+      name: v1
       schema:
         openAPIV3Schema:
           description: OCIRepository is the Schema for the ocirepositories API
@@ -95,12 +100,6 @@ spec:
                     must
 
                     be of type `Opaque` or `kubernetes.io/tls`.
-
-
-                    Note: Support for the `caFile`, `certFile` and `keyFile`
-                    keys have
-
-                    been deprecated.
                   properties:
                     name:
                       description: Name of the referent.
@@ -133,7 +132,7 @@ spec:
                     ensure
 
                     efficient use of resources.
-                  pattern: ^([0-9]+(\.[0-9]+)?(ms|s|m|h))+$
+                  pattern: '^([0-9]+(\.[0-9]+)?(ms|s|m|h))+$'
                   type: string
                 layerSelector:
                   description: >-
@@ -217,7 +216,7 @@ spec:
                         within the SemVer range.
                       type: string
                     tag:
-                      description: Tag is the image tag to pull, defaults to latest.
+                      description: 'Tag is the image tag to pull, defaults to latest.'
                       type: string
                   type: object
                 secretRef:
@@ -255,13 +254,13 @@ spec:
                   description: >-
                     The timeout for remote OCI Repository operations like
                     pulling, defaults to 60s.
-                  pattern: ^([0-9]+(\.[0-9]+)?(ms|s|m))+$
+                  pattern: '^([0-9]+(\.[0-9]+)?(ms|s|m))+$'
                   type: string
                 url:
                   description: |-
                     URL is a reference to an OCI artifact repository hosted
                     on a remote container registry.
-                  pattern: ^oci://.*$
+                  pattern: '^oci://.*$'
                   type: string
                 verify:
                   description: >-
@@ -337,6 +336,26 @@ spec:
                       required:
                         - name
                       type: object
+                    trustedRootSecretRef:
+                      description: >-
+                        TrustedRootSecretRef specifies the Kubernetes Secret
+                        containing a
+
+                        Sigstore trusted_root.json file. This enables
+                        verification against
+
+                        self-hosted Sigstore infrastructure (custom Fulcio CA,
+                        self-hosted
+
+                        Rekor instance). The Secret must contain a key named
+                        "trusted_root.json".
+                      properties:
+                        name:
+                          description: Name of the referent.
+                          type: string
+                      required:
+                        - name
+                      type: object
                   required:
                     - provider
                   type: object
@@ -358,7 +377,7 @@ spec:
                       description: >-
                         Digest is the digest of the file in the form of
                         '<algorithm>:<checksum>'.
-                      pattern: ^[a-z0-9]+(?:[.+_-][a-z0-9]+)*:[a-zA-Z0-9=_-]+$
+                      pattern: '^[a-z0-9]+(?:[.+_-][a-z0-9]+)*:[a-zA-Z0-9=_-]+$'
                       type: string
                     lastUpdateTime:
                       description: >-
@@ -409,6 +428,7 @@ spec:
                         Artifact contents.
                       type: string
                   required:
+                    - digest
                     - lastUpdateTime
                     - path
                     - revision
@@ -468,10 +488,10 @@ spec:
                           This field may not be empty.
                         maxLength: 1024
                         minLength: 1
-                        pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                        pattern: '^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$'
                         type: string
                       status:
-                        description: status of the condition, one of True, False, Unknown.
+                        description: 'status of the condition, one of True, False, Unknown.'
                         enum:
                           - 'True'
                           - 'False'
@@ -493,31 +513,6 @@ spec:
                       - type
                     type: object
                   type: array
-                contentConfigChecksum:
-                  description: >-
-                    ContentConfigChecksum is a checksum of all the
-                    configurations related to
-
-                    the content of the source artifact:
-                     - .spec.ignore
-                     - .spec.layerSelector
-                    observed in .status.observedGeneration version of the
-                    object. This can
-
-                    be used to determine if the content configuration has
-                    changed and the
-
-                    artifact needs to be rebuilt.
-
-                    It has the format of `<algo>:<checksum>`, for example:
-                    `sha256:<checksum>`.
-
-
-                    Deprecated: Replaced with explicit fields for observed
-                    artifact content
-
-                    config in the status.
-                  type: string
                 lastHandledReconcileAt:
                   description: |-
                     LastHandledReconcileAt holds the value of the most recent

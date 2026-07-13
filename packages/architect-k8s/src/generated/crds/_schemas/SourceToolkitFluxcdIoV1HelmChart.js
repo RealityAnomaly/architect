@@ -1,2352 +1,1653 @@
-import { formats } from "@kubernetes-models/validate";
-export const validate = validate28;
-const schema12 = {
-  "type": "object",
-  "properties": {
-    "apiVersion": {
-      "$ref": "DolBXdjKC6N0AR3dFfs3Zl92D71L7EImbUYRyomJHg"
-    },
-    "kind": {
-      "$ref": "cV0gMkTMXkb3Zm4B8XAaBO6yQ26R7FXg5P4rPW1SqtU"
-    },
-    "metadata": {
-      "$ref": "a6f0oUEaFqHmymdwnqPORTNOTU7GczWAkwGD0uYU"
-    },
-    "spec": {
-      "$ref": "xkqqCAxkhquy1Ko6FoyYmb2ppjTotTiedExtC3clyU"
-    },
-    "status": {
-      "$ref": "JN3Wydbob8wNm8SLlcyU5I7TIMOdjoNzLpQDamdX9oU"
-    }
-  },
-  "required": ["apiVersion", "kind"],
-  "$id": "source.toolkit.fluxcd.io.v1.HelmChart"
-};
-const schema13 = {
-  "type": "string",
-  "enum": ["source.toolkit.fluxcd.io/v1"]
-};
-function validate29(data, {
-  instancePath = "",
-  parentData,
-  parentDataProperty,
-  rootData = data
-} = {}) {
-  let vErrors = null;
-  let errors = 0;
-  if (typeof data !== "string") {
-    const err0 = {
-      instancePath,
-      schemaPath: "#/type",
-      keyword: "type",
-      params: {
-        type: "string"
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err0];
-    } else {
-      vErrors.push(err0);
-    }
-    errors++;
-  }
-  if (!(data === "source.toolkit.fluxcd.io/v1")) {
-    const err1 = {
-      instancePath,
-      schemaPath: "#/enum",
-      keyword: "enum",
-      params: {
-        allowedValues: schema13.enum
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err1];
-    } else {
-      vErrors.push(err1);
-    }
-    errors++;
-  }
-  validate29.errors = vErrors;
-  return errors === 0;
+import { formats } from "@glassway/architect/kubernetes/validate";
+export const validate = validate7;
+const schema6 = {"type":"object","properties":{"apiVersion":{"$ref":"Kh58gQpWKNTSxbzWbp9kjRfvxYaBu7Yl4XdqmlEwMrM"},"kind":{"$ref":"jaLeLS6T2wtFeIDUE6TdeWqqsfYW-JrHijLHqlWTQhc"},"metadata":{"$ref":"P3srTZpWadQH4s4N9KfJR0iCqydQo9YAz7xMB2qf0GQ"},"spec":{"$ref":"hZ8nAdS29Ncd5qezTGgZ2oNJWojgWdKBh-FM8Qr_UG0"},"status":{"$ref":"OthQZ7fuh0M7OZxufudQ6jdA05Mhi_nKrKvbcB7ji5s"}},"required":["apiVersion","kind"],"$id":"source.toolkit.fluxcd.io.v1.HelmChart"};
+const schema7 = {"type":"string","enum":["source.toolkit.fluxcd.io/v1"]};
+
+function validate8(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+if(typeof data !== "string"){
+const err0 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "string"}};
+if(vErrors === null){
+vErrors = [err0];
 }
-const schema14 = {
-  "type": "string",
-  "enum": ["HelmChart"]
-};
-function validate31(data, {
-  instancePath = "",
-  parentData,
-  parentDataProperty,
-  rootData = data
-} = {}) {
-  let vErrors = null;
-  let errors = 0;
-  if (typeof data !== "string") {
-    const err0 = {
-      instancePath,
-      schemaPath: "#/type",
-      keyword: "type",
-      params: {
-        type: "string"
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err0];
-    } else {
-      vErrors.push(err0);
-    }
-    errors++;
-  }
-  if (!(data === "HelmChart")) {
-    const err1 = {
-      instancePath,
-      schemaPath: "#/enum",
-      keyword: "enum",
-      params: {
-        allowedValues: schema14.enum
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err1];
-    } else {
-      vErrors.push(err1);
-    }
-    errors++;
-  }
-  validate31.errors = vErrors;
-  return errors === 0;
+else {
+vErrors.push(err0);
 }
-const schema15 = {
-  "nullableRef": "io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta#"
-};
-const schema16 = {};
-import { validate as validate34 } from "@kubernetes-models/apimachinery/_schemas/IoK8sApimachineryPkgApisMetaV1ObjectMeta";
-function validate33(data, {
-  instancePath = "",
-  parentData,
-  parentDataProperty,
-  rootData = data
-} = {}) {
-  let vErrors = null;
-  let errors = 0;
-  if (data !== null) {
-    if (!validate34(data, {
-      instancePath,
-      parentData,
-      parentDataProperty,
-      rootData
-    })) {
-      vErrors = vErrors === null ? validate34.errors : vErrors.concat(validate34.errors);
-      errors = vErrors.length;
-    }
-  }
-  validate33.errors = vErrors;
-  return errors === 0;
+errors++;
 }
-const schema17 = {
-  "properties": {
-    "chart": {
-      "$ref": "jdFtv6DGtroqVatkuk8ipQtGFLMzfSuVek97sB0uauQ"
-    },
-    "ignoreMissingValuesFiles": {
-      "$ref": "hsGPmGwy4VrrbOBJwiGgjUKGPtMFeHO5cmtUu5ZUh0"
-    },
-    "interval": {
-      "$ref": "VTS2hqBen1ql8yB5hEunjoVVvxlzpwuCJKblEhORdw"
-    },
-    "reconcileStrategy": {
-      "$ref": "ySp5Bunyfj1DSY4H0pNpJVvjrN6pwWzcaXqFLaxN0"
-    },
-    "sourceRef": {
-      "$ref": "oIAOWlzPkDcY2mewSlsjfr5V3FbU1jFstFi0n1oJ8"
-    },
-    "suspend": {
-      "$ref": "hsGPmGwy4VrrbOBJwiGgjUKGPtMFeHO5cmtUu5ZUh0"
-    },
-    "valuesFiles": {
-      "$ref": "aRQtgAls8PT3219P8mxz6PPEAVWN1SvmCHi6z12UM"
-    },
-    "verify": {
-      "$ref": "q9Wq6xO5imxyPNSbz5858G2ZHg1ObXCEDcdzSDThCo"
-    },
-    "version": {
-      "$ref": "AkOHq2iPv4pa7Q6zJFEOi1xU6czpxKKJgHUNGmbJPk"
-    }
-  },
-  "required": ["chart", "interval", "sourceRef"],
-  "type": "object",
-  "nullable": true
-};
-const schema6 = {
-  "type": "string"
-};
-function validate21(data, {
-  instancePath = "",
-  parentData,
-  parentDataProperty,
-  rootData = data
-} = {}) {
-  let vErrors = null;
-  let errors = 0;
-  if (typeof data !== "string") {
-    const err0 = {
-      instancePath,
-      schemaPath: "#/type",
-      keyword: "type",
-      params: {
-        type: "string"
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err0];
-    } else {
-      vErrors.push(err0);
-    }
-    errors++;
-  }
-  validate21.errors = vErrors;
-  return errors === 0;
+const _errs0 = errors;
+const vSchema0 = schema7.enum;
+if(!(data === "source.toolkit.fluxcd.io/v1")){
+const err1 = {instancePath,schemaPath:"#/enum",keyword:"enum",params:{allowedValues: schema7.enum}};
+if(vErrors === null){
+vErrors = [err1];
 }
-const schema7 = {
-  "type": "boolean",
-  "nullable": true
-};
-function validate22(data, {
-  instancePath = "",
-  parentData,
-  parentDataProperty,
-  rootData = data
-} = {}) {
-  let vErrors = null;
-  let errors = 0;
-  if (typeof data !== "boolean" && data !== null) {
-    const err0 = {
-      instancePath,
-      schemaPath: "#/type",
-      keyword: "type",
-      params: {
-        type: "boolean"
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err0];
-    } else {
-      vErrors.push(err0);
-    }
-    errors++;
-  }
-  validate22.errors = vErrors;
-  return errors === 0;
+else {
+vErrors.push(err1);
 }
-const schema18 = {
-  "pattern": "^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$",
-  "type": "string"
-};
+errors++;
+}
+validate8.errors = vErrors;
+return errors === 0;
+}
+
+const schema8 = {"type":"string","enum":["HelmChart"]};
+
+function validate10(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+if(typeof data !== "string"){
+const err0 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "string"}};
+if(vErrors === null){
+vErrors = [err0];
+}
+else {
+vErrors.push(err0);
+}
+errors++;
+}
+const _errs0 = errors;
+const vSchema0 = schema8.enum;
+if(!(data === "HelmChart")){
+const err1 = {instancePath,schemaPath:"#/enum",keyword:"enum",params:{allowedValues: schema8.enum}};
+if(vErrors === null){
+vErrors = [err1];
+}
+else {
+vErrors.push(err1);
+}
+errors++;
+}
+validate10.errors = vErrors;
+return errors === 0;
+}
+
+const schema9 = {"nullableRef":"io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta#"};
+const schema10 = {};
+
+import { validate as validate13 } from "@glassway/architect/kubernetes/apimachinery/_schemas/IoK8sApimachineryPkgApisMetaV1ObjectMeta";
+
+
+function validate12(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+if(data !== null){
+if(!(validate13(data, {instancePath,parentData,parentDataProperty,rootData}))){
+vErrors = vErrors === null ? validate13.errors : vErrors.concat(validate13.errors);
+errors = vErrors.length;
+}
+else {
+}
+}
+validate12.errors = vErrors;
+return errors === 0;
+}
+
+const schema11 = {"properties":{"chart":{"$ref":"sLlNkWhANXZ15lvmcujppy1mXxqn6f-GaeQpWRYm_dw"},"ignoreMissingValuesFiles":{"$ref":"CTX4WtafS9K1Gv7k2X1H0J3M9LziUVVRBMOR0rDDzTk"},"interval":{"$ref":"LsMD3Ue9PdPHLGttXdfcxIWepwGNenjy1vMwBiao_hY"},"reconcileStrategy":{"$ref":"T43tADg444WCCiFJoyY2ieqIXkN9r3gxsSC4aR8L6aQ"},"sourceRef":{"$ref":"J7ytUDbiAcnfkUHKdhVp0ijz4hEsm9AcZuiHffEBz3E"},"suspend":{"$ref":"CTX4WtafS9K1Gv7k2X1H0J3M9LziUVVRBMOR0rDDzTk"},"valuesFiles":{"$ref":"uqi-NWpwJAtCtKg340P2GU85hOwdccNKh8Eansj5IGE"},"verify":{"$ref":"hxfkOzKPVAw1G6A5_vEU045rsM9vSpbW-NC7QKjkN74"},"version":{"$ref":"7Ae4kI5YYV9DPpIiILTK1sc5oZLmV0nMffCXZi4qKv8"}},"required":["chart","interval","sourceRef"],"type":"object","nullable":true};
+const schema0 = {"type":"string"};
+
+function validate0(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+if(typeof data !== "string"){
+const err0 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "string"}};
+if(vErrors === null){
+vErrors = [err0];
+}
+else {
+vErrors.push(err0);
+}
+errors++;
+}
+const _errs0 = errors;
+validate0.errors = vErrors;
+return errors === 0;
+}
+
+const schema1 = {"type":"boolean","nullable":true};
+
+function validate1(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+if((typeof data !== "boolean") && (data !== null)){
+const err0 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "boolean"}};
+if(vErrors === null){
+vErrors = [err0];
+}
+else {
+vErrors.push(err0);
+}
+errors++;
+}
+const _errs0 = errors;
+const _errs1 = errors;
+validate1.errors = vErrors;
+return errors === 0;
+}
+
+const schema12 = {"pattern":"^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$","type":"string"};
 const pattern0 = new RegExp("^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$", "u");
-function validate40(data, {
-  instancePath = "",
-  parentData,
-  parentDataProperty,
-  rootData = data
-} = {}) {
-  let vErrors = null;
-  let errors = 0;
-  if (typeof data === "string") {
-    if (!pattern0.test(data)) {
-      const err0 = {
-        instancePath,
-        schemaPath: "#/pattern",
-        keyword: "pattern",
-        params: {
-          pattern: "^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$"
-        }
-      };
-      if (vErrors === null) {
-        vErrors = [err0];
-      } else {
-        vErrors.push(err0);
-      }
-      errors++;
-    }
-  } else {
-    const err1 = {
-      instancePath,
-      schemaPath: "#/type",
-      keyword: "type",
-      params: {
-        type: "string"
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err1];
-    } else {
-      vErrors.push(err1);
-    }
-    errors++;
-  }
-  validate40.errors = vErrors;
-  return errors === 0;
+
+function validate19(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+const _errs0 = errors;
+if(typeof data === "string"){
+if(!pattern0.test(data)){
+const err0 = {instancePath,schemaPath:"#/pattern",keyword:"pattern",params:{pattern: "^([0-9]+(\\.[0-9]+)?(ms|s|m|h))+$"}};
+if(vErrors === null){
+vErrors = [err0];
 }
-const schema19 = {
-  "default": "ChartVersion",
-  "enum": ["ChartVersion", "Revision"],
-  "type": "string",
-  "nullable": true
-};
-function validate42(data, {
-  instancePath = "",
-  parentData,
-  parentDataProperty,
-  rootData = data
-} = {}) {
-  let vErrors = null;
-  let errors = 0;
-  if (typeof data !== "string" && data !== null) {
-    const err0 = {
-      instancePath,
-      schemaPath: "#/type",
-      keyword: "type",
-      params: {
-        type: "string"
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err0];
-    } else {
-      vErrors.push(err0);
-    }
-    errors++;
-  }
-  if (!(data === "ChartVersion" || data === "Revision")) {
-    const err1 = {
-      instancePath,
-      schemaPath: "#/enum",
-      keyword: "enum",
-      params: {
-        allowedValues: schema19.enum
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err1];
-    } else {
-      vErrors.push(err1);
-    }
-    errors++;
-  }
-  validate42.errors = vErrors;
-  return errors === 0;
+else {
+vErrors.push(err0);
 }
-const schema20 = {
-  "properties": {
-    "apiVersion": {
-      "$ref": "GlcYMJF0EagTzhTCQIbCB22J377Z87wRm00IC2Ss2g"
-    },
-    "kind": {
-      "$ref": "Sn4pzIouE92yhB9vZ34wX3fMx4gCgsAZSc516BQ"
-    },
-    "name": {
-      "$ref": "jdFtv6DGtroqVatkuk8ipQtGFLMzfSuVek97sB0uauQ"
-    }
-  },
-  "required": ["kind", "name"],
-  "type": "object"
-};
-const schema9 = {
-  "type": "string",
-  "nullable": true
-};
-function validate24(data, {
-  instancePath = "",
-  parentData,
-  parentDataProperty,
-  rootData = data
-} = {}) {
-  let vErrors = null;
-  let errors = 0;
-  if (typeof data !== "string" && data !== null) {
-    const err0 = {
-      instancePath,
-      schemaPath: "#/type",
-      keyword: "type",
-      params: {
-        type: "string"
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err0];
-    } else {
-      vErrors.push(err0);
-    }
-    errors++;
-  }
-  validate24.errors = vErrors;
-  return errors === 0;
+errors++;
 }
-const schema21 = {
-  "enum": ["HelmRepository", "GitRepository", "Bucket"],
-  "type": "string"
-};
-function validate46(data, {
-  instancePath = "",
-  parentData,
-  parentDataProperty,
-  rootData = data
-} = {}) {
-  let vErrors = null;
-  let errors = 0;
-  if (typeof data !== "string") {
-    const err0 = {
-      instancePath,
-      schemaPath: "#/type",
-      keyword: "type",
-      params: {
-        type: "string"
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err0];
-    } else {
-      vErrors.push(err0);
-    }
-    errors++;
-  }
-  if (!(data === "HelmRepository" || data === "GitRepository" || data === "Bucket")) {
-    const err1 = {
-      instancePath,
-      schemaPath: "#/enum",
-      keyword: "enum",
-      params: {
-        allowedValues: schema21.enum
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err1];
-    } else {
-      vErrors.push(err1);
-    }
-    errors++;
-  }
-  validate46.errors = vErrors;
-  return errors === 0;
 }
-function validate44(data, {
-  instancePath = "",
-  parentData,
-  parentDataProperty,
-  rootData = data
-} = {}) {
-  let vErrors = null;
-  let errors = 0;
-  if (data && typeof data == "object" && !Array.isArray(data)) {
-    if (data.kind === undefined) {
-      const err0 = {
-        instancePath,
-        schemaPath: "#/required",
-        keyword: "required",
-        params: {
-          missingProperty: "kind"
-        }
-      };
-      if (vErrors === null) {
-        vErrors = [err0];
-      } else {
-        vErrors.push(err0);
-      }
-      errors++;
-    }
-    if (data.name === undefined) {
-      const err1 = {
-        instancePath,
-        schemaPath: "#/required",
-        keyword: "required",
-        params: {
-          missingProperty: "name"
-        }
-      };
-      if (vErrors === null) {
-        vErrors = [err1];
-      } else {
-        vErrors.push(err1);
-      }
-      errors++;
-    }
-    if (data.apiVersion !== undefined) {
-      if (!validate24(data.apiVersion, {
-        instancePath: instancePath + "/apiVersion",
-        parentData: data,
-        parentDataProperty: "apiVersion",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate24.errors : vErrors.concat(validate24.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.kind !== undefined) {
-      if (!validate46(data.kind, {
-        instancePath: instancePath + "/kind",
-        parentData: data,
-        parentDataProperty: "kind",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate46.errors : vErrors.concat(validate46.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.name !== undefined) {
-      if (!validate21(data.name, {
-        instancePath: instancePath + "/name",
-        parentData: data,
-        parentDataProperty: "name",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate21.errors : vErrors.concat(validate21.errors);
-        errors = vErrors.length;
-      }
-    }
-  } else {
-    const err2 = {
-      instancePath,
-      schemaPath: "#/type",
-      keyword: "type",
-      params: {
-        type: "object"
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err2];
-    } else {
-      vErrors.push(err2);
-    }
-    errors++;
-  }
-  validate44.errors = vErrors;
-  return errors === 0;
+else {
+const err1 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "string"}};
+if(vErrors === null){
+vErrors = [err1];
 }
-const schema11 = {
-  "items": {
-    "$ref": "jdFtv6DGtroqVatkuk8ipQtGFLMzfSuVek97sB0uauQ"
-  },
-  "type": "array",
-  "nullable": true
-};
-function validate26(data, {
-  instancePath = "",
-  parentData,
-  parentDataProperty,
-  rootData = data
-} = {}) {
-  let vErrors = null;
-  let errors = 0;
-  if (!Array.isArray(data) && data !== null) {
-    const err0 = {
-      instancePath,
-      schemaPath: "#/type",
-      keyword: "type",
-      params: {
-        type: "array"
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err0];
-    } else {
-      vErrors.push(err0);
-    }
-    errors++;
-  }
-  if (Array.isArray(data)) {
-    const len0 = data.length;
-    for (let i0 = 0; i0 < len0; i0++) {
-      if (!validate21(data[i0], {
-        instancePath: instancePath + "/" + i0,
-        parentData: data,
-        parentDataProperty: i0,
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate21.errors : vErrors.concat(validate21.errors);
-        errors = vErrors.length;
-      }
-    }
-  }
-  validate26.errors = vErrors;
-  return errors === 0;
+else {
+vErrors.push(err1);
 }
-const schema22 = {
-  "properties": {
-    "matchOIDCIdentity": {
-      "$ref": "CV6ZIv2ObNgZLAwmkKr7Qgn7smVYJyHkYNFrj3II"
-    },
-    "provider": {
-      "$ref": "vRhUbhrrGw8KDpAtkNdHVZSX6StppKnJdBIYWWDP0"
-    },
-    "secretRef": {
-      "$ref": "OAgQGC3YN1FICnXF5ReeaD1QWt6Riug0pHBXOEYs"
-    }
-  },
-  "required": ["provider"],
-  "type": "object",
-  "nullable": true
-};
-const schema23 = {
-  "items": {
-    "$ref": "jYD5F9sAvMRmaSd397On06RAJGBN3zsBc7JyBinOYiY"
-  },
-  "type": "array",
-  "nullable": true
-};
-const schema24 = {
-  "properties": {
-    "issuer": {
-      "$ref": "jdFtv6DGtroqVatkuk8ipQtGFLMzfSuVek97sB0uauQ"
-    },
-    "subject": {
-      "$ref": "jdFtv6DGtroqVatkuk8ipQtGFLMzfSuVek97sB0uauQ"
-    }
-  },
-  "required": ["issuer", "subject"],
-  "type": "object"
-};
-function validate54(data, {
-  instancePath = "",
-  parentData,
-  parentDataProperty,
-  rootData = data
-} = {}) {
-  let vErrors = null;
-  let errors = 0;
-  if (data && typeof data == "object" && !Array.isArray(data)) {
-    if (data.issuer === undefined) {
-      const err0 = {
-        instancePath,
-        schemaPath: "#/required",
-        keyword: "required",
-        params: {
-          missingProperty: "issuer"
-        }
-      };
-      if (vErrors === null) {
-        vErrors = [err0];
-      } else {
-        vErrors.push(err0);
-      }
-      errors++;
-    }
-    if (data.subject === undefined) {
-      const err1 = {
-        instancePath,
-        schemaPath: "#/required",
-        keyword: "required",
-        params: {
-          missingProperty: "subject"
-        }
-      };
-      if (vErrors === null) {
-        vErrors = [err1];
-      } else {
-        vErrors.push(err1);
-      }
-      errors++;
-    }
-    if (data.issuer !== undefined) {
-      if (!validate21(data.issuer, {
-        instancePath: instancePath + "/issuer",
-        parentData: data,
-        parentDataProperty: "issuer",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate21.errors : vErrors.concat(validate21.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.subject !== undefined) {
-      if (!validate21(data.subject, {
-        instancePath: instancePath + "/subject",
-        parentData: data,
-        parentDataProperty: "subject",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate21.errors : vErrors.concat(validate21.errors);
-        errors = vErrors.length;
-      }
-    }
-  } else {
-    const err2 = {
-      instancePath,
-      schemaPath: "#/type",
-      keyword: "type",
-      params: {
-        type: "object"
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err2];
-    } else {
-      vErrors.push(err2);
-    }
-    errors++;
-  }
-  validate54.errors = vErrors;
-  return errors === 0;
+errors++;
 }
-function validate53(data, {
-  instancePath = "",
-  parentData,
-  parentDataProperty,
-  rootData = data
-} = {}) {
-  let vErrors = null;
-  let errors = 0;
-  if (!Array.isArray(data) && data !== null) {
-    const err0 = {
-      instancePath,
-      schemaPath: "#/type",
-      keyword: "type",
-      params: {
-        type: "array"
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err0];
-    } else {
-      vErrors.push(err0);
-    }
-    errors++;
-  }
-  if (Array.isArray(data)) {
-    const len0 = data.length;
-    for (let i0 = 0; i0 < len0; i0++) {
-      if (!validate54(data[i0], {
-        instancePath: instancePath + "/" + i0,
-        parentData: data,
-        parentDataProperty: i0,
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate54.errors : vErrors.concat(validate54.errors);
-        errors = vErrors.length;
-      }
-    }
-  }
-  validate53.errors = vErrors;
-  return errors === 0;
+validate19.errors = vErrors;
+return errors === 0;
 }
-const schema25 = {
-  "default": "cosign",
-  "enum": ["cosign", "notation"],
-  "type": "string"
-};
-function validate59(data, {
-  instancePath = "",
-  parentData,
-  parentDataProperty,
-  rootData = data
-} = {}) {
-  let vErrors = null;
-  let errors = 0;
-  if (typeof data !== "string") {
-    const err0 = {
-      instancePath,
-      schemaPath: "#/type",
-      keyword: "type",
-      params: {
-        type: "string"
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err0];
-    } else {
-      vErrors.push(err0);
-    }
-    errors++;
-  }
-  if (!(data === "cosign" || data === "notation")) {
-    const err1 = {
-      instancePath,
-      schemaPath: "#/enum",
-      keyword: "enum",
-      params: {
-        allowedValues: schema25.enum
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err1];
-    } else {
-      vErrors.push(err1);
-    }
-    errors++;
-  }
-  validate59.errors = vErrors;
-  return errors === 0;
+
+const schema13 = {"default":"ChartVersion","enum":["ChartVersion","Revision"],"type":"string","nullable":true};
+
+function validate21(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+if((typeof data !== "string") && (data !== null)){
+const err0 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "string"}};
+if(vErrors === null){
+vErrors = [err0];
 }
-const schema26 = {
-  "properties": {
-    "name": {
-      "$ref": "jdFtv6DGtroqVatkuk8ipQtGFLMzfSuVek97sB0uauQ"
-    }
-  },
-  "required": ["name"],
-  "type": "object",
-  "nullable": true
-};
-function validate61(data, {
-  instancePath = "",
-  parentData,
-  parentDataProperty,
-  rootData = data
-} = {}) {
-  let vErrors = null;
-  let errors = 0;
-  if (!(data && typeof data == "object" && !Array.isArray(data)) && data !== null) {
-    const err0 = {
-      instancePath,
-      schemaPath: "#/type",
-      keyword: "type",
-      params: {
-        type: "object"
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err0];
-    } else {
-      vErrors.push(err0);
-    }
-    errors++;
-  }
-  if (data && typeof data == "object" && !Array.isArray(data)) {
-    if (data.name === undefined) {
-      const err1 = {
-        instancePath,
-        schemaPath: "#/required",
-        keyword: "required",
-        params: {
-          missingProperty: "name"
-        }
-      };
-      if (vErrors === null) {
-        vErrors = [err1];
-      } else {
-        vErrors.push(err1);
-      }
-      errors++;
-    }
-    if (data.name !== undefined) {
-      if (!validate21(data.name, {
-        instancePath: instancePath + "/name",
-        parentData: data,
-        parentDataProperty: "name",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate21.errors : vErrors.concat(validate21.errors);
-        errors = vErrors.length;
-      }
-    }
-  }
-  validate61.errors = vErrors;
-  return errors === 0;
+else {
+vErrors.push(err0);
 }
-function validate52(data, {
-  instancePath = "",
-  parentData,
-  parentDataProperty,
-  rootData = data
-} = {}) {
-  let vErrors = null;
-  let errors = 0;
-  if (!(data && typeof data == "object" && !Array.isArray(data)) && data !== null) {
-    const err0 = {
-      instancePath,
-      schemaPath: "#/type",
-      keyword: "type",
-      params: {
-        type: "object"
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err0];
-    } else {
-      vErrors.push(err0);
-    }
-    errors++;
-  }
-  if (data && typeof data == "object" && !Array.isArray(data)) {
-    if (data.provider === undefined) {
-      const err1 = {
-        instancePath,
-        schemaPath: "#/required",
-        keyword: "required",
-        params: {
-          missingProperty: "provider"
-        }
-      };
-      if (vErrors === null) {
-        vErrors = [err1];
-      } else {
-        vErrors.push(err1);
-      }
-      errors++;
-    }
-    if (data.matchOIDCIdentity !== undefined) {
-      if (!validate53(data.matchOIDCIdentity, {
-        instancePath: instancePath + "/matchOIDCIdentity",
-        parentData: data,
-        parentDataProperty: "matchOIDCIdentity",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate53.errors : vErrors.concat(validate53.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.provider !== undefined) {
-      if (!validate59(data.provider, {
-        instancePath: instancePath + "/provider",
-        parentData: data,
-        parentDataProperty: "provider",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate59.errors : vErrors.concat(validate59.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.secretRef !== undefined) {
-      if (!validate61(data.secretRef, {
-        instancePath: instancePath + "/secretRef",
-        parentData: data,
-        parentDataProperty: "secretRef",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate61.errors : vErrors.concat(validate61.errors);
-        errors = vErrors.length;
-      }
-    }
-  }
-  validate52.errors = vErrors;
-  return errors === 0;
+errors++;
 }
-const schema27 = {
-  "default": "*",
-  "type": "string",
-  "nullable": true
-};
-function validate65(data, {
-  instancePath = "",
-  parentData,
-  parentDataProperty,
-  rootData = data
-} = {}) {
-  let vErrors = null;
-  let errors = 0;
-  if (typeof data !== "string" && data !== null) {
-    const err0 = {
-      instancePath,
-      schemaPath: "#/type",
-      keyword: "type",
-      params: {
-        type: "string"
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err0];
-    } else {
-      vErrors.push(err0);
-    }
-    errors++;
-  }
-  validate65.errors = vErrors;
-  return errors === 0;
+const _errs0 = errors;
+const _errs1 = errors;
+const vSchema0 = schema13.enum;
+if(!((data === "ChartVersion") || (data === "Revision"))){
+const err1 = {instancePath,schemaPath:"#/enum",keyword:"enum",params:{allowedValues: schema13.enum}};
+if(vErrors === null){
+vErrors = [err1];
 }
-function validate37(data, {
-  instancePath = "",
-  parentData,
-  parentDataProperty,
-  rootData = data
-} = {}) {
-  let vErrors = null;
-  let errors = 0;
-  if (!(data && typeof data == "object" && !Array.isArray(data)) && data !== null) {
-    const err0 = {
-      instancePath,
-      schemaPath: "#/type",
-      keyword: "type",
-      params: {
-        type: "object"
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err0];
-    } else {
-      vErrors.push(err0);
-    }
-    errors++;
-  }
-  if (data && typeof data == "object" && !Array.isArray(data)) {
-    if (data.chart === undefined) {
-      const err1 = {
-        instancePath,
-        schemaPath: "#/required",
-        keyword: "required",
-        params: {
-          missingProperty: "chart"
-        }
-      };
-      if (vErrors === null) {
-        vErrors = [err1];
-      } else {
-        vErrors.push(err1);
-      }
-      errors++;
-    }
-    if (data.interval === undefined) {
-      const err2 = {
-        instancePath,
-        schemaPath: "#/required",
-        keyword: "required",
-        params: {
-          missingProperty: "interval"
-        }
-      };
-      if (vErrors === null) {
-        vErrors = [err2];
-      } else {
-        vErrors.push(err2);
-      }
-      errors++;
-    }
-    if (data.sourceRef === undefined) {
-      const err3 = {
-        instancePath,
-        schemaPath: "#/required",
-        keyword: "required",
-        params: {
-          missingProperty: "sourceRef"
-        }
-      };
-      if (vErrors === null) {
-        vErrors = [err3];
-      } else {
-        vErrors.push(err3);
-      }
-      errors++;
-    }
-    if (data.chart !== undefined) {
-      if (!validate21(data.chart, {
-        instancePath: instancePath + "/chart",
-        parentData: data,
-        parentDataProperty: "chart",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate21.errors : vErrors.concat(validate21.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.ignoreMissingValuesFiles !== undefined) {
-      if (!validate22(data.ignoreMissingValuesFiles, {
-        instancePath: instancePath + "/ignoreMissingValuesFiles",
-        parentData: data,
-        parentDataProperty: "ignoreMissingValuesFiles",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate22.errors : vErrors.concat(validate22.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.interval !== undefined) {
-      if (!validate40(data.interval, {
-        instancePath: instancePath + "/interval",
-        parentData: data,
-        parentDataProperty: "interval",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate40.errors : vErrors.concat(validate40.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.reconcileStrategy !== undefined) {
-      if (!validate42(data.reconcileStrategy, {
-        instancePath: instancePath + "/reconcileStrategy",
-        parentData: data,
-        parentDataProperty: "reconcileStrategy",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate42.errors : vErrors.concat(validate42.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.sourceRef !== undefined) {
-      if (!validate44(data.sourceRef, {
-        instancePath: instancePath + "/sourceRef",
-        parentData: data,
-        parentDataProperty: "sourceRef",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate44.errors : vErrors.concat(validate44.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.suspend !== undefined) {
-      if (!validate22(data.suspend, {
-        instancePath: instancePath + "/suspend",
-        parentData: data,
-        parentDataProperty: "suspend",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate22.errors : vErrors.concat(validate22.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.valuesFiles !== undefined) {
-      if (!validate26(data.valuesFiles, {
-        instancePath: instancePath + "/valuesFiles",
-        parentData: data,
-        parentDataProperty: "valuesFiles",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate26.errors : vErrors.concat(validate26.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.verify !== undefined) {
-      if (!validate52(data.verify, {
-        instancePath: instancePath + "/verify",
-        parentData: data,
-        parentDataProperty: "verify",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate52.errors : vErrors.concat(validate52.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.version !== undefined) {
-      if (!validate65(data.version, {
-        instancePath: instancePath + "/version",
-        parentData: data,
-        parentDataProperty: "version",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate65.errors : vErrors.concat(validate65.errors);
-        errors = vErrors.length;
-      }
-    }
-  }
-  validate37.errors = vErrors;
-  return errors === 0;
+else {
+vErrors.push(err1);
 }
-const schema28 = {
-  "default": {
-    "observedGeneration": -1
-  },
-  "properties": {
-    "artifact": {
-      "$ref": "jiHkswxB98ofrpIIPUl3HE3plV5Yqu6vw9maUZo"
-    },
-    "conditions": {
-      "$ref": "zBl6OiSXSxQ6tDeBlQ4suXy9oTADY8BgOSRVMsB44"
-    },
-    "lastHandledReconcileAt": {
-      "$ref": "GlcYMJF0EagTzhTCQIbCB22J377Z87wRm00IC2Ss2g"
-    },
-    "observedChartName": {
-      "$ref": "GlcYMJF0EagTzhTCQIbCB22J377Z87wRm00IC2Ss2g"
-    },
-    "observedGeneration": {
-      "$ref": "NW88HfrvS38u8Yy207QW6S7qFs2gsa0jBgSYGvqPw"
-    },
-    "observedSourceArtifactRevision": {
-      "$ref": "GlcYMJF0EagTzhTCQIbCB22J377Z87wRm00IC2Ss2g"
-    },
-    "observedValuesFiles": {
-      "$ref": "aRQtgAls8PT3219P8mxz6PPEAVWN1SvmCHi6z12UM"
-    },
-    "url": {
-      "$ref": "GlcYMJF0EagTzhTCQIbCB22J377Z87wRm00IC2Ss2g"
-    }
-  },
-  "type": "object",
-  "nullable": true
-};
-const schema29 = {
-  "properties": {
-    "digest": {
-      "$ref": "pGa9qDq5w5PXeR9H6OnMarn1LqGrzl9fCMQkU35V1M"
-    },
-    "lastUpdateTime": {
-      "$ref": "KrhXBWKB1pK8JptMQRXbBg5co4bpZWZnIUkdeEo37wY"
-    },
-    "metadata": {
-      "$ref": "C53Ns4GLXWl74ijREqYSmV6XcmHYHGe7sMKYak37s"
-    },
-    "path": {
-      "$ref": "jdFtv6DGtroqVatkuk8ipQtGFLMzfSuVek97sB0uauQ"
-    },
-    "revision": {
-      "$ref": "jdFtv6DGtroqVatkuk8ipQtGFLMzfSuVek97sB0uauQ"
-    },
-    "size": {
-      "$ref": "NW88HfrvS38u8Yy207QW6S7qFs2gsa0jBgSYGvqPw"
-    },
-    "url": {
-      "$ref": "jdFtv6DGtroqVatkuk8ipQtGFLMzfSuVek97sB0uauQ"
-    }
-  },
-  "required": ["lastUpdateTime", "path", "revision", "url"],
-  "type": "object",
-  "nullable": true
-};
-const schema30 = {
-  "pattern": "^[a-z0-9]+(?:[.+_-][a-z0-9]+)*:[a-zA-Z0-9=_-]+$",
-  "type": "string",
-  "nullable": true
-};
+errors++;
+}
+validate21.errors = vErrors;
+return errors === 0;
+}
+
+const schema14 = {"properties":{"apiVersion":{"$ref":"ldoCEsh0ARg8F2aeji6S38NFl7aLPSuz1hGlgX2tjuQ"},"kind":{"$ref":"5V0QnOenUIHl6nvb8NFKtJlwe4qJPrcEDm2HXmCwpOA"},"name":{"$ref":"sLlNkWhANXZ15lvmcujppy1mXxqn6f-GaeQpWRYm_dw"}},"required":["kind","name"],"type":"object"};
+const schema3 = {"type":"string","nullable":true};
+
+function validate3(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+if((typeof data !== "string") && (data !== null)){
+const err0 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "string"}};
+if(vErrors === null){
+vErrors = [err0];
+}
+else {
+vErrors.push(err0);
+}
+errors++;
+}
+const _errs0 = errors;
+const _errs1 = errors;
+validate3.errors = vErrors;
+return errors === 0;
+}
+
+const schema15 = {"enum":["HelmRepository","GitRepository","Bucket"],"type":"string"};
+
+function validate25(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+if(typeof data !== "string"){
+const err0 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "string"}};
+if(vErrors === null){
+vErrors = [err0];
+}
+else {
+vErrors.push(err0);
+}
+errors++;
+}
+const _errs0 = errors;
+const vSchema0 = schema15.enum;
+if(!(((data === "HelmRepository") || (data === "GitRepository")) || (data === "Bucket"))){
+const err1 = {instancePath,schemaPath:"#/enum",keyword:"enum",params:{allowedValues: schema15.enum}};
+if(vErrors === null){
+vErrors = [err1];
+}
+else {
+vErrors.push(err1);
+}
+errors++;
+}
+validate25.errors = vErrors;
+return errors === 0;
+}
+
+
+function validate23(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+const _errs0 = errors;
+if(data && typeof data == "object" && !Array.isArray(data)){
+if(data.kind === undefined){
+const err0 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "kind"}};
+if(vErrors === null){
+vErrors = [err0];
+}
+else {
+vErrors.push(err0);
+}
+errors++;
+}
+if(data.name === undefined){
+const err1 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "name"}};
+if(vErrors === null){
+vErrors = [err1];
+}
+else {
+vErrors.push(err1);
+}
+errors++;
+}
+if(data.apiVersion !== undefined){
+let data0 = data.apiVersion;
+const _errs1 = errors;
+if(!(validate3(data0, {instancePath:instancePath+"/apiVersion",parentData:data,parentDataProperty:"apiVersion",rootData}))){
+vErrors = vErrors === null ? validate3.errors : vErrors.concat(validate3.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs1 === errors;
+}
+if(data.kind !== undefined){
+let data1 = data.kind;
+const _errs2 = errors;
+if(!(validate25(data1, {instancePath:instancePath+"/kind",parentData:data,parentDataProperty:"kind",rootData}))){
+vErrors = vErrors === null ? validate25.errors : vErrors.concat(validate25.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs2 === errors;
+}
+if(data.name !== undefined){
+let data2 = data.name;
+const _errs3 = errors;
+if(!(validate0(data2, {instancePath:instancePath+"/name",parentData:data,parentDataProperty:"name",rootData}))){
+vErrors = vErrors === null ? validate0.errors : vErrors.concat(validate0.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs3 === errors;
+}
+}
+else {
+const err2 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "object"}};
+if(vErrors === null){
+vErrors = [err2];
+}
+else {
+vErrors.push(err2);
+}
+errors++;
+}
+validate23.errors = vErrors;
+return errors === 0;
+}
+
+const schema5 = {"items":{"$ref":"sLlNkWhANXZ15lvmcujppy1mXxqn6f-GaeQpWRYm_dw"},"type":"array","nullable":true};
+
+function validate5(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+if((!(Array.isArray(data))) && (data !== null)){
+const err0 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "array"}};
+if(vErrors === null){
+vErrors = [err0];
+}
+else {
+vErrors.push(err0);
+}
+errors++;
+}
+const _errs0 = errors;
+const _errs1 = errors;
+if(Array.isArray(data)){
+let valid1 = true;
+const len0 = data.length;
+for(let i0=0; i0<len0; i0++){
+let data0 = data[i0];
+const _errs2 = errors;
+if(!(validate0(data0, {instancePath:instancePath+"/" + i0,parentData:data,parentDataProperty:i0,rootData}))){
+vErrors = vErrors === null ? validate0.errors : vErrors.concat(validate0.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs2 === errors;
+if(!valid0){
+valid1 = false;
+}
+}
+}
+validate5.errors = vErrors;
+return errors === 0;
+}
+
+const schema16 = {"properties":{"matchOIDCIdentity":{"$ref":"QwL_qcW4SiFWkMaGVDzC-I1rdJbDhPQ4cuPeSiRm64Y"},"provider":{"$ref":"TQ6Cg9YL7mzUZwcGmnOgF-VM40YMiThyPFAaE206My4"},"secretRef":{"$ref":"E97dOchMV0AJMEW2BvWE8x-plhaqw9P894BmF33ZGUY"}},"required":["provider"],"type":"object","nullable":true};
+const schema17 = {"items":{"$ref":"UnAbhUgmXpkjcDbhx7YQpJ93wvenThqA130Ti8jADoQ"},"type":"array","nullable":true};
+const schema18 = {"properties":{"issuer":{"$ref":"sLlNkWhANXZ15lvmcujppy1mXxqn6f-GaeQpWRYm_dw"},"subject":{"$ref":"sLlNkWhANXZ15lvmcujppy1mXxqn6f-GaeQpWRYm_dw"}},"required":["issuer","subject"],"type":"object"};
+
+function validate33(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+const _errs0 = errors;
+if(data && typeof data == "object" && !Array.isArray(data)){
+if(data.issuer === undefined){
+const err0 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "issuer"}};
+if(vErrors === null){
+vErrors = [err0];
+}
+else {
+vErrors.push(err0);
+}
+errors++;
+}
+if(data.subject === undefined){
+const err1 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "subject"}};
+if(vErrors === null){
+vErrors = [err1];
+}
+else {
+vErrors.push(err1);
+}
+errors++;
+}
+if(data.issuer !== undefined){
+let data0 = data.issuer;
+const _errs1 = errors;
+if(!(validate0(data0, {instancePath:instancePath+"/issuer",parentData:data,parentDataProperty:"issuer",rootData}))){
+vErrors = vErrors === null ? validate0.errors : vErrors.concat(validate0.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs1 === errors;
+}
+if(data.subject !== undefined){
+let data1 = data.subject;
+const _errs2 = errors;
+if(!(validate0(data1, {instancePath:instancePath+"/subject",parentData:data,parentDataProperty:"subject",rootData}))){
+vErrors = vErrors === null ? validate0.errors : vErrors.concat(validate0.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs2 === errors;
+}
+}
+else {
+const err2 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "object"}};
+if(vErrors === null){
+vErrors = [err2];
+}
+else {
+vErrors.push(err2);
+}
+errors++;
+}
+validate33.errors = vErrors;
+return errors === 0;
+}
+
+
+function validate32(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+if((!(Array.isArray(data))) && (data !== null)){
+const err0 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "array"}};
+if(vErrors === null){
+vErrors = [err0];
+}
+else {
+vErrors.push(err0);
+}
+errors++;
+}
+const _errs0 = errors;
+const _errs1 = errors;
+if(Array.isArray(data)){
+let valid1 = true;
+const len0 = data.length;
+for(let i0=0; i0<len0; i0++){
+let data0 = data[i0];
+const _errs2 = errors;
+if(!(validate33(data0, {instancePath:instancePath+"/" + i0,parentData:data,parentDataProperty:i0,rootData}))){
+vErrors = vErrors === null ? validate33.errors : vErrors.concat(validate33.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs2 === errors;
+if(!valid0){
+valid1 = false;
+}
+}
+}
+validate32.errors = vErrors;
+return errors === 0;
+}
+
+const schema19 = {"default":"cosign","enum":["cosign","notation"],"type":"string"};
+
+function validate38(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+if(typeof data !== "string"){
+const err0 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "string"}};
+if(vErrors === null){
+vErrors = [err0];
+}
+else {
+vErrors.push(err0);
+}
+errors++;
+}
+const _errs0 = errors;
+const vSchema0 = schema19.enum;
+if(!((data === "cosign") || (data === "notation"))){
+const err1 = {instancePath,schemaPath:"#/enum",keyword:"enum",params:{allowedValues: schema19.enum}};
+if(vErrors === null){
+vErrors = [err1];
+}
+else {
+vErrors.push(err1);
+}
+errors++;
+}
+validate38.errors = vErrors;
+return errors === 0;
+}
+
+const schema20 = {"properties":{"name":{"$ref":"sLlNkWhANXZ15lvmcujppy1mXxqn6f-GaeQpWRYm_dw"}},"required":["name"],"type":"object","nullable":true};
+
+function validate40(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+if((!(data && typeof data == "object" && !Array.isArray(data))) && (data !== null)){
+const err0 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "object"}};
+if(vErrors === null){
+vErrors = [err0];
+}
+else {
+vErrors.push(err0);
+}
+errors++;
+}
+const _errs0 = errors;
+const _errs1 = errors;
+if(data && typeof data == "object" && !Array.isArray(data)){
+if(data.name === undefined){
+const err1 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "name"}};
+if(vErrors === null){
+vErrors = [err1];
+}
+else {
+vErrors.push(err1);
+}
+errors++;
+}
+if(data.name !== undefined){
+let data0 = data.name;
+const _errs2 = errors;
+if(!(validate0(data0, {instancePath:instancePath+"/name",parentData:data,parentDataProperty:"name",rootData}))){
+vErrors = vErrors === null ? validate0.errors : vErrors.concat(validate0.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs2 === errors;
+}
+}
+validate40.errors = vErrors;
+return errors === 0;
+}
+
+
+function validate31(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+if((!(data && typeof data == "object" && !Array.isArray(data))) && (data !== null)){
+const err0 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "object"}};
+if(vErrors === null){
+vErrors = [err0];
+}
+else {
+vErrors.push(err0);
+}
+errors++;
+}
+const _errs0 = errors;
+const _errs1 = errors;
+if(data && typeof data == "object" && !Array.isArray(data)){
+if(data.provider === undefined){
+const err1 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "provider"}};
+if(vErrors === null){
+vErrors = [err1];
+}
+else {
+vErrors.push(err1);
+}
+errors++;
+}
+if(data.matchOIDCIdentity !== undefined){
+let data0 = data.matchOIDCIdentity;
+const _errs2 = errors;
+if(!(validate32(data0, {instancePath:instancePath+"/matchOIDCIdentity",parentData:data,parentDataProperty:"matchOIDCIdentity",rootData}))){
+vErrors = vErrors === null ? validate32.errors : vErrors.concat(validate32.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs2 === errors;
+}
+if(data.provider !== undefined){
+let data1 = data.provider;
+const _errs3 = errors;
+if(!(validate38(data1, {instancePath:instancePath+"/provider",parentData:data,parentDataProperty:"provider",rootData}))){
+vErrors = vErrors === null ? validate38.errors : vErrors.concat(validate38.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs3 === errors;
+}
+if(data.secretRef !== undefined){
+let data2 = data.secretRef;
+const _errs4 = errors;
+if(!(validate40(data2, {instancePath:instancePath+"/secretRef",parentData:data,parentDataProperty:"secretRef",rootData}))){
+vErrors = vErrors === null ? validate40.errors : vErrors.concat(validate40.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs4 === errors;
+}
+}
+validate31.errors = vErrors;
+return errors === 0;
+}
+
+const schema21 = {"default":"*","type":"string","nullable":true};
+
+function validate44(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+if((typeof data !== "string") && (data !== null)){
+const err0 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "string"}};
+if(vErrors === null){
+vErrors = [err0];
+}
+else {
+vErrors.push(err0);
+}
+errors++;
+}
+const _errs0 = errors;
+const _errs1 = errors;
+validate44.errors = vErrors;
+return errors === 0;
+}
+
+
+function validate16(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+if((!(data && typeof data == "object" && !Array.isArray(data))) && (data !== null)){
+const err0 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "object"}};
+if(vErrors === null){
+vErrors = [err0];
+}
+else {
+vErrors.push(err0);
+}
+errors++;
+}
+const _errs0 = errors;
+const _errs1 = errors;
+if(data && typeof data == "object" && !Array.isArray(data)){
+if(data.chart === undefined){
+const err1 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "chart"}};
+if(vErrors === null){
+vErrors = [err1];
+}
+else {
+vErrors.push(err1);
+}
+errors++;
+}
+if(data.interval === undefined){
+const err2 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "interval"}};
+if(vErrors === null){
+vErrors = [err2];
+}
+else {
+vErrors.push(err2);
+}
+errors++;
+}
+if(data.sourceRef === undefined){
+const err3 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "sourceRef"}};
+if(vErrors === null){
+vErrors = [err3];
+}
+else {
+vErrors.push(err3);
+}
+errors++;
+}
+if(data.chart !== undefined){
+let data0 = data.chart;
+const _errs2 = errors;
+if(!(validate0(data0, {instancePath:instancePath+"/chart",parentData:data,parentDataProperty:"chart",rootData}))){
+vErrors = vErrors === null ? validate0.errors : vErrors.concat(validate0.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs2 === errors;
+}
+if(data.ignoreMissingValuesFiles !== undefined){
+let data1 = data.ignoreMissingValuesFiles;
+const _errs3 = errors;
+if(!(validate1(data1, {instancePath:instancePath+"/ignoreMissingValuesFiles",parentData:data,parentDataProperty:"ignoreMissingValuesFiles",rootData}))){
+vErrors = vErrors === null ? validate1.errors : vErrors.concat(validate1.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs3 === errors;
+}
+if(data.interval !== undefined){
+let data2 = data.interval;
+const _errs4 = errors;
+if(!(validate19(data2, {instancePath:instancePath+"/interval",parentData:data,parentDataProperty:"interval",rootData}))){
+vErrors = vErrors === null ? validate19.errors : vErrors.concat(validate19.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs4 === errors;
+}
+if(data.reconcileStrategy !== undefined){
+let data3 = data.reconcileStrategy;
+const _errs5 = errors;
+if(!(validate21(data3, {instancePath:instancePath+"/reconcileStrategy",parentData:data,parentDataProperty:"reconcileStrategy",rootData}))){
+vErrors = vErrors === null ? validate21.errors : vErrors.concat(validate21.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs5 === errors;
+}
+if(data.sourceRef !== undefined){
+let data4 = data.sourceRef;
+const _errs6 = errors;
+if(!(validate23(data4, {instancePath:instancePath+"/sourceRef",parentData:data,parentDataProperty:"sourceRef",rootData}))){
+vErrors = vErrors === null ? validate23.errors : vErrors.concat(validate23.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs6 === errors;
+}
+if(data.suspend !== undefined){
+let data5 = data.suspend;
+const _errs7 = errors;
+if(!(validate1(data5, {instancePath:instancePath+"/suspend",parentData:data,parentDataProperty:"suspend",rootData}))){
+vErrors = vErrors === null ? validate1.errors : vErrors.concat(validate1.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs7 === errors;
+}
+if(data.valuesFiles !== undefined){
+let data6 = data.valuesFiles;
+const _errs8 = errors;
+if(!(validate5(data6, {instancePath:instancePath+"/valuesFiles",parentData:data,parentDataProperty:"valuesFiles",rootData}))){
+vErrors = vErrors === null ? validate5.errors : vErrors.concat(validate5.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs8 === errors;
+}
+if(data.verify !== undefined){
+let data7 = data.verify;
+const _errs9 = errors;
+if(!(validate31(data7, {instancePath:instancePath+"/verify",parentData:data,parentDataProperty:"verify",rootData}))){
+vErrors = vErrors === null ? validate31.errors : vErrors.concat(validate31.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs9 === errors;
+}
+if(data.version !== undefined){
+let data8 = data.version;
+const _errs10 = errors;
+if(!(validate44(data8, {instancePath:instancePath+"/version",parentData:data,parentDataProperty:"version",rootData}))){
+vErrors = vErrors === null ? validate44.errors : vErrors.concat(validate44.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs10 === errors;
+}
+}
+validate16.errors = vErrors;
+return errors === 0;
+}
+
+const schema22 = {"default":{"observedGeneration":-1},"properties":{"artifact":{"$ref":"sqstztctM_LP_S8X_S_Lujx8sNL9xovIXify3AZbAL4"},"conditions":{"$ref":"hhAxL57cvApnLYfNWQbGuX0ymd4M4buVmG7H0q63I0w"},"lastHandledReconcileAt":{"$ref":"ldoCEsh0ARg8F2aeji6S38NFl7aLPSuz1hGlgX2tjuQ"},"observedChartName":{"$ref":"ldoCEsh0ARg8F2aeji6S38NFl7aLPSuz1hGlgX2tjuQ"},"observedGeneration":{"$ref":"otlW-2SioSJxw2ZRa8bQrFi14CUkm_yS2tfdShK98Vk"},"observedSourceArtifactRevision":{"$ref":"ldoCEsh0ARg8F2aeji6S38NFl7aLPSuz1hGlgX2tjuQ"},"observedValuesFiles":{"$ref":"uqi-NWpwJAtCtKg340P2GU85hOwdccNKh8Eansj5IGE"},"url":{"$ref":"ldoCEsh0ARg8F2aeji6S38NFl7aLPSuz1hGlgX2tjuQ"}},"type":"object","nullable":true};
+const schema23 = {"properties":{"digest":{"$ref":"SfRU3MVL1wbfCR1JJqPSvJazsW8zLQJ8fL2i2_rCYzQ"},"lastUpdateTime":{"$ref":"nWP098h5Flk6EOMa_OWYW4EnhyCrisyvgJPgk0WtC9c"},"metadata":{"$ref":"HJJzIHbiJa8GGL2u2CTOVy-Hry2MGWIvSIk30RN75wI"},"path":{"$ref":"sLlNkWhANXZ15lvmcujppy1mXxqn6f-GaeQpWRYm_dw"},"revision":{"$ref":"sLlNkWhANXZ15lvmcujppy1mXxqn6f-GaeQpWRYm_dw"},"size":{"$ref":"otlW-2SioSJxw2ZRa8bQrFi14CUkm_yS2tfdShK98Vk"},"url":{"$ref":"sLlNkWhANXZ15lvmcujppy1mXxqn6f-GaeQpWRYm_dw"}},"required":["digest","lastUpdateTime","path","revision","url"],"type":"object","nullable":true};
+const schema24 = {"pattern":"^[a-z0-9]+(?:[.+_-][a-z0-9]+)*:[a-zA-Z0-9=_-]+$","type":"string"};
 const pattern1 = new RegExp("^[a-z0-9]+(?:[.+_-][a-z0-9]+)*:[a-zA-Z0-9=_-]+$", "u");
-function validate70(data, {
-  instancePath = "",
-  parentData,
-  parentDataProperty,
-  rootData = data
-} = {}) {
-  let vErrors = null;
-  let errors = 0;
-  if (typeof data !== "string" && data !== null) {
-    const err0 = {
-      instancePath,
-      schemaPath: "#/type",
-      keyword: "type",
-      params: {
-        type: "string"
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err0];
-    } else {
-      vErrors.push(err0);
-    }
-    errors++;
-  }
-  if (typeof data === "string") {
-    if (!pattern1.test(data)) {
-      const err1 = {
-        instancePath,
-        schemaPath: "#/pattern",
-        keyword: "pattern",
-        params: {
-          pattern: "^[a-z0-9]+(?:[.+_-][a-z0-9]+)*:[a-zA-Z0-9=_-]+$"
-        }
-      };
-      if (vErrors === null) {
-        vErrors = [err1];
-      } else {
-        vErrors.push(err1);
-      }
-      errors++;
-    }
-  }
-  validate70.errors = vErrors;
-  return errors === 0;
+
+function validate49(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+const _errs0 = errors;
+if(typeof data === "string"){
+if(!pattern1.test(data)){
+const err0 = {instancePath,schemaPath:"#/pattern",keyword:"pattern",params:{pattern: "^[a-z0-9]+(?:[.+_-][a-z0-9]+)*:[a-zA-Z0-9=_-]+$"}};
+if(vErrors === null){
+vErrors = [err0];
 }
-const schema8 = {
-  "format": "date-time",
-  "type": "string"
-};
+else {
+vErrors.push(err0);
+}
+errors++;
+}
+}
+else {
+const err1 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "string"}};
+if(vErrors === null){
+vErrors = [err1];
+}
+else {
+vErrors.push(err1);
+}
+errors++;
+}
+validate49.errors = vErrors;
+return errors === 0;
+}
+
+const schema2 = {"format":"date-time","type":"string"};
 const formats0 = formats["date-time"];
-function validate23(data, {
-  instancePath = "",
-  parentData,
-  parentDataProperty,
-  rootData = data
-} = {}) {
-  let vErrors = null;
-  let errors = 0;
-  if (typeof data === "string") {
-    if (!formats0.validate(data)) {
-      const err0 = {
-        instancePath,
-        schemaPath: "#/format",
-        keyword: "format",
-        params: {
-          format: "date-time"
-        }
-      };
-      if (vErrors === null) {
-        vErrors = [err0];
-      } else {
-        vErrors.push(err0);
-      }
-      errors++;
-    }
-  } else {
-    const err1 = {
-      instancePath,
-      schemaPath: "#/type",
-      keyword: "type",
-      params: {
-        type: "string"
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err1];
-    } else {
-      vErrors.push(err1);
-    }
-    errors++;
-  }
-  validate23.errors = vErrors;
-  return errors === 0;
+
+function validate2(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+const _errs0 = errors;
+if((typeof data == "number") && (isFinite(data))){
 }
-const schema31 = {
-  "additionalProperties": {
-    "$ref": "jdFtv6DGtroqVatkuk8ipQtGFLMzfSuVek97sB0uauQ"
-  },
-  "type": "object",
-  "properties": {},
-  "nullable": true
-};
-function validate73(data, {
-  instancePath = "",
-  parentData,
-  parentDataProperty,
-  rootData = data
-} = {}) {
-  let vErrors = null;
-  let errors = 0;
-  if (!(data && typeof data == "object" && !Array.isArray(data)) && data !== null) {
-    const err0 = {
-      instancePath,
-      schemaPath: "#/type",
-      keyword: "type",
-      params: {
-        type: "object"
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err0];
-    } else {
-      vErrors.push(err0);
-    }
-    errors++;
-  }
-  if (data && typeof data == "object" && !Array.isArray(data)) {
-    for (const key0 in data) {
-      if (!validate21(data[key0], {
-        instancePath: instancePath + "/" + key0.replace(/~/g, "~0").replace(/\//g, "~1"),
-        parentData: data,
-        parentDataProperty: key0,
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate21.errors : vErrors.concat(validate21.errors);
-        errors = vErrors.length;
-      }
-    }
-  }
-  validate73.errors = vErrors;
-  return errors === 0;
+if(typeof data === "string"){
+if(!(formats0.validate(data))){
+const err0 = {instancePath,schemaPath:"#/format",keyword:"format",params:{format: "date-time"}};
+if(vErrors === null){
+vErrors = [err0];
 }
-const schema10 = {
-  "format": "int64",
-  "type": "integer",
-  "nullable": true
-};
+else {
+vErrors.push(err0);
+}
+errors++;
+}
+}
+else {
+const err1 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "string"}};
+if(vErrors === null){
+vErrors = [err1];
+}
+else {
+vErrors.push(err1);
+}
+errors++;
+}
+validate2.errors = vErrors;
+return errors === 0;
+}
+
+const schema25 = {"additionalProperties":{"$ref":"sLlNkWhANXZ15lvmcujppy1mXxqn6f-GaeQpWRYm_dw"},"type":"object","properties":{},"nullable":true};
+
+function validate52(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+if((!(data && typeof data == "object" && !Array.isArray(data))) && (data !== null)){
+const err0 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "object"}};
+if(vErrors === null){
+vErrors = [err0];
+}
+else {
+vErrors.push(err0);
+}
+errors++;
+}
+const _errs0 = errors;
+const _errs1 = errors;
+if(data && typeof data == "object" && !Array.isArray(data)){
+const _errs2 = errors;
+for(const key0 in data){
+let data0 = data[key0];
+const _errs3 = errors;
+if(!(validate0(data0, {instancePath:instancePath+"/" + key0.replace(/~/g, "~0").replace(/\//g, "~1"),parentData:data,parentDataProperty:key0,rootData}))){
+vErrors = vErrors === null ? validate0.errors : vErrors.concat(validate0.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs3 === errors;
+}
+}
+validate52.errors = vErrors;
+return errors === 0;
+}
+
+const schema4 = {"format":"int64","type":"integer","nullable":true};
 const formats2 = formats.int64;
-function validate25(data, {
-  instancePath = "",
-  parentData,
-  parentDataProperty,
-  rootData = data
-} = {}) {
-  let vErrors = null;
-  let errors = 0;
-  if (!(typeof data == "number" && !(data % 1) && !isNaN(data) && isFinite(data)) && data !== null) {
-    const err0 = {
-      instancePath,
-      schemaPath: "#/type",
-      keyword: "type",
-      params: {
-        type: "integer"
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err0];
-    } else {
-      vErrors.push(err0);
-    }
-    errors++;
-  }
-  if (typeof data == "number" && isFinite(data)) {
-    if (!formats2.validate(data)) {
-      const err1 = {
-        instancePath,
-        schemaPath: "#/format",
-        keyword: "format",
-        params: {
-          format: "int64"
-        }
-      };
-      if (vErrors === null) {
-        vErrors = [err1];
-      } else {
-        vErrors.push(err1);
-      }
-      errors++;
-    }
-  }
-  validate25.errors = vErrors;
-  return errors === 0;
+
+function validate4(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+if((!(((typeof data == "number") && (!(data % 1) && !isNaN(data))) && (isFinite(data)))) && (data !== null)){
+const err0 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "integer"}};
+if(vErrors === null){
+vErrors = [err0];
 }
-function validate69(data, {
-  instancePath = "",
-  parentData,
-  parentDataProperty,
-  rootData = data
-} = {}) {
-  let vErrors = null;
-  let errors = 0;
-  if (!(data && typeof data == "object" && !Array.isArray(data)) && data !== null) {
-    const err0 = {
-      instancePath,
-      schemaPath: "#/type",
-      keyword: "type",
-      params: {
-        type: "object"
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err0];
-    } else {
-      vErrors.push(err0);
-    }
-    errors++;
-  }
-  if (data && typeof data == "object" && !Array.isArray(data)) {
-    if (data.lastUpdateTime === undefined) {
-      const err1 = {
-        instancePath,
-        schemaPath: "#/required",
-        keyword: "required",
-        params: {
-          missingProperty: "lastUpdateTime"
-        }
-      };
-      if (vErrors === null) {
-        vErrors = [err1];
-      } else {
-        vErrors.push(err1);
-      }
-      errors++;
-    }
-    if (data.path === undefined) {
-      const err2 = {
-        instancePath,
-        schemaPath: "#/required",
-        keyword: "required",
-        params: {
-          missingProperty: "path"
-        }
-      };
-      if (vErrors === null) {
-        vErrors = [err2];
-      } else {
-        vErrors.push(err2);
-      }
-      errors++;
-    }
-    if (data.revision === undefined) {
-      const err3 = {
-        instancePath,
-        schemaPath: "#/required",
-        keyword: "required",
-        params: {
-          missingProperty: "revision"
-        }
-      };
-      if (vErrors === null) {
-        vErrors = [err3];
-      } else {
-        vErrors.push(err3);
-      }
-      errors++;
-    }
-    if (data.url === undefined) {
-      const err4 = {
-        instancePath,
-        schemaPath: "#/required",
-        keyword: "required",
-        params: {
-          missingProperty: "url"
-        }
-      };
-      if (vErrors === null) {
-        vErrors = [err4];
-      } else {
-        vErrors.push(err4);
-      }
-      errors++;
-    }
-    if (data.digest !== undefined) {
-      if (!validate70(data.digest, {
-        instancePath: instancePath + "/digest",
-        parentData: data,
-        parentDataProperty: "digest",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate70.errors : vErrors.concat(validate70.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.lastUpdateTime !== undefined) {
-      if (!validate23(data.lastUpdateTime, {
-        instancePath: instancePath + "/lastUpdateTime",
-        parentData: data,
-        parentDataProperty: "lastUpdateTime",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate23.errors : vErrors.concat(validate23.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.metadata !== undefined) {
-      if (!validate73(data.metadata, {
-        instancePath: instancePath + "/metadata",
-        parentData: data,
-        parentDataProperty: "metadata",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate73.errors : vErrors.concat(validate73.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.path !== undefined) {
-      if (!validate21(data.path, {
-        instancePath: instancePath + "/path",
-        parentData: data,
-        parentDataProperty: "path",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate21.errors : vErrors.concat(validate21.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.revision !== undefined) {
-      if (!validate21(data.revision, {
-        instancePath: instancePath + "/revision",
-        parentData: data,
-        parentDataProperty: "revision",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate21.errors : vErrors.concat(validate21.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.size !== undefined) {
-      if (!validate25(data.size, {
-        instancePath: instancePath + "/size",
-        parentData: data,
-        parentDataProperty: "size",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate25.errors : vErrors.concat(validate25.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.url !== undefined) {
-      if (!validate21(data.url, {
-        instancePath: instancePath + "/url",
-        parentData: data,
-        parentDataProperty: "url",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate21.errors : vErrors.concat(validate21.errors);
-        errors = vErrors.length;
-      }
-    }
-  }
-  validate69.errors = vErrors;
-  return errors === 0;
+else {
+vErrors.push(err0);
 }
-const schema32 = {
-  "items": {
-    "$ref": "qF2xzAbTxVDKuLvsNu75Dkz2iJf8KcuXclF0tKipnn0"
-  },
-  "type": "array",
-  "nullable": true
-};
-const schema33 = {
-  "properties": {
-    "lastTransitionTime": {
-      "$ref": "KrhXBWKB1pK8JptMQRXbBg5co4bpZWZnIUkdeEo37wY"
-    },
-    "message": {
-      "$ref": "Kduwl8DcA0kMznK9kNMJ5ZDKDZL9GH04F46AbIesag"
-    },
-    "observedGeneration": {
-      "$ref": "Sg5VMnp9PeciTWOOocDxVZ8KL974mKlNPE7Z3LxfFY"
-    },
-    "reason": {
-      "$ref": "ffwvxWNmgAw4j3J98OozNWe0YovCdcCVbNeffpYY"
-    },
-    "status": {
-      "$ref": "pxfc6xQekz8UJRTLhQQLAy8qHcx9lW4EsDEEbdf5fxA"
-    },
-    "type": {
-      "$ref": "abwpMDY1BocHdDN72xQbiDERuNabmToRz3D0GKn0D4"
-    }
-  },
-  "required": ["lastTransitionTime", "message", "reason", "status", "type"],
-  "type": "object"
-};
-const schema34 = {
-  "maxLength": 32768,
-  "type": "string"
-};
-import func2 from "@kubernetes-models/validate/runtime/ucs2length";
-function validate84(data, {
-  instancePath = "",
-  parentData,
-  parentDataProperty,
-  rootData = data
-} = {}) {
-  let vErrors = null;
-  let errors = 0;
-  if (typeof data === "string") {
-    if (func2(data) > 32768) {
-      const err0 = {
-        instancePath,
-        schemaPath: "#/maxLength",
-        keyword: "maxLength",
-        params: {
-          limit: 32768
-        }
-      };
-      if (vErrors === null) {
-        vErrors = [err0];
-      } else {
-        vErrors.push(err0);
-      }
-      errors++;
-    }
-  } else {
-    const err1 = {
-      instancePath,
-      schemaPath: "#/type",
-      keyword: "type",
-      params: {
-        type: "string"
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err1];
-    } else {
-      vErrors.push(err1);
-    }
-    errors++;
-  }
-  validate84.errors = vErrors;
-  return errors === 0;
+errors++;
 }
-const schema35 = {
-  "format": "int64",
-  "type": "integer",
-  "minimum": 0,
-  "nullable": true
-};
-function validate86(data, {
-  instancePath = "",
-  parentData,
-  parentDataProperty,
-  rootData = data
-} = {}) {
-  let vErrors = null;
-  let errors = 0;
-  if (!(typeof data == "number" && !(data % 1) && !isNaN(data) && isFinite(data)) && data !== null) {
-    const err0 = {
-      instancePath,
-      schemaPath: "#/type",
-      keyword: "type",
-      params: {
-        type: "integer"
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err0];
-    } else {
-      vErrors.push(err0);
-    }
-    errors++;
-  }
-  if (typeof data == "number" && isFinite(data)) {
-    if (data < 0 || isNaN(data)) {
-      const err1 = {
-        instancePath,
-        schemaPath: "#/minimum",
-        keyword: "minimum",
-        params: {
-          comparison: ">=",
-          limit: 0
-        }
-      };
-      if (vErrors === null) {
-        vErrors = [err1];
-      } else {
-        vErrors.push(err1);
-      }
-      errors++;
-    }
-    if (!formats2.validate(data)) {
-      const err2 = {
-        instancePath,
-        schemaPath: "#/format",
-        keyword: "format",
-        params: {
-          format: "int64"
-        }
-      };
-      if (vErrors === null) {
-        vErrors = [err2];
-      } else {
-        vErrors.push(err2);
-      }
-      errors++;
-    }
-  }
-  validate86.errors = vErrors;
-  return errors === 0;
+const _errs0 = errors;
+const _errs1 = errors;
+if((typeof data == "number") && (isFinite(data))){
+if(!(formats2.validate(data))){
+const err1 = {instancePath,schemaPath:"#/format",keyword:"format",params:{format: "int64"}};
+if(vErrors === null){
+vErrors = [err1];
 }
-const schema36 = {
-  "maxLength": 1024,
-  "minLength": 1,
-  "pattern": "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$",
-  "type": "string"
-};
+else {
+vErrors.push(err1);
+}
+errors++;
+}
+}
+if(typeof data === "string"){
+}
+validate4.errors = vErrors;
+return errors === 0;
+}
+
+
+function validate48(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+if((!(data && typeof data == "object" && !Array.isArray(data))) && (data !== null)){
+const err0 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "object"}};
+if(vErrors === null){
+vErrors = [err0];
+}
+else {
+vErrors.push(err0);
+}
+errors++;
+}
+const _errs0 = errors;
+const _errs1 = errors;
+if(data && typeof data == "object" && !Array.isArray(data)){
+if(data.digest === undefined){
+const err1 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "digest"}};
+if(vErrors === null){
+vErrors = [err1];
+}
+else {
+vErrors.push(err1);
+}
+errors++;
+}
+if(data.lastUpdateTime === undefined){
+const err2 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "lastUpdateTime"}};
+if(vErrors === null){
+vErrors = [err2];
+}
+else {
+vErrors.push(err2);
+}
+errors++;
+}
+if(data.path === undefined){
+const err3 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "path"}};
+if(vErrors === null){
+vErrors = [err3];
+}
+else {
+vErrors.push(err3);
+}
+errors++;
+}
+if(data.revision === undefined){
+const err4 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "revision"}};
+if(vErrors === null){
+vErrors = [err4];
+}
+else {
+vErrors.push(err4);
+}
+errors++;
+}
+if(data.url === undefined){
+const err5 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "url"}};
+if(vErrors === null){
+vErrors = [err5];
+}
+else {
+vErrors.push(err5);
+}
+errors++;
+}
+if(data.digest !== undefined){
+let data0 = data.digest;
+const _errs2 = errors;
+if(!(validate49(data0, {instancePath:instancePath+"/digest",parentData:data,parentDataProperty:"digest",rootData}))){
+vErrors = vErrors === null ? validate49.errors : vErrors.concat(validate49.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs2 === errors;
+}
+if(data.lastUpdateTime !== undefined){
+let data1 = data.lastUpdateTime;
+const _errs3 = errors;
+if(!(validate2(data1, {instancePath:instancePath+"/lastUpdateTime",parentData:data,parentDataProperty:"lastUpdateTime",rootData}))){
+vErrors = vErrors === null ? validate2.errors : vErrors.concat(validate2.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs3 === errors;
+}
+if(data.metadata !== undefined){
+let data2 = data.metadata;
+const _errs4 = errors;
+if(!(validate52(data2, {instancePath:instancePath+"/metadata",parentData:data,parentDataProperty:"metadata",rootData}))){
+vErrors = vErrors === null ? validate52.errors : vErrors.concat(validate52.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs4 === errors;
+}
+if(data.path !== undefined){
+let data3 = data.path;
+const _errs5 = errors;
+if(!(validate0(data3, {instancePath:instancePath+"/path",parentData:data,parentDataProperty:"path",rootData}))){
+vErrors = vErrors === null ? validate0.errors : vErrors.concat(validate0.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs5 === errors;
+}
+if(data.revision !== undefined){
+let data4 = data.revision;
+const _errs6 = errors;
+if(!(validate0(data4, {instancePath:instancePath+"/revision",parentData:data,parentDataProperty:"revision",rootData}))){
+vErrors = vErrors === null ? validate0.errors : vErrors.concat(validate0.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs6 === errors;
+}
+if(data.size !== undefined){
+let data5 = data.size;
+const _errs7 = errors;
+if(!(validate4(data5, {instancePath:instancePath+"/size",parentData:data,parentDataProperty:"size",rootData}))){
+vErrors = vErrors === null ? validate4.errors : vErrors.concat(validate4.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs7 === errors;
+}
+if(data.url !== undefined){
+let data6 = data.url;
+const _errs8 = errors;
+if(!(validate0(data6, {instancePath:instancePath+"/url",parentData:data,parentDataProperty:"url",rootData}))){
+vErrors = vErrors === null ? validate0.errors : vErrors.concat(validate0.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs8 === errors;
+}
+}
+validate48.errors = vErrors;
+return errors === 0;
+}
+
+const schema26 = {"items":{"$ref":"dZ13d79yfL0AfKGv8XJr0-7aalgpv7dwgkV5EU9HxwM"},"type":"array","nullable":true};
+const schema27 = {"properties":{"lastTransitionTime":{"$ref":"nWP098h5Flk6EOMa_OWYW4EnhyCrisyvgJPgk0WtC9c"},"message":{"$ref":"CG805GD3KzsipQt5EKLOQw9SjU_4PVFnnbOjDh0LzJQ"},"observedGeneration":{"$ref":"Tv0gqme9PlVaT-l831KRjUe4u9reG1m_llVaPqPtqUs"},"reason":{"$ref":"UPBfG4e9zcqG6mx3tN1LWinVzYKOFfIO2VnMgg6lAWI"},"status":{"$ref":"UcCRuQZyUlftnmEwuGDZcciwLAdzzRj4HOLofWAwyW8"},"type":{"$ref":"grctw_GwW6iDVZUzowft1rMz55_d64qiJ_wOfyk2Qoo"}},"required":["lastTransitionTime","message","reason","status","type"],"type":"object"};
+const schema28 = {"maxLength":32768,"type":"string"};
+import func0 from "@glassway/architect/kubernetes/validate/runtime/ucs2length";
+
+function validate63(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+const _errs0 = errors;
+if(typeof data === "string"){
+if(func0(data) > 32768){
+const err0 = {instancePath,schemaPath:"#/maxLength",keyword:"maxLength",params:{limit: 32768}};
+if(vErrors === null){
+vErrors = [err0];
+}
+else {
+vErrors.push(err0);
+}
+errors++;
+}
+}
+else {
+const err1 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "string"}};
+if(vErrors === null){
+vErrors = [err1];
+}
+else {
+vErrors.push(err1);
+}
+errors++;
+}
+validate63.errors = vErrors;
+return errors === 0;
+}
+
+const schema29 = {"format":"int64","type":"integer","minimum":0,"nullable":true};
+
+function validate65(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+if((!(((typeof data == "number") && (!(data % 1) && !isNaN(data))) && (isFinite(data)))) && (data !== null)){
+const err0 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "integer"}};
+if(vErrors === null){
+vErrors = [err0];
+}
+else {
+vErrors.push(err0);
+}
+errors++;
+}
+const _errs0 = errors;
+const _errs1 = errors;
+if((typeof data == "number") && (isFinite(data))){
+if(data < 0 || isNaN(data)){
+const err1 = {instancePath,schemaPath:"#/minimum",keyword:"minimum",params:{comparison: ">=", limit: 0}};
+if(vErrors === null){
+vErrors = [err1];
+}
+else {
+vErrors.push(err1);
+}
+errors++;
+}
+if(!(formats2.validate(data))){
+const err2 = {instancePath,schemaPath:"#/format",keyword:"format",params:{format: "int64"}};
+if(vErrors === null){
+vErrors = [err2];
+}
+else {
+vErrors.push(err2);
+}
+errors++;
+}
+}
+if(typeof data === "string"){
+}
+validate65.errors = vErrors;
+return errors === 0;
+}
+
+const schema30 = {"maxLength":1024,"minLength":1,"pattern":"^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$","type":"string"};
 const pattern2 = new RegExp("^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$", "u");
-function validate88(data, {
-  instancePath = "",
-  parentData,
-  parentDataProperty,
-  rootData = data
-} = {}) {
-  let vErrors = null;
-  let errors = 0;
-  if (typeof data === "string") {
-    if (func2(data) > 1024) {
-      const err0 = {
-        instancePath,
-        schemaPath: "#/maxLength",
-        keyword: "maxLength",
-        params: {
-          limit: 1024
-        }
-      };
-      if (vErrors === null) {
-        vErrors = [err0];
-      } else {
-        vErrors.push(err0);
-      }
-      errors++;
-    }
-    if (func2(data) < 1) {
-      const err1 = {
-        instancePath,
-        schemaPath: "#/minLength",
-        keyword: "minLength",
-        params: {
-          limit: 1
-        }
-      };
-      if (vErrors === null) {
-        vErrors = [err1];
-      } else {
-        vErrors.push(err1);
-      }
-      errors++;
-    }
-    if (!pattern2.test(data)) {
-      const err2 = {
-        instancePath,
-        schemaPath: "#/pattern",
-        keyword: "pattern",
-        params: {
-          pattern: "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$"
-        }
-      };
-      if (vErrors === null) {
-        vErrors = [err2];
-      } else {
-        vErrors.push(err2);
-      }
-      errors++;
-    }
-  } else {
-    const err3 = {
-      instancePath,
-      schemaPath: "#/type",
-      keyword: "type",
-      params: {
-        type: "string"
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err3];
-    } else {
-      vErrors.push(err3);
-    }
-    errors++;
-  }
-  validate88.errors = vErrors;
-  return errors === 0;
+
+function validate67(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+const _errs0 = errors;
+if(typeof data === "string"){
+if(func0(data) > 1024){
+const err0 = {instancePath,schemaPath:"#/maxLength",keyword:"maxLength",params:{limit: 1024}};
+if(vErrors === null){
+vErrors = [err0];
 }
-const schema37 = {
-  "enum": ["True", "False", "Unknown"],
-  "type": "string"
-};
-function validate90(data, {
-  instancePath = "",
-  parentData,
-  parentDataProperty,
-  rootData = data
-} = {}) {
-  let vErrors = null;
-  let errors = 0;
-  if (typeof data !== "string") {
-    const err0 = {
-      instancePath,
-      schemaPath: "#/type",
-      keyword: "type",
-      params: {
-        type: "string"
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err0];
-    } else {
-      vErrors.push(err0);
-    }
-    errors++;
-  }
-  if (!(data === "True" || data === "False" || data === "Unknown")) {
-    const err1 = {
-      instancePath,
-      schemaPath: "#/enum",
-      keyword: "enum",
-      params: {
-        allowedValues: schema37.enum
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err1];
-    } else {
-      vErrors.push(err1);
-    }
-    errors++;
-  }
-  validate90.errors = vErrors;
-  return errors === 0;
+else {
+vErrors.push(err0);
 }
-const schema38 = {
-  "maxLength": 316,
-  "pattern": "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$",
-  "type": "string"
-};
+errors++;
+}
+if(func0(data) < 1){
+const err1 = {instancePath,schemaPath:"#/minLength",keyword:"minLength",params:{limit: 1}};
+if(vErrors === null){
+vErrors = [err1];
+}
+else {
+vErrors.push(err1);
+}
+errors++;
+}
+if(!pattern2.test(data)){
+const err2 = {instancePath,schemaPath:"#/pattern",keyword:"pattern",params:{pattern: "^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$"}};
+if(vErrors === null){
+vErrors = [err2];
+}
+else {
+vErrors.push(err2);
+}
+errors++;
+}
+}
+else {
+const err3 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "string"}};
+if(vErrors === null){
+vErrors = [err3];
+}
+else {
+vErrors.push(err3);
+}
+errors++;
+}
+validate67.errors = vErrors;
+return errors === 0;
+}
+
+const schema31 = {"enum":["True","False","Unknown"],"type":"string"};
+
+function validate69(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+if(typeof data !== "string"){
+const err0 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "string"}};
+if(vErrors === null){
+vErrors = [err0];
+}
+else {
+vErrors.push(err0);
+}
+errors++;
+}
+const _errs0 = errors;
+const vSchema0 = schema31.enum;
+if(!(((data === "True") || (data === "False")) || (data === "Unknown"))){
+const err1 = {instancePath,schemaPath:"#/enum",keyword:"enum",params:{allowedValues: schema31.enum}};
+if(vErrors === null){
+vErrors = [err1];
+}
+else {
+vErrors.push(err1);
+}
+errors++;
+}
+validate69.errors = vErrors;
+return errors === 0;
+}
+
+const schema32 = {"maxLength":316,"pattern":"^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$","type":"string"};
 const pattern3 = new RegExp("^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$", "u");
-function validate92(data, {
-  instancePath = "",
-  parentData,
-  parentDataProperty,
-  rootData = data
-} = {}) {
-  let vErrors = null;
-  let errors = 0;
-  if (typeof data === "string") {
-    if (func2(data) > 316) {
-      const err0 = {
-        instancePath,
-        schemaPath: "#/maxLength",
-        keyword: "maxLength",
-        params: {
-          limit: 316
-        }
-      };
-      if (vErrors === null) {
-        vErrors = [err0];
-      } else {
-        vErrors.push(err0);
-      }
-      errors++;
-    }
-    if (!pattern3.test(data)) {
-      const err1 = {
-        instancePath,
-        schemaPath: "#/pattern",
-        keyword: "pattern",
-        params: {
-          pattern: "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$"
-        }
-      };
-      if (vErrors === null) {
-        vErrors = [err1];
-      } else {
-        vErrors.push(err1);
-      }
-      errors++;
-    }
-  } else {
-    const err2 = {
-      instancePath,
-      schemaPath: "#/type",
-      keyword: "type",
-      params: {
-        type: "string"
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err2];
-    } else {
-      vErrors.push(err2);
-    }
-    errors++;
-  }
-  validate92.errors = vErrors;
-  return errors === 0;
+
+function validate71(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+const _errs0 = errors;
+if(typeof data === "string"){
+if(func0(data) > 316){
+const err0 = {instancePath,schemaPath:"#/maxLength",keyword:"maxLength",params:{limit: 316}};
+if(vErrors === null){
+vErrors = [err0];
 }
-function validate82(data, {
-  instancePath = "",
-  parentData,
-  parentDataProperty,
-  rootData = data
-} = {}) {
-  let vErrors = null;
-  let errors = 0;
-  if (data && typeof data == "object" && !Array.isArray(data)) {
-    if (data.lastTransitionTime === undefined) {
-      const err0 = {
-        instancePath,
-        schemaPath: "#/required",
-        keyword: "required",
-        params: {
-          missingProperty: "lastTransitionTime"
-        }
-      };
-      if (vErrors === null) {
-        vErrors = [err0];
-      } else {
-        vErrors.push(err0);
-      }
-      errors++;
-    }
-    if (data.message === undefined) {
-      const err1 = {
-        instancePath,
-        schemaPath: "#/required",
-        keyword: "required",
-        params: {
-          missingProperty: "message"
-        }
-      };
-      if (vErrors === null) {
-        vErrors = [err1];
-      } else {
-        vErrors.push(err1);
-      }
-      errors++;
-    }
-    if (data.reason === undefined) {
-      const err2 = {
-        instancePath,
-        schemaPath: "#/required",
-        keyword: "required",
-        params: {
-          missingProperty: "reason"
-        }
-      };
-      if (vErrors === null) {
-        vErrors = [err2];
-      } else {
-        vErrors.push(err2);
-      }
-      errors++;
-    }
-    if (data.status === undefined) {
-      const err3 = {
-        instancePath,
-        schemaPath: "#/required",
-        keyword: "required",
-        params: {
-          missingProperty: "status"
-        }
-      };
-      if (vErrors === null) {
-        vErrors = [err3];
-      } else {
-        vErrors.push(err3);
-      }
-      errors++;
-    }
-    if (data.type === undefined) {
-      const err4 = {
-        instancePath,
-        schemaPath: "#/required",
-        keyword: "required",
-        params: {
-          missingProperty: "type"
-        }
-      };
-      if (vErrors === null) {
-        vErrors = [err4];
-      } else {
-        vErrors.push(err4);
-      }
-      errors++;
-    }
-    if (data.lastTransitionTime !== undefined) {
-      if (!validate23(data.lastTransitionTime, {
-        instancePath: instancePath + "/lastTransitionTime",
-        parentData: data,
-        parentDataProperty: "lastTransitionTime",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate23.errors : vErrors.concat(validate23.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.message !== undefined) {
-      if (!validate84(data.message, {
-        instancePath: instancePath + "/message",
-        parentData: data,
-        parentDataProperty: "message",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate84.errors : vErrors.concat(validate84.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.observedGeneration !== undefined) {
-      if (!validate86(data.observedGeneration, {
-        instancePath: instancePath + "/observedGeneration",
-        parentData: data,
-        parentDataProperty: "observedGeneration",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate86.errors : vErrors.concat(validate86.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.reason !== undefined) {
-      if (!validate88(data.reason, {
-        instancePath: instancePath + "/reason",
-        parentData: data,
-        parentDataProperty: "reason",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate88.errors : vErrors.concat(validate88.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.status !== undefined) {
-      if (!validate90(data.status, {
-        instancePath: instancePath + "/status",
-        parentData: data,
-        parentDataProperty: "status",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate90.errors : vErrors.concat(validate90.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.type !== undefined) {
-      if (!validate92(data.type, {
-        instancePath: instancePath + "/type",
-        parentData: data,
-        parentDataProperty: "type",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate92.errors : vErrors.concat(validate92.errors);
-        errors = vErrors.length;
-      }
-    }
-  } else {
-    const err5 = {
-      instancePath,
-      schemaPath: "#/type",
-      keyword: "type",
-      params: {
-        type: "object"
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err5];
-    } else {
-      vErrors.push(err5);
-    }
-    errors++;
-  }
-  validate82.errors = vErrors;
-  return errors === 0;
+else {
+vErrors.push(err0);
 }
-function validate81(data, {
-  instancePath = "",
-  parentData,
-  parentDataProperty,
-  rootData = data
-} = {}) {
-  let vErrors = null;
-  let errors = 0;
-  if (!Array.isArray(data) && data !== null) {
-    const err0 = {
-      instancePath,
-      schemaPath: "#/type",
-      keyword: "type",
-      params: {
-        type: "array"
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err0];
-    } else {
-      vErrors.push(err0);
-    }
-    errors++;
-  }
-  if (Array.isArray(data)) {
-    const len0 = data.length;
-    for (let i0 = 0; i0 < len0; i0++) {
-      if (!validate82(data[i0], {
-        instancePath: instancePath + "/" + i0,
-        parentData: data,
-        parentDataProperty: i0,
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate82.errors : vErrors.concat(validate82.errors);
-        errors = vErrors.length;
-      }
-    }
-  }
-  validate81.errors = vErrors;
-  return errors === 0;
+errors++;
 }
-function validate68(data, {
-  instancePath = "",
-  parentData,
-  parentDataProperty,
-  rootData = data
-} = {}) {
-  let vErrors = null;
-  let errors = 0;
-  if (!(data && typeof data == "object" && !Array.isArray(data)) && data !== null) {
-    const err0 = {
-      instancePath,
-      schemaPath: "#/type",
-      keyword: "type",
-      params: {
-        type: "object"
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err0];
-    } else {
-      vErrors.push(err0);
-    }
-    errors++;
-  }
-  if (data && typeof data == "object" && !Array.isArray(data)) {
-    if (data.artifact !== undefined) {
-      if (!validate69(data.artifact, {
-        instancePath: instancePath + "/artifact",
-        parentData: data,
-        parentDataProperty: "artifact",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate69.errors : vErrors.concat(validate69.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.conditions !== undefined) {
-      if (!validate81(data.conditions, {
-        instancePath: instancePath + "/conditions",
-        parentData: data,
-        parentDataProperty: "conditions",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate81.errors : vErrors.concat(validate81.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.lastHandledReconcileAt !== undefined) {
-      if (!validate24(data.lastHandledReconcileAt, {
-        instancePath: instancePath + "/lastHandledReconcileAt",
-        parentData: data,
-        parentDataProperty: "lastHandledReconcileAt",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate24.errors : vErrors.concat(validate24.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.observedChartName !== undefined) {
-      if (!validate24(data.observedChartName, {
-        instancePath: instancePath + "/observedChartName",
-        parentData: data,
-        parentDataProperty: "observedChartName",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate24.errors : vErrors.concat(validate24.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.observedGeneration !== undefined) {
-      if (!validate25(data.observedGeneration, {
-        instancePath: instancePath + "/observedGeneration",
-        parentData: data,
-        parentDataProperty: "observedGeneration",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate25.errors : vErrors.concat(validate25.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.observedSourceArtifactRevision !== undefined) {
-      if (!validate24(data.observedSourceArtifactRevision, {
-        instancePath: instancePath + "/observedSourceArtifactRevision",
-        parentData: data,
-        parentDataProperty: "observedSourceArtifactRevision",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate24.errors : vErrors.concat(validate24.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.observedValuesFiles !== undefined) {
-      if (!validate26(data.observedValuesFiles, {
-        instancePath: instancePath + "/observedValuesFiles",
-        parentData: data,
-        parentDataProperty: "observedValuesFiles",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate26.errors : vErrors.concat(validate26.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.url !== undefined) {
-      if (!validate24(data.url, {
-        instancePath: instancePath + "/url",
-        parentData: data,
-        parentDataProperty: "url",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate24.errors : vErrors.concat(validate24.errors);
-        errors = vErrors.length;
-      }
-    }
-  }
-  validate68.errors = vErrors;
-  return errors === 0;
+if(!pattern3.test(data)){
+const err1 = {instancePath,schemaPath:"#/pattern",keyword:"pattern",params:{pattern: "^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$"}};
+if(vErrors === null){
+vErrors = [err1];
 }
-function validate28(data, {
-  instancePath = "",
-  parentData,
-  parentDataProperty,
-  rootData = data
-} = {}) {
-  /*# sourceURL="source.toolkit.fluxcd.io.v1.HelmChart" */;
-  let vErrors = null;
-  let errors = 0;
-  if (data && typeof data == "object" && !Array.isArray(data)) {
-    if (data.apiVersion === undefined) {
-      const err0 = {
-        instancePath,
-        schemaPath: "#/required",
-        keyword: "required",
-        params: {
-          missingProperty: "apiVersion"
-        }
-      };
-      if (vErrors === null) {
-        vErrors = [err0];
-      } else {
-        vErrors.push(err0);
-      }
-      errors++;
-    }
-    if (data.kind === undefined) {
-      const err1 = {
-        instancePath,
-        schemaPath: "#/required",
-        keyword: "required",
-        params: {
-          missingProperty: "kind"
-        }
-      };
-      if (vErrors === null) {
-        vErrors = [err1];
-      } else {
-        vErrors.push(err1);
-      }
-      errors++;
-    }
-    if (data.apiVersion !== undefined) {
-      if (!validate29(data.apiVersion, {
-        instancePath: instancePath + "/apiVersion",
-        parentData: data,
-        parentDataProperty: "apiVersion",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate29.errors : vErrors.concat(validate29.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.kind !== undefined) {
-      if (!validate31(data.kind, {
-        instancePath: instancePath + "/kind",
-        parentData: data,
-        parentDataProperty: "kind",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate31.errors : vErrors.concat(validate31.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.metadata !== undefined) {
-      if (!validate33(data.metadata, {
-        instancePath: instancePath + "/metadata",
-        parentData: data,
-        parentDataProperty: "metadata",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate33.errors : vErrors.concat(validate33.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.spec !== undefined) {
-      if (!validate37(data.spec, {
-        instancePath: instancePath + "/spec",
-        parentData: data,
-        parentDataProperty: "spec",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate37.errors : vErrors.concat(validate37.errors);
-        errors = vErrors.length;
-      }
-    }
-    if (data.status !== undefined) {
-      if (!validate68(data.status, {
-        instancePath: instancePath + "/status",
-        parentData: data,
-        parentDataProperty: "status",
-        rootData
-      })) {
-        vErrors = vErrors === null ? validate68.errors : vErrors.concat(validate68.errors);
-        errors = vErrors.length;
-      }
-    }
-  } else {
-    const err2 = {
-      instancePath,
-      schemaPath: "#/type",
-      keyword: "type",
-      params: {
-        type: "object"
-      }
-    };
-    if (vErrors === null) {
-      vErrors = [err2];
-    } else {
-      vErrors.push(err2);
-    }
-    errors++;
-  }
-  validate28.errors = vErrors;
-  return errors === 0;
+else {
+vErrors.push(err1);
+}
+errors++;
+}
+}
+else {
+const err2 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "string"}};
+if(vErrors === null){
+vErrors = [err2];
+}
+else {
+vErrors.push(err2);
+}
+errors++;
+}
+validate71.errors = vErrors;
+return errors === 0;
+}
+
+
+function validate61(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+const _errs0 = errors;
+if(data && typeof data == "object" && !Array.isArray(data)){
+if(data.lastTransitionTime === undefined){
+const err0 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "lastTransitionTime"}};
+if(vErrors === null){
+vErrors = [err0];
+}
+else {
+vErrors.push(err0);
+}
+errors++;
+}
+if(data.message === undefined){
+const err1 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "message"}};
+if(vErrors === null){
+vErrors = [err1];
+}
+else {
+vErrors.push(err1);
+}
+errors++;
+}
+if(data.reason === undefined){
+const err2 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "reason"}};
+if(vErrors === null){
+vErrors = [err2];
+}
+else {
+vErrors.push(err2);
+}
+errors++;
+}
+if(data.status === undefined){
+const err3 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "status"}};
+if(vErrors === null){
+vErrors = [err3];
+}
+else {
+vErrors.push(err3);
+}
+errors++;
+}
+if(data.type === undefined){
+const err4 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "type"}};
+if(vErrors === null){
+vErrors = [err4];
+}
+else {
+vErrors.push(err4);
+}
+errors++;
+}
+if(data.lastTransitionTime !== undefined){
+let data0 = data.lastTransitionTime;
+const _errs1 = errors;
+if(!(validate2(data0, {instancePath:instancePath+"/lastTransitionTime",parentData:data,parentDataProperty:"lastTransitionTime",rootData}))){
+vErrors = vErrors === null ? validate2.errors : vErrors.concat(validate2.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs1 === errors;
+}
+if(data.message !== undefined){
+let data1 = data.message;
+const _errs2 = errors;
+if(!(validate63(data1, {instancePath:instancePath+"/message",parentData:data,parentDataProperty:"message",rootData}))){
+vErrors = vErrors === null ? validate63.errors : vErrors.concat(validate63.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs2 === errors;
+}
+if(data.observedGeneration !== undefined){
+let data2 = data.observedGeneration;
+const _errs3 = errors;
+if(!(validate65(data2, {instancePath:instancePath+"/observedGeneration",parentData:data,parentDataProperty:"observedGeneration",rootData}))){
+vErrors = vErrors === null ? validate65.errors : vErrors.concat(validate65.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs3 === errors;
+}
+if(data.reason !== undefined){
+let data3 = data.reason;
+const _errs4 = errors;
+if(!(validate67(data3, {instancePath:instancePath+"/reason",parentData:data,parentDataProperty:"reason",rootData}))){
+vErrors = vErrors === null ? validate67.errors : vErrors.concat(validate67.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs4 === errors;
+}
+if(data.status !== undefined){
+let data4 = data.status;
+const _errs5 = errors;
+if(!(validate69(data4, {instancePath:instancePath+"/status",parentData:data,parentDataProperty:"status",rootData}))){
+vErrors = vErrors === null ? validate69.errors : vErrors.concat(validate69.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs5 === errors;
+}
+if(data.type !== undefined){
+let data5 = data.type;
+const _errs6 = errors;
+if(!(validate71(data5, {instancePath:instancePath+"/type",parentData:data,parentDataProperty:"type",rootData}))){
+vErrors = vErrors === null ? validate71.errors : vErrors.concat(validate71.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs6 === errors;
+}
+}
+else {
+const err5 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "object"}};
+if(vErrors === null){
+vErrors = [err5];
+}
+else {
+vErrors.push(err5);
+}
+errors++;
+}
+validate61.errors = vErrors;
+return errors === 0;
+}
+
+
+function validate60(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+if((!(Array.isArray(data))) && (data !== null)){
+const err0 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "array"}};
+if(vErrors === null){
+vErrors = [err0];
+}
+else {
+vErrors.push(err0);
+}
+errors++;
+}
+const _errs0 = errors;
+const _errs1 = errors;
+if(Array.isArray(data)){
+let valid1 = true;
+const len0 = data.length;
+for(let i0=0; i0<len0; i0++){
+let data0 = data[i0];
+const _errs2 = errors;
+if(!(validate61(data0, {instancePath:instancePath+"/" + i0,parentData:data,parentDataProperty:i0,rootData}))){
+vErrors = vErrors === null ? validate61.errors : vErrors.concat(validate61.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs2 === errors;
+if(!valid0){
+valid1 = false;
+}
+}
+}
+validate60.errors = vErrors;
+return errors === 0;
+}
+
+
+function validate47(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+if((!(data && typeof data == "object" && !Array.isArray(data))) && (data !== null)){
+const err0 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "object"}};
+if(vErrors === null){
+vErrors = [err0];
+}
+else {
+vErrors.push(err0);
+}
+errors++;
+}
+const _errs0 = errors;
+const _errs1 = errors;
+if(data && typeof data == "object" && !Array.isArray(data)){
+if(data.artifact !== undefined){
+let data0 = data.artifact;
+const _errs2 = errors;
+if(!(validate48(data0, {instancePath:instancePath+"/artifact",parentData:data,parentDataProperty:"artifact",rootData}))){
+vErrors = vErrors === null ? validate48.errors : vErrors.concat(validate48.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs2 === errors;
+}
+if(data.conditions !== undefined){
+let data1 = data.conditions;
+const _errs3 = errors;
+if(!(validate60(data1, {instancePath:instancePath+"/conditions",parentData:data,parentDataProperty:"conditions",rootData}))){
+vErrors = vErrors === null ? validate60.errors : vErrors.concat(validate60.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs3 === errors;
+}
+if(data.lastHandledReconcileAt !== undefined){
+let data2 = data.lastHandledReconcileAt;
+const _errs4 = errors;
+if(!(validate3(data2, {instancePath:instancePath+"/lastHandledReconcileAt",parentData:data,parentDataProperty:"lastHandledReconcileAt",rootData}))){
+vErrors = vErrors === null ? validate3.errors : vErrors.concat(validate3.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs4 === errors;
+}
+if(data.observedChartName !== undefined){
+let data3 = data.observedChartName;
+const _errs5 = errors;
+if(!(validate3(data3, {instancePath:instancePath+"/observedChartName",parentData:data,parentDataProperty:"observedChartName",rootData}))){
+vErrors = vErrors === null ? validate3.errors : vErrors.concat(validate3.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs5 === errors;
+}
+if(data.observedGeneration !== undefined){
+let data4 = data.observedGeneration;
+const _errs6 = errors;
+if(!(validate4(data4, {instancePath:instancePath+"/observedGeneration",parentData:data,parentDataProperty:"observedGeneration",rootData}))){
+vErrors = vErrors === null ? validate4.errors : vErrors.concat(validate4.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs6 === errors;
+}
+if(data.observedSourceArtifactRevision !== undefined){
+let data5 = data.observedSourceArtifactRevision;
+const _errs7 = errors;
+if(!(validate3(data5, {instancePath:instancePath+"/observedSourceArtifactRevision",parentData:data,parentDataProperty:"observedSourceArtifactRevision",rootData}))){
+vErrors = vErrors === null ? validate3.errors : vErrors.concat(validate3.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs7 === errors;
+}
+if(data.observedValuesFiles !== undefined){
+let data6 = data.observedValuesFiles;
+const _errs8 = errors;
+if(!(validate5(data6, {instancePath:instancePath+"/observedValuesFiles",parentData:data,parentDataProperty:"observedValuesFiles",rootData}))){
+vErrors = vErrors === null ? validate5.errors : vErrors.concat(validate5.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs8 === errors;
+}
+if(data.url !== undefined){
+let data7 = data.url;
+const _errs9 = errors;
+if(!(validate3(data7, {instancePath:instancePath+"/url",parentData:data,parentDataProperty:"url",rootData}))){
+vErrors = vErrors === null ? validate3.errors : vErrors.concat(validate3.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs9 === errors;
+}
+}
+validate47.errors = vErrors;
+return errors === 0;
+}
+
+
+function validate7(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+/*# sourceURL="source.toolkit.fluxcd.io.v1.HelmChart" */;
+let vErrors = null;
+let errors = 0;
+const _errs0 = errors;
+if(data && typeof data == "object" && !Array.isArray(data)){
+if(data.apiVersion === undefined){
+const err0 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "apiVersion"}};
+if(vErrors === null){
+vErrors = [err0];
+}
+else {
+vErrors.push(err0);
+}
+errors++;
+}
+if(data.kind === undefined){
+const err1 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "kind"}};
+if(vErrors === null){
+vErrors = [err1];
+}
+else {
+vErrors.push(err1);
+}
+errors++;
+}
+if(data.apiVersion !== undefined){
+let data0 = data.apiVersion;
+const _errs1 = errors;
+if(!(validate8(data0, {instancePath:instancePath+"/apiVersion",parentData:data,parentDataProperty:"apiVersion",rootData}))){
+vErrors = vErrors === null ? validate8.errors : vErrors.concat(validate8.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs1 === errors;
+}
+if(data.kind !== undefined){
+let data1 = data.kind;
+const _errs2 = errors;
+if(!(validate10(data1, {instancePath:instancePath+"/kind",parentData:data,parentDataProperty:"kind",rootData}))){
+vErrors = vErrors === null ? validate10.errors : vErrors.concat(validate10.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs2 === errors;
+}
+if(data.metadata !== undefined){
+let data2 = data.metadata;
+const _errs3 = errors;
+if(!(validate12(data2, {instancePath:instancePath+"/metadata",parentData:data,parentDataProperty:"metadata",rootData}))){
+vErrors = vErrors === null ? validate12.errors : vErrors.concat(validate12.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs3 === errors;
+}
+if(data.spec !== undefined){
+let data3 = data.spec;
+const _errs4 = errors;
+if(!(validate16(data3, {instancePath:instancePath+"/spec",parentData:data,parentDataProperty:"spec",rootData}))){
+vErrors = vErrors === null ? validate16.errors : vErrors.concat(validate16.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs4 === errors;
+}
+if(data.status !== undefined){
+let data4 = data.status;
+const _errs5 = errors;
+if(!(validate47(data4, {instancePath:instancePath+"/status",parentData:data,parentDataProperty:"status",rootData}))){
+vErrors = vErrors === null ? validate47.errors : vErrors.concat(validate47.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs5 === errors;
+}
+}
+else {
+const err2 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "object"}};
+if(vErrors === null){
+vErrors = [err2];
+}
+else {
+vErrors.push(err2);
+}
+errors++;
+}
+validate7.errors = vErrors;
+return errors === 0;
 }
