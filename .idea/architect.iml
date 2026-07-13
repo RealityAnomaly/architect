@@ -17,6 +17,8 @@
       <excludeFolder url="file://$MODULE_DIR$/../kubernetes/packages/k8s-internal/build" />
       <excludeFolder url="file://$MODULE_DIR$/../kubernetes/packages/k8s-shared/src/generated" />
     </content>
+    <content url="file://$MODULE_DIR$/../kubernetes-models" />
+    <content url="file://$MODULE_DIR$/../kubernetes-types" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>

@@ -6,8 +6,8 @@ import * as kubernetesModels from '@glassway/kubernetes-models';
 
 import { ModuleUtilities } from '../../utils/modules.ts';
 import { TypeUtilities } from '../../utils/types.ts';
-import { Model } from '../../../../kubernetes-types/src/model.ts';
-import { TypeMeta } from '../../../../kubernetes-types/src/meta.ts';
+import { Model } from '@glassway/kubernetes-types';
+import { TypeMeta } from '@glassway/kubernetes-types';
 
 /**
  * Responsible for registering type definitions for the Kubernetes API and CRDs
