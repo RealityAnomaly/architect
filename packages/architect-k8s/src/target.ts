@@ -27,6 +27,7 @@ import { KubeWriter } from './writer.ts';
 import { K8S_PLUGIN_CLASS, K8sPlugin } from './plugin.ts';
 import { KubeContext } from './context.ts';
 import { KubeCRDDependencyGraph } from './crds/graph.ts';
+import { NamespaceDefaults, NamespaceRef } from './types/scn.ts';
 
 export enum KubeTargetOutputFormat {
   SingleFile,
@@ -67,9 +68,9 @@ export class KubeTarget extends Target {
       plugins: {
         kubernetes: {
           ns: {
-            features: 'infra-system',
-            operators: 'operator-system',
-            services: 'services',
+            features: NamespaceDefaults['features'],
+            operators: NamespaceDefaults['operators'],
+            services: NamespaceDefaults['services'],
           },
         },
       },
@@ -136,11 +137,11 @@ export class KubeTarget extends Target {
     context = super.defaultContext(token, context, force);
     if (context.namespace && !force) return context;
 
-    const replacements = {
-      '$features$': this.cluster.ns!.features!,
-      '$services$': this.cluster.ns!.services!,
-      '$operators$': this.cluster.ns!.operators!,
-    };
+    const replacements: Record<string, string> = {};
+    for (const [k, v] of Object.entries(NamespaceRef)) {
+      // @ts-ignore: dynamic lookup of namespace ref
+      replacements[k] = this.cluster.ns![v]!;
+    }
 
     if (!context.namespace || force) {
       const meta = ComponentMetadata.from<KubeComponentModel>(token);

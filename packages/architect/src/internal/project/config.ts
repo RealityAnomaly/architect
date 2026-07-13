@@ -1,3 +1,4 @@
+import * as yaml from '@std/yaml';
 import * as fs from 'node:fs/promises';
 import { Ajv, JSONSchemaType } from 'ajv';
 
@@ -35,7 +36,7 @@ const ProjectConfigSchema: JSONSchemaType<ProjectConfig> = {
 
 export class ProjectConfigLoader {
   public static async save(path: string, config: ProjectConfig): Promise<void> {
-    await fs.writeFile(path, JSON.stringify(config, undefined, 2));
+    await fs.writeFile(path, yaml.stringify(config));
   }
 
   public static validate(
