@@ -8,7 +8,7 @@ import {
   ValidationErrorLevel,
 } from '../../index.ts';
 
-import { Logger } from 'winston';
+import * as logtape from '@logtape/logtape';
 
 export interface ResolvedComponent {
   component: Component;
@@ -118,7 +118,7 @@ export class DependencyGraph {
   /**
    * Logs any global or component-specific validation errors, and returns false if any are fatal
    */
-  public assertValid(logger?: Logger): boolean {
+  public assertValid(logger?: logtape.Logger): boolean {
     if (logger) {
       for (const error of this.errors) {
         error.assert(logger);
@@ -133,17 +133,20 @@ export class DependencyGraph {
 
     const errors = this.countErrors();
 
-    let level = 'info';
+    let error = false;
     let message = 'passed';
     if (errors.errors > 0) {
-      level = 'error';
+      error = true;
       message = 'failed';
     }
 
-    logger?.log(
-      level,
-      `validation ${message} for ${this.target.toString()}: ${errors.errors} errors, ${errors.warnings} warnings, ${errors.messages} messages`,
-    );
+    const line = `validation ${message} for ${this.target.toString()}: ${errors.errors} errors, ${errors.warnings} warnings, ${errors.messages} messages`;
+
+    if (error) {
+      logger?.error(line);
+    } else {
+      logger?.info(line);
+    }
 
     return errors.errors <= 0;
   }

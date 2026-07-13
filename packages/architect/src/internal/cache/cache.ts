@@ -4,16 +4,16 @@ import * as path from 'node:path';
 
 import { HashUtilities, StateProvider } from '../../utils/index.ts';
 import objectHash from 'object-hash';
-import { Logger } from 'winston';
+import * as logtape from '@logtape/logtape';
 
 /**
  * Target cache that caches the result of build inputs
  */
 export class TargetCache {
   readonly dir: string;
-  readonly logger?: Logger;
+  readonly logger?: logtape.Logger;
 
-  constructor(state: StateProvider, logger?: Logger) {
+  constructor(state: StateProvider, logger?: logtape.Logger) {
     this.dir = state.dirs.cache;
     this.logger = logger;
   }
@@ -26,11 +26,11 @@ export class TargetCache {
 
     try {
       await fs.stat(file);
-      this.logger?.silly(
+      this.logger?.trace(
         `cache hit for key ${JSON.stringify(key)} in namespace ${ns}`,
       );
     } catch {
-      this.logger?.silly(
+      this.logger?.trace(
         `cache miss for key ${JSON.stringify(key)} in namespace ${ns}`,
       );
       return null;

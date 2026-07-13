@@ -57,7 +57,7 @@ export class Helm extends Builder {
         params.concat("--values", valuesFile),
         { maxBuffer: undefined },
       );
-      const resources = await this.loader.loadString(buf.stdout);
+      const resources = this.loader.loadString(buf.stdout);
 
       // cache the result from the inputs
       await this.storeCache(hashInput, buf.stdout);
@@ -226,7 +226,7 @@ export class Helm extends Builder {
       try {
         parsed = new semver.SemVer(variant.version, true);
       } catch (exception) {
-        this.logger.silly(
+        this.logger.trace(
           `failed to parse version as semver for chart ${name}: ${exception}`,
         );
         continue;
@@ -259,7 +259,7 @@ export class Helm extends Builder {
       try {
         parsed = new Date(variant.created);
       } catch (exception) {
-        this.logger.silly(
+        this.logger.trace(
           `failed to parse created timestamp for chart ${name}: ${exception}`,
         );
         continue;

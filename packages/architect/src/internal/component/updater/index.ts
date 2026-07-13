@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import { Logger } from 'winston';
+import * as logtape from '@logtape/logtape';
 import { Project } from '../../project/index.ts';
 import { ComponentClass } from '../index.ts';
 import { ComponentModel, ComponentModelFileInstance, ComponentModelUtilities, } from '../model.ts';
@@ -14,7 +14,7 @@ export interface ComponentUpgradeState<
   meta: ComponentMetadata;
   model: TModel;
   file: ComponentModelFileInstance<TModel>;
-  logger: Logger;
+  logger: logtape.Logger;
 }
 
 /**
@@ -22,11 +22,11 @@ export interface ComponentUpgradeState<
  */
 export class Updater {
   private readonly project: Project;
-  private readonly logger: Logger;
+  private readonly logger: logtape.Logger;
 
   constructor(project: Project) {
     this.project = project;
-    this.logger = project.app.logger.child({component: 'updater'});
+    this.logger = logtape.getLogger(['architect', 'updater']);
   }
 
   public async update(components: ComponentClass[], dry: boolean = false) {

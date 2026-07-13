@@ -1,6 +1,6 @@
 import { KubeResourceConstructor } from '../resource.ts';
 import { GVK } from './gvk.ts';
-import { Logger } from 'winston';
+import * as logtape from '@logtape/logtape';
 
 import * as kubernetesModels from '@glassway/kubernetes-models';
 
@@ -13,10 +13,10 @@ import { TypeMeta } from '../../../../kubernetes-types/src/meta.ts';
  * Responsible for registering type definitions for the Kubernetes API and CRDs
  */
 export class KubeTypeRegistry {
-  private logger?: Logger;
+  private logger?: logtape.Logger;
   private data: Record<string, KubeResourceConstructor> = {};
 
-  constructor(logger?: Logger) {
+  constructor(logger?: logtape.Logger) {
     this.logger = logger;
 
     this.appendModule(kubernetesModels);

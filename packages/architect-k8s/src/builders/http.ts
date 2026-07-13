@@ -26,6 +26,6 @@ export class HttpBuilder extends Builder {
     }
 
     const text = await response.text();
-    return await this.loader.loadString(text);
+    return this.loader.loadString(text);
   }
 }

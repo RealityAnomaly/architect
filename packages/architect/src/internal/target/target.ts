@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { Logger } from 'winston';
+import * as logtape from '@logtape/logtape';
 
 import { architectGlasswayNet } from '../../kubernetes/crds/index.ts';
 
@@ -91,7 +91,7 @@ export class Target {
    */
   public async compile(
     params?: TargetResolveParams,
-    logger?: Logger,
+    logger?: logtape.Logger,
     listener?: ICompileListener,
   ): Promise<Result | undefined> {
     listener?.setTotal(this.components.length());
@@ -168,7 +168,7 @@ export class Target {
    */
   public async apply(
     params?: TargetResolveParams,
-    logger?: Logger,
+    logger?: logtape.Logger,
     listener?: ICompileListener,
   ) {
     await this.compile(params, logger, listener);

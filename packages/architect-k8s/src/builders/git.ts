@@ -1,9 +1,10 @@
 import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
+import * as util from 'node:util';
+import { execFile } from 'node:child_process';
 import { KubeResource, walk } from '@glassway/architect';
 
-import * as simpleGit from 'simple-git';
 import { Builder, BuilderParams } from './builder.ts';
 
 export interface GitFetchOptions {
@@ -15,11 +16,8 @@ export interface GitFetchOptions {
  * Fetches a list of resources from a remote Git repository
  */
 export class GitBuilder extends Builder {
-  private readonly instance: simpleGit.SimpleGit;
-
   constructor(params: BuilderParams) {
     super(params, "git");
-    this.instance = simpleGit.simpleGit();
   }
 
   public async fetch(
@@ -35,7 +33,8 @@ export class GitBuilder extends Builder {
     if (options?.extraArgs) params.push(...options.extraArgs);
 
     try {
-      await this.instance.clone(url, tempDir, params);
+      const execFileAsync = util.promisify(execFile);
+      await execFileAsync("git", ["clone", ...params, url, tempDir]);
 
       const paths = options?.paths && options.paths.length > 0
         ? options.paths.map((p) => path.join(tempDir, p))
@@ -46,7 +45,7 @@ export class GitBuilder extends Builder {
         for await (const file of walk(p)) {
           if (!(file.endsWith(".yaml") || file.endsWith(".yml"))) continue;
           const text = await fs.readFile(file, "utf-8");
-          result.push(...await this.loader.loadString(text));
+          result.push(...this.loader.loadString(text));
         }
       }
     } finally {

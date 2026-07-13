@@ -1,10 +1,10 @@
 import * as util from 'node:util';
 
-import { Logger } from 'winston';
+import * as logtape from '@logtape/logtape';
 import { KubeResource, ManifestLoader, TargetCache } from '@glassway/architect';
 
 export interface BuilderParams {
-  logger: Logger;
+  logger: logtape.Logger;
   loader: ManifestLoader;
   cache: TargetCache;
 }
@@ -15,7 +15,7 @@ export interface BuilderParams {
  */
 export abstract class Builder {
   protected readonly key: string;
-  protected readonly logger: Logger;
+  protected readonly logger: logtape.Logger;
   protected readonly loader: ManifestLoader;
   protected readonly cache: TargetCache;
 

@@ -26,7 +26,7 @@ export class Kustomize extends Builder {
       maxBuffer: undefined,
     });
 
-    return await this.loader.loadString(buf.stdout);
+    return this.loader.loadString(buf.stdout);
   }
 
   private buildParams(config: KustomizeOpts, params: string[]) {

@@ -2,7 +2,7 @@ import * as commander from 'commander';
 import 'reflect-metadata';
 
 import { Architect, TargetClass } from './index.ts';
-import { Logger } from 'winston';
+import * as logtape from '@logtape/logtape';
 import Module from 'node:module';
 import { TypeUtilities } from './utils/types.ts';
 import { ModuleUtilities } from './utils/modules.ts';
@@ -47,12 +47,12 @@ export abstract class Plugin {
 
   public readonly name: string;
   public readonly parent: Architect;
-  public readonly logger: Logger;
+  public readonly logger: logtape.Logger;
 
   protected constructor(parent: Architect, name: string) {
     this.name = name;
     this.parent = parent;
-    this.logger = parent.logger.child({ component: `plugin.${name}` });
+    this.logger = logtape.getLogger(['architect', 'plugin', name]);
   }
 
   public abstract get targets(): Record<string, TargetClass>;

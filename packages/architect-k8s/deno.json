@@ -13,10 +13,8 @@
     "lodash": "npm:lodash@^4.18.1",
     "object-hash": "npm:object-hash@^3.0.0",
     "semver": "npm:semver@^7.8.5",
-    "simple-git": "npm:simple-git@^3.36.0",
     "ts-graphviz": "npm:ts-graphviz@^2.1.6",
-    "wildcard-match": "npm:wildcard-match@^5.1.4",
-    "winston": "npm:winston@^3.19.0"
+    "wildcard-match": "npm:wildcard-match@^5.1.4"
   },
   "exports": {
     ".": "./src/index.ts",
