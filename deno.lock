@@ -4,6 +4,8 @@
     "jsr:@deno-library/progress@*": "1.5.1",
     "jsr:@deno-library/progress@^1.5.1": "1.5.1",
     "jsr:@es-toolkit/es-toolkit@^1.49.0": "1.49.0",
+    "jsr:@glassway/kubernetes-models@^1.36.2": "1.36.2",
+    "jsr:@glassway/kubernetes-types@^1.0.1": "1.0.1",
     "jsr:@logtape/logtape@^2.2.3": "2.2.3",
     "jsr:@match/match@0.1": "0.1.0",
     "jsr:@std/assert@^1.0.9": "1.0.11",
@@ -19,7 +21,6 @@
     "npm:@types/object-hash@^3.0.6": "3.0.6",
     "npm:ajv-formats-draft2019@^1.6.1": "1.6.1_ajv@8.20.0",
     "npm:ajv-formats@^3.0.1": "3.0.1_ajv@8.20.0",
-    "npm:ajv-i18n@4.2.0": "4.2.0_ajv@8.20.0",
     "npm:ajv-i18n@^4.2.0": "4.2.0_ajv@8.20.0",
     "npm:ajv@^8.20.0": "8.20.0",
     "npm:appdirsjs@^1.2.7": "1.2.7",
@@ -32,7 +33,6 @@
     "npm:lodash@^4.18.1": "4.18.1",
     "npm:object-hash@3": "3.0.0",
     "npm:ohash@^2.0.11": "2.0.11",
-    "npm:openapi-types@^12.1.3": "12.1.3",
     "npm:reflect-metadata@~0.2.2": "0.2.2",
     "npm:semver@^7.8.5": "7.8.5",
     "npm:ts-graphviz@^2.1.6": "2.1.6",
@@ -48,6 +48,27 @@
     },
     "@es-toolkit/es-toolkit@1.49.0": {
       "integrity": "65c5efb21703a5c7c4367d4428e2495d209804278ae32dd04d7a663a3104a40b"
+    },
+    "@glassway/kubernetes-models@1.36.2": {
+      "integrity": "45da6078ee65b68fa3a473c95a48367d77d1885af964886b9f2068576b5766cc",
+      "dependencies": [
+        "jsr:@es-toolkit/es-toolkit",
+        "jsr:@glassway/kubernetes-types",
+        "jsr:@std/yaml",
+        "npm:ajv",
+        "npm:ohash"
+      ]
+    },
+    "@glassway/kubernetes-types@1.0.1": {
+      "integrity": "0aaffd9a237561307e7680d3319e4e055305ac6a0687164505a1145cb1076a66",
+      "dependencies": [
+        "jsr:@es-toolkit/es-toolkit",
+        "npm:ajv",
+        "npm:ajv-formats",
+        "npm:ajv-formats-draft2019",
+        "npm:ajv-i18n",
+        "npm:is-cidr"
+      ]
     },
     "@logtape/logtape@2.2.3": {
       "integrity": "73911ec91d87bd7367ea5690d1dc438c0c73d27ef5d8d7565644f6bb4fa8be24"
@@ -293,9 +314,6 @@
     "ohash@2.0.11": {
       "integrity": "sha512-RdR9FQrFwNBNXAr4GixM8YaRZRJ5PUWbKYbE5eOsrwAjJW0q2REGcf79oYPsLyskQCZG1PLN+S/K1V00joZAoQ=="
     },
-    "openapi-types@12.1.3": {
-      "integrity": "sha512-N4YtSYJqghVu4iek2ZUvcN/0aqH1kRDuNqzcycDxhOUpg7GdvLa2F3DgS6yBNhInhv2r/6I0Flkn7CqL8+nIcw=="
-    },
     "picomatch@2.3.2": {
       "integrity": "sha512-V7+vQEJ06Z+c5tSye8S+nHUfI51xoXIXjHQ99cQtKUkQqqO1kO/KCJUfZXuB47h/YBlDhah2H3hdUGXn8ie0oA=="
     },
@@ -389,7 +407,8 @@
         "dependencies": [
           "jsr:@deno-library/progress@^1.5.1",
           "jsr:@es-toolkit/es-toolkit@^1.49.0",
-          "jsr:@glassway/kubernetes-models@^1.36.0",
+          "jsr:@glassway/kubernetes-models@^1.36.2",
+          "jsr:@glassway/kubernetes-types@^1.0.1",
           "npm:@types/js-yaml@^4.0.9",
           "npm:@types/lodash@^4.17.24",
           "npm:@types/object-hash@^3.0.6",
@@ -419,23 +438,6 @@
           "npm:semver@^7.8.5",
           "npm:ts-graphviz@^2.1.6",
           "npm:wildcard-match@^5.1.4"
-        ]
-      },
-      "packages/kubernetes-models": {
-        "dependencies": [
-          "jsr:@glassway/kubernetes-types@1",
-          "jsr:@std/yaml@^1.1.2",
-          "npm:ajv@^8.20.0",
-          "npm:openapi-types@^12.1.3"
-        ]
-      },
-      "packages/kubernetes-types": {
-        "dependencies": [
-          "npm:ajv-formats-draft2019@^1.6.1",
-          "npm:ajv-formats@^3.0.1",
-          "npm:ajv-i18n@^4.2.0",
-          "npm:ajv@^8.20.0",
-          "npm:is-cidr@7"
         ]
       }
     }
