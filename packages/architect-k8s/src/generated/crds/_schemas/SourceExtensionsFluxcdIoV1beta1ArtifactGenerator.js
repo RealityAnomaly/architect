@@ -1,4 +1,5 @@
-import { formats } from "@glassway/architect/kubernetes/validate";
+/* @ts-self-types="./SourceExtensionsFluxcdIoV1beta1ArtifactGenerator.d.ts" */
+import { formats } from "@glassway/kubernetes-types/validate";
 export const validate = validate5;
 const schema4 = {"type":"object","properties":{"apiVersion":{"$ref":"nr0SPxWyadIFhvTJWQdew2YvCL2-gYKuqz1gVt30qDQ"},"kind":{"$ref":"lE7yUecsrxz3CIv2u1tBvRsNpA4c_Mml-6ace_jZPYg"},"metadata":{"$ref":"P3srTZpWadQH4s4N9KfJR0iCqydQo9YAz7xMB2qf0GQ"},"spec":{"$ref":"pCB5Asojhnu138L963ddBPeSFAU36Z3RdXB4XdMlU9E"},"status":{"$ref":"W_KjE0eCB7znm--m04tHekoGpNBj9IFF5TJXKXVDy5E"}},"required":["apiVersion","kind"],"$id":"source.extensions.fluxcd.io.v1beta1.ArtifactGenerator"};
 const schema5 = {"type":"string","enum":["source.extensions.fluxcd.io/v1beta1"]};
@@ -66,7 +67,7 @@ return errors === 0;
 const schema7 = {"nullableRef":"io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta#"};
 const schema8 = {};
 
-import { validate as validate11 } from "@glassway/architect/kubernetes/apimachinery/_schemas/ObjectMeta";
+import { validate as validate11 } from "@glassway/kubernetes-models/apimachinery/_schemas/ObjectMeta";
 
 
 function validate10(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
@@ -159,7 +160,7 @@ return errors === 0;
 }
 
 const schema15 = {"maxLength":1024,"minLength":1,"pattern":"^@([a-z0-9]([a-z0-9_-]*[a-z0-9])?)/(.*)$","type":"string"};
-import func0 from "@glassway/architect/kubernetes/validate/runtime/ucs2length";
+import func0 from "@glassway/kubernetes-types/validate/runtime/ucs2length";
 const pattern1 = new RegExp("^@([a-z0-9]([a-z0-9_-]*[a-z0-9])?)/(.*)$", "u");
 
 function validate22(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){

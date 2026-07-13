@@ -1,7 +1,7 @@
-import { IObjectMeta } from "@glassway/architect/kubernetes/apimachinery/apis/meta/v1/ObjectMeta";
-import { Model, ModelData, setValidateFunc } from "@glassway/architect/kubernetes/types/model";
-import { TypeMetaGuard, createTypeMetaGuard } from "@glassway/architect/kubernetes/types/meta";
-import { ValidateFunc } from "@glassway/architect/kubernetes/validate";
+import { IObjectMeta } from "@glassway/kubernetes-models/apimachinery/apis/meta/v1/ObjectMeta";
+import { Model, ModelData, setValidateFunc } from "@glassway/kubernetes-types/model";
+import { TypeMetaGuard, createTypeMetaGuard } from "@glassway/kubernetes-types/meta";
+import { ValidateFunc } from "@glassway/kubernetes-types/validate";
 import { validate } from "../../_schemas/SourceToolkitFluxcdIoV1HelmRepository.js";
 
 /**

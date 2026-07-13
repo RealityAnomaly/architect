@@ -1,4 +1,4 @@
-import { IObjectMeta } from "./apimachinery/apis/meta/v1/ObjectMeta.ts";
+import { IObjectMeta } from "@glassway/kubernetes-models/apimachinery/apis/meta/v1/ObjectMeta";
 import * as toolkit from "@es-toolkit/es-toolkit";
 
 /**

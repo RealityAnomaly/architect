@@ -1,4 +1,4 @@
-import { apiextensionsK8sIo } from '../models/index.ts';
+import { apiextensionsK8sIo } from '@glassway/kubernetes-models';
 import { KubeResource } from '../resource.ts';
 
 /**

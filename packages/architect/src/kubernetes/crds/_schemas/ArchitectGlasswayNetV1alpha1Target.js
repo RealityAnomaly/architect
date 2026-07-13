@@ -1,3 +1,4 @@
+/* @ts-self-types="./ArchitectGlasswayNetV1alpha1Target.d.ts" */
 export const validate = validate3;
 const schema3 = {"type":"object","properties":{"apiVersion":{"$ref":"HcvyTMgw51vgbZ9ry16Kf5jnbh0yNPNerD08c-MShBE"},"kind":{"$ref":"OvKWXaCYvqr2yWY12Y8T1dEHpq_EwFKzHwuOvEcsziw"},"metadata":{"$ref":"yYmnefnmsYn5-MOwxbbM2mBS0bwKIjMQRJHxUmcKHgU"},"spec":{"$ref":"VUanxKplRvZYUrLl_ivJPEc-HJzqOCA4Jhkj4dixK4o"}},"required":["apiVersion","kind","metadata","spec"],"$id":"architect.glassway.net.v1alpha1.Target"};
 const schema4 = {"type":"string","enum":["architect.glassway.net/v1alpha1"]};
@@ -65,7 +66,7 @@ return errors === 0;
 const schema6 = {"$ref":"io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta#"};
 const schema7 = {};
 
-import { validate as validate9 } from "@glassway/architect/kubernetes/apimachinery/_schemas/ObjectMeta";
+import { validate as validate9 } from "@glassway/kubernetes-models/apimachinery/_schemas/ObjectMeta";
 
 
 function validate8(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){

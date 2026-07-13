@@ -1,4 +1,4 @@
-import * as api from './models/index.ts';
+import * as api from '@glassway/kubernetes-models';
 import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';

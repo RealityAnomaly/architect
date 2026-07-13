@@ -17,7 +17,7 @@ import {
   ValidationErrorLevel,
 } from '@glassway/architect';
 
-import * as api from '@glassway/kubernetes-models/models';
+import * as api from '@glassway/kubernetes-models';
 import { Logger } from 'winston';
 
 import { FluxCDController, FluxCDMode } from './apply/flux/index.ts';

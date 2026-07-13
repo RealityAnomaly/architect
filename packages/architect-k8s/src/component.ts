@@ -17,7 +17,7 @@ import {
 } from '@glassway/architect';
 
 import { JSONSchemaType } from 'ajv';
-import * as api from '@glassway/kubernetes-models/models';
+import * as api from '@glassway/kubernetes-models';
 import * as toolkit from '@es-toolkit/es-toolkit';
 import { CNICapability, DNSCapability } from './capabilities/index.ts';
 
