@@ -1,0 +1,39 @@
+import { IIoK8sApiAppsV1RollingUpdateStatefulSetStrategy } from "./RollingUpdateStatefulSetStrategy.ts";
+import { ModelData, Model, setValidateFunc } from "@glassway/architect/kubernetes/types/model";
+import { ValidateFunc } from "@glassway/architect/kubernetes/validate";
+import { validate } from "../../_schemas/IoK8sApiAppsV1StatefulSetUpdateStrategy.js";
+
+/**
+ * StatefulSetUpdateStrategy indicates the strategy that the StatefulSet controller will use to perform updates. It includes any additional parameters necessary to perform the update for the indicated strategy.
+ */
+export interface IStatefulSetUpdateStrategy {
+  /**
+ * RollingUpdate is used to communicate parameters when Type is RollingUpdateStatefulSetStrategyType.
+ */
+"rollingUpdate"?: IIoK8sApiAppsV1RollingUpdateStatefulSetStrategy;
+/**
+ * Type indicates the type of the StatefulSetUpdateStrategy. Default is RollingUpdate.
+ */
+"type"?: string;
+}
+
+/**
+ * StatefulSetUpdateStrategy indicates the strategy that the StatefulSet controller will use to perform updates. It includes any additional parameters necessary to perform the update for the indicated strategy.
+ */
+export class StatefulSetUpdateStrategy extends Model<IStatefulSetUpdateStrategy> implements IStatefulSetUpdateStrategy {
+  "rollingUpdate"?: IIoK8sApiAppsV1RollingUpdateStatefulSetStrategy;
+"type"?: string;
+
+constructor(data?: ModelData<IStatefulSetUpdateStrategy>) {
+  super();
+
+  this.setDefinedProps(data);
+}
+}
+
+setValidateFunc(StatefulSetUpdateStrategy, validate as ValidateFunc<IStatefulSetUpdateStrategy>);
+
+export type {
+  IStatefulSetUpdateStrategy as IIoK8sApiAppsV1StatefulSetUpdateStrategy,
+  StatefulSetUpdateStrategy as IoK8sApiAppsV1StatefulSetUpdateStrategy
+};

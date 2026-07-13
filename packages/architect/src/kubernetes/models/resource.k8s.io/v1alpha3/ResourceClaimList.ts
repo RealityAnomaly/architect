@@ -1,0 +1,53 @@
+import { IIoK8sApiResourceV1alpha3ResourceClaim } from "./ResourceClaim.ts";
+import { IIoK8sApimachineryPkgApisMetaV1ListMeta } from "../../../apimachinery/apis/meta/v1/ListMeta.ts";
+import { ModelData, Model, setValidateFunc } from "@glassway/architect/kubernetes/types/model";
+import { TypeMeta, TypeMetaGuard, createTypeMetaGuard } from "@glassway/architect/kubernetes/types/meta";
+import { ValidateFunc } from "@glassway/architect/kubernetes/validate";
+import { validate } from "../../_schemas/IoK8sApiResourceV1alpha3ResourceClaimList.js";
+
+/**
+ * ResourceClaimList is a collection of claims.
+ */
+export interface IResourceClaimList extends TypeMeta {
+  "apiVersion": "resource.k8s.io/v1alpha3";
+/**
+ * Items is the list of resource claims.
+ */
+"items": Array<IIoK8sApiResourceV1alpha3ResourceClaim>;
+"kind": "ResourceClaimList";
+/**
+ * Standard list metadata
+ */
+"metadata"?: IIoK8sApimachineryPkgApisMetaV1ListMeta;
+}
+
+/**
+ * ResourceClaimList is a collection of claims.
+ */
+export class ResourceClaimList extends Model<IResourceClaimList> implements IResourceClaimList {
+  "apiVersion": IResourceClaimList["apiVersion"];
+"items": Array<IIoK8sApiResourceV1alpha3ResourceClaim>;
+"kind": IResourceClaimList["kind"];
+"metadata"?: IIoK8sApimachineryPkgApisMetaV1ListMeta;
+
+static apiVersion: IResourceClaimList["apiVersion"] = "resource.k8s.io/v1alpha3";
+static kind: IResourceClaimList["kind"] = "ResourceClaimList";
+static is = createTypeMetaGuard<IResourceClaimList>(ResourceClaimList);
+
+constructor(data?: ModelData<IResourceClaimList>) {
+  super();
+
+  this.setDefinedProps({
+    apiVersion: ResourceClaimList.apiVersion,
+    kind: ResourceClaimList.kind,
+    ...data
+  } as IResourceClaimList);
+}
+}
+
+setValidateFunc(ResourceClaimList, validate as ValidateFunc<IResourceClaimList>);
+
+export type {
+  IResourceClaimList as IIoK8sApiResourceV1alpha3ResourceClaimList,
+  ResourceClaimList as IoK8sApiResourceV1alpha3ResourceClaimList
+};

@@ -1,0 +1,33 @@
+import { ModelData, Model, setValidateFunc } from "@glassway/architect/kubernetes/types/model";
+import { ValidateFunc } from "@glassway/architect/kubernetes/validate";
+import { validate } from "../../_schemas/IoK8sApiAutoscalingV1ScaleSpec.js";
+
+/**
+ * ScaleSpec describes the attributes of a scale subresource.
+ */
+export interface IScaleSpec {
+  /**
+ * replicas is the desired number of instances for the scaled object.
+ */
+"replicas"?: number;
+}
+
+/**
+ * ScaleSpec describes the attributes of a scale subresource.
+ */
+export class ScaleSpec extends Model<IScaleSpec> implements IScaleSpec {
+  "replicas"?: number;
+
+constructor(data?: ModelData<IScaleSpec>) {
+  super();
+
+  this.setDefinedProps(data);
+}
+}
+
+setValidateFunc(ScaleSpec, validate as ValidateFunc<IScaleSpec>);
+
+export type {
+  IScaleSpec as IIoK8sApiAutoscalingV1ScaleSpec,
+  ScaleSpec as IoK8sApiAutoscalingV1ScaleSpec
+};
