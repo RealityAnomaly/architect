@@ -22,6 +22,8 @@
     "npm:ajv-i18n@^4.2.0": "4.2.0_ajv@8.20.0",
     "npm:ajv@^8.20.0": "8.20.0",
     "npm:appdirsjs@^1.2.7": "1.2.7",
+    "npm:commander@15": "15.0.0",
+    "npm:commander@15.0.0": "15.0.0",
     "npm:commander@^12.1.0": "12.1.0",
     "npm:fast-glob@^3.3.3": "3.3.3",
     "npm:is-cidr@7": "7.0.0",
@@ -247,6 +249,9 @@
     },
     "commander@12.1.0": {
       "integrity": "sha512-Vw8qHK3bZM9y/P10u3Vib8o/DdkvA2OtPtZvD871QKjy74Wj1WSKFILMPRPSdUSx5RFK1arlJzEtA4PkFgnbuA=="
+    },
+    "commander@15.0.0": {
+      "integrity": "sha512-z67u4ZhzCL/Tydu1lJARtEZYWbWaN7oYLHbsuzocr6y4N6WZAagG3RQ4FW61V1/0+jImpj293XfrcYnd1qxtPg=="
     },
     "commander@2.20.3": {
       "integrity": "sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ=="
@@ -551,6 +556,7 @@
       "jsr:@std/assert@^1.0.9",
       "jsr:@std/streams@^1.1.1",
       "jsr:@std/yaml@^1.1.2",
+      "npm:commander@15",
       "npm:ohash@^2.0.11",
       "npm:re2-wasm@^1.0.2"
     ],
@@ -567,7 +573,6 @@
           "npm:ajv-i18n@^4.2.0",
           "npm:ajv@^8.20.0",
           "npm:appdirsjs@^1.2.7",
-          "npm:commander@^12.1.0",
           "npm:is-cidr@7",
           "npm:js-yaml@^4.3.0",
           "npm:object-hash@3",
