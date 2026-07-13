@@ -1,0 +1,53 @@
+import { IIoK8sApimachineryPkgApisMetaV1ObjectMeta } from "../../../apimachinery/apis/meta/v1/ObjectMeta.ts";
+import { IIoK8sApiAdmissionregistrationV1MutatingAdmissionPolicySpec } from "./MutatingAdmissionPolicySpec.ts";
+import { ModelData, Model, setValidateFunc } from "@glassway/architect/kubernetes/types/model";
+import { TypeMeta, TypeMetaGuard, createTypeMetaGuard } from "@glassway/architect/kubernetes/types/meta";
+import { ValidateFunc } from "@glassway/architect/kubernetes/validate";
+import { validate } from "../../_schemas/IoK8sApiAdmissionregistrationV1MutatingAdmissionPolicy.js";
+
+/**
+ * MutatingAdmissionPolicy describes the definition of an admission mutation policy that mutates the object coming into admission chain.
+ */
+export interface IMutatingAdmissionPolicy extends TypeMeta {
+  "apiVersion": "admissionregistration.k8s.io/v1";
+"kind": "MutatingAdmissionPolicy";
+/**
+ * metadata is the standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata.
+ */
+"metadata"?: IIoK8sApimachineryPkgApisMetaV1ObjectMeta;
+/**
+ * spec defines the desired behavior of the MutatingAdmissionPolicy.
+ */
+"spec"?: IIoK8sApiAdmissionregistrationV1MutatingAdmissionPolicySpec;
+}
+
+/**
+ * MutatingAdmissionPolicy describes the definition of an admission mutation policy that mutates the object coming into admission chain.
+ */
+export class MutatingAdmissionPolicy extends Model<IMutatingAdmissionPolicy> implements IMutatingAdmissionPolicy {
+  "apiVersion": IMutatingAdmissionPolicy["apiVersion"];
+"kind": IMutatingAdmissionPolicy["kind"];
+"metadata"?: IIoK8sApimachineryPkgApisMetaV1ObjectMeta;
+"spec"?: IIoK8sApiAdmissionregistrationV1MutatingAdmissionPolicySpec;
+
+static apiVersion: IMutatingAdmissionPolicy["apiVersion"] = "admissionregistration.k8s.io/v1";
+static kind: IMutatingAdmissionPolicy["kind"] = "MutatingAdmissionPolicy";
+static is = createTypeMetaGuard<IMutatingAdmissionPolicy>(MutatingAdmissionPolicy);
+
+constructor(data?: ModelData<IMutatingAdmissionPolicy>) {
+  super();
+
+  this.setDefinedProps({
+    apiVersion: MutatingAdmissionPolicy.apiVersion,
+    kind: MutatingAdmissionPolicy.kind,
+    ...data
+  } as IMutatingAdmissionPolicy);
+}
+}
+
+setValidateFunc(MutatingAdmissionPolicy, validate as ValidateFunc<IMutatingAdmissionPolicy>);
+
+export type {
+  IMutatingAdmissionPolicy as IIoK8sApiAdmissionregistrationV1MutatingAdmissionPolicy,
+  MutatingAdmissionPolicy as IoK8sApiAdmissionregistrationV1MutatingAdmissionPolicy
+};

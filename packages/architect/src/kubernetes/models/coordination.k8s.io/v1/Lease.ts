@@ -1,0 +1,53 @@
+import { IIoK8sApimachineryPkgApisMetaV1ObjectMeta } from "../../../apimachinery/apis/meta/v1/ObjectMeta.ts";
+import { IIoK8sApiCoordinationV1LeaseSpec } from "./LeaseSpec.ts";
+import { ModelData, Model, setValidateFunc } from "@glassway/architect/kubernetes/types/model";
+import { TypeMeta, TypeMetaGuard, createTypeMetaGuard } from "@glassway/architect/kubernetes/types/meta";
+import { ValidateFunc } from "@glassway/architect/kubernetes/validate";
+import { validate } from "../../_schemas/IoK8sApiCoordinationV1Lease.js";
+
+/**
+ * Lease defines a lease concept.
+ */
+export interface ILease extends TypeMeta {
+  "apiVersion": "coordination.k8s.io/v1";
+"kind": "Lease";
+/**
+ * More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+ */
+"metadata"?: IIoK8sApimachineryPkgApisMetaV1ObjectMeta;
+/**
+ * spec contains the specification of the Lease. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
+ */
+"spec"?: IIoK8sApiCoordinationV1LeaseSpec;
+}
+
+/**
+ * Lease defines a lease concept.
+ */
+export class Lease extends Model<ILease> implements ILease {
+  "apiVersion": ILease["apiVersion"];
+"kind": ILease["kind"];
+"metadata"?: IIoK8sApimachineryPkgApisMetaV1ObjectMeta;
+"spec"?: IIoK8sApiCoordinationV1LeaseSpec;
+
+static apiVersion: ILease["apiVersion"] = "coordination.k8s.io/v1";
+static kind: ILease["kind"] = "Lease";
+static is = createTypeMetaGuard<ILease>(Lease);
+
+constructor(data?: ModelData<ILease>) {
+  super();
+
+  this.setDefinedProps({
+    apiVersion: Lease.apiVersion,
+    kind: Lease.kind,
+    ...data
+  } as ILease);
+}
+}
+
+setValidateFunc(Lease, validate as ValidateFunc<ILease>);
+
+export type {
+  ILease as IIoK8sApiCoordinationV1Lease,
+  Lease as IoK8sApiCoordinationV1Lease
+};

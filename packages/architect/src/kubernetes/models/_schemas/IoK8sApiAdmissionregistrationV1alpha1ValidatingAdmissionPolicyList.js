@@ -1,0 +1,228 @@
+export const validate = validate0;
+const schema0 = {"properties":{"apiVersion":{"$ref":"05facqcL97vWMqb2X_omskOZT4uSCuhksp8wi9P643E"},"items":{"$ref":"XIEiPBXvV3IuZiZb-p5Gyb0Y0MosUvyXJkngD74S3zE"},"kind":{"$ref":"QYAsiZDuGMA3iv2vgvjjeFDRuT_dg4jCW0yRA433oz4"},"metadata":{"$ref":"ltKCbb6Afl8nUl7eHOXxCc7fTyKPDEePIkmfx-Al-5U"}},"type":"object","required":["apiVersion","kind"],"$id":"io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicyList"};
+const schema1 = {"type":"string","enum":["admissionregistration.k8s.io/v1alpha1"]};
+
+function validate1(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+if(typeof data !== "string"){
+const err0 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "string"}};
+if(vErrors === null){
+vErrors = [err0];
+}
+else {
+vErrors.push(err0);
+}
+errors++;
+}
+const _errs0 = errors;
+const vSchema0 = schema1.enum;
+if(!(data === "admissionregistration.k8s.io/v1alpha1")){
+const err1 = {instancePath,schemaPath:"#/enum",keyword:"enum",params:{allowedValues: schema1.enum}};
+if(vErrors === null){
+vErrors = [err1];
+}
+else {
+vErrors.push(err1);
+}
+errors++;
+}
+validate1.errors = vErrors;
+return errors === 0;
+}
+
+const schema2 = {"items":{"$ref":"CapqTHVLIXRs0S3c3PrBjYsHK9fsulvcE4ISoRXjCdk"},"type":"array","nullable":true};
+const schema3 = {"$ref":"io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicy#"};
+const schema4 = {};
+
+import { validate as validate5 } from "./IoK8sApiAdmissionregistrationV1alpha1ValidatingAdmissionPolicy.js";
+
+
+function validate4(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+if(!(validate5(data, {instancePath,parentData,parentDataProperty,rootData}))){
+vErrors = vErrors === null ? validate5.errors : vErrors.concat(validate5.errors);
+errors = vErrors.length;
+}
+else {
+}
+validate4.errors = vErrors;
+return errors === 0;
+}
+
+
+function validate3(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+if((!(Array.isArray(data))) && (data !== null)){
+const err0 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "array"}};
+if(vErrors === null){
+vErrors = [err0];
+}
+else {
+vErrors.push(err0);
+}
+errors++;
+}
+const _errs0 = errors;
+const _errs1 = errors;
+if(Array.isArray(data)){
+let valid1 = true;
+const len0 = data.length;
+for(let i0=0; i0<len0; i0++){
+let data0 = data[i0];
+const _errs2 = errors;
+if(!(validate4(data0, {instancePath:instancePath+"/" + i0,parentData:data,parentDataProperty:i0,rootData}))){
+vErrors = vErrors === null ? validate4.errors : vErrors.concat(validate4.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs2 === errors;
+if(!valid0){
+valid1 = false;
+}
+}
+}
+validate3.errors = vErrors;
+return errors === 0;
+}
+
+const schema5 = {"type":"string","enum":["ValidatingAdmissionPolicyList"]};
+
+function validate9(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+if(typeof data !== "string"){
+const err0 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "string"}};
+if(vErrors === null){
+vErrors = [err0];
+}
+else {
+vErrors.push(err0);
+}
+errors++;
+}
+const _errs0 = errors;
+const vSchema0 = schema5.enum;
+if(!(data === "ValidatingAdmissionPolicyList")){
+const err1 = {instancePath,schemaPath:"#/enum",keyword:"enum",params:{allowedValues: schema5.enum}};
+if(vErrors === null){
+vErrors = [err1];
+}
+else {
+vErrors.push(err1);
+}
+errors++;
+}
+validate9.errors = vErrors;
+return errors === 0;
+}
+
+const schema6 = {"nullableRef":"io.k8s.apimachinery.pkg.apis.meta.v1.ListMeta#"};
+const schema7 = {};
+
+import { validate as validate12 } from "./../../apimachinery/_schemas/IoK8sApimachineryPkgApisMetaV1ListMeta.js";
+
+
+function validate11(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+let vErrors = null;
+let errors = 0;
+if(data !== null){
+if(!(validate12(data, {instancePath,parentData,parentDataProperty,rootData}))){
+vErrors = vErrors === null ? validate12.errors : vErrors.concat(validate12.errors);
+errors = vErrors.length;
+}
+else {
+}
+}
+validate11.errors = vErrors;
+return errors === 0;
+}
+
+
+function validate0(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
+/*# sourceURL="io.k8s.api.admissionregistration.v1alpha1.ValidatingAdmissionPolicyList" */;
+let vErrors = null;
+let errors = 0;
+const _errs0 = errors;
+if(data && typeof data == "object" && !Array.isArray(data)){
+if(data.apiVersion === undefined){
+const err0 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "apiVersion"}};
+if(vErrors === null){
+vErrors = [err0];
+}
+else {
+vErrors.push(err0);
+}
+errors++;
+}
+if(data.kind === undefined){
+const err1 = {instancePath,schemaPath:"#/required",keyword:"required",params:{missingProperty: "kind"}};
+if(vErrors === null){
+vErrors = [err1];
+}
+else {
+vErrors.push(err1);
+}
+errors++;
+}
+if(data.apiVersion !== undefined){
+let data0 = data.apiVersion;
+const _errs1 = errors;
+if(!(validate1(data0, {instancePath:instancePath+"/apiVersion",parentData:data,parentDataProperty:"apiVersion",rootData}))){
+vErrors = vErrors === null ? validate1.errors : vErrors.concat(validate1.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs1 === errors;
+}
+if(data.items !== undefined){
+let data1 = data.items;
+const _errs2 = errors;
+if(!(validate3(data1, {instancePath:instancePath+"/items",parentData:data,parentDataProperty:"items",rootData}))){
+vErrors = vErrors === null ? validate3.errors : vErrors.concat(validate3.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs2 === errors;
+}
+if(data.kind !== undefined){
+let data2 = data.kind;
+const _errs3 = errors;
+if(!(validate9(data2, {instancePath:instancePath+"/kind",parentData:data,parentDataProperty:"kind",rootData}))){
+vErrors = vErrors === null ? validate9.errors : vErrors.concat(validate9.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs3 === errors;
+}
+if(data.metadata !== undefined){
+let data3 = data.metadata;
+const _errs4 = errors;
+if(!(validate11(data3, {instancePath:instancePath+"/metadata",parentData:data,parentDataProperty:"metadata",rootData}))){
+vErrors = vErrors === null ? validate11.errors : vErrors.concat(validate11.errors);
+errors = vErrors.length;
+}
+else {
+}
+var valid0 = _errs4 === errors;
+}
+}
+else {
+const err2 = {instancePath,schemaPath:"#/type",keyword:"type",params:{type: "object"}};
+if(vErrors === null){
+vErrors = [err2];
+}
+else {
+vErrors.push(err2);
+}
+errors++;
+}
+validate0.errors = vErrors;
+return errors === 0;
+}
