@@ -19,7 +19,8 @@
     "winston": "npm:winston@^3.19.0"
   },
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./crds": "./src/generated/crds/index.ts"
   },
   "lint": {
     "include": [

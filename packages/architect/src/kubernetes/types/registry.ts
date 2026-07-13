@@ -6,8 +6,8 @@ import * as kubernetesModels from '../models/index.ts';
 
 import { ModuleUtilities } from '../../utils/modules.ts';
 import { TypeUtilities } from '../../utils/types.ts';
-import { Model } from './model.ts';
-import { TypeMeta } from './meta.ts';
+import { Model } from '../../../../kubernetes-types/src/model.ts';
+import { TypeMeta } from '../../../../kubernetes-types/src/meta.ts';
 
 /**
  * Responsible for registering type definitions for the Kubernetes API and CRDs

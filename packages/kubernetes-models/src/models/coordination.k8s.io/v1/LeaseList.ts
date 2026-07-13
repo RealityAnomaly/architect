@@ -1,0 +1,53 @@
+import { IIoK8sApiCoordinationV1Lease } from "./Lease.ts";
+import { IIoK8sApimachineryPkgApisMetaV1ListMeta } from "../../../apimachinery/apis/meta/v1/ListMeta.ts";
+import { ModelData, Model, setValidateFunc } from "@glassway/kubernetes-types/model";
+import { TypeMeta, TypeMetaGuard, createTypeMetaGuard } from "@glassway/kubernetes-types/meta";
+import { ValidateFunc } from "@glassway/kubernetes-types/validate";
+import { validate } from "../../_schemas/coordination.k8s.io/v1/LeaseList.js";
+
+/**
+ * LeaseList is a list of Lease objects.
+ */
+export interface ILeaseList extends TypeMeta {
+  "apiVersion": "coordination.k8s.io/v1";
+/**
+ * items is a list of schema objects.
+ */
+"items": Array<IIoK8sApiCoordinationV1Lease>;
+"kind": "LeaseList";
+/**
+ * Standard list metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+ */
+"metadata"?: IIoK8sApimachineryPkgApisMetaV1ListMeta;
+}
+
+/**
+ * LeaseList is a list of Lease objects.
+ */
+export class LeaseList extends Model<ILeaseList> implements ILeaseList {
+  "apiVersion": ILeaseList["apiVersion"];
+"items": Array<IIoK8sApiCoordinationV1Lease>;
+"kind": ILeaseList["kind"];
+"metadata"?: IIoK8sApimachineryPkgApisMetaV1ListMeta;
+
+static apiVersion: ILeaseList["apiVersion"] = "coordination.k8s.io/v1";
+static kind: ILeaseList["kind"] = "LeaseList";
+static is: TypeMetaGuard<ILeaseList> = createTypeMetaGuard<ILeaseList>(LeaseList);
+
+constructor(data?: ModelData<ILeaseList>) {
+  super();
+
+  this.setDefinedProps({
+    apiVersion: LeaseList.apiVersion,
+    kind: LeaseList.kind,
+    ...data
+  } as ILeaseList);
+}
+}
+
+setValidateFunc(LeaseList, validate as ValidateFunc<ILeaseList>);
+
+export type {
+  ILeaseList as IIoK8sApiCoordinationV1LeaseList,
+  LeaseList as IoK8sApiCoordinationV1LeaseList
+};

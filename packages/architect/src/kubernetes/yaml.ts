@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import { parseAll } from '@std/yaml';
 
 import { KubeResource, KubeResourceUtilities } from './resource.ts';
-import { GVK, KubeTypeRegistry } from './types/index.ts';
+import { GVK, KubeTypeRegistry } from '../../../kubernetes-types/src/index.ts';
 import { TypeUtilities } from '../utils/types.ts';
 
 export class ManifestLoader {

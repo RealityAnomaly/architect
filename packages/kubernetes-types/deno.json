@@ -1,0 +1,36 @@
+{
+  "imports": {
+    "ajv": "npm:ajv@^8.20.0",
+    "ajv-formats": "npm:ajv-formats@^3.0.1",
+    "ajv-formats-draft2019": "npm:ajv-formats-draft2019@^1.6.1",
+    "ajv-i18n": "npm:ajv-i18n@^4.2.0",
+    "is-cidr": "npm:is-cidr@^7.0.0"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./meta": "./src/meta.ts",
+    "./model": "./src/model.ts",
+    "./validate": "./src/validate/index.ts",
+    "./validate/runtime/equal": "./src/validate/runtime/equal.ts",
+    "./validate/runtime/parseJson": "./src/validate/runtime/parseJson.ts",
+    "./validate/runtime/quote": "./src/validate/runtime/quote.ts",
+    "./validate/runtime/re2": "./src/validate/runtime/re2.ts",
+    "./validate/runtime/timestamp": "./src/validate/runtime/timestamp.ts",
+    "./validate/runtime/ucs2length": "./src/validate/runtime/ucs2length.ts",
+    "./validate/runtime/uri": "./src/validate/runtime/uri.ts",
+    "./validate/runtime/validation_error": "./src/validate/runtime/validation_error.ts"
+  },
+  "lint": {
+    "include": [
+      "src/"
+    ]
+  },
+  "fmt": {
+    "options": {
+      "singleQuote": true
+    }
+  },
+  "license": "GPL-3.0-or-later",
+  "name": "@glassway/kubernetes-types",
+  "version": "1.0.0"
+}

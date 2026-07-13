@@ -10,6 +10,8 @@
       <excludeFolder url="file://$MODULE_DIR$/packages/architect/src/kubernetes/apimachinery" />
       <excludeFolder url="file://$MODULE_DIR$/packages/architect/src/kubernetes/crds" />
       <excludeFolder url="file://$MODULE_DIR$/packages/architect/src/kubernetes/models" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/kubernetes-models/src/apimachinery" />
+      <excludeFolder url="file://$MODULE_DIR$/packages/kubernetes-models/src/models" />
     </content>
     <content url="file://$MODULE_DIR$/../kubernetes">
       <excludeFolder url="file://$MODULE_DIR$/../kubernetes/packages/k8s-internal/build" />

@@ -3,7 +3,7 @@ import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import * as yaml from '@std/yaml';
-import * as crdGenerate from './generate/crd-generate/index.ts'
+import * as crdGenerate from '../../../kubernetes-models/src/generate/crd-generate/index.ts'
 import { ManifestLoader } from './yaml.ts';
 import { walk } from '../utils/files.ts';
 
@@ -66,14 +66,6 @@ export class CRDModelGenerator {
       //   new RegExp('^(export *.*from )"(.*?)"', 'gm'),
       //   '$1"$2.ts"',
       // );
-
-      if (schema) {
-        const name = path.parse(file).name;
-        content = content.replaceAll(
-          "static is = createTypeMetaGuard",
-          `static is: TypeMetaGuard<I${name}> = createTypeMetaGuard`);
-        content = content.replaceAll("setValidateFunc, createTypeMetaGuard", "setValidateFunc, createTypeMetaGuard, TypeMetaGuard");
-      }
 
       await fs.writeFile(file, content);
     }
