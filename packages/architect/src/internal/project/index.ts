@@ -7,6 +7,7 @@ import Module from 'node:module';
 import { Architect } from '../../app.ts';
 import { ProjectConfig, ProjectConfigLoader } from './config.ts';
 import { ProjectUtils } from './utils.ts';
+import * as yaml from '@std/yaml';
 
 export abstract class Project {
   /**
@@ -39,6 +40,15 @@ export abstract class Project {
     };
   }
 
+  public static decorateYaml<T extends object>(
+    text: string,
+  ): (target: T) => void {
+    return (target: T) => {
+      const model = yaml.parse(text) as ProjectConfig;
+      new ProjectMetadata(model).assign(target);
+    };
+  }
+
   public resolveImports(): Project[] {
     return this.app.projectRegistry.resolveAll(this.imports);
   }
@@ -57,7 +67,7 @@ export abstract class Project {
 
       if (!this.root) {
         this.app.logger.error(
-          `couldn't automatically detect the project root. either pass -w, or ensure an architect.json folder is present in a parent folder`,
+          `couldn't automatically detect the project root. either pass -w, or ensure an architect.yaml folder is present in a parent folder`,
         );
         this.app.logger.error(
           `because project root detection failed, actions that write to configuration files will be unavailable`,
@@ -83,7 +93,7 @@ export abstract class Project {
   public async saveConfig() {
     if (!this.root) return;
     await ProjectConfigLoader.save(
-      path.join(this.root, 'architect.json'),
+      path.join(this.root, 'architect.yaml'),
       this.config!,
     );
   }

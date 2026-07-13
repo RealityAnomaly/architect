@@ -6,7 +6,7 @@ export class ProjectUtils {
   ): Promise<string | undefined> {
     const parts = start.split(path.sep);
     while (parts.length > 0) {
-      const fn = path.join(...parts, "architect.json");
+      const fn = path.join(...parts, "architect.yaml");
 
       try {
         const result = await Deno.stat(fn);
