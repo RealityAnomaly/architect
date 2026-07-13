@@ -565,6 +565,7 @@
         "dependencies": [
           "jsr:@deno-library/progress@^1.5.1",
           "jsr:@es-toolkit/es-toolkit@^1.49.0",
+          "jsr:@glassway/kubernetes-models@^1.36.0",
           "npm:@types/js-yaml@^4.0.9",
           "npm:@types/lodash@^4.17.24",
           "npm:@types/object-hash@^3.0.6",

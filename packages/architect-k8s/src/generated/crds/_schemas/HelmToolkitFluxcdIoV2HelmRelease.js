@@ -1,4 +1,5 @@
-import { formats } from "@glassway/architect/kubernetes/validate";
+/* @ts-self-types="./HelmToolkitFluxcdIoV2HelmRelease.d.ts" */
+import { formats } from "@glassway/kubernetes-types/validate";
 export const validate = validate31;
 const schema18 = {"type":"object","properties":{"apiVersion":{"$ref":"Wgi43w9BfvsDf9zsq62ZzQjdd-xk5BcaZmwCFSYojj4"},"kind":{"$ref":"mqWRR4EoDr4i-0EwXbsjLv8vg0Qp9Ujz5w6tH4Y9mmw"},"metadata":{"$ref":"P3srTZpWadQH4s4N9KfJR0iCqydQo9YAz7xMB2qf0GQ"},"spec":{"$ref":"z5bWtchhc0m8YVpOo2Zb67yuInumCskIwt_sgBXVDz0"},"status":{"$ref":"iiwgKi80zAuQFcf1j0uC0W6igatCHyMXPrqd36rAnrY"}},"required":["apiVersion","kind"],"$id":"helm.toolkit.fluxcd.io.v2.HelmRelease"};
 const schema19 = {"type":"string","enum":["helm.toolkit.fluxcd.io/v2"]};
@@ -66,7 +67,7 @@ return errors === 0;
 const schema21 = {"nullableRef":"io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta#"};
 const schema22 = {};
 
-import { validate as validate37 } from "@glassway/architect/kubernetes/apimachinery/_schemas/ObjectMeta";
+import { validate as validate37 } from "@glassway/kubernetes-models/apimachinery/_schemas/ObjectMeta";
 
 
 function validate36(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
@@ -188,7 +189,7 @@ return errors === 0;
 
 const schema25 = {"properties":{"chart":{"$ref":"Rohd5dq27qj2tztTuRaGh8X48XyCl2VBKQt1sfAA6Fg"},"ignoreMissingValuesFiles":{"$ref":"CTX4WtafS9K1Gv7k2X1H0J3M9LziUVVRBMOR0rDDzTk"},"interval":{"$ref":"pBaBQUcJ_4VVd59oMlDSOC0VZvtZV0pop01FX11W3LU"},"reconcileStrategy":{"$ref":"T43tADg444WCCiFJoyY2ieqIXkN9r3gxsSC4aR8L6aQ"},"sourceRef":{"$ref":"6hzt0seTdM0G1dEur1X0Q43_OMgCNt79qzwGWDQ2yIk"},"valuesFiles":{"$ref":"uqi-NWpwJAtCtKg340P2GU85hOwdccNKh8Eansj5IGE"},"verify":{"$ref":"xEVkbItf9TGB_ZixwsEHFTo8N8tuRtqRQIWUCXFdZC8"},"version":{"$ref":"7Ae4kI5YYV9DPpIiILTK1sc5oZLmV0nMffCXZi4qKv8"}},"required":["chart","sourceRef"],"type":"object"};
 const schema26 = {"maxLength":2048,"minLength":1,"type":"string"};
-import func0 from "@glassway/architect/kubernetes/validate/runtime/ucs2length";
+import func0 from "@glassway/kubernetes-types/validate/runtime/ucs2length";
 
 function validate44(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
 let vErrors = null;

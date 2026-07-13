@@ -3,7 +3,7 @@ import { escapeRegExp, omit, omitBy, uniq } from "@es-toolkit/es-toolkit";
 import { Ajv, _ } from "ajv";
 import standaloneCodeMod from "ajv/dist/standalone/index.js";
 import assert from "node:assert";
-import { formats } from "../../../../kubernetes-types/src/validate/index.ts";
+import { formats } from "@glassway/kubernetes-types/validate";
 import { SchemaEnv, type SchemaRefs } from "ajv/dist/compile/index.js";
 import { serialize, digest } from "ohash";
 import nullableRef from "./nullable-ref.ts";

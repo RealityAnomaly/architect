@@ -1,5 +1,5 @@
 import { CRDModelGenerator, GVK, TypeUtilities } from '@glassway/architect';
-import * as api from '@glassway/kubernetes-models/models';
+import * as api from '@glassway/kubernetes-models';
 import { KubeComponent, KubeComponentGenericResources, } from '../../component.ts';
 
 import model from './architect.json' with { type: 'json' };

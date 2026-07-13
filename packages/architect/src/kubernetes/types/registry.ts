@@ -2,7 +2,7 @@ import { KubeResourceConstructor } from '../resource.ts';
 import { GVK } from './gvk.ts';
 import { Logger } from 'winston';
 
-import * as kubernetesModels from '../models/index.ts';
+import * as kubernetesModels from '@glassway/kubernetes-models';
 
 import { ModuleUtilities } from '../../utils/modules.ts';
 import { TypeUtilities } from '../../utils/types.ts';

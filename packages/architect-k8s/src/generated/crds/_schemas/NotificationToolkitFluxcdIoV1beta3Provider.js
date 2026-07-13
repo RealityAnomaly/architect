@@ -1,3 +1,4 @@
+/* @ts-self-types="./NotificationToolkitFluxcdIoV1beta3Provider.d.ts" */
 export const validate = validate5;
 const schema4 = {"type":"object","properties":{"apiVersion":{"$ref":"FDO61L2EGWtAu8DEHokPFMq1oB_uZaf0Js0o3DWGqmo"},"kind":{"$ref":"TzK_z0f57OcVEiQgE4YpHNXla7xpG37QVsMan1UKtiA"},"metadata":{"$ref":"P3srTZpWadQH4s4N9KfJR0iCqydQo9YAz7xMB2qf0GQ"},"spec":{"$ref":"e7_VdNJkHCy3hLsAc0YhS8JY_bBiAD3DLezglnHyres"}},"required":["apiVersion","kind"],"$id":"notification.toolkit.fluxcd.io.v1beta3.Provider"};
 const schema5 = {"type":"string","enum":["notification.toolkit.fluxcd.io/v1beta3"]};
@@ -65,7 +66,7 @@ return errors === 0;
 const schema7 = {"nullableRef":"io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta#"};
 const schema8 = {};
 
-import { validate as validate11 } from "@glassway/architect/kubernetes/apimachinery/_schemas/ObjectMeta";
+import { validate as validate11 } from "@glassway/kubernetes-models/apimachinery/_schemas/ObjectMeta";
 
 
 function validate10(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
@@ -85,7 +86,7 @@ return errors === 0;
 
 const schema9 = {"properties":{"address":{"$ref":"wF8Z4bvfqJOijhq3xTXZkuKD8wvFMdZBklQ_DFak_tM"},"certSecretRef":{"$ref":"E97dOchMV0AJMEW2BvWE8x-plhaqw9P894BmF33ZGUY"},"channel":{"$ref":"wF8Z4bvfqJOijhq3xTXZkuKD8wvFMdZBklQ_DFak_tM"},"commitStatusExpr":{"$ref":"ldoCEsh0ARg8F2aeji6S38NFl7aLPSuz1hGlgX2tjuQ"},"interval":{"$ref":"pBaBQUcJ_4VVd59oMlDSOC0VZvtZV0pop01FX11W3LU"},"proxy":{"$ref":"B1t5LjOl3yvZ6x7L-4nAQiX3SMGJaabTSRUGLkgnEXo"},"proxySecretRef":{"$ref":"E97dOchMV0AJMEW2BvWE8x-plhaqw9P894BmF33ZGUY"},"secretRef":{"$ref":"E97dOchMV0AJMEW2BvWE8x-plhaqw9P894BmF33ZGUY"},"serviceAccountName":{"$ref":"ldoCEsh0ARg8F2aeji6S38NFl7aLPSuz1hGlgX2tjuQ"},"suspend":{"$ref":"CTX4WtafS9K1Gv7k2X1H0J3M9LziUVVRBMOR0rDDzTk"},"timeout":{"$ref":"NxYVC3iXeyIXvWkEba5ma3lHyRQHVFyBMV_5tuprckc"},"type":{"$ref":"KmEPbSKBQaql7i2r2EAMoEpB5tBy-EqouBCCzPPkTEE"},"username":{"$ref":"wF8Z4bvfqJOijhq3xTXZkuKD8wvFMdZBklQ_DFak_tM"}},"required":["type"],"type":"object","nullable":true};
 const schema0 = {"maxLength":2048,"type":"string","nullable":true};
-import func0 from "@glassway/architect/kubernetes/validate/runtime/ucs2length";
+import func0 from "@glassway/kubernetes-types/validate/runtime/ucs2length";
 
 function validate0(data, {instancePath="", parentData, parentDataProperty, rootData=data}={}){
 let vErrors = null;
