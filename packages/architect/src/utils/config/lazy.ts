@@ -1,6 +1,6 @@
 import * as toolkit from '@es-toolkit/es-toolkit';
 import { PathResultBuilder, ValuePath, ValuePathKey } from './paths.ts';
-import { DeepPartial, Resolver, Value } from './value.ts';
+import { DeepPartial, Resolver, Value, ValueResult } from './value.ts';
 import { RecursiveRecord, TypeUtilities } from '../types.ts';
 import { CollectionUtilities } from '../collections.ts';
 
@@ -14,6 +14,11 @@ export interface _LazyProxy<T> {
   $__root__: Lazy<T>;
 
   /**
+   * The parent proxy
+   */
+  $__parent__: _LazyProxy<unknown> | undefined;
+
+  /**
    * The path to the current value in the tree
    */
   $__path__: ValuePath;
@@ -21,7 +26,7 @@ export interface _LazyProxy<T> {
   /**
    * The result of the last evaluation attempt
    */
-  $__cache__: T;
+  $__cache__: T | undefined;
 
   /**
    * The fallback value to use if the value is undefined
@@ -41,6 +46,11 @@ export interface _LazyProxy<T> {
    * Transforms this proxy using the specified function and wraps it in a Resolver<T>
    */
   $transform<TResult>(func: (value: T) => TResult): Resolver<TResult>;
+
+  /**
+   * Invalidates the proxy's cache
+   */
+  $invalidate(): void;
 
   /**
    * Sets the value of this object recursively, from a value or another Lazy<U>
@@ -66,10 +76,12 @@ export interface _LazyProxy<T> {
 class LazyProxy {
   public static from<T>(
     root: Lazy<unknown>,
+    parent: _LazyProxy<unknown> | undefined = undefined,
     path: ValuePath = [],
   ): LazyAuto<T> {
     const internal = {
       $__root__: root,
+      $__parent__: parent,
       $__path__: path,
       $__cache__: undefined,
 
@@ -91,8 +103,10 @@ class LazyProxy {
         }
 
         let result: unknown;
+        let volatile = false;
+
         try {
-          result = await root.get(path, depth);
+          ({ result, volatile } = await root.get(path, depth));
           if (fallback !== undefined) {
             if (
               result !== undefined && TypeUtilities.isObjectDeepKeys(result)
@@ -111,7 +125,12 @@ class LazyProxy {
           }
         }
 
-        internal.$__cache__ = result as T;
+        if (volatile) {
+          internal.$invalidate();
+        } else {
+          internal.$__cache__ = result as T;
+        }
+
         return result;
       },
 
@@ -122,12 +141,22 @@ class LazyProxy {
         });
       },
 
+      $invalidate() {
+        if (internal.$__parent__) {
+          internal.$__parent__.$invalidate();
+        }
+
+        internal.$__cache__ = undefined;
+      },
+
       $set(value, weight?, force?, condition?) {
         root.set(path, value, weight, force, condition);
+        internal.$invalidate();
       },
 
       $setFallback(value) {
         internal.$__fallback__ = value;
+        internal.$invalidate();
       },
     } as _LazyProxy<T>;
 
@@ -136,9 +165,9 @@ class LazyProxy {
       enumerable: true,
     });
 
-    function accessor(key: ValuePathKey) {
+    function accessor(target: _LazyProxy<unknown>, key: ValuePathKey) {
       const _path = internal.$__path__.concat(key.toString());
-      return LazyProxy.from(internal.$__root__, _path);
+      return LazyProxy.from(internal.$__root__, target, _path);
     }
 
     return new Proxy(internal, {
@@ -159,7 +188,7 @@ class LazyProxy {
           return Reflect.get(target, p, receiver);
         }
 
-        return accessor(p);
+        return accessor(target, p);
       },
     }) as LazyAuto<T>;
   }
@@ -224,7 +253,7 @@ export class Lazy<T> {
   /**
    * Gets the value at the specified ValuePath.
    */
-  public async get<TValue>(path: ValuePath, depth: number): Promise<TValue> {
+  public async get<TValue>(path: ValuePath, depth: number): Promise<ValueResult<TValue>> {
     const values = this.matchValues(path);
     if (values.length <= 0) {
       throw new TypeError(
@@ -232,6 +261,8 @@ export class Lazy<T> {
       );
     }
 
+    // whether we can cache this result or not (no proxy references, no function keys)
+    let volatile = false;
     const builder = new PathResultBuilder();
 
     for (const value of values) {
@@ -242,10 +273,12 @@ export class Lazy<T> {
       let temp: T;
       if (typeof value.value === 'function') {
         temp = await (value.value as Resolver<T>)();
+        volatile = true;
       } else {
         temp = value.value;
       }
 
+      if (LazyProxy.is(temp)) volatile = true;
       const resolved = toolkit.cloneDeep(
         LazyProxy.is(temp) ? await temp.$resolve(undefined, depth) : temp,
       );
@@ -254,7 +287,7 @@ export class Lazy<T> {
 
     // traverse into the result to get the final value
     const result = builder.resolve() as TValue;
-    if (result === undefined) return result;
+    if (result === undefined) return { result, volatile };
 
     let curr = result as RecursiveRecord<TValue>;
     for (const key of path) {
@@ -267,7 +300,7 @@ export class Lazy<T> {
       curr = curr[key] as RecursiveRecord<TValue>;
     }
 
-    return curr as TValue;
+    return { result: curr as TValue, volatile };
   }
 
   /**

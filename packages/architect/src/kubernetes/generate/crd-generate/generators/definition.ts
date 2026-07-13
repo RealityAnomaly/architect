@@ -71,22 +71,27 @@ constructor(data?: ModelData<${interfaceName}>) {
 
   imports.push({
     name: "Model",
-    path: "@glassway/architect/kubernetes/types",
+    path: "@glassway/architect/kubernetes/types/model",
   });
 
   imports.push({
     name: "ModelData",
-    path: "@glassway/architect/kubernetes/types",
+    path: "@glassway/architect/kubernetes/types/model",
   });
 
   imports.push({
     name: "setValidateFunc",
-    path: "@glassway/architect/kubernetes/types",
+    path: "@glassway/architect/kubernetes/types/model",
+  });
+
+  imports.push({
+    name: "TypeMetaGuard",
+    path: "@glassway/architect/kubernetes/types/meta",
   });
 
   imports.push({
     name: "createTypeMetaGuard",
-    path: "@glassway/architect/kubernetes/types",
+    path: "@glassway/architect/kubernetes/types/meta",
   });
 
   imports.push({

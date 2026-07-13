@@ -18,3 +18,8 @@ export type DeepPartial<T> = T extends undefined ? T
   : T extends (infer U)[] ? DeepPartialArray<U> | T
   : T extends object ? DeepPartialObject<T> | Partial<T>
   : T;
+
+export interface ValueResult<TValue> {
+  result: TValue;
+  volatile: boolean;
+}
