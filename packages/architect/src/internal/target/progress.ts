@@ -5,6 +5,7 @@ export enum CompilePhase {
 }
 
 export interface ICompileListener {
+  setTarget(target: string | undefined): void
   setTotal(total: number): void;
   setCompleted(): void;
   onComponentStart(name: string): void;

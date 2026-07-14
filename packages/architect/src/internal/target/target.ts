@@ -101,6 +101,7 @@ export class Target {
     logger?: logtape.Logger,
     listener?: ICompileListener,
   ): Promise<Result | undefined> {
+    listener?.setTarget(this.model.metadata?.name);
     listener?.setTotal(this.components.length());
     listener?.onPhaseChange(CompilePhase.Resolve);
 

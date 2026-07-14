@@ -9,6 +9,7 @@ import { ProjectClass } from '../internal/project/index.ts';
 import { DependencyGraphRenderer } from '../internal/graph/render.ts';
 import * as logtape from '@logtape/logtape';
 import fs from 'node:fs/promises';
+import { CompileProgressBar } from './progress.ts';
 
 export interface AppCommandOptions {
   debug: boolean;
@@ -156,13 +157,13 @@ export class App {
     }
 
     // currently the bar only works when we're not rendering multiple targets in parallel
-    //const bar = targets.length == 1 ? new CompileProgressBar() : undefined;
+    const bar = targets.length == 1 ? new CompileProgressBar() : undefined;
 
     const architect = this.instanceAsserted();
-    await Promise.all(targets.map(async (v): Promise<void> => {
+    let promises = targets.map(async (v): Promise<void> => {
       if (!v) return;
 
-      const result = await v.compile(params, architect.logger);
+      const result = await v.compile(params, architect.logger, bar);
       if (result == null) return;
 
       const output = path.join(options.output, v.model.metadata.name!);
@@ -175,9 +176,13 @@ export class App {
           path: output,
         });
       }
-    }));
+    });
 
-    //if (bar != undefined) await bar.render();
+    if (bar != undefined) {
+      promises = promises.concat(bar.render());
+    }
+
+    await Promise.all(promises);
   }
 
   private async apply(options: AppCommandApplyOptions) {
