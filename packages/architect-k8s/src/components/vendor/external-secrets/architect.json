@@ -8,7 +8,7 @@
       "chart": {
         "helm": {
           "repo": "https://charts.external-secrets.io",
-          "version": "0.5.3",
+          "version": "2.7.0",
           "name": "external-secrets"
         }
       }

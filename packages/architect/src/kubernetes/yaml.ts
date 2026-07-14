@@ -15,7 +15,7 @@ export class ManifestLoader {
   public loadArray(
     content: unknown[],
   ): KubeResource[] {
-    content = content.filter((x: unknown) => x != null);
+    content = content.filter((x: unknown) => x !== null && x !== undefined);
     const resources: KubeResource[] = [];
 
     for (const object of content) {

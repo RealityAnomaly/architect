@@ -8,7 +8,7 @@
       "chart": {
         "helm": {
           "repo": "https://charts.rook.io/release",
-          "version": "v1.9.3",
+          "version": "v1.20.2",
           "name": "rook-ceph"
         }
       }

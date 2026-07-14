@@ -4,16 +4,19 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import * as util from 'node:util';
 import * as yaml from '@std/yaml';
-import { KubeResource } from '@glassway/architect';
+import * as url from '@std/url';
+import { KubeResource, getLatestSemVer } from '@glassway/architect';
 
+import { OCIHelper } from '../helpers/oci.ts';
 import { Builder, BuilderParams } from './builder.ts';
-import * as semver from 'semver';
 
 export class Helm extends Builder {
   private readonly indexCache: Record<string, HelmIndex> = {};
+  private readonly oci: OCIHelper;
 
-  constructor(params: BuilderParams) {
+  constructor(params: BuilderParams, oci: OCIHelper) {
     super(params, "helm");
+    this.oci = oci;
   }
 
   /**
@@ -36,9 +39,11 @@ export class Helm extends Builder {
       params.push(chart);
     }
 
-    // chart name
-    params.push(chart);
-    this.buildParams(config, params);
+    this.buildParams(chart, config, params);
+
+    function filterResources(resources: KubeResource[]): KubeResource[] {
+      return resources.filter(resource => !("Pulled" in resource) && !("Digest" in resource));
+    }
 
     // consult our cache for the input values plus the params
     const hashInput = [values, params];
@@ -57,11 +62,15 @@ export class Helm extends Builder {
         params.concat("--values", valuesFile),
         { maxBuffer: undefined },
       );
-      const resources = this.loader.loadString(buf.stdout);
+
+      let documents = yaml.parseAll(buf.stdout) as Record<string, unknown>[];
+      // OCI charts include Pulled and Digest entries as the first document
+      documents = documents.filter(resource => !("Pulled" in resource) && !("Digest" in resource));
+      const resources = this.loader.loadArray(documents);
 
       // cache the result from the inputs
       await this.storeCache(hashInput, buf.stdout);
-      return resources;
+      return filterResources(resources);
     } finally {
       await fs.rm(dir, {
         force: true,
@@ -71,22 +80,15 @@ export class Helm extends Builder {
   }
 
   public async getIndex(repository: string): Promise<HelmIndex | undefined> {
-    if (repository.startsWith("oci://")) {
-      this.logger.warn(
-        `OCI Helm repositories are not yet supported: ${repository}`,
-      );
-      return undefined;
-    }
-
     if (Object.hasOwn(this.indexCache, repository)) {
       return this.indexCache[repository];
     }
 
-    const url = path.join(repository, "index.yaml");
-    const response = await fetch(url);
+    const _url = url.join(repository, "index.yaml");
+    const response = await fetch(_url);
     if (response.status !== 200) {
       this.logger.error(
-        `HTTP fetch failed for ${url}: returned code ${response.status}`,
+        `HTTP fetch failed for ${_url}: returned code ${response.status}`,
       );
       return undefined;
     }
@@ -103,6 +105,11 @@ export class Helm extends Builder {
     repository: string,
     constraint?: string,
   ): Promise<string | undefined> {
+    if (repository.startsWith("oci://")) {
+      const path = this.getChartRepositoryPath(repository, chart);
+      return await this.oci.getLatestVersion(path, constraint);
+    }
+
     const index = await this.getIndex(repository);
     if (!index) return undefined;
 
@@ -115,7 +122,7 @@ export class Helm extends Builder {
 
     // first, try and locate the latest version by semver
     const variants = index.entries[chart];
-    let version = this.getLatestChartSemVer(chart, variants, constraint);
+    let version = getLatestSemVer(variants.map(v => v.version), constraint);
     if (version) return version;
 
     if (constraint) {
@@ -137,7 +144,15 @@ export class Helm extends Builder {
     return version;
   }
 
-  private buildParams(config: HelmChartOpts, params: string[]) {
+  private buildParams(chart: string, config: HelmChartOpts, params: string[]) {
+    const repo = this.getChartRepositoryPath(config.repo, chart);
+    if (repo.startsWith("oci://")) {
+      params.push(repo);
+    } else {
+      params.push(chart);
+      params.push("--repo", repo);
+    }
+
     // Helm parameters
     if (config.apiVersions !== undefined) {
       params.push("--api-versions", config.apiVersions.join(","));
@@ -208,42 +223,7 @@ export class Helm extends Builder {
     }
 
     params.push("--disable-openapi-validation");
-    params.push("--repo", config.repo);
     params.push("--version", config.version);
-  }
-
-  private getLatestChartSemVer(
-    name: string,
-    variants: HelmIndexEntry[],
-    constraint?: string,
-  ): string | undefined {
-    let version: semver.SemVer | undefined = undefined;
-    let original: string | undefined = undefined;
-
-    for (const variant of variants) {
-      let parsed: semver.SemVer;
-
-      try {
-        parsed = new semver.SemVer(variant.version, true);
-      } catch (exception) {
-        this.logger.trace(
-          `failed to parse version as semver for chart ${name}: ${exception}`,
-        );
-        continue;
-      }
-
-      if (
-        (!version || parsed.compare(version) === 1) &&
-        parsed.prerelease.length <= 0
-      ) {
-        if (constraint && !semver.satisfies(parsed, constraint)) continue;
-
-        version = parsed;
-        original = variant.version;
-      }
-    }
-
-    return original;
   }
 
   private getLatestChartUnixTime(
@@ -272,6 +252,14 @@ export class Helm extends Builder {
     }
 
     return version;
+  }
+
+  private getChartRepositoryPath(repository: string, chart: string) {
+    if (repository.startsWith("oci://")) {
+      return `${repository}/${chart}`;
+    }
+
+    return repository;
   }
 }
 

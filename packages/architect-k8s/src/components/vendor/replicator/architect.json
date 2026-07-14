@@ -8,7 +8,7 @@
       "chart": {
         "helm": {
           "repo": "https://helm.mittwald.de",
-          "version": "2.7.3",
+          "version": "2.12.4",
           "name": "kubernetes-replicator"
         }
       }

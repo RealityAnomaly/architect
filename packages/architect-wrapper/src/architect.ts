@@ -1,6 +1,8 @@
 import appDirs from 'npm:appdirsjs@1.2.7';
 import path from 'node:path';
+import { userInfo } from "node:os";
 
+const home = userInfo().homedir;
 const dirs = appDirs.default({ appName: 'architect' });
 const tmpdir = Deno.env.get('TMPDIR');
 
@@ -14,9 +16,19 @@ export function trimSuffix(s: string, suffix: string): string {
   return s;
 }
 
-const allowed_dirs = [dirs.cache,dirs.config,dirs.data,dirs.runtime,tmpdir]
+const allowed_dirs = [
+  dirs.cache,dirs.config,dirs.data,dirs.runtime,tmpdir,
+  path.join(home, '.kube')
+]
   .filter(x => x !== undefined)
   .map(x => trimSuffix(x, "/"));
+
+const allowed_addrs = [
+  'github.com:443',
+  'openebs.github.io:443',
+  'release-assets.githubusercontent.com:443',
+  'kubernetes.docker.internal:6443'
+]
 
 async function findProjectRoot(
   start: string,
@@ -53,13 +65,13 @@ if (!root) {
   Deno.exit(1);
 }
 
-const dirStr = allowed_dirs.join(",");
+const dirStr = allowed_dirs.join(',');
 const command = new Deno.Command('deno', {
   args: [
     '--allow-env',
-    '--allow-net=github.com:443,release-assets.githubusercontent.com:443',
+    `--allow-net=${allowed_addrs.join(',')}`,
     '--allow-run=kustomize,helm',
-    '--allow-sys=homedir',
+    '--allow-sys=homedir,userInfo,uid,gid',
     '--deny-read', // to prevent being prompted for load of cjs modules
     `--allow-read=.,${dirStr}`,
     `--allow-write=.,${dirStr}`,

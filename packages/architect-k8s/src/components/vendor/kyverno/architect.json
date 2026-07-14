@@ -8,7 +8,7 @@
       "chart": {
         "helm": {
           "repo": "https://kyverno.github.io/kyverno",
-          "version": "v2.3.3",
+          "version": "3.8.2",
           "name": "kyverno"
         }
       }

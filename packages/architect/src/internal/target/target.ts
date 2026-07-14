@@ -20,7 +20,7 @@ import {
   ApplyStatus,
   Architect,
   Capability,
-  CompilePhase,
+  BuildPhase,
   DependencyGraph, ExtractComponentArgs,
   ICompileListener,
   VirtualCapability,
@@ -42,14 +42,19 @@ export interface TargetResolveParams {
   validate?: boolean;
 
   /**
+   * Validate without building
+   */
+  validateOnly?: boolean;
+
+  /**
    * Write a visualised dependency graph
    */
   graph?: boolean;
 }
 
 export interface TargetApplyParams extends TargetResolveParams {
+  force?: boolean;
   dryRun?: boolean;
-
   watch?: boolean;
 }
 
@@ -101,28 +106,25 @@ export class Target {
     logger?: logtape.Logger,
     listener?: ICompileListener,
   ): Promise<Result | undefined> {
-    listener?.setTarget(this.model.metadata?.name);
+    listener?.setTarget(this);
     listener?.setTotal(this.components.length());
-    listener?.onPhaseChange(CompilePhase.Resolve);
+    listener?.onPhaseChange(BuildPhase.Resolve);
 
     // in validateOnly mode, only first stage validation runs
     const validate = params?.validate !== false;
-    const validateOnly = false;
 
     const graph = await this.resolve(params);
-    if (validateOnly) {
+    if (params?.validateOnly) {
       graph.assertValid(logger);
-      listener?.setCompleted();
       return undefined;
     }
 
-    listener?.onPhaseChange(CompilePhase.Build);
+    listener?.onPhaseChange(BuildPhase.Build);
 
     const results: Record<string, unknown> = {};
     await Promise.all(
       Object.values(graph.components).map(async (v): Promise<void> => {
-        const name = v.component.toString();
-        listener?.onComponentStart(name);
+        listener?.onComponentStart(v.component);
 
         let result = undefined;
         try {
@@ -142,7 +144,7 @@ export class Target {
         if (result === undefined) return;
 
         results[v.component.rid] = await v.component.postBuild(result);
-        listener?.onComponentEnd(name);
+        listener?.onComponentEnd(v.component);
       }),
     );
 
@@ -154,9 +156,8 @@ export class Target {
     );
 
     if (validate) {
-      listener?.onPhaseChange(CompilePhase.Validate);
+      listener?.onPhaseChange(BuildPhase.Validate);
       if (!result.graph.assertValid(logger)) {
-        listener?.setCompleted();
         return result;
       }
     } else {
@@ -165,7 +166,6 @@ export class Target {
       );
     }
 
-    listener?.setCompleted();
     return result;
   }
 
@@ -175,14 +175,19 @@ export class Target {
    * @param logger
    * @param listener
    */
-  public async* apply(
-    // deno-lint-ignore no-unused-vars
+  public async apply(
     params?: TargetApplyParams,
-    // deno-lint-ignore no-unused-vars
     logger?: logtape.Logger,
-    // deno-lint-ignore no-unused-vars
     listener?: ICompileListener,
-  ): AsyncGenerator<ApplyStatus> {}
+  ): Promise<Result> {
+    if (params?.validateOnly) {
+      throw Error("validateOnly cannot be used at the same time as apply");
+    }
+
+    const result = await this.compile(params, logger, listener);
+    listener?.onPhaseChange(BuildPhase.Apply);
+    return result!;
+  }
 
   /**
    * Registers and enables the specified component
@@ -250,7 +255,7 @@ export class Target {
   }
 
   public toString(): string {
-    return `target ${this.model.metadata.name}`;
+    return this.model.metadata.name ?? "unnamed";
   }
 
   public async init() {

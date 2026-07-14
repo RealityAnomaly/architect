@@ -216,7 +216,7 @@ export class MultiProgressBar {
     await this.resetScreen();
     await this.write(`${message}`);
     await this.breakLine();
-    await this.write(this.lastStr);
+    //await this.write(this.lastStr);
   }
 
   private write(msg: string): Promise<void> {

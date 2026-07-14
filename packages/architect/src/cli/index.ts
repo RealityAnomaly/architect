@@ -164,6 +164,7 @@ export class App {
       if (!v) return;
 
       const result = await v.compile(params, architect.logger, bar);
+      bar?.setCompleted();
       if (result == null) return;
 
       const output = path.join(options.output, v.model.metadata.name!);
@@ -201,11 +202,21 @@ export class App {
       return;
     }
 
+    // currently the bar only works when we're not rendering multiple targets in parallel
+    const bar = targets.length == 1 ? new CompileProgressBar() : undefined;
+
     const architect = this.instanceAsserted();
-    await Promise.all(targets.map(async (v): Promise<void> => {
+    let promises = targets.map(async (v): Promise<void> => {
       if (!v) return;
 
-      await v.apply(params, architect.logger);
-    }));
+      await v.apply(params, architect.logger, bar);
+      bar?.setCompleted();
+    });
+
+    if (bar != undefined) {
+      promises = promises.concat(bar.render());
+    }
+
+    await Promise.all(promises);
   }
 }
