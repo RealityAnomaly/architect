@@ -253,7 +253,7 @@ export class KubeTarget extends Target {
           undefined,
           params?.dryRun ? "All" : undefined,
           "architect.glassway.net", // field manager
-          params?.force,
+          false,
           "application/apply-patch+yaml" // SSA
         );
       } catch (e) {
@@ -277,11 +277,12 @@ export class KubeTarget extends Target {
   }
 
   public override async apply(
+    result: Result,
     params?: TargetApplyParams,
     logger?: logtape.Logger,
     listener?: ICompileListener,
-  ): Promise<Result> {
-    const result = await super.apply(params, logger, listener);
+  ): Promise<void> {
+    await super.apply(result, params, logger, listener);
     const resources = result.all as KubeResource[];
     listener?.setTotal(resources.length);
 
@@ -293,8 +294,6 @@ export class KubeTarget extends Target {
 
     const everything = resources.filter((r) => !isFirst(r));
     await this.applyResources(everything, client, params, logger, listener);
-
-    return result;
   }
 
   private createDefaultResources() {

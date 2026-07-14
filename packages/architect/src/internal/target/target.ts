@@ -171,22 +171,18 @@ export class Target {
 
   /**
    * Applies the result of a compile operation
+   * @param result
    * @param params
    * @param logger
    * @param listener
    */
   public async apply(
+    result: Result,
     params?: TargetApplyParams,
     logger?: logtape.Logger,
     listener?: ICompileListener,
-  ): Promise<Result> {
-    if (params?.validateOnly) {
-      throw Error("validateOnly cannot be used at the same time as apply");
-    }
-
-    const result = await this.compile(params, logger, listener);
+  ): Promise<void> {
     listener?.onPhaseChange(BuildPhase.Apply);
-    return result!;
   }
 
   /**

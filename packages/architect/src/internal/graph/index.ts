@@ -115,6 +115,11 @@ export class DependencyGraph {
     return count;
   }
 
+  public get valid(): boolean {
+    const errors = this.countErrors();
+    return errors.errors <= 0;
+  }
+
   /**
    * Logs any global or component-specific validation errors, and returns false if any are fatal
    */
