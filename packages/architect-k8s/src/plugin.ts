@@ -2,9 +2,13 @@ import { Architect, Plugin, TargetClass } from '@glassway/architect';
 import { CRDCommand } from './crds/cli.ts';
 import { CrdsConfig } from './crds/config.ts';
 import { CRDManager } from './crds/index.ts';
-import { KubeTarget } from './target.ts';
+import { KubeTarget } from './target/target.ts';
+import { userInfo } from "node:os";
 import { Command } from 'npm:commander@15.0.0'
 import { BuilderParams, GitBuilder, Helm, HttpBuilder, Kustomize, } from './index.ts';
+
+import * as _client from '@kubernetes/client-node';
+import * as path from 'node:path';
 
 export const K8S_PLUGIN_CLASS = "plugin.architect.glassway.net/kubernetes";
 
@@ -20,6 +24,7 @@ export class K8sPlugin extends Plugin {
   public kustomize: Kustomize;
   public gitBuilder: GitBuilder;
   public httpBuilder: HttpBuilder;
+  public kubeConfig: _client.KubeConfig | undefined;
 
   constructor(parent: Architect) {
     super(parent, "kubernetes");
@@ -38,7 +43,7 @@ export class K8sPlugin extends Plugin {
   }
 
   public get config(): K8sPluginConfig {
-    return this.parent.project!.config.plugins?.kubernetes || {};
+    return this.parent.getProject().config.plugins?.kubernetes || {};
   }
 
   public get targets(): Record<string, TargetClass> {
@@ -52,5 +57,16 @@ export class K8sPlugin extends Plugin {
       .description("Commands for the Kubernetes module");
 
     command.addCommand(new CRDCommand(this));
+  }
+
+  public getKubeConfig(): _client.KubeConfig {
+    if (this.kubeConfig) return this.kubeConfig;
+
+    const home = userInfo().homedir;
+    const config = new _client.KubeConfig();
+    config.loadFromFile(path.join(home, ".kube/config"));
+
+    this.kubeConfig = config;
+    return this.kubeConfig;
   }
 }

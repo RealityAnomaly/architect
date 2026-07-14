@@ -57,7 +57,7 @@ export class ComponentCommand extends Command {
 
   private async list(options: AppCommandComponentListOptions) {
     const context = this.cli.instance!;
-    const ourComponents = await context.project!.getComponents();
+    const ourComponents = await context.getProject().getComponents();
 
     if (!options.library && ourComponents.length > 0) {
       console.log('Current project:');
@@ -70,7 +70,7 @@ export class ComponentCommand extends Command {
       console.log('');
     }
 
-    for (const library of context.project!.resolveImports()) {
+    for (const library of context.getProject().resolveImports()) {
       if (options.library && library.config.name !== options.library) continue;
 
       const components = await library.getComponents();
@@ -89,7 +89,7 @@ export class ComponentCommand extends Command {
 
   private async show(options: AppComponentCommandShowOptions) {
     const context = this.cli.instance!;
-    const component = await context.project!.getComponent(options.class, true);
+    const component = await context.getProject().getComponent(options.class, true);
     if (!component) {
       console.log(`Unable to find any component with class ${options.class}`);
       return;
@@ -102,10 +102,10 @@ export class ComponentCommand extends Command {
     const context = this.cli.instance!;
     let components: ComponentClass[] = [];
     if (options.class) {
-      const component = await context.project!.getComponent(options.class);
+      const component = await context.getProject().getComponent(options.class);
       if (component) components = [component];
     } else {
-      components = await context.project!.getComponents();
+      components = await context.getProject().getComponents();
     }
 
     if (components.length <= 0) {
@@ -113,7 +113,7 @@ export class ComponentCommand extends Command {
       return;
     }
 
-    const updater = new Updater(context.project!);
+    const updater = new Updater(context.getProject());
     await updater.update(components, options.dryRun);
   }
 }

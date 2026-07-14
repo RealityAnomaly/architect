@@ -3,7 +3,7 @@ import * as yaml from '@std/yaml';
 import * as fs from 'node:fs/promises';
 
 import { KubeResource, KubeResourceUtilities, Result, Writer, } from '@glassway/architect';
-import { KubeTarget, KubeTargetOutputFormat } from './target.ts';
+import { KubeTarget, KubeTargetOutputFormat } from './target/target.ts';
 import { KubeContext } from './context.ts';
 import { KubeComponent } from './index.ts';
 
@@ -12,6 +12,12 @@ export class KubeWriter implements Writer {
 
   constructor(target: KubeTarget) {
     this.target = target;
+  }
+
+  protected stringify(resource: KubeResource): string {
+    return yaml.stringify(resource, {
+      skipInvalid: true
+    });
   }
 
   public async write(result: Result, dir: string) {
@@ -35,7 +41,7 @@ export class KubeWriter implements Writer {
 
   private async writeSingleFile(result: Result, dir: string) {
     const resources = result.all as KubeResource[] ?? [];
-    const resource = resources.map((r) => yaml.stringify(r)).join("\n---\n");
+    const resource = resources.map((r) => this.stringify(r)).join("\n---\n");
 
     await fs.writeFile(path.join(dir, "resources.yaml"), resource);
   }
@@ -44,7 +50,7 @@ export class KubeWriter implements Writer {
     const resources = result.all as KubeResource[] ?? [];
     await Promise.all(resources.map(async (r) => {
       const name = `${KubeResourceUtilities.resourceId(r)}.yaml`;
-      const resource = yaml.stringify(r);
+      const resource = this.stringify(r);
 
       await fs.writeFile(path.join(dir, name), resource);
     }));
@@ -70,7 +76,7 @@ export class KubeWriter implements Writer {
 
         await Promise.all(resources.map(async (r) => {
           const name = `${KubeResourceUtilities.resourceId(r)}.yaml`;
-          const resource = yaml.stringify(r);
+          const resource = this.stringify(r);
 
           await fs.writeFile(path.join(rd, name), resource);
         }));
@@ -99,7 +105,7 @@ export class KubeWriter implements Writer {
             clusterDir,
             `${KubeResourceUtilities.resourceId(resource)}.yaml`,
           ),
-          yaml.stringify(resource),
+          this.stringify(resource),
         );
 
         // extract and write any namespaces the component declares to the cluster dir
@@ -112,7 +118,7 @@ export class KubeWriter implements Writer {
               clusterDir,
               `${KubeResourceUtilities.resourceId(r)}.yaml`,
             ),
-            yaml.stringify(r),
+            this.stringify(r),
           )
         ));
       }),

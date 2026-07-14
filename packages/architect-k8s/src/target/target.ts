@@ -19,15 +19,18 @@ import {
 
 import * as api from '@glassway/kubernetes-models';
 import * as logtape from '@logtape/logtape';
+import * as _client from '@kubernetes/client-node';
 
-import { FluxCDController, FluxCDMode } from './apply/flux/index.ts';
-import { KubeComponentModel, KubePreludeComponent } from './component.ts';
-import { CrdsComponent } from './components/index.ts';
-import { KubeWriter } from './writer.ts';
-import { K8S_PLUGIN_CLASS, K8sPlugin } from './plugin.ts';
-import { KubeContext } from './context.ts';
-import { KubeCRDDependencyGraph } from './crds/graph.ts';
-import { NamespaceDefaults, NamespaceRef } from './types/scn.ts';
+import { FluxCDController, FluxCDMode } from '../apply/flux/index.ts';
+import { KubeComponentModel, KubePreludeComponent } from '../component.ts';
+import { CrdsComponent } from '../components/index.ts';
+import { KubeWriter } from '../writer.ts';
+import { K8S_PLUGIN_CLASS, K8sPlugin } from '../plugin.ts';
+import { KubeContext } from '../context.ts';
+import { KubeCRDDependencyGraph } from '../crds/graph.ts';
+import { NamespaceDefaults, NamespaceRef } from '../types/scn.ts';
+import { ApplyStatus, TargetApplyParams } from '../../../architect/src/index.ts';
+import { getFakeTarget } from './fake.ts';
 
 export enum KubeTargetOutputFormat {
   SingleFile,
@@ -49,7 +52,8 @@ export interface KubeTargetParams extends TargetParams {
  */
 export class KubeTarget extends Target {
   declare public readonly params: KubeTargetParams;
-  public flux: FluxCDController;
+  public readonly flux: FluxCDController;
+  public client: _client.KubernetesObjectApi | undefined;
 
   private readonly markedCRDGVKs: GVK[] = [];
   private readonly markedCRDGroups: string[] = [];
@@ -68,9 +72,9 @@ export class KubeTarget extends Target {
       plugins: {
         kubernetes: {
           ns: {
-            features: NamespaceDefaults['features'],
-            operators: NamespaceDefaults['operators'],
-            services: NamespaceDefaults['services'],
+            features: NamespaceDefaults.features,
+            operators: NamespaceDefaults.operators,
+            services: NamespaceDefaults.services,
           },
         },
       },
@@ -104,29 +108,7 @@ export class KubeTarget extends Target {
   }
 
   public static fake(): architectGlasswayNet.v1alpha1.Target {
-    return new architectGlasswayNet.v1alpha1.Target({
-      metadata: {
-        name: 'fake-cluster',
-      },
-      spec: {
-        plugins: {
-          kubernetes: {
-            client: {
-              context: 'admin@fake-cluster',
-            },
-            dns: 'fake.example.com',
-            podNetwork: {
-              ipFamilies: ['IPv4', 'IPv6'],
-            },
-            flavor: 'docker-desktop',
-            version: 'v1.31.3',
-            metal: {
-              nodes: 3,
-            },
-          },
-        },
-      },
-    });
+    return getFakeTarget();
   }
 
   public override defaultContext<T extends Component>(
@@ -140,7 +122,7 @@ export class KubeTarget extends Target {
     const replacements: Record<string, string> = {};
     for (const [k, v] of Object.entries(NamespaceRef)) {
       // @ts-ignore: dynamic lookup of namespace ref
-      replacements[k] = this.cluster.ns![v]!;
+      replacements[v] = this.cluster.ns![k]!;
     }
 
     if (!context.namespace || force) {
@@ -249,9 +231,33 @@ export class KubeTarget extends Target {
     return result;
   }
 
+  public override async* apply(
+    params?: TargetApplyParams,
+    logger?: logtape.Logger,
+    listener?: ICompileListener,
+  ): AsyncGenerator<ApplyStatus> {
+    // should return AsyncGenerator<TStatus>
+    // should take dryRun, watch
+  }
+
   private createDefaultResources() {
     this.createNamespace(this.cluster.ns!.features!);
     this.createNamespace(this.cluster.ns!.operators!);
     this.createNamespace(this.cluster.ns!.services!);
+  }
+
+  public getClient(): _client.KubernetesObjectApi {
+    if (this.client) return this.client;
+
+    const config = new _client.KubeConfig();
+    config.mergeConfig(this.plugin.getKubeConfig());
+
+    const context = this.cluster.client?.context;
+    if (!context) throw Error("Cluster context must be defined to use client");
+
+    config.setCurrentContext(context);
+    // client.patch, etc, server side apply
+    this.client = _client.KubernetesObjectApi.makeApiClient(config);
+    return this.client;
   }
 }

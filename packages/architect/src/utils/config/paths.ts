@@ -27,7 +27,7 @@ export class PathResultBuilder<T> {
     function stripMeta(value: PathResultValue<T>): unknown {
       if (Array.isArray(value.value)) {
         return value.value.map((v) => stripMeta(v));
-      } else if (typeof value.value === "object") {
+      } else if (value.value !== null && typeof value.value === "object") {
         const result = {} as Record<string, unknown>;
         const obj = value.value as Record<string | symbol, PathResultValue<T>>;
 

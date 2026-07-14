@@ -1,0 +1,39 @@
+{
+  "imports": {
+    "appdirsjs": "npm:appdirsjs@^1.2.7"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "lint": {
+    "include": [
+      "src/"
+    ],
+    "rules": {
+      "tags": [
+        "recommended"
+      ],
+      "exclude": [
+        "require-await",
+        "no-empty-interface"
+      ]
+    }
+  },
+  "fmt": {
+    "options": {
+      "singleQuote": true
+    }
+  },
+  "test": {
+    "include": [
+      "src/"
+    ],
+    "exclude": [
+      "src/testdata/",
+      "src/fixtures/**/*.ts"
+    ]
+  },
+  "license": "GPL-3.0-or-later",
+  "name": "@glassway/architect-wrapper",
+  "version": "1.0.0"
+}

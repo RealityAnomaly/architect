@@ -1,8 +1,8 @@
 import { Constructor } from './types.ts';
 
 export class ModuleUtilities {
-  // deno-lint-ignore no-explicit-any
   public static collectClasses<T>(
+    // deno-lint-ignore no-explicit-any
     module: any,
     matcher: (clazz: Constructor<T>) => boolean,
   ): Constructor<T>[] {

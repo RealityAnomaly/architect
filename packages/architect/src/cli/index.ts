@@ -36,7 +36,7 @@ export class App {
   }
 
   protected get project(): Project {
-    return this.instanceAsserted().project!;
+    return this.instanceAsserted().getProject();
   }
 
   public static async run(_projectClass?: ProjectClass) {

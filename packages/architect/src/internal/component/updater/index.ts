@@ -32,7 +32,7 @@ export class Updater {
   public async update(components: ComponentClass[], dry: boolean = false) {
     this.logger.debug('updater: loading model definition files');
     const modelFiles = await ComponentModelUtilities.collect([
-      path.join(this.project.root!, 'src/components'),
+      path.join(this.project.getRoot(), 'src/components'),
     ]);
 
     const map: ComponentUpgradeState[] = [];

@@ -1,6 +1,7 @@
 {
   "imports": {
     "@es-toolkit/es-toolkit": "jsr:@es-toolkit/es-toolkit@^1.49.0",
+    "@kubernetes/client-node": "npm:@kubernetes/client-node@^1.4.0",
     "@match/match": "jsr:@match/match@^0.1.0",
     "@types/js-yaml": "npm:@types/js-yaml@^4.0.9",
     "@types/lodash": "npm:@types/lodash@^4.17.24",
@@ -54,7 +55,7 @@
     ]
   },
   "tasks": {
-    "run": "deno run --check -A ./src/index.ts"
+    "run": "deno run --check ./src/index.ts"
   },
   "license": "GPL-3.0-or-later",
   "name": "@glassway/architect-k8s",
