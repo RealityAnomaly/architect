@@ -41,10 +41,6 @@ export class Helm extends Builder {
 
     this.buildParams(chart, config, params);
 
-    function filterResources(resources: KubeResource[]): KubeResource[] {
-      return resources.filter(resource => !("Pulled" in resource) && !("Digest" in resource));
-    }
-
     // consult our cache for the input values plus the params
     const hashInput = [values, params];
     const cacheResult = await this.tryFetchCache(hashInput);
@@ -65,12 +61,12 @@ export class Helm extends Builder {
 
       let documents = yaml.parseAll(buf.stdout) as Record<string, unknown>[];
       // OCI charts include Pulled and Digest entries as the first document
-      documents = documents.filter(resource => !("Pulled" in resource) && !("Digest" in resource));
+      documents = documents.filter(resource => resource && !("Pulled" in resource) && !("Digest" in resource));
       const resources = this.loader.loadArray(documents);
 
       // cache the result from the inputs
       await this.storeCache(hashInput, buf.stdout);
-      return filterResources(resources);
+      return resources;
     } finally {
       await fs.rm(dir, {
         force: true,
