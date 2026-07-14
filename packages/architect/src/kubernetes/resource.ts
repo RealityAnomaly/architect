@@ -71,6 +71,7 @@ export interface KubeResourceKind {
 export interface KubeResource extends KubeResourceKind {
   metadata?: IObjectMeta;
   spec?: unknown;
+  status?: unknown;
 }
 
 /**

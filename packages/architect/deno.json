@@ -2,8 +2,6 @@
   "imports": {
     "@deno-library/progress": "jsr:@deno-library/progress@^1.5.1",
     "@es-toolkit/es-toolkit": "jsr:@es-toolkit/es-toolkit@^1.49.0",
-    "@glassway/kubernetes-models": "jsr:@glassway/kubernetes-models@^1.36.2",
-    "@glassway/kubernetes-types": "jsr:@glassway/kubernetes-types@^1.0.1",
     "@types/js-yaml": "npm:@types/js-yaml@^4.0.9",
     "@types/lodash": "npm:@types/lodash@^4.17.24",
     "@types/object-hash": "npm:@types/object-hash@^3.0.6",

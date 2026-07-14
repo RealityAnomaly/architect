@@ -43,6 +43,7 @@ export class Architect {
     logtape.configure({
       sinks: { console: logtape.getConsoleSink() },
       loggers: [
+        { category: "logtape", lowestLevel: "warning", sinks: ["console"] },
         { category: "architect", lowestLevel: logLevel, sinks: ["console"] }
       ]
     });
@@ -91,6 +92,11 @@ export class Architect {
 
   public static class(name: string): any {
     return Reflect.metadata(Architect.CLASS_META_KEY, name);
+  }
+
+  public getProject(): Project {
+    if (!this.project) throw new Error("Project is not available");
+    return this.project;
   }
 
   public getProjects(): Project[] {

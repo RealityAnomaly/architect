@@ -9,7 +9,7 @@ export const NamespaceRef: Record<NamespaceType, string> = {
   services: '$services$',
 }
 
-export const NamespaceDefaults: Record<string, string> = {
+export const NamespaceDefaults: Record<NamespaceType, string> = {
   features: 'infra-system',
   operators: 'operator-system',
   services: 'services',

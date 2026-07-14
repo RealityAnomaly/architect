@@ -21,7 +21,7 @@ import * as api from '@glassway/kubernetes-models';
 import * as toolkit from '@es-toolkit/es-toolkit';
 import { CNICapability, DNSCapability } from './capabilities/index.ts';
 
-import { KubeTarget } from './target.ts';
+import { KubeTarget } from './target/target.ts';
 import { KubeContext } from './context.ts';
 import { GitFetchOptions, HelmChartOpts, HttpFetchOptions, KustomizeOpts, } from './index.ts';
 

@@ -15,7 +15,8 @@ interface FluxCDComponentResources {
 export class FluxCDComponent
   extends KubeComponent<FluxCDComponentResources, FluxCDComponentOptions> {
   public override async build(resources: FluxCDComponentResources = {}): Promise<FluxCDComponentResources> {
-    const url = `https://github.com/fluxcd/flux2/releases/${this.props.version ?? "v2.9.2"}/download/install.yaml`;
+    const props = await this.props.$resolve();
+    const url = `https://github.com/fluxcd/flux2/releases/download/${props.version ?? "v2.9.2"}/install.yaml`;
     resources.manifests = await this.httpFetch(url, true);
 
     return super.build(resources);

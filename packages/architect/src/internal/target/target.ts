@@ -17,6 +17,7 @@ import {
 import { Result } from '../result/index.ts';
 import { Context } from '../../utils/index.ts';
 import {
+  ApplyStatus,
   Architect,
   Capability,
   CompilePhase,
@@ -44,6 +45,12 @@ export interface TargetResolveParams {
    * Write a visualised dependency graph
    */
   graph?: boolean;
+}
+
+export interface TargetApplyParams extends TargetResolveParams {
+  dryRun?: boolean;
+
+  watch?: boolean;
 }
 
 /**
@@ -121,9 +128,10 @@ export class Target {
           result = await v.component.build();
         } catch (e) {
           const message = e instanceof Error ? e.message : 'Unknown exception';
+
           graph.components[v.component.rid].errors.push(
             new ValidationError(
-              'build exception thrown:\n' + message,
+              'build exception thrown: ' + message,
               ValidationErrorLevel.ERROR,
               v.component.toString(),
             ),
@@ -166,13 +174,14 @@ export class Target {
    * @param logger
    * @param listener
    */
-  public async apply(
-    params?: TargetResolveParams,
+  public async* apply(
+    // deno-lint-ignore no-unused-vars
+    params?: TargetApplyParams,
+    // deno-lint-ignore no-unused-vars
     logger?: logtape.Logger,
+    // deno-lint-ignore no-unused-vars
     listener?: ICompileListener,
-  ) {
-    await this.compile(params, logger, listener);
-  }
+  ): AsyncGenerator<ApplyStatus> {}
 
   /**
    * Registers and enables the specified component

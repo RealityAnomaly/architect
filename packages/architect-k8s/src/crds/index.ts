@@ -17,8 +17,6 @@ export interface CRDSyncOptions {
 
 export class CRDManager {
   public readonly plugin: K8sPlugin;
-  private readonly srcDir: string;
-  private readonly dataDir: string;
   private readonly logger: logtape.Logger;
 
   private readonly generator: CRDModelGenerator;
@@ -27,10 +25,16 @@ export class CRDManager {
 
   constructor(plugin: K8sPlugin) {
     this.plugin = plugin;
-    this.srcDir = path.join(plugin.parent.project!.root!, 'src/generated/crds');
-    this.dataDir = path.join(plugin.parent.project!.root!, 'data/crds');
     this.logger = logtape.getLogger(['architect', 'plugin', 'kubernetes', 'CRDManager']);
     this.generator = new CRDModelGenerator(plugin.parent.kubeLoader);
+  }
+
+  private get srcDir(): string {
+    return path.join(this.plugin.parent.getProject().getRoot(), 'src/generated/crds');
+  }
+
+  private get dataDir(): string {
+    return path.join(this.plugin.parent.getProject().getRoot(), 'src/generated/crds');
   }
 
   public async add(crd: CrdsConfig): Promise<void> {
@@ -54,6 +58,8 @@ export class CRDManager {
     if (!this.plugin.config.crds) return;
     const idx = this.plugin.config.crds.findIndex((i) => i.name === name);
     if (idx === -1) return;
+
+    if (!this.dataDir) throw Error("Project is not writable");
 
     // delete data dir, and regenerate models
     const dataDir = path.join(this.dataDir, name);
@@ -83,6 +89,8 @@ export class CRDManager {
   public async sync(crd: CrdsConfig, options: CRDSyncOptions): Promise<void> {
     const resources = await this.fetch(crd);
     if (resources.length > 0) {
+      if (!this.dataDir) throw Error("Project is not writable");
+
       const dir = path.join(this.dataDir, crd.name);
       await fs.rm(dir, {recursive: true, force: true});
       await fs.mkdir(dir, {recursive: true});
@@ -108,7 +116,7 @@ export class CRDManager {
   public async commit(): Promise<void> {
     if (this.configDirty) {
       this.logger.debug('configuration marked dirty, writing');
-      await this.plugin.parent.project!.saveConfig();
+      await this.plugin.parent.getProject().saveConfig();
     }
 
     if (this.modelsDirty) {

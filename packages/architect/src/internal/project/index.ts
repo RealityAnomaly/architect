@@ -66,11 +66,8 @@ export abstract class Project {
       this.root = await ProjectUtils.findProjectRoot(Deno.cwd());
 
       if (!this.root) {
-        this.app.logger.error(
-          `couldn't automatically detect the project root. either pass -w, or ensure an architect.yaml folder is present in a parent folder`,
-        );
-        this.app.logger.error(
-          `because project root detection failed, actions that write to configuration files will be unavailable`,
+        this.app.logger.info(
+          `the project root is not writeable, actions that write to configuration files will be unavailable`,
         );
       }
     }
@@ -91,9 +88,8 @@ export abstract class Project {
   }
 
   public async saveConfig() {
-    if (!this.root) return;
     await ProjectConfigLoader.save(
-      path.join(this.root, 'architect.yaml'),
+      path.join(this.getRoot(), 'architect.yaml'),
       this.config!,
     );
   }
@@ -157,6 +153,14 @@ export abstract class Project {
 
   public getPlugins(): PluginClass[] {
     return this.plugins;
+  }
+
+  public getRoot(): string {
+    if (!this.root) {
+      throw Error("Project is not writable");
+    }
+
+    return this.root;
   }
 
   protected addModules(...mods: unknown[]) {

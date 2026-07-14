@@ -13,8 +13,7 @@
       "runtimeArgs": [
         "run",
         "--unstable",
-        "--inspect-wait",
-        "--allow-all"
+        "--inspect-wait"
       ],
       "attachSimplePort": 9229
     }
