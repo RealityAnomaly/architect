@@ -1,6 +1,5 @@
 {
   "imports": {
-    "@deno-library/progress": "jsr:@deno-library/progress@^1.5.1",
     "@es-toolkit/es-toolkit": "jsr:@es-toolkit/es-toolkit@^1.49.0",
     "@types/js-yaml": "npm:@types/js-yaml@^4.0.9",
     "@types/lodash": "npm:@types/lodash@^4.17.24",

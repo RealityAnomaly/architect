@@ -1,19 +1,18 @@
 {
   "version": "5",
   "specifiers": {
-    "jsr:@deno-library/progress@*": "1.5.1",
-    "jsr:@deno-library/progress@^1.5.1": "1.5.1",
     "jsr:@es-toolkit/es-toolkit@^1.49.0": "1.49.0",
     "jsr:@glassway/kubernetes-models@^1.36.3": "1.36.3",
     "jsr:@glassway/kubernetes-types@^1.0.2": "1.0.2",
-    "jsr:@logtape/logtape@^2.2.3": "2.2.3",
+    "jsr:@logtape/logtape@^2.2.3": "2.2.4",
     "jsr:@match/match@0.1": "0.1.0",
-    "jsr:@std/assert@^1.0.9": "1.0.11",
+    "jsr:@std/assert@^1.0.9": "1.0.19",
     "jsr:@std/async@*": "1.0.11",
+    "jsr:@std/async@^1.5.0": "1.5.0",
     "jsr:@std/bytes@^1.0.6": "1.0.6",
-    "jsr:@std/fmt@1.0.3": "1.0.3",
+    "jsr:@std/data-structures@^1.1.1": "1.1.1",
+    "jsr:@std/internal@^1.0.12": "1.0.14",
     "jsr:@std/internal@^1.0.5": "1.0.5",
-    "jsr:@std/io@0.225.0": "0.225.0",
     "jsr:@std/streams@^1.1.1": "1.1.1",
     "jsr:@std/yaml@^1.1.2": "1.1.2",
     "npm:@kubernetes/client-node@^1.4.0": "1.4.0",
@@ -40,13 +39,6 @@
     "npm:wildcard-match@^5.1.4": "5.1.4"
   },
   "jsr": {
-    "@deno-library/progress@1.5.1": {
-      "integrity": "966611826b8bb27baae73ab1c4fa4317cd4edd2abb99750cd6f8488d22d5b121",
-      "dependencies": [
-        "jsr:@std/fmt",
-        "jsr:@std/io"
-      ]
-    },
     "@es-toolkit/es-toolkit@1.49.0": {
       "integrity": "65c5efb21703a5c7c4367d4428e2495d209804278ae32dd04d7a663a3104a40b"
     },
@@ -74,29 +66,44 @@
     "@logtape/logtape@2.2.3": {
       "integrity": "73911ec91d87bd7367ea5690d1dc438c0c73d27ef5d8d7565644f6bb4fa8be24"
     },
+    "@logtape/logtape@2.2.4": {
+      "integrity": "8ee23b7c8d4b2e28c43a3a16027a7a27ed3d453c395c7d91b9960640399201ec"
+    },
     "@match/match@0.1.0": {
       "integrity": "d98fdfe9b241c662f3b1ce2aca601a17033350fb2549e212abbe7d3c29170656"
     },
     "@std/assert@1.0.11": {
       "integrity": "2461ef3c368fe88bc60e186e7744a93112f16fd110022e113a0849e94d1c83c1",
       "dependencies": [
-        "jsr:@std/internal"
+        "jsr:@std/internal@^1.0.5"
+      ]
+    },
+    "@std/assert@1.0.19": {
+      "integrity": "eaada96ee120cb980bc47e040f82814d786fe8162ecc53c91d8df60b8755991e",
+      "dependencies": [
+        "jsr:@std/internal@^1.0.12"
       ]
     },
     "@std/async@1.0.11": {
       "integrity": "eee0d3405275506638a9c8efaa849cf0d35873120c69b7caa1309c9a9e5b6f85"
     },
+    "@std/async@1.5.0": {
+      "integrity": "4c1f22d287a17ad7d8643b1952bc5a4d21e5d8b68dc8c20d8268eecc69096e82",
+      "dependencies": [
+        "jsr:@std/data-structures"
+      ]
+    },
     "@std/bytes@1.0.6": {
       "integrity": "f6ac6adbd8ccd99314045f5703e23af0a68d7f7e58364b47d2c7f408aeb5820a"
     },
-    "@std/fmt@1.0.3": {
-      "integrity": "97765c16aa32245ff4e2204ecf7d8562496a3cb8592340a80e7e554e0bb9149f"
+    "@std/data-structures@1.1.1": {
+      "integrity": "7e1fcf19771fb9c6dbcd7f65039d6d42ef8dc023cfbc0c4cdc74b24e09229380"
     },
     "@std/internal@1.0.5": {
       "integrity": "54a546004f769c1ac9e025abd15a76b6671ddc9687e2313b67376125650dc7ba"
     },
-    "@std/io@0.225.0": {
-      "integrity": "c1db7c5e5a231629b32d64b9a53139445b2ca640d828c26bf23e1c55f8c079b3"
+    "@std/internal@1.0.14": {
+      "integrity": "291516b3d4c35024d6ffbc0a9df5bf4c64116e05b50012cf846710152d2ffdf7"
     },
     "@std/streams@1.1.1": {
       "integrity": "92556d350e537e9dce527a6d08f6f15be3ff65e656079dea69d15252187c7613",
@@ -771,6 +778,7 @@
       "jsr:@glassway/kubernetes-types@^1.0.2",
       "jsr:@logtape/logtape@^2.2.3",
       "jsr:@std/assert@^1.0.9",
+      "jsr:@std/async@^1.5.0",
       "jsr:@std/streams@^1.1.1",
       "jsr:@std/yaml@^1.1.2",
       "npm:commander@15",
@@ -779,7 +787,6 @@
     "members": {
       "packages/architect": {
         "dependencies": [
-          "jsr:@deno-library/progress@^1.5.1",
           "jsr:@es-toolkit/es-toolkit@^1.49.0",
           "npm:@types/js-yaml@^4.0.9",
           "npm:@types/lodash@^4.17.24",
@@ -815,6 +822,7 @@
       },
       "packages/architect-wrapper": {
         "dependencies": [
+          "jsr:@es-toolkit/es-toolkit@^1.49.0",
           "npm:appdirsjs@^1.2.7"
         ]
       }
