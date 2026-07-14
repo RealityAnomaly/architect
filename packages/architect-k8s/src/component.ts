@@ -178,14 +178,21 @@ export abstract class KubeComponent<
         if (input.helm.version !== latest) {
           changed = true;
           state.logger.info(
-            `${this.constructor.name}: input '${k}': changed from ${input.helm.version} -> ${latest}`,
+            `${this.constructor.name}: input '${k}': ${input.helm.repo}/${input.helm.name} changed from ${input.helm.version} -> ${latest}`,
           );
           input.helm.version = latest;
         }
       } else if (input.oci) {
-        state.logger.warn(
-          `${this.constructor.name}: input '${k}': sources of type OCI are not yet supported`,
-        );
+        const latest = await this.target.plugin.oci.getLatestVersion(input.oci.name, input.oci.constraint)
+        if (!latest) continue;
+
+        if (input.oci.version !== latest) {
+          changed = true;
+          state.logger.info(
+            `${this.constructor.name}: input '${k}': ${input.oci.name} changed from ${input.oci.version} -> ${latest}`,
+          );
+          input.oci.version = latest;
+        }
       }
     }
 
@@ -254,6 +261,7 @@ export interface KubeComponentContext {
 export interface KubeComponentInputOCIModel {
   name: string;
   version: string;
+  constraint?: string;
 }
 
 export interface KubeComponentInputHelmModel {
@@ -297,6 +305,10 @@ const KubeComponentModelInputSchema: JSONSchemaType<KubeComponentModelInput> = {
         },
         version: {
           type: 'string',
+        },
+        constraint: {
+          type: 'string',
+          nullable: true,
         },
       },
     },

@@ -2,8 +2,8 @@
   "version": "5",
   "specifiers": {
     "jsr:@es-toolkit/es-toolkit@^1.49.0": "1.49.0",
-    "jsr:@glassway/kubernetes-models@^1.36.3": "1.36.3",
-    "jsr:@glassway/kubernetes-types@^1.0.2": "1.0.2",
+    "jsr:@glassway/kubernetes-models@^1.36.4": "1.36.4",
+    "jsr:@glassway/kubernetes-types@^1.0.3": "1.0.3",
     "jsr:@logtape/logtape@^2.2.3": "2.2.4",
     "jsr:@match/match@0.1": "0.1.0",
     "jsr:@std/assert@^1.0.9": "1.0.19",
@@ -11,9 +11,15 @@
     "jsr:@std/async@^1.5.0": "1.5.0",
     "jsr:@std/bytes@^1.0.6": "1.0.6",
     "jsr:@std/data-structures@^1.1.1": "1.1.1",
+    "jsr:@std/fmt@1.0.3": "1.0.3",
     "jsr:@std/internal@^1.0.12": "1.0.14",
+    "jsr:@std/internal@^1.0.14": "1.0.14",
     "jsr:@std/internal@^1.0.5": "1.0.5",
+    "jsr:@std/io@0.225.0": "0.225.0",
+    "jsr:@std/path@^1.0.4": "1.1.6",
+    "jsr:@std/path@^1.1.6": "1.1.6",
     "jsr:@std/streams@^1.1.1": "1.1.1",
+    "jsr:@std/url@~0.225.1": "0.225.1",
     "jsr:@std/yaml@^1.1.2": "1.1.2",
     "npm:@kubernetes/client-node@^1.4.0": "1.4.0",
     "npm:@types/js-yaml@^4.0.9": "4.0.9",
@@ -32,6 +38,7 @@
     "npm:js-yaml@^4.3.0": "4.3.0",
     "npm:lodash@^4.18.1": "4.18.1",
     "npm:object-hash@3": "3.0.0",
+    "npm:oci-client@^0.0.13": "0.0.13",
     "npm:ohash@^2.0.11": "2.0.11",
     "npm:reflect-metadata@~0.2.2": "0.2.2",
     "npm:semver@^7.8.5": "7.8.5",
@@ -42,8 +49,8 @@
     "@es-toolkit/es-toolkit@1.49.0": {
       "integrity": "65c5efb21703a5c7c4367d4428e2495d209804278ae32dd04d7a663a3104a40b"
     },
-    "@glassway/kubernetes-models@1.36.3": {
-      "integrity": "dc02049573d11657f8f43b395644ebb3bdb6e7a005d51a29abe5ec53ad78a04d",
+    "@glassway/kubernetes-models@1.36.4": {
+      "integrity": "a45856d4ca28bc6da6d0a70efb690dbb05b68dfce64da0837ebcbce4f1f93d5c",
       "dependencies": [
         "jsr:@es-toolkit/es-toolkit",
         "jsr:@glassway/kubernetes-types",
@@ -52,8 +59,8 @@
         "npm:ohash"
       ]
     },
-    "@glassway/kubernetes-types@1.0.2": {
-      "integrity": "2ba610d5585597f3aafce9bee3b91c58c92089f01750079ee7206a9de0212d2b",
+    "@glassway/kubernetes-types@1.0.3": {
+      "integrity": "e3793e65777fbc1dff2a9b48675a5b26de2431a3de71b0485b2cbfac5b75b7df",
       "dependencies": [
         "jsr:@es-toolkit/es-toolkit",
         "npm:ajv",
@@ -99,16 +106,34 @@
     "@std/data-structures@1.1.1": {
       "integrity": "7e1fcf19771fb9c6dbcd7f65039d6d42ef8dc023cfbc0c4cdc74b24e09229380"
     },
+    "@std/fmt@1.0.3": {
+      "integrity": "97765c16aa32245ff4e2204ecf7d8562496a3cb8592340a80e7e554e0bb9149f"
+    },
     "@std/internal@1.0.5": {
       "integrity": "54a546004f769c1ac9e025abd15a76b6671ddc9687e2313b67376125650dc7ba"
     },
     "@std/internal@1.0.14": {
       "integrity": "291516b3d4c35024d6ffbc0a9df5bf4c64116e05b50012cf846710152d2ffdf7"
     },
+    "@std/io@0.225.0": {
+      "integrity": "c1db7c5e5a231629b32d64b9a53139445b2ca640d828c26bf23e1c55f8c079b3"
+    },
+    "@std/path@1.1.6": {
+      "integrity": "c68485c2a4dfbb5ae3cc74fae4e8c4e5d874cf8a8ed12927917235c758b46cbe",
+      "dependencies": [
+        "jsr:@std/internal@^1.0.14"
+      ]
+    },
     "@std/streams@1.1.1": {
       "integrity": "92556d350e537e9dce527a6d08f6f15be3ff65e656079dea69d15252187c7613",
       "dependencies": [
         "jsr:@std/bytes"
+      ]
+    },
+    "@std/url@0.225.1": {
+      "integrity": "7961f62f0a3cd2c7aa5b785822874132760b50bbf5ed0ccfded8668f203e7a95",
+      "dependencies": [
+        "jsr:@std/path@^1.0.4"
       ]
     },
     "@std/yaml@1.1.2": {
@@ -584,6 +609,9 @@
     "object-hash@3.0.0": {
       "integrity": "sha512-RSn9F68PjH9HqtltsSnqYC1XXoWe9Bju5+213R98cNGttag9q9yAOTzdbsqvIa7aNm5WffBZFpWYr2aWrklWAw=="
     },
+    "oci-client@0.0.13": {
+      "integrity": "sha512-apMDP8ZSnO1v2Dk9+b+1WqsChjF4VbKLryJlz/gl9SIPerSUo4pZMnRyHuXzWpprwVovC1rRzeFFE5fgn5cfiw=="
+    },
     "ohash@2.0.11": {
       "integrity": "sha512-RdR9FQrFwNBNXAr4GixM8YaRZRJ5PUWbKYbE5eOsrwAjJW0q2REGcf79oYPsLyskQCZG1PLN+S/K1V00joZAoQ=="
     },
@@ -774,15 +802,18 @@
   "workspace": {
     "dependencies": [
       "jsr:@es-toolkit/es-toolkit@^1.49.0",
-      "jsr:@glassway/kubernetes-models@^1.36.3",
-      "jsr:@glassway/kubernetes-types@^1.0.2",
+      "jsr:@glassway/kubernetes-models@^1.36.4",
+      "jsr:@glassway/kubernetes-types@^1.0.3",
       "jsr:@logtape/logtape@^2.2.3",
       "jsr:@std/assert@^1.0.9",
       "jsr:@std/async@^1.5.0",
+      "jsr:@std/path@^1.1.6",
       "jsr:@std/streams@^1.1.1",
+      "jsr:@std/url@~0.225.1",
       "jsr:@std/yaml@^1.1.2",
       "npm:commander@15",
-      "npm:ohash@^2.0.11"
+      "npm:ohash@^2.0.11",
+      "npm:semver@^7.8.5"
     ],
     "members": {
       "packages/architect": {
@@ -815,6 +846,7 @@
           "npm:js-yaml@^4.3.0",
           "npm:lodash@^4.18.1",
           "npm:object-hash@3",
+          "npm:oci-client@^0.0.13",
           "npm:semver@^7.8.5",
           "npm:ts-graphviz@^2.1.6",
           "npm:wildcard-match@^5.1.4"

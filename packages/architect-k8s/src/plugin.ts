@@ -9,6 +9,7 @@ import { BuilderParams, GitBuilder, Helm, HttpBuilder, Kustomize, } from './inde
 
 import * as _client from '@kubernetes/client-node';
 import * as path from 'node:path';
+import { OCIHelper } from './helpers/oci.ts';
 
 export const K8S_PLUGIN_CLASS = "plugin.architect.glassway.net/kubernetes";
 
@@ -19,6 +20,7 @@ export class K8sPluginConfig {
 @Plugin.decorate(K8S_PLUGIN_CLASS)
 export class K8sPlugin extends Plugin {
   public readonly crds: CRDManager;
+  public oci: OCIHelper;
 
   public helm: Helm;
   public kustomize: Kustomize;
@@ -29,6 +31,7 @@ export class K8sPlugin extends Plugin {
   constructor(parent: Architect) {
     super(parent, "kubernetes");
     this.crds = new CRDManager(this);
+    this.oci = new OCIHelper(this.logger);
 
     const builderParams: BuilderParams = {
       loader: this.parent.kubeLoader,
@@ -36,7 +39,7 @@ export class K8sPlugin extends Plugin {
       cache: this.parent.cache,
     };
 
-    this.helm = new Helm(builderParams);
+    this.helm = new Helm(builderParams, this.oci);
     this.kustomize = new Kustomize(builderParams);
     this.gitBuilder = new GitBuilder(builderParams);
     this.httpBuilder = new HttpBuilder(builderParams);

@@ -1,7 +1,7 @@
 import * as logtape from '@logtape/logtape';
 import { ProgressBar } from '../vendor/progress/index.ts';
 import { delay } from '@std/async';
-import { CompilePhase, ICompileListener } from '../internal/index.ts';
+import { BuildPhase, Component, ICompileListener, Target } from '../internal/index.ts';
 
 export class CompileProgressBar implements ICompileListener {
   protected bar: ProgressBar;
@@ -9,7 +9,7 @@ export class CompileProgressBar implements ICompileListener {
   protected progress: number = 0;
   protected title?: string;
   protected status?: string;
-  protected target?: string;
+  protected target?: Target;
   protected completed: boolean = false;
   private messages: string[] = [];
 
@@ -79,35 +79,46 @@ export class CompileProgressBar implements ICompileListener {
     this.total = total;
   }
 
-  public onComponentStart(name: string) {
-    this.status = name;
+  public onComponentStart(component: Component) {
+    this.status = component.toString();
   }
 
-  public onComponentEnd(name: string) {
+  public onComponentEnd(_component: Component) {
     this.progress++;
   }
 
-  public onPhaseChange(phase: CompilePhase) {
+  public onResourceStart(component: Component) {
+    this.status = component.toString();
+  }
+
+  public onResourceEnd(_component: Component) {
+    this.progress++;
+  }
+
+  public onPhaseChange(phase: BuildPhase) {
     this.progress = 0;
     this.status = undefined;
 
     let prefix;
     switch (phase) {
-      case CompilePhase.Resolve:
+      case BuildPhase.Resolve:
         prefix = 'Resolving';
         break;
-      case CompilePhase.Build:
+      case BuildPhase.Build:
         prefix = 'Building';
         break;
-      case CompilePhase.Validate:
+      case BuildPhase.Validate:
         prefix = 'Validating';
+        break;
+      case BuildPhase.Apply:
+        prefix = 'Applying';
         break;
     }
 
     this.title = `${prefix} Target ${this.target}`;
   }
 
-  public setTarget(target: string | undefined) {
+  public setTarget(target: Target | undefined) {
     this.target = target;
   }
 

@@ -231,13 +231,54 @@ export class KubeTarget extends Target {
     return result;
   }
 
-  public override async* apply(
+  protected async applyResources(
+    resources: KubeResource[],
+    client: _client.KubernetesObjectApi,
     params?: TargetApplyParams,
     logger?: logtape.Logger,
     listener?: ICompileListener,
-  ): AsyncGenerator<ApplyStatus> {
-    // should return AsyncGenerator<TStatus>
-    // should take dryRun, watch
+  ): Promise<void> {
+    await Promise.all(resources.map(async (r) => {
+      listener?.onResourceStart(r);
+
+      try {
+        await client.patch(
+          r as _client.KubernetesObject,
+          undefined,
+          params?.dryRun ? "All" : undefined,
+          "architect.glassway.net", // field manager
+          params?.force,
+          "application/apply-patch+yaml" // SSA
+        );
+      } catch (e) {
+        if (e instanceof Error) {
+          logger?.error(e.message);
+        }
+      }
+
+      listener?.onResourceEnd(r);
+    }));
+  }
+
+  public override async apply(
+    params?: TargetApplyParams,
+    logger?: logtape.Logger,
+    listener?: ICompileListener,
+  ): Promise<Result> {
+    const result = await super.apply(params, logger, listener);
+    const resources = result.all as KubeResource[];
+    listener?.setTotal(resources.length);
+
+    // namespaces must be applied first
+    const client = this.getClient();
+    const isNs = (r: KubeResource) => r.kind === "Namespace";
+    const namespaces = resources.filter(isNs);
+    await this.applyResources(namespaces, client, params, logger, listener);
+
+    const everything = resources.filter((r) => !isNs(r));
+    await this.applyResources(everything, client, params, logger, listener);
+
+    return result;
   }
 
   private createDefaultResources() {

@@ -1,4 +1,4 @@
 import ProgressBar from './mod.ts';
-export { ProgressBar };
-export * from './multi.ts';
+import { MultiProgressBar } from './mod.ts';
+export { ProgressBar, MultiProgressBar };
 export * from './time.ts';

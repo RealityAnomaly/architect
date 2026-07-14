@@ -44,7 +44,8 @@ export class Architect {
       sinks: { console: logtape.getConsoleSink() },
       loggers: [
         { category: "logtape", lowestLevel: "warning", sinks: ["console"] },
-        { category: "architect", lowestLevel: logLevel, sinks: ["console"] }
+        { category: "architect", lowestLevel: logLevel, sinks: ["console"] },
+        { category: ["architect", "updater", "validator"], lowestLevel: "warning" },
       ]
     });
 

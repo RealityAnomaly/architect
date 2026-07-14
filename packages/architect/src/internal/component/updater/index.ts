@@ -78,17 +78,14 @@ export class Updater {
 
     for (const component of map) {
       await this.updateComponent(component);
+      if (dry || !component.file.dirty) continue;
+      await fs.writeFile(component.file.path, JSON.stringify(component.file.model, null, 2));
     }
 
     if (dry) {
       this.logger.warn(
         `updater: dry run specified, not writing definition files`,
       );
-    } else {
-      for (const file of modelFiles) {
-        if (!file.dirty) continue;
-        await fs.writeFile(file.path, JSON.stringify(file.model, null, 2));
-      }
     }
   }
 
@@ -112,7 +109,8 @@ export class Updater {
       const params = {requirements: false};
       const resolved = await target.compile(params);
 
-      if (resolved && !resolved.graph.assertValid()) {
+      const logger = logtape.getLogger(['architect', 'updater', 'validator']);
+      if (resolved && !resolved.graph.assertValid(logger)) {
         throw new Error(
           `failed to validate component ${component.clazz.name} after input upgrade`,
         );

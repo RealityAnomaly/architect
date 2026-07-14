@@ -35,13 +35,13 @@ export class ComponentCommand extends Command {
     this.command('show')
       .description('Shows information about a specific component')
       .requiredOption(
-        '--class <class>',
+        '-c, --class <class>',
         'Specify the component class (required)',
       )
       .action(this.show.bind(this));
     this.command('upgrade')
       .description('Upgrades versions of component dependencies')
-      .option('--class <class>', 'Only target the specified component class')
+      .option('-c, --class <class>', 'Only target the specified component class')
       .option(
         '--dry-run',
         'Simulates the upgrade, displaying the changes that would be made',
