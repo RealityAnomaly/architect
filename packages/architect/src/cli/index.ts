@@ -141,11 +141,18 @@ export class App {
     }
   }
 
-  private async compile(options: AppCommandCompileOptions) {
+  private async run(options: AppCommandCompileOptions | AppCommandApplyOptions, apply: boolean) {
     const params: TargetResolveParams = {
       requirements: options.requirements,
       validate: options.validate,
+      graph: options.graph,
     };
+
+    if (apply && params?.validateOnly) {
+      throw Error("validateOnly cannot be used at the same time as apply");
+    }
+
+    const ignoreErrors = true;
 
     const targets = options.target
       ? [await this.project.getTarget(options.target)]
@@ -160,23 +167,38 @@ export class App {
     const bar = targets.length == 1 ? new CompileProgressBar() : undefined;
 
     const architect = this.instanceAsserted();
+    const logger = architect.logger;
     let promises = targets.map(async (v): Promise<void> => {
       if (!v) return;
 
-      const result = await v.compile(params, architect.logger, bar);
-      bar?.setCompleted();
+      const result = await v.compile(params, logger, bar);
       if (result == null) return;
 
-      const output = path.join(options.output, v.model.metadata.name!);
-      await fs.rm(output, {recursive: true, force: true});
-      await fs.mkdir(output, {recursive: true});
-      await result.write(output);
+      if (apply) {
+        if (!result.graph.valid) {
+          if (ignoreErrors) {
+            logger.warn(`validation errors occurred, but continuing anyway as the ignore option was specified`)
+          } else {
+            bar?.setCompleted();
+            return;
+          }
+        }
 
-      if (options.graph) {
-        await DependencyGraphRenderer.render(result.graph, {
-          path: output,
-        });
+        await v.apply(result, params, logger, bar);
+      } else {
+        const output = path.join(options.output, v.model.metadata.name!);
+        await fs.rm(output, {recursive: true, force: true});
+        await fs.mkdir(output, {recursive: true});
+        await result.write(output);
+
+        if (options.graph) {
+          await DependencyGraphRenderer.render(result.graph, {
+            path: output,
+          });
+        }
       }
+
+      bar?.setCompleted();
     });
 
     if (bar != undefined) {
@@ -186,37 +208,11 @@ export class App {
     await Promise.all(promises);
   }
 
+  private async compile(options: AppCommandCompileOptions) {
+    await this.run(options, false);
+  }
+
   private async apply(options: AppCommandApplyOptions) {
-    const params: TargetResolveParams = {
-      requirements: options.requirements,
-      validate: options.validate,
-      graph: options.graph,
-    };
-
-    const targets = options.target
-      ? [await this.project.getTarget(options.target)]
-      : await this.project.getTargets();
-
-    if (targets.length <= 0) {
-      console.log(`Unable to find any targets`);
-      return;
-    }
-
-    // currently the bar only works when we're not rendering multiple targets in parallel
-    const bar = targets.length == 1 ? new CompileProgressBar() : undefined;
-
-    const architect = this.instanceAsserted();
-    let promises = targets.map(async (v): Promise<void> => {
-      if (!v) return;
-
-      await v.apply(params, architect.logger, bar);
-      bar?.setCompleted();
-    });
-
-    if (bar != undefined) {
-      promises = promises.concat(bar.render());
-    }
-
-    await Promise.all(promises);
+    await this.run(options, true);
   }
 }
