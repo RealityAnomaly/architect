@@ -17,9 +17,11 @@ import {
   ValidationErrorLevel,
 } from '@glassway/architect';
 
+import * as toolkit from '@es-toolkit/es-toolkit';
 import * as api from '@glassway/kubernetes-models';
 import * as logtape from '@logtape/logtape';
 import * as _client from '@kubernetes/client-node';
+import * as yaml from '@std/yaml';
 
 import { FluxCDController, FluxCDMode } from '../apply/flux/index.ts';
 import { KubeComponentModel, KubePreludeComponent } from '../component.ts';
@@ -29,7 +31,7 @@ import { K8S_PLUGIN_CLASS, K8sPlugin } from '../plugin.ts';
 import { KubeContext } from '../context.ts';
 import { KubeCRDDependencyGraph } from '../crds/graph.ts';
 import { NamespaceDefaults, NamespaceRef } from '../types/scn.ts';
-import { ApplyStatus, TargetApplyParams } from '../../../architect/src/index.ts';
+import { TargetApplyParams } from '../../../architect/src/index.ts';
 import { getFakeTarget } from './fake.ts';
 
 export enum KubeTargetOutputFormat {
@@ -241,9 +243,13 @@ export class KubeTarget extends Target {
     await Promise.all(resources.map(async (r) => {
       listener?.onResourceStart(r);
 
+      // hate this serdes but https://github.com/kubernetes-client/javascript/issues/2483 breaks it otherwise
+      const data = yaml.stringify(r, { skipInvalid: true });
+      const parsed = _client.loadYaml(data) as _client.KubernetesObject;
+
       try {
         await client.patch(
-          r as _client.KubernetesObject,
+          parsed,
           undefined,
           params?.dryRun ? "All" : undefined,
           "architect.glassway.net", // field manager
@@ -251,8 +257,18 @@ export class KubeTarget extends Target {
           "application/apply-patch+yaml" // SSA
         );
       } catch (e) {
-        if (e instanceof Error) {
-          logger?.error(e.message);
+        if (e instanceof _client.ApiException) {
+          let message = toolkit.trim(e.body, "\n");
+          try {
+            const obj = JSON.parse(e.body);
+            message = obj["message"]
+          } catch (_e) {
+            // not valid json
+          }
+
+          logger?.error(`${r.kind} ${r.metadata?.namespace ?? "default"}/${r.metadata?.name}: apply failed: ${message}`);
+        } else {
+          throw e;
         }
       }
 
@@ -269,13 +285,13 @@ export class KubeTarget extends Target {
     const resources = result.all as KubeResource[];
     listener?.setTotal(resources.length);
 
-    // namespaces must be applied first
+    // namespaces and CRDs must be applied first
     const client = this.getClient();
-    const isNs = (r: KubeResource) => r.kind === "Namespace";
-    const namespaces = resources.filter(isNs);
+    const isFirst = (r: KubeResource) => r.kind === "Namespace" || r.kind === "CustomResourceDefinition";
+    const namespaces = resources.filter(isFirst);
     await this.applyResources(namespaces, client, params, logger, listener);
 
-    const everything = resources.filter((r) => !isNs(r));
+    const everything = resources.filter((r) => !isFirst(r));
     await this.applyResources(everything, client, params, logger, listener);
 
     return result;
