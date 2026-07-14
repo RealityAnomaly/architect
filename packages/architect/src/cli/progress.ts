@@ -3,6 +3,8 @@ import { ProgressBar } from '../vendor/progress/index.ts';
 import { delay } from '@std/async';
 import { BuildPhase, Component, ICompileListener, Target } from '../internal/index.ts';
 
+import { defaultConsoleFormatter } from '@logtape/logtape';
+
 export class CompileProgressBar implements ICompileListener {
   protected bar: ProgressBar;
   protected total: number = 100;
@@ -11,7 +13,7 @@ export class CompileProgressBar implements ICompileListener {
   protected status?: string;
   protected target?: Target;
   protected completed: boolean = false;
-  private messages: string[] = [];
+  private messages: logtape.LogRecord[] = [];
 
   constructor() {
     this.bar = new ProgressBar();
@@ -20,9 +22,32 @@ export class CompileProgressBar implements ICompileListener {
   private async renderBar(): Promise<void> {
     const progress = this.completed ? this.total : this.progress;
 
+    const levelMap: Record<logtape.LogLevel, string> = {
+      trace: "debug",
+      debug: "debug",
+      info: "info",
+      warning: "warn",
+      error: "error",
+      fatal: "error",
+    }
+
     while (this.messages.length > 0) {
-      const msg = this.messages.shift()!;
-      await this.bar.console(msg);
+      const record = this.messages.shift()!;
+      const args = defaultConsoleFormatter(record) as string[] | string;
+      await this.bar.clearLine();
+      await this.bar.stdoutWrite("\r");
+
+      const method = levelMap[record.level];
+      if (typeof args === "string") {
+        const msg = args.replace(/\r?\n$/, "");
+        // @ts-ignore: dynamic
+        globalThis.console[method](msg);
+      } else {
+        // @ts-ignore: dynamic
+        globalThis.console[method](...args);
+      }
+
+      await this.bar.stdoutWrite("\x1b[?25l");
     }
 
     await this.bar.render(progress, {
@@ -41,8 +66,9 @@ export class CompileProgressBar implements ICompileListener {
       const sinks = loggerConfig.sinks;
       if ("console" in sinks) {
         oldSink = sinks.console;
+
         sinks.console = async (record: logtape.LogRecord) => {
-          this.messages.push(record.message.join(""));
+          this.messages.push(record);
         };
 
         loggerConfig.reset = true;

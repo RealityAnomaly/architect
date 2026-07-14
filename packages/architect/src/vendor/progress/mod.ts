@@ -238,16 +238,16 @@ export default class ProgressBar {
     return Deno.consoleSize().columns;
   }
 
-  private breakLine(): Promise<void> {
+  public breakLine(): Promise<void> {
     return this.stdoutWrite("\n");
   }
 
-  private stdoutWrite(msg: string): Promise<void> {
+  public stdoutWrite(msg: string): Promise<void> {
     // return this.writer.write(this.encoder.encode(msg));
     return writeAll(this.writer, this.encoder.encode(msg))
   }
 
-  private clearLine(direction: Direction = Direction.all): Promise<void> {
+  public clearLine(direction: Direction = Direction.all): Promise<void> {
     switch (direction) {
       case Direction.all:
         return this.stdoutWrite("\x1b[2K");
