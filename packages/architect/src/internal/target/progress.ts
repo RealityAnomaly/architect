@@ -13,7 +13,7 @@ export interface ICompileListener {
   setTotal(total: number): void;
   onComponentStart(component: Component): void;
   onComponentEnd(component: Component): void;
-  onResourceStart(resource: unknown): void;
-  onResourceEnd(resource: unknown): void;
+  onResourceStart(resource: object, description?: string): void;
+  onResourceEnd(resource: object): void;
   onPhaseChange(phase: BuildPhase): void;
 }

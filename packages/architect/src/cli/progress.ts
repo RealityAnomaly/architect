@@ -113,11 +113,11 @@ export class CompileProgressBar implements ICompileListener {
     this.progress++;
   }
 
-  public onResourceStart(component: Component) {
-    this.status = component.toString();
+  public onResourceStart(resource: object, description?: string) {
+    this.status = description ?? resource.toString();
   }
 
-  public onResourceEnd(_component: Component) {
+  public onResourceEnd(_resource: object) {
     this.progress++;
   }
 
