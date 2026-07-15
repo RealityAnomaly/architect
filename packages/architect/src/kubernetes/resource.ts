@@ -125,6 +125,10 @@ export class KubeResourceUtilities {
     return builder.join(".");
   }
 
+  static resourceName(data: KubeResource): string {
+    return `${data.kind} ${data.metadata?.namespace ?? "default"}/${data.metadata?.name}`;
+  }
+
   /**
    * Normalises a recursive list or set of potential resources into a flat list of resources.
    */

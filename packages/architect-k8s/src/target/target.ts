@@ -31,7 +31,7 @@ import { K8S_PLUGIN_CLASS, K8sPlugin } from '../plugin.ts';
 import { KubeContext } from '../context.ts';
 import { KubeCRDDependencyGraph } from '../crds/graph.ts';
 import { NamespaceDefaults, NamespaceRef } from '../types/scn.ts';
-import { TargetApplyParams } from '../../../architect/src/index.ts';
+import { KubeResourceUtilities, TargetApplyParams } from '../../../architect/src/index.ts';
 import { getFakeTarget } from './fake.ts';
 
 export enum KubeTargetOutputFormat {
@@ -241,7 +241,8 @@ export class KubeTarget extends Target {
     listener?: ICompileListener,
   ): Promise<void> {
     await Promise.all(resources.map(async (r) => {
-      listener?.onResourceStart(r);
+      const resourceName = KubeResourceUtilities.resourceName(r);
+      listener?.onResourceStart(r, resourceName);
 
       // hate this serdes but https://github.com/kubernetes-client/javascript/issues/2483 breaks it otherwise
       const data = yaml.stringify(r, { skipInvalid: true });
@@ -266,7 +267,7 @@ export class KubeTarget extends Target {
             // not valid json
           }
 
-          logger?.error(`${r.kind} ${r.metadata?.namespace ?? "default"}/${r.metadata?.name}: apply failed: ${message}`);
+          logger?.error(`${resourceName}: apply failed: ${message}`);
         } else {
           throw e;
         }

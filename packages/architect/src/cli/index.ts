@@ -153,10 +153,9 @@ export class App {
     }
 
     const ignoreErrors = true;
-
-    const targets = options.target
+    const targets = (options.target
       ? [await this.project.getTarget(options.target)]
-      : await this.project.getTargets();
+      : await this.project.getTargets()).filter((t) => !!t);
 
     if (targets.length <= 0) {
       console.log(`Unable to find any targets`);
