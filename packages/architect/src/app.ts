@@ -1,7 +1,6 @@
 import * as kubeUtils from './kubernetes/index.ts';
 import 'reflect-metadata';
 import path from 'node:path';
-import { PluginRegistry } from './plugin.ts';
 import { TargetCache } from './internal/index.ts';
 import * as logtape from '@logtape/logtape';
 import { Project } from './internal/project/index.ts';
@@ -10,6 +9,7 @@ import { Ajv } from 'ajv';
 import { TypeRegistry } from './utils/index.ts';
 import { StateProvider } from './utils/state.ts';
 import { ProjectClass } from './index.ts';
+import { PluginRegistry } from './internal/plugin/registry.ts';
 
 /**
  * The main class of the application.

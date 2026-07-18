@@ -134,6 +134,7 @@ export abstract class Component<
   /**
    * Constructs this component, setting properties on the Result object.
    */
+  // noinspection JSUnusedGlobalSymbols
   public async build(result: TResult = {} as TResult): Promise<TResult> {
     for (const c of this.children) {
       if (c.independent) continue;
@@ -184,6 +185,7 @@ export abstract class Component<
   /**
    * Adds a child by constructing it and adding it to this component
    */
+  // noinspection JSUnusedGlobalSymbols
   protected addChild(child: Constructor<Component>, independent = false) {
     const context = this.target.defaultContext(
       child,
@@ -211,6 +213,7 @@ export abstract class Component<
   /**
    * Creates a reference to a component with the same context
    */
+  // noinspection JSUnusedGlobalSymbols
   protected localRef<T extends Component>(
     type: Constructor<T>,
     name?: string,
@@ -233,8 +236,9 @@ export abstract class Component<
   }
 
   /**
-   * Sets the default values for this component's properties. Should be called in the configure() function, or alternatively init()
+   * Sets the default values for this component's properties. Should be called in the {@link Component.configure} function, or alternatively {@link Component.init}
    */
+  // noinspection JSUnusedGlobalSymbols
   protected setDefaults(defaults: DeepPartial<TArgs>) {
     this.props.$setFallback(defaults);
   }

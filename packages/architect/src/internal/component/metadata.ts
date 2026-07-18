@@ -38,6 +38,7 @@ export class ComponentMetadata<TModel extends ComponentModel = ComponentModel> {
     );
   }
 
+  // noinspection JSUnusedGlobalSymbols
   public assign<T extends object>(target: T) {
     Reflect.defineMetadata(Architect.TYPE_META_KEY, 'component', target);
     Reflect.defineMetadata(Architect.MODEL_META_KEY, this.model, target);

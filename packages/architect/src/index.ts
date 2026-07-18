@@ -17,8 +17,11 @@ export * from './utils/index.ts';
 export * from './internal/index.ts';
 
 export * from './app.ts';
-export * from './plugin.ts';
+export * from './internal/plugin/plugin.ts';
 export * from './internal/project/index.ts';
+
+export { ProjectMetadata } from './internal/project/meta.ts';
+export { PluginRegistry } from './internal/plugin/registry.ts';
 
 @Project.decorate({
   name: '@glassway/architect',

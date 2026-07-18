@@ -55,7 +55,8 @@ export class K8sPlugin extends Plugin {
 
   public async init(): Promise<void> {}
 
-  public async registerCommand(cmd: Command): Promise<void> {
+  // noinspection JSUnusedGlobalSymbols
+  public override async registerCommand(cmd: Command): Promise<void> {
     const command = cmd.command("k8s")
       .description("Commands for the Kubernetes module");
 

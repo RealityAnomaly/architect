@@ -4,6 +4,7 @@ import { IComponentMatcher } from './index.ts';
 import { Component } from '../component.ts';
 import { ComponentReference } from '../types.ts';
 
+// noinspection JSUnusedGlobalSymbols
 export class ComponentReferenceMatcher<T> implements IComponentMatcher {
   private readonly ref: ComponentReference<T>;
 
