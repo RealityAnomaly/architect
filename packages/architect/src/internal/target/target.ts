@@ -276,9 +276,9 @@ export class Target {
 }
 
 export type TargetClass = {
-  // deno-lint-ignore no-explicit-any
   new (
     model: architectGlasswayNet.v1alpha1.Target,
+    // deno-lint-ignore no-explicit-any
     params: any,
     parent: Project,
   ): Target;

@@ -17,6 +17,7 @@ export interface IComponentMatcher {
   toString(): string;
 }
 
+// noinspection JSUnusedGlobalSymbols
 export class ComponentMatcher implements IComponentMatcher {
   private readonly token: Constructor<Component>;
   private readonly clazz: string;

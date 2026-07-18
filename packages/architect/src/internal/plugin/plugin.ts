@@ -1,41 +1,11 @@
 import * as commander from 'commander';
 import 'reflect-metadata';
 
-import { Architect, TargetClass } from './index.ts';
+import { Architect, TargetClass } from '../../index.ts';
 import * as logtape from '@logtape/logtape';
 import Module from 'node:module';
-import { TypeUtilities } from './utils/types.ts';
-import { ModuleUtilities } from './utils/modules.ts';
-
-export class PluginRegistry {
-  public readonly data: Record<string, Plugin> = {};
-
-  public get targetMap(): Record<string, TargetClass> {
-    const results = {} as Record<string, TargetClass>;
-    Object.values(this.data).forEach((p) => {
-      for (const [k, v] of Object.entries(p.targets)) results[k] = v;
-    });
-
-    return results;
-  }
-
-  public async register(plugin: PluginClass, parent: Architect): Promise<void> {
-    const clazz = Reflect.getMetadata(Architect.CLASS_META_KEY, plugin);
-    this.data[clazz] = new plugin(parent);
-  }
-
-  public async resolve(): Promise<void> {}
-
-  public async init(): Promise<void> {
-    for (const plugin of Object.values(this.data)) {
-      await plugin.init();
-    }
-  }
-
-  public get(module: string): Plugin {
-    return this.data[module];
-  }
-}
+import { TypeUtilities } from '../../utils/types.ts';
+import { ModuleUtilities } from '../../utils/modules.ts';
 
 /**
  * Represents an extension to Architect that defines new functionality.
@@ -57,6 +27,7 @@ export abstract class Plugin {
 
   public abstract get targets(): Record<string, TargetClass>;
 
+  // noinspection JSUnusedGlobalSymbols
   public static decorate<T extends Plugin>(
     clazz: string,
   ): (target: PluginClass<T>) => void {
@@ -68,6 +39,7 @@ export abstract class Plugin {
     return decorator;
   }
 
+  // noinspection JSUnusedGlobalSymbols
   public static async collect(module: Module): Promise<PluginClass[]> {
     return ModuleUtilities.collectClasses(module, (clazz) => {
       return TypeUtilities.isObject(clazz) &&

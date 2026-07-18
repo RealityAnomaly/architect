@@ -1,12 +1,14 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import * as logtape from '@logtape/logtape';
-import { Plugin, PluginRegistry } from '../../plugin.ts';
+import { walk } from "jsr:@std/fs/walk";
+import { Plugin } from '../plugin/plugin.ts';
 import { Target } from './target.ts';
 import { Project } from '../project/index.ts';
 
 import { architectGlasswayNet } from '../../kubernetes/crds/index.ts';
 import { ManifestLoader } from '../../kubernetes/index.ts';
+import { PluginRegistry } from '../plugin/registry.ts';
 
 export class TargetLoader {
   public static async collectFolder(
@@ -23,39 +25,39 @@ export class TargetLoader {
       return [];
     }
 
-    const result = await fs.readdir(input);
-    const results =
-      (await Promise.all(result.map(async (k): Promise<Target[]> => {
-        if (!k.endsWith('.yaml')) return [];
+    // should instead find files recursively of type target.yaml
+    const results = [];
+    for await (const entry of walk(input, { exts: ["yaml"] })) {
+      if (!entry.isFile || entry.name !== "target.yaml") continue;
 
-        const resources = await loader.loadFile(path.join(input, k));
-        return resources.filter((r) =>
-          r instanceof architectGlasswayNet.v1alpha1.Target
-        ).map((r) => {
-          try {
-            r.validate();
-          } catch (exception: unknown) {
-            logger?.error(
-              `failed to validate target ${r?.metadata?.name}: ${exception}`,
-            );
-            return undefined;
-          }
+      const resources = await loader.loadFile(entry.path);
+      results.push(...resources.filter((r) =>
+        r instanceof architectGlasswayNet.v1alpha1.Target
+      ).map((r) => {
+        try {
+          r.validate();
+        } catch (exception: unknown) {
+          logger?.error(
+            `failed to validate target ${r?.metadata?.name}: ${exception}`,
+          );
+          return undefined;
+        }
 
-          // pick target type from plugin property
-          if (r.spec.plugins?.kubernetes) {
-            return new plugins.targetMap[Plugin.TARGET_IDENTIFIERS.kubernetes](
-              r,
-              {},
-              project,
-            );
-          } else {
-            logger?.error(
-              `attempted to load target ${r.metadata.name} with un-configured plugins`,
-            );
-            return undefined;
-          }
-        }).filter((r) => r !== undefined);
-      }))).flat();
+        // pick target type from plugin property
+        if (r.spec.plugins?.kubernetes) {
+          return new plugins.targetMap[Plugin.TARGET_IDENTIFIERS.kubernetes](
+            r,
+            {},
+            project,
+          );
+        } else {
+          logger?.error(
+            `attempted to load target ${r.metadata.name} with un-configured plugins`,
+          );
+          return undefined;
+        }
+      }).filter((r) => r !== undefined));
+    }
 
     await Promise.all(results.map(async (t) => {
       await t.init();
