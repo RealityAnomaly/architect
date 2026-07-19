@@ -78,34 +78,13 @@ spec:
                               type: string
                             services:
                               type: string
-                        podNetwork:
-                          properties:
-                            ipFamilies:
-                              items:
-                                type: string
-                                enum: [ "IPv4", "IPv6" ]
-                              type: array
-                          required:
-                            - ipFamilies
-                          type: object
                         flavor:
                           type: string
                           enum: [ "docker-desktop", "kind", "k3s", "talos" ]
-                        version:
-                          type: string
-                        metal:
-                          type: object
-                          properties:
-                            nodes:
-                              type: integer
-                          required: [ "nodes" ]
                       required:
                         - client
                         - dns
-                        - podNetwork
                         - flavor
-                        - version
-                        - metal
                 capabilities:
                   description: >-
                     Capabilities is a list of capability identifiers that this target exposes but are not created by components within the build tree.

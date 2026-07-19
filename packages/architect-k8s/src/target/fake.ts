@@ -1,4 +1,5 @@
 import { architectGlasswayNet } from '@glassway/architect';
+import { KubeTargetState } from './intro.ts';
 
 export function getFakeTarget() {
   return new architectGlasswayNet.v1alpha1.Target({
@@ -12,16 +13,21 @@ export function getFakeTarget() {
             context: 'admin@fake-cluster',
           },
           dns: 'fake.example.com',
-          podNetwork: {
-            ipFamilies: ['IPv4', 'IPv6'],
-          },
           flavor: 'docker-desktop',
-          version: 'v1.31.3',
-          metal: {
-            nodes: 3,
-          },
         },
       },
     },
   });
+}
+
+export function getFakeState(): KubeTargetState {
+  return {
+    stateVersion: 'v1',
+    version: 'v1.31.3',
+    nodes: {
+      control: 3,
+      worker: 3,
+      ipFamilies: ['IPv4', 'IPv6']
+    },
+  }
 }
