@@ -31,8 +31,9 @@ import { K8S_PLUGIN_CLASS, K8sPlugin } from '../plugin.ts';
 import { KubeContext } from '../context.ts';
 import { KubeCRDDependencyGraph } from '../crds/graph.ts';
 import { NamespaceDefaults, NamespaceRef } from '../types/scn.ts';
-import { KubeResourceUtilities, TargetApplyParams } from '../../../architect/src/index.ts';
-import { getFakeTarget } from './fake.ts';
+import { KubeResourceUtilities, TargetApplyParams, TargetFake } from '@glassway/architect';
+import { getFakeState, getFakeTarget } from './fake.ts';
+import { KubeTargetIntrospection } from './intro.ts';
 
 export enum KubeTargetOutputFormat {
   SingleFile,
@@ -57,6 +58,7 @@ export class KubeTarget extends Target {
   public readonly flux: FluxCDController;
   public client: _client.KubernetesObjectApi | undefined;
 
+  protected introspection: KubeTargetIntrospection | undefined;
   private readonly markedCRDGVKs: GVK[] = [];
   private readonly markedCRDGroups: string[] = [];
 
@@ -109,8 +111,11 @@ export class KubeTarget extends Target {
     return this.component(KubePreludeComponent);
   }
 
-  public static fake(): architectGlasswayNet.v1alpha1.Target {
-    return getFakeTarget();
+  public static fake(): TargetFake {
+    return {
+      model: getFakeTarget(),
+      state: getFakeState()
+    }
   }
 
   public override defaultContext<T extends Component>(
@@ -303,9 +308,7 @@ export class KubeTarget extends Target {
     this.createNamespace(this.cluster.ns!.services!);
   }
 
-  public getClient(): _client.KubernetesObjectApi {
-    if (this.client) return this.client;
-
+  public getConfig(): _client.KubeConfig {
     const config = new _client.KubeConfig();
     config.mergeConfig(this.plugin.getKubeConfig());
 
@@ -313,8 +316,24 @@ export class KubeTarget extends Target {
     if (!context) throw Error("Cluster context must be defined to use client");
 
     config.setCurrentContext(context);
+    return config;
+  }
+
+  public getClient(): _client.KubernetesObjectApi {
+    if (this.client) return this.client;
+    const config = this.getConfig();
+
     // client.patch, etc, server side apply
     this.client = _client.KubernetesObjectApi.makeApiClient(config);
     return this.client;
+  }
+
+  public override getIntrospection(): KubeTargetIntrospection {
+    if (!this.introspection) {
+      const config = this.getConfig();
+      this.introspection = new KubeTargetIntrospection(config);
+    }
+
+    return this.introspection;
   }
 }

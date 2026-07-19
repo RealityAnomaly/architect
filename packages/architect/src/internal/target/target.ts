@@ -3,7 +3,7 @@ import * as logtape from '@logtape/logtape';
 
 import { architectGlasswayNet } from '../../kubernetes/crds/index.ts';
 
-import { Component, ComponentClass,  } from '../component/component.ts';
+import { Component, ComponentClass,  } from '../component/index.ts';
 import {
   Condition,
   Constructor,
@@ -17,13 +17,12 @@ import {
 import { Result } from '../result/index.ts';
 import { Context } from '../../utils/index.ts';
 import {
-  ApplyStatus,
   Architect,
   Capability,
   BuildPhase,
   DependencyGraph, ExtractComponentArgs,
   ICompileListener,
-  VirtualCapability,
+  VirtualCapability, TargetIntrospection,
 } from '../../index.ts';
 import { Project } from '../project/index.ts';
 
@@ -273,6 +272,15 @@ export class Target {
       );
     }
   }
+
+  public getIntrospection(): TargetIntrospection<unknown> | undefined {
+    return undefined;
+  }
+}
+
+export interface TargetFake {
+  model: architectGlasswayNet.v1alpha1.Target,
+  state?: object
 }
 
 export type TargetClass = {
@@ -282,5 +290,5 @@ export type TargetClass = {
     params: any,
     parent: Project,
   ): Target;
-  fake(): architectGlasswayNet.v1alpha1.Target;
+  fake(): TargetFake;
 };

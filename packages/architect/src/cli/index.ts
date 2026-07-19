@@ -152,7 +152,7 @@ export class App {
       throw Error("validateOnly cannot be used at the same time as apply");
     }
 
-    const ignoreErrors = true;
+    const ignoreErrors = false;
     const targets = (options.target
       ? [await this.project.getTarget(options.target)]
       : await this.project.getTargets()).filter((t) => !!t);

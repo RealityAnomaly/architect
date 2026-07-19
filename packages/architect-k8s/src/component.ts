@@ -24,6 +24,7 @@ import { CNICapability, DNSCapability } from './capabilities/index.ts';
 import { KubeTarget } from './target/target.ts';
 import { KubeContext } from './context.ts';
 import { GitFetchOptions, HelmChartOpts, HttpFetchOptions, KustomizeOpts, } from './index.ts';
+import { KubeTargetIntrospection } from './target/intro.ts';
 
 export interface KubeComponentArgs
   extends ComponentArgs<KubeComponentModelInput> {
@@ -73,6 +74,10 @@ export abstract class KubeComponent<
     >['kubernetes']
   > {
     return this.target.cluster;
+  }
+
+  protected get introspection(): KubeTargetIntrospection {
+    return this.target.getIntrospection();
   }
 
   /**
@@ -225,9 +230,11 @@ export abstract class KubeComponent<
     config: HelmChartOpts,
     filter?: (v: KubeResource) => boolean,
   ): Promise<KubeResource[]> {
+    const state = await this.introspection.getState();
+
     config = toolkit.merge({
       namespace: this.context.namespace,
-      kubeVersion: this.cluster.version,
+      kubeVersion: state.version,
       includeCRDs: true,
       noHooks: true,
       skipTests: true,

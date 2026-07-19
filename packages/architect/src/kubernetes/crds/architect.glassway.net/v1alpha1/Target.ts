@@ -45,14 +45,7 @@ export interface ITarget {
 "operators"?: string;
 "services"?: string;
 };
-"podNetwork": {
-  "ipFamilies": Array<"IPv4" | "IPv6">;
-};
 "flavor": "docker-desktop" | "kind" | "k3s" | "talos";
-"version": string;
-"metal": {
-  "nodes": number;
-};
 };
 };
 /**

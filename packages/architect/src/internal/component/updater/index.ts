@@ -94,7 +94,9 @@ export class Updater {
     // The fake target is an approximation and is not intended to simulate all use cases, component requirements are also disabled
     const targetType =
       this.project.app.pluginRegistry.targetMap[component.meta.target!];
-    const target = new targetType(targetType.fake(), {}, this.project);
+    const fake = targetType.fake();
+    const target = new targetType(fake.model, {}, this.project);
+
     target.enable(
       component.clazz,
       {inputs: component.model.inputs},
@@ -102,6 +104,11 @@ export class Updater {
       100,
       true,
     );
+
+    const introspection = target.getIntrospection();
+    if (introspection) {
+      introspection.setState(fake.state);
+    }
 
     const instance = target.component(component.clazz, undefined, true);
     const changed = await instance.upgrade(component);
