@@ -28,7 +28,7 @@ export class KubeTargetIntrospection extends TargetIntrospection<KubeTargetState
     this.api = config.makeApiClient(_client.CoreV1Api);
   }
 
-  public async loadState(): Promise<KubeTargetState> {
+  public override async loadState(): Promise<KubeTargetState> {
     const version = await this.getVersion();
     const nodes = await this.getNodes();
 
@@ -55,7 +55,10 @@ export class KubeTargetIntrospection extends TargetIntrospection<KubeTargetState
       const labels = node?.metadata?.labels ?? ({});
       if ("node-role.kubernetes.io/control-plane" in labels) {
         control++;
-      } else {
+      }
+
+      // control plane nodes without the taint are treated as workers
+      if (!("node-role.kubernetes.io/control-plane:NoSchedule" in labels)) {
         worker++;
       }
 

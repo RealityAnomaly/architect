@@ -5,7 +5,6 @@ export abstract class TargetIntrospection<T> {
 
   public async getState(): Promise<T> {
     if (!this.state) this.state = await this.loadState();
-
     return this.state;
   }
 
