@@ -74,7 +74,7 @@ export class MockTarget implements ITarget {
   }
 
   component<T extends Component>(token: ComponentClass<T>, context?: Partial<Context>, auto?: boolean): T {
-    return new MockComponent() as T;
+    return new MockComponent() as unknown as T;
   }
 
   declare(capability: Capability<unknown>): void {

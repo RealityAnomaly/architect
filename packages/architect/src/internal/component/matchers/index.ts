@@ -1,4 +1,4 @@
-import { Component } from '../component.ts';
+import { Component, IComponent } from '../component.ts';
 import { Constructor } from '../../../utils/index.ts';
 import { ComponentMetadata } from '../metadata.ts';
 
@@ -10,9 +10,7 @@ export * from './reference.ts';
  * Defines an object that matches one or more components according to a defined ruleset
  */
 export interface IComponentMatcher {
-  match(input: Component): boolean;
-
-  constraint(): string;
+  match(input: IComponent): boolean;
 
   toString(): string;
 }
@@ -27,15 +25,11 @@ export class ComponentMatcher implements IComponentMatcher {
     this.clazz = ComponentMetadata.from(this.token)!.model!.class!;
   }
 
-  match(input: Component): boolean {
+  match(input: IComponent): boolean {
     return input.clazz === this.clazz;
   }
 
-  constraint(): string {
-    return `Component("${this.clazz}")`;
-  }
-
   toString(): string {
-    return `${this.constructor.name}(${this.token.name})`;
+    return `Component("${this.clazz}")`;
   }
 }

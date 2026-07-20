@@ -71,7 +71,7 @@ export class DependencyGraph {
 
             results[v.rid].errors!.push(
               new ValidationError(
-                `failed to satisfy dependency on ${cur.constraint()}`,
+                `failed to satisfy dependency on ${cur.toString()}`,
                 ValidationErrorLevel.ERROR,
                 v.toString(),
               ),

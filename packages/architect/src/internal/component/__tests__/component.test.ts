@@ -74,8 +74,16 @@ Deno.test.beforeEach(() => {
   child = new TestComponent(target, context, undefined, parent);
 });
 
+Deno.test('context returns context', () => {
+  assert.assertStrictEquals(component.context, context);
+});
+
+Deno.test('target returns target', () => {
+  assert.assertStrictEquals(component.target, target);
+});
+
 Deno.test('name returns context name', () => {
-  assert.assertEquals(component.name, context.name);
+  assert.assertStrictEquals(component.name, context.name);
 });
 
 Deno.test('capabilities returns empty', () => {

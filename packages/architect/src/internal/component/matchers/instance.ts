@@ -1,22 +1,18 @@
-import { Component } from '../component.ts';
+import { IComponent } from '../component.ts';
 import { IComponentMatcher } from './index.ts';
 
 export class ComponentInstanceMatcher implements IComponentMatcher {
-  public readonly instance: Component;
+  public readonly instance: IComponent;
 
-  constructor(instance: Component) {
+  constructor(instance: IComponent) {
     this.instance = instance;
   }
 
-  match(input: Component): boolean {
+  match(input: IComponent): boolean {
     return input === this.instance;
   }
 
-  constraint(): string {
-    return `ComponentInstance("${this.instance.rid}")`;
-  }
-
   toString(): string {
-    return `${this.constructor.name}(${this.instance.rid})`;
+    return `ComponentInstance("${this.instance.rid}")`;
   }
 }

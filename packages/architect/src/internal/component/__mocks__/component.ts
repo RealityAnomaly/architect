@@ -1,14 +1,26 @@
 // deno-coverage-ignore-file
 // deno-lint-ignore-file no-unused-vars
-import { Capability, ComponentMetadata, ComponentModel, IComponentMatcher, ConfigurationContext, ComponentUpgradeState } from '../../../index.ts';
+import {
+  Capability, ComponentMetadata, ComponentModel, IComponentMatcher, ConfigurationContext, ComponentUpgradeState,
+  ITarget, Context
+} from '../../../index.ts';
 import { IComponent } from '../component.ts';
 
 export class MockComponent implements IComponent {
-  get name(): string {
+  public _context: Context = { name: 'blah123' };
+  public _capabilities: Capability<unknown>[] = [];
+
+  get context(): Context {
+    return this._context;
+  }
+  get target(): ITarget {
     throw new Error('Method not implemented.');
   }
+  get name(): string {
+    return this.context.name;
+  }
   get capabilities(): Capability<unknown>[] {
-    throw new Error('Method not implemented.');
+    return this._capabilities;
   }
   get clazz(): string {
     throw new Error('Method not implemented.');
@@ -20,7 +32,7 @@ export class MockComponent implements IComponent {
     throw new Error('Method not implemented.');
   }
   get rid(): string {
-    throw new Error('Method not implemented.');
+    return 'foobar-b475d49';
   }
   setParent(parent?: any): void {
     throw new Error('Method not implemented.');
