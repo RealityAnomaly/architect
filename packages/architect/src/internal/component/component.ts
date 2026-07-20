@@ -24,6 +24,8 @@ export interface IComponent<
   // deno-lint-ignore no-explicit-any
   TParent extends IComponent = any,
 > {
+  get context(): Context;
+  get target(): ITarget;
   get name(): string;
 
   /**
@@ -99,7 +101,9 @@ export class Component<
   // deno-lint-ignore no-explicit-any
   TParent extends Component = any,
 > implements IComponent<TResult, TArgs, TParent> {
-  public context: Context;
+  protected readonly _context: Context;
+  protected readonly _target: ITarget;
+
   public parent?: TParent;
   public readonly children: Component[] = [];
   public readonly independent: boolean;
@@ -108,8 +112,6 @@ export class Component<
    * The configuration model of the component as a {LazyAuto}
    */
   public props: LazyAuto<TArgs>;
-  protected readonly target: ITarget;
-
   private _metadata?: ComponentMetadata;
   protected _validator?: ValidateFunction<unknown>;
 
@@ -119,8 +121,8 @@ export class Component<
     props?: TArgs,
     parent?: TParent,
   ) {
-    this.context = context as Context;
-    this.target = target;
+    this._context = context as Context;
+    this._target = target;
     this.independent = parent === undefined;
     this.setParent(parent);
 
@@ -136,8 +138,16 @@ export class Component<
     this.configure(new ConfigurationContext(target, this.props));
   }
 
+  public get context() {
+    return this._context;
+  }
+
+  public get target() {
+    return this._target;
+  }
+
   public get name(): string {
-    return this.context.name;
+    return this._context.name;
   }
 
   public get capabilities(): Capability<unknown>[] {
@@ -151,7 +161,7 @@ export class Component<
   public get meta(): ComponentMetadata {
     if (!this._metadata) {
       this._metadata = ComponentMetadata.from(this.constructor as Constructor<Component>);
-      this._metadata.validate(this.constructor.name, this.target.app.ajv, this._validator);
+      this._metadata.validate(this.constructor.name, this._target.app.ajv, this._validator);
     }
 
     return this._metadata;
@@ -166,7 +176,7 @@ export class Component<
   }
 
   public get rid(): string {
-    return Component.rid(this.context.name, this.context);
+    return Component.rid(this._context.name, this._context);
   }
 
   public static rid(name: string, context?: object): string {
@@ -231,7 +241,7 @@ export class Component<
   }
 
   public toString(): string {
-    return `Component ${this.context.name}`;
+    return `Component ${this._context.name}`;
   }
 
   /**
@@ -239,14 +249,14 @@ export class Component<
    */
   // noinspection JSUnusedGlobalSymbols
   protected addChild(child: Constructor<Component>, independent = false) {
-    const context = this.target.defaultContext(
+    const context = this._target.defaultContext(
       child,
-      structuredClone(this.context),
+      structuredClone(this._context),
       true,
     );
 
     const instance = new child(
-      this.target,
+      this._target,
       context,
       undefined,
       independent ? undefined : this,
@@ -256,8 +266,8 @@ export class Component<
 
     if (independent) {
       instance.setParent(this);
-      this.target.enable(child)
-      this.target.register(child, instance, instance.context);
+      this._target.enable(child)
+      this._target.register(child, instance, instance._context);
     }
 
     this.children.push(instance);
@@ -283,7 +293,7 @@ export class Component<
     }
 
     return {
-      ...this.context,
+      ...this._context,
       name: name,
     };
   }

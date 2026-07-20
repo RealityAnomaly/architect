@@ -1,7 +1,7 @@
 import * as toolkit from '@es-toolkit/es-toolkit';
 
 import { IComponentMatcher } from './index.ts';
-import { Component } from '../component.ts';
+import { IComponent } from '../component.ts';
 import { ComponentReference } from '../types.ts';
 
 // noinspection JSUnusedGlobalSymbols
@@ -12,15 +12,11 @@ export class ComponentReferenceMatcher<T> implements IComponentMatcher {
     this.ref = ref;
   }
 
-  match(input: Component): boolean {
+  match(input: IComponent): boolean {
     return toolkit.isEqual(input.context, this.ref);
   }
 
-  constraint(): string {
-    return `ComponentReference(${JSON.stringify(this.ref)})`;
-  }
-
   toString(): string {
-    return `${this.constructor.name}(${this.ref})`;
+    return `ComponentReference(${JSON.stringify(this.ref)})`;
   }
 }

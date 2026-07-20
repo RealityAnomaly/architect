@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 
 import { Constructor } from '../../../index.ts';
-import { Component } from '../index.ts';
+import { IComponent } from '../index.ts';
 import { Capability } from '../capability.ts';
 import { IComponentMatcher } from './index.ts';
 import { Constants } from '../../constants.ts';
@@ -20,7 +20,7 @@ export class CapabilityMatcher<T extends Capability<unknown>>
     this.condition = condition;
   }
 
-  match(input: Component): boolean {
+  match(input: IComponent): boolean {
     return this.matchArray(input.capabilities);
   }
 
@@ -36,13 +36,9 @@ export class CapabilityMatcher<T extends Capability<unknown>>
     return true;
   }
 
-  constraint(): string {
+  toString(): string {
     return `Capability("${
       Reflect.getMetadata(Constants.CLASS_META_KEY, this.token)
     }")`;
-  }
-
-  toString(): string {
-    return `${this.constructor.name}(${this.token.name})`;
   }
 }
