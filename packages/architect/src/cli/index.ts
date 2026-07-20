@@ -1,7 +1,7 @@
 import path from 'node:path';
 import * as commander from 'commander';
 import { TargetResolveParams } from '../internal/index.ts';
-import { Architect, Project } from '../index.ts';
+import { Architect, IProject } from '../index.ts';
 import { ComponentCommand } from './component.ts';
 import { TargetCommand } from './target.ts';
 import process from 'node:process';
@@ -36,7 +36,7 @@ export class App {
     this._projectClass = _projectClass;
   }
 
-  protected get project(): Project {
+  protected get project(): IProject {
     return this.instanceAsserted().getProject();
   }
 

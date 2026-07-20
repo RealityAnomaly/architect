@@ -10,6 +10,7 @@ import {
   KubeResource,
   Project,
   Result,
+  ITarget,
   Target,
   TargetParams,
   TargetResolveParams,
@@ -50,12 +51,59 @@ export interface KubeTargetParams extends TargetParams {
   };
 }
 
+export interface IKubeTarget extends ITarget {
+  get params(): KubeTargetParams;
+  get flux(): FluxCDController;
+
+  get cluster(): NonNullable<
+    NonNullable<
+      architectGlasswayNet.v1alpha1.Target['spec']['plugins']
+    >['kubernetes']
+  >;
+
+  get plugin(): K8sPlugin;
+
+  defaultContext<T extends Component>(
+    token: Constructor<T>,
+    context?: Partial<KubeContext>,
+    force?: boolean,
+  ): Partial<KubeContext>;
+
+  /**
+   * Installs the CRD specified by the GVK, or just marks it as installed.
+   * @param gvk The GVK to install the CRD by
+   * @param mark Just mark the CRD as present in the cluster, and don't install it
+   */
+  enableCRD(gvk: GVK, mark?: boolean): void;
+
+  /**
+   * Installs the CRDs specified by the group, or just marks them as installed.
+   * @param group The group(s) of CRDs to install from the shared repository
+   * @param subgroups Whether to add a wildcard rule to match subgroups
+   * @param mark Just mark the CRDs as present in the cluster, and don't install them
+   */
+  enableCRDGroup(
+    group: string,
+    subgroups?: boolean,
+    mark?: boolean,
+  ): void;
+
+  /**
+   * Creates a new namespace and returns it
+   */
+  createNamespace(name: string): api.v1.Namespace;
+
+  getConfig(): _client.KubeConfig;
+  getClient(): _client.KubernetesObjectApi;
+  getIntrospection(): KubeTargetIntrospection;
+}
+
 /**
  * Version of {Target} that provides build constructs for a specific Kubernetes cluster.
  */
-export class KubeTarget extends Target {
-  declare public readonly params: KubeTargetParams;
-  public readonly flux: FluxCDController;
+export class KubeTarget extends Target implements IKubeTarget {
+  declare protected readonly _params: KubeTargetParams;
+  protected readonly _flux: FluxCDController;
   public client: _client.KubernetesObjectApi | undefined;
 
   protected introspection: KubeTargetIntrospection | undefined;
@@ -87,12 +135,20 @@ export class KubeTarget extends Target {
     model.spec = CollectionUtilities.recursiveMerge(defaults, model.spec);
     super(model, params, project);
 
-    this.flux = new FluxCDController(this);
+    this._flux = new FluxCDController(this);
 
     this.enable(KubePreludeComponent);
     this.enable(CrdsComponent);
 
     this.createDefaultResources();
+  }
+
+  public override get params(): KubeTargetParams {
+    return this._params;
+  }
+
+  public get flux(): FluxCDController {
+    return this._flux;
   }
 
   public get cluster(): NonNullable<
@@ -148,11 +204,6 @@ export class KubeTarget extends Target {
     return context;
   }
 
-  /**
-   * Installs the CRD specified by the GVK, or just marks it as installed.
-   * @param gvk The GVK to install the CRD by
-   * @param mark Just mark the CRD as present in the cluster, and don't install it
-   */
   public enableCRD(gvk: GVK, mark: boolean = false) {
     if (mark === true) {
       this.markedCRDGVKs.push(gvk);
@@ -161,12 +212,6 @@ export class KubeTarget extends Target {
     }
   }
 
-  /**
-   * Installs the CRDs specified by the group, or just marks them as installed.
-   * @param group The group(s) of CRDs to install from the shared repository
-   * @param subgroups Whether to add a wildcard rule to match subgroups
-   * @param mark Just mark the CRDs as present in the cluster, and don't install them
-   */
   public enableCRDGroup(
     group: string,
     subgroups: boolean = true,
@@ -181,9 +226,6 @@ export class KubeTarget extends Target {
     if (subgroups) this.enableCRDGroup(`*.${group}`, false, mark);
   }
 
-  /**
-   * Creates a new namespace and returns it
-   */
   public createNamespace(name: string): api.v1.Namespace {
     const namespace = new api.v1.Namespace({
       metadata: {

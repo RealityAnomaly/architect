@@ -2,7 +2,7 @@ import { Component } from '../component.ts';
 import { IComponentMatcher } from './index.ts';
 
 export class ComponentInstanceMatcher implements IComponentMatcher {
-  private readonly instance: Component;
+  public readonly instance: Component;
 
   constructor(instance: Component) {
     this.instance = instance;

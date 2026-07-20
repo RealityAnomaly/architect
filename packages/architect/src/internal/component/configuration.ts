@@ -1,6 +1,6 @@
 import { Component,  } from './component.ts';
 import { Context } from '../../utils/index.ts';
-import { Target } from '../target/index.ts';
+import { ITarget } from '../target/index.ts';
 import { _LazyProxy, Condition, Constructor, DeepLazySpec, DeepPartial, Lazy, LazyAuto, } from '../../utils/index.ts';
 import { ComponentArgs, ExtractComponentArgs } from './arguments.ts';
 
@@ -8,12 +8,12 @@ import { ComponentArgs, ExtractComponentArgs } from './arguments.ts';
  * Provides context for component configuration execution
  */
 export class ConfigurationContext {
-  private readonly target: Target;
+  private readonly target: ITarget;
   private readonly self: LazyAuto<ComponentArgs>;
   private readonly enabler: Condition;
 
   constructor(
-    target: Target,
+    target: ITarget,
     self: LazyAuto<ComponentArgs>,
     enabler: Condition = self.enable,
   ) {

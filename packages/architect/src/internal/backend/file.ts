@@ -1,5 +1,5 @@
 import { Project } from '../project/index.ts';
-import { Target } from '../index.ts';
+import { ITarget } from '../index.ts';
 import { Backend } from './base.ts';
 
 /**
@@ -13,7 +13,7 @@ export class FileBackend extends Backend {
     this.project = project;
   }
 
-  public async targets(): Promise<Target[]> {
+  public async targets(): Promise<ITarget[]> {
     return await this.project.getTargets();
   }
 }

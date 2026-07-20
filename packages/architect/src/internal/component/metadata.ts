@@ -11,14 +11,12 @@ import 'reflect-metadata';
 export class ComponentMetadata<TModel extends ComponentModel = ComponentModel> {
   public model?: TModel;
   public target?: string;
-  public clazz?: string;
 
   private validated = false;
 
-  constructor(model: TModel, target: string, clazz?: string) {
+  constructor(model: TModel, target?: string) {
     this.model = model;
     this.target = target;
-    this.clazz = clazz;
   }
 
   public static from<
@@ -32,9 +30,6 @@ export class ComponentMetadata<TModel extends ComponentModel = ComponentModel> {
       Reflect.hasMetadata(Architect.TARGET_TYPE_META_KEY, clazz)
         ? Reflect.getMetadata(Architect.TARGET_TYPE_META_KEY, clazz)
         : undefined,
-      Reflect.hasMetadata(Architect.CLASS_META_KEY, clazz)
-        ? Reflect.getMetadata(Architect.CLASS_META_KEY, clazz)
-        : undefined,
     );
   }
 
@@ -43,9 +38,6 @@ export class ComponentMetadata<TModel extends ComponentModel = ComponentModel> {
     Reflect.defineMetadata(Architect.TYPE_META_KEY, 'component', target);
     Reflect.defineMetadata(Architect.MODEL_META_KEY, this.model, target);
     Reflect.defineMetadata(Architect.TARGET_TYPE_META_KEY, this.target, target);
-    if (this.clazz) {
-      Reflect.defineMetadata(Architect.CLASS_META_KEY, this.clazz, target);
-    }
   }
 
   public validate(parent: string, ajv: Ajv, validator?: ValidateFunction) {

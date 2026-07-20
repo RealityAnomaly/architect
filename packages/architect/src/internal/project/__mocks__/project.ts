@@ -1,0 +1,52 @@
+// deno-lint-ignore-file no-unused-vars
+import { IArchitect, ITarget, ComponentClass, PluginClass } from '../../../index.ts';
+import { ProjectConfig } from '../config.ts';
+import { IProject, Project } from '../index.ts';
+
+export class MockProject implements IProject {
+  public _app: IArchitect;
+
+  constructor(app: IArchitect) {
+    this._app = app;
+  }
+
+  get app(): IArchitect {
+    return this._app;
+  }
+  get config(): ProjectConfig {
+    throw new Error('Method not implemented.');
+  }
+  resolveImports(): Project[] {
+    throw new Error('Method not implemented.');
+  }
+  load(topLevel?: boolean): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+  configure(): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+  saveConfig(): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+  getTarget(name: string): Promise<ITarget | undefined> {
+    throw new Error('Method not implemented.');
+  }
+  getTargets(): Promise<ITarget[]> {
+    throw new Error('Method not implemented.');
+  }
+  getComponent(clazz: string, recursive?: boolean): Promise<ComponentClass | undefined> {
+    throw new Error('Method not implemented.');
+  }
+  getComponents(recursive?: boolean): Promise<ComponentClass[]> {
+    throw new Error('Method not implemented.');
+  }
+  getModules(): unknown[] {
+    throw new Error('Method not implemented.');
+  }
+  getPlugins(): PluginClass[] {
+    throw new Error('Method not implemented.');
+  }
+  getRoot(): string {
+    throw new Error('Method not implemented.');
+  }
+}

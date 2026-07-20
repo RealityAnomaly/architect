@@ -1,7 +1,7 @@
 import * as commander from 'commander';
 import 'reflect-metadata';
 
-import { Architect, TargetClass } from '../../index.ts';
+import { IArchitect, Architect, TargetClass } from '../../index.ts';
 import * as logtape from '@logtape/logtape';
 import Module from 'node:module';
 import { TypeUtilities } from '../../utils/types.ts';
@@ -16,10 +16,10 @@ export abstract class Plugin {
   };
 
   public readonly name: string;
-  public readonly parent: Architect;
+  public readonly parent: IArchitect;
   public readonly logger: logtape.Logger;
 
-  protected constructor(parent: Architect, name: string) {
+  protected constructor(parent: IArchitect, name: string) {
     this.name = name;
     this.parent = parent;
     this.logger = logtape.getLogger(['architect', 'plugin', name]);
@@ -54,5 +54,5 @@ export abstract class Plugin {
 }
 
 export interface PluginClass<T extends Plugin = Plugin> {
-  new (parent: Architect): T;
+  new (parent: IArchitect): T;
 }

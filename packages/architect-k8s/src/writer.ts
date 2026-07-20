@@ -3,14 +3,14 @@ import * as yaml from '@std/yaml';
 import * as fs from 'node:fs/promises';
 
 import { KubeResource, KubeResourceUtilities, Result, Writer, } from '@glassway/architect';
-import { KubeTarget, KubeTargetOutputFormat } from './target/target.ts';
+import { IKubeTarget, KubeTargetOutputFormat } from './target/target.ts';
 import { KubeContext } from './context.ts';
 import { KubeComponent } from './index.ts';
 
 export class KubeWriter implements Writer {
-  private readonly target: KubeTarget;
+  private readonly target: IKubeTarget;
 
-  constructor(target: KubeTarget) {
+  constructor(target: IKubeTarget) {
     this.target = target;
   }
 

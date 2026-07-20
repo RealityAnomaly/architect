@@ -6,12 +6,16 @@
     "jsr:@glassway/kubernetes-types@^1.0.3": "1.0.3",
     "jsr:@logtape/logtape@^2.2.3": "2.2.4",
     "jsr:@match/match@0.1": "0.1.0",
+    "jsr:@std/assert@^1.0.19": "1.0.19",
     "jsr:@std/assert@^1.0.9": "1.0.19",
     "jsr:@std/async@*": "1.0.11",
+    "jsr:@std/async@^1.4.0": "1.5.0",
     "jsr:@std/async@^1.5.0": "1.5.0",
     "jsr:@std/bytes@^1.0.6": "1.0.6",
+    "jsr:@std/data-structures@^1.1.0": "1.1.1",
     "jsr:@std/data-structures@^1.1.1": "1.1.1",
     "jsr:@std/fmt@1.0.3": "1.0.3",
+    "jsr:@std/fs@*": "1.0.24",
     "jsr:@std/fs@^1.0.24": "1.0.24",
     "jsr:@std/internal@^1.0.12": "1.0.14",
     "jsr:@std/internal@^1.0.14": "1.0.14",
@@ -21,6 +25,7 @@
     "jsr:@std/path@^1.1.5": "1.1.6",
     "jsr:@std/path@^1.1.6": "1.1.6",
     "jsr:@std/streams@^1.1.1": "1.1.1",
+    "jsr:@std/testing@^1.0.19": "1.0.19",
     "jsr:@std/url@~0.225.1": "0.225.1",
     "jsr:@std/yaml@^1.1.2": "1.1.2",
     "npm:@kubernetes/client-node@^1.4.0": "1.4.0",
@@ -99,7 +104,7 @@
     "@std/async@1.5.0": {
       "integrity": "4c1f22d287a17ad7d8643b1952bc5a4d21e5d8b68dc8c20d8268eecc69096e82",
       "dependencies": [
-        "jsr:@std/data-structures"
+        "jsr:@std/data-structures@^1.1.1"
       ]
     },
     "@std/bytes@1.0.6": {
@@ -137,6 +142,17 @@
       "integrity": "92556d350e537e9dce527a6d08f6f15be3ff65e656079dea69d15252187c7613",
       "dependencies": [
         "jsr:@std/bytes"
+      ]
+    },
+    "@std/testing@1.0.19": {
+      "integrity": "f4236172365b216728dc3cc8b5e80a9f4c33083d1e4ede7613d5b25b4014898e",
+      "dependencies": [
+        "jsr:@std/assert@^1.0.19",
+        "jsr:@std/async@^1.4.0",
+        "jsr:@std/data-structures@^1.1.0",
+        "jsr:@std/fs@^1.0.24",
+        "jsr:@std/internal@^1.0.14",
+        "jsr:@std/path@^1.1.5"
       ]
     },
     "@std/url@0.225.1": {
@@ -819,6 +835,7 @@
       "jsr:@std/fs@^1.0.24",
       "jsr:@std/path@^1.1.6",
       "jsr:@std/streams@^1.1.1",
+      "jsr:@std/testing@^1.0.19",
       "jsr:@std/url@~0.225.1",
       "jsr:@std/yaml@^1.1.2",
       "npm:commander@15",
