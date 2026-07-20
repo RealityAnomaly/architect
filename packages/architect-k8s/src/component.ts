@@ -47,9 +47,8 @@ export abstract class KubeComponent<
   TArgs extends KubeComponentArgs = KubeComponentArgs,
   TParent extends Component = Component,
 > extends Component<TResult, TArgs, TParent> implements IKubeComponent<TResult, TArgs, TParent> {
-  declare protected readonly target: IKubeTarget;
-
-  public override context: KubeContext;
+  declare protected readonly _target: IKubeTarget;
+  declare protected readonly _context: KubeContext;
 
   /**
    * Whether to enable adding standard requirements such as CNI and DNS
@@ -63,13 +62,21 @@ export abstract class KubeComponent<
     parent?: TParent,
   ) {
     super(target, context, props, parent);
-    this.context = context;
+    this._context = context;
 
     this._validator = ComponentModelUtilities.createValidator(
       this.target.app.ajv,
       KubeComponentContextSchema,
       KubeComponentModelInputSchema,
     );
+  }
+
+  public override get target(): IKubeTarget {
+    return this._target;
+  }
+
+  public override get context(): KubeContext {
+    return this._context;
   }
 
   public get namespace(): string {
@@ -184,7 +191,7 @@ export abstract class KubeComponent<
 
         if (input.helm.version !== latest) {
           changed = true;
-          state.logger.info(
+          state.logger?.info(
             `${this.constructor.name}: input '${k}': ${input.helm.repo}/${input.helm.name} changed from ${input.helm.version} -> ${latest}`,
           );
           input.helm.version = latest;
@@ -195,7 +202,7 @@ export abstract class KubeComponent<
 
         if (input.oci.version !== latest) {
           changed = true;
-          state.logger.info(
+          state.logger?.info(
             `${this.constructor.name}: input '${k}': ${input.oci.name} changed from ${input.oci.version} -> ${latest}`,
           );
           input.oci.version = latest;

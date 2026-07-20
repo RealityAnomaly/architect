@@ -8,7 +8,7 @@ import {
   ICompileListener,
   isValidator,
   KubeResource,
-  Project,
+  IProject,
   Result,
   ITarget,
   Target,
@@ -118,7 +118,7 @@ export class KubeTarget extends Target implements IKubeTarget {
         format: KubeTargetOutputFormat.PerComponent,
       },
     },
-    project: Project,
+    project: IProject,
   ) {
     const defaults = {
       plugins: {
