@@ -2,7 +2,7 @@
 
 import * as assert from '@std/assert';
 import * as toolkit from '@es-toolkit/es-toolkit';
-import { CollectionUtilities } from './collections.ts';
+import { CollectionUtilities } from './../collections.ts';
 
 Deno.test('toArray', async () => {
   assert.assertEquals(CollectionUtilities.toArray('foo'), ['foo']);

@@ -1,8 +1,7 @@
 import {
   CapabilityMatcher,
   CollectionUtilities,
-  Component,
-  Target,
+  Component, ITarget,
   ValidationError,
   ValidationErrorCount,
   ValidationErrorLevel,
@@ -20,7 +19,7 @@ export interface ResolvedComponent {
  * Result of a resolve operation, a dependency graph showing relationships between components and any dependency errors.
  */
 export class DependencyGraph {
-  public readonly target: Target;
+  public readonly target: ITarget;
 
   /**
    * Validation errors on the configuration tree
@@ -33,7 +32,7 @@ export class DependencyGraph {
   public readonly components: Record<string, ResolvedComponent>;
 
   private constructor(
-    target: Target,
+    target: ITarget,
     components: Record<string, ResolvedComponent>,
   ) {
     this.target = target;
@@ -41,7 +40,7 @@ export class DependencyGraph {
   }
 
   public static async resolve(
-    target: Target,
+    target: ITarget,
     components: Component[],
     validate: boolean = true,
   ): Promise<DependencyGraph> {

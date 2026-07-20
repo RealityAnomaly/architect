@@ -1,6 +1,6 @@
 // noinspection SpellCheckingInspection
 import * as assert from '@std/assert';
-import { TypeUtilities } from './types.ts';
+import { TypeUtilities } from './../types.ts';
 
 Deno.test('isRecord', async () => {
   assert.assertEquals(TypeUtilities.isRecord({ foo: 'bar' }), true);

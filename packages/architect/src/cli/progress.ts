@@ -1,7 +1,7 @@
 import * as logtape from '@logtape/logtape';
 import { ProgressBar } from '../vendor/progress/index.ts';
 import { delay } from '@std/async';
-import { BuildPhase, Component, ICompileListener, Target } from '../internal/index.ts';
+import { BuildPhase, Component, ICompileListener, ITarget } from '../internal/index.ts';
 
 import { defaultConsoleFormatter } from '@logtape/logtape';
 
@@ -11,7 +11,7 @@ export class CompileProgressBar implements ICompileListener {
   protected progress: number = 0;
   protected title?: string;
   protected status?: string;
-  protected target?: Target;
+  protected target?: ITarget;
   protected completed: boolean = false;
   private messages: logtape.LogRecord[] = [];
 
@@ -144,7 +144,7 @@ export class CompileProgressBar implements ICompileListener {
     this.title = `${prefix} Target ${this.target}`;
   }
 
-  public setTarget(target: Target | undefined) {
+  public setTarget(target: ITarget | undefined) {
     this.target = target;
   }
 

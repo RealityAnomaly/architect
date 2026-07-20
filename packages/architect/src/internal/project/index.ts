@@ -6,31 +6,104 @@ import {
   ComponentClass,
   ComponentLoader,
   ComponentMetadata,
-  Target,
+  ITarget,
   TargetLoader,
 } from '../../index.ts';
 import { PluginClass } from '../plugin/plugin.ts';
 import Module from 'node:module';
-import { Architect } from '../../app.ts';
+import { IArchitect } from '../../app.ts';
 import { ProjectConfig, ProjectConfigLoader } from './config.ts';
 import { ProjectUtils } from './utils.ts';
 import * as yaml from '@std/yaml';
 import { ProjectMetadata } from './meta.ts';
 
+export interface IProject {
+  /**
+   * Pointer to the global {@link IArchitect} instance.
+   */
+  get app(): IArchitect;
+
+  /**
+   * Returns the configuration (architect.yaml) from the decorator on this project's constructor
+   */
+  get config(): ProjectConfig;
+
+  /**
+   * Recursively resolves all dependencies of this project, returning a {@link Project} instance for each dependency
+   */
+  resolveImports(): Project[];
+
+  /**
+   * Loads and registers the imports of this and all descendent imports
+   * @param topLevel Whether this project is the top level in the hierarchy (current workspace project)
+   */
+  load(topLevel?: boolean): Promise<void>;
+
+  /**
+   * Configure your project by overriding this method and calling addModules, addImports, or addPlugins.
+   */
+  configure(): Promise<void>;
+
+  /**
+   * Saves the project configuration file
+   */
+  saveConfig(): Promise<void>;
+
+  /**
+   * Finds a target available in this project by name
+   * @param name The name of the target
+   */
+  getTarget(name: string): Promise<ITarget | undefined>;
+
+  /**
+   * Returns all targets available in this project
+   */
+  getTargets(): Promise<ITarget[]>;
+
+  /**
+   * Locates the class of a component by its logical class
+   * @param clazz The logical class of the component, i.e. architect.glassway.net/external-secrets
+   * @param recursive Whether to recursively locate the component from all dependencies
+   */
+  getComponent(
+    clazz: string,
+    recursive?: boolean,
+  ): Promise<ComponentClass | undefined>;
+
+  /**
+   * Returns the classes of all components from all modules registered with this project, and optionally all dependencies
+   * @param recursive Whether to fetch the components of all dependencies
+   */
+  getComponents(
+    recursive?: boolean,
+  ): Promise<ComponentClass[]>;
+
+  /**
+   * Returns all component ECMAScript modules in the project.
+   */
+  getModules(): unknown[];
+
+  /**
+   * Returns the classes of all plugins in the project.
+   */
+  getPlugins(): PluginClass[];
+
+  /**
+   * Returns the filesystem root of the project.
+   */
+  getRoot(): string;
+}
+
 /**
  * High-level abstraction that defines a provider of components, targets, and plugins.
  * Override the {@link Project.configure} method to configure the project, register the architect.yaml file with {@link Project.decorate}, and finally use {@link App.run} to invoke it.
  */
-export abstract class Project {
+export abstract class Project implements IProject {
   /**
    * The root path of the project. Only set if this project is the currently active workspace.
    */
-  public root?: string;
-
-  /**
-   * Pointer to the global {@link Architect} instance.
-   */
-  public app: Architect;
+  private _root?: string;
+  private readonly _app: IArchitect;
 
   /**
    * Whether the project is loaded (it's configured, all imports are resolved, and the root path if present is found)
@@ -43,15 +116,16 @@ export abstract class Project {
   private plugins: PluginClass[] = [];
 
   private components?: ComponentClass[];
-  private targets?: Target[];
+  private targets?: ITarget[];
 
-  constructor(app: Architect) {
-    this.app = app;
+  constructor(app: IArchitect) {
+    this._app = app;
   }
 
-  /**
-   * Returns the configuration (architect.yaml) from the decorator on this project's constructor
-   */
+  public get app(): IArchitect {
+    return this._app;
+  }
+
   public get config(): ProjectConfig {
     return ProjectMetadata.from(this.constructor as ProjectClass).model;
   }
@@ -81,17 +155,10 @@ export abstract class Project {
     };
   }
 
-  /**
-   * Recursively resolves all dependencies of this project, returning a {@link Project} instance for each dependency
-   */
   public resolveImports(): Project[] {
     return this.app.projectRegistry.resolveAll(this.imports);
   }
 
-  /**
-   * Loads and registers the imports of this and all descendent imports
-   * @param topLevel Whether this project is the top level in the hierarchy (current workspace project)
-   */
   public async load(topLevel: boolean = false) {
     if (this.loaded) return;
 
@@ -99,9 +166,9 @@ export abstract class Project {
     await this.configure();
 
     if (topLevel) {
-      this.root = await ProjectUtils.findProjectRoot(Deno.cwd());
+      this._root = await ProjectUtils.findProjectRoot(Deno.cwd());
 
-      if (!this.root) {
+      if (!this._root) {
         this.app.logger.info(
           `the project root is not writeable, actions that write to configuration files will be unavailable`,
         );
@@ -119,16 +186,10 @@ export abstract class Project {
     this.loaded = true;
   }
 
-  /**
-   * Configure your project by overriding this method and calling addModules, addImports, or addPlugins.
-   */
   public async configure() {
     this.addImports(ArchitectCoreProject);
   }
 
-  /**
-   * Saves the project configuration file
-   */
   public async saveConfig() {
     await ProjectConfigLoader.save(
       path.join(this.getRoot(), 'architect.yaml'),
@@ -136,25 +197,18 @@ export abstract class Project {
     );
   }
 
-  /**
-   * Finds a target available in this project by name
-   * @param name The name of the target
-   */
-  public async getTarget(name: string): Promise<Target | undefined> {
+  public async getTarget(name: string): Promise<ITarget | undefined> {
     const targets = await this.getTargets();
     return targets.find((t) => t.model.metadata.name === name);
   }
 
-  /**
-   * Returns all targets available in this project
-   */
-  public async getTargets(): Promise<Target[]> {
-    if (!this.targets && this.root) {
+  public async getTargets(): Promise<ITarget[]> {
+    if (!this.targets && this._root) {
       this.targets = await TargetLoader.collectFolder(
         this,
         this.app.pluginRegistry,
         this.app.kubeLoader,
-        path.join(this.root, 'targets'),
+        path.join(this._root, 'targets'),
         this.app.logger
       );
     }
@@ -162,11 +216,6 @@ export abstract class Project {
     return this.targets || [];
   }
 
-  /**
-   * Locates the class of a component by its logical class
-   * @param clazz The logical class of the component, i.e. architect.glassway.net/external-secrets
-   * @param recursive Whether to recursively locate the component from all dependencies
-   */
   public async getComponent(
     clazz: string,
     recursive: boolean = false,
@@ -180,10 +229,6 @@ export abstract class Project {
     });
   }
 
-  /**
-   * Returns the classes of all components from all modules registered with this project, and optionally all dependencies
-   * @param recursive Whether to fetch the components of all dependencies
-   */
   public async getComponents(
     recursive: boolean = false,
   ): Promise<ComponentClass[]> {
@@ -207,29 +252,20 @@ export abstract class Project {
     return copy;
   }
 
-  /**
-   * Returns all component ESM modules in the project.
-   */
   public getModules(): unknown[] {
     return this.modules;
   }
 
-  /**
-   * Returns the classes of all plugins in the project.
-   */
   public getPlugins(): PluginClass[] {
     return this.plugins;
   }
 
-  /**
-   * Returns the filesystem root of the project.
-   */
   public getRoot(): string {
-    if (!this.root) {
+    if (!this._root) {
       throw Error("Project is not writable");
     }
 
-    return this.root;
+    return this._root;
   }
 
   /**
@@ -262,5 +298,6 @@ export abstract class Project {
 }
 
 export interface ProjectClass<T extends Project = Project> {
-  new(app: Architect): T;
+  // deno-lint-ignore no-explicit-any
+  new(app: any): T;
 }

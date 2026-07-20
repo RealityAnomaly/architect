@@ -1,5 +1,5 @@
 import * as assert from '@std/assert';
-import { PathResultBuilder, prettifyPath, ValuePath } from './paths.ts';
+import { PathResultBuilder, prettifyPath, ValuePath } from './../paths.ts';
 
 Deno.test("prettifyPath works for all cases", async () => {
   const path: ValuePath = ["foo", "bar", 123, "baz"];

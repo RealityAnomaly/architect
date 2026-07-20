@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 import * as logtape from '@logtape/logtape';
-import { Project } from '../../project/index.ts';
+import { IProject } from '../../project/index.ts';
 import { ComponentClass } from '../index.ts';
 import { ComponentModel, ComponentModelFileInstance, ComponentModelUtilities, } from '../model.ts';
 import { ComponentMetadata } from '../metadata.ts';
@@ -14,17 +14,17 @@ export interface ComponentUpgradeState<
   meta: ComponentMetadata;
   model: TModel;
   file: ComponentModelFileInstance<TModel>;
-  logger: logtape.Logger;
+  logger?: logtape.Logger;
 }
 
 /**
  * Component updater, responsible for updating component inputs.
  */
 export class Updater {
-  private readonly project: Project;
+  private readonly project: IProject;
   private readonly logger: logtape.Logger;
 
-  constructor(project: Project) {
+  constructor(project: IProject) {
     this.project = project;
     this.logger = logtape.getLogger(['architect', 'updater']);
   }

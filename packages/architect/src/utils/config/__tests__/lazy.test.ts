@@ -1,7 +1,7 @@
 // deno-lint-ignore-file no-explicit-any
 // noinspection SpellCheckingInspection
 
-import { Lazy } from './lazy.ts';
+import { Lazy } from './../lazy.ts';
 import * as assert from '@std/assert';
 
 interface TestOptionsB {

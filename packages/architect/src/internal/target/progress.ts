@@ -1,4 +1,4 @@
-import { Target } from './target.ts';
+import { ITarget } from './target.ts';
 import { Component } from '../component/index.ts';
 
 export enum BuildPhase {
@@ -9,7 +9,7 @@ export enum BuildPhase {
 }
 
 export interface ICompileListener {
-  setTarget(target: Target | undefined): void
+  setTarget(target: ITarget | undefined): void
   setTotal(total: number): void;
   onComponentStart(component: Component): void;
   onComponentEnd(component: Component): void;

@@ -3,7 +3,7 @@ import 'reflect-metadata';
 import path from 'node:path';
 import { TargetCache } from './internal/index.ts';
 import * as logtape from '@logtape/logtape';
-import { Project } from './internal/project/index.ts';
+import { IProject } from './internal/project/index.ts';
 import { Ajv } from 'ajv';
 
 import { TypeRegistry } from './utils/index.ts';
@@ -11,10 +11,25 @@ import { StateProvider } from './utils/state.ts';
 import { ProjectClass } from './index.ts';
 import { PluginRegistry } from './internal/plugin/registry.ts';
 
+export interface IArchitect {
+  get ajv(): Ajv;
+  get pluginRegistry(): PluginRegistry;
+  get projectRegistry(): TypeRegistry<IProject>;
+  get logger(): logtape.Logger;
+  get state(): StateProvider;
+  get cache(): TargetCache;
+  get kubeTypes(): kubeUtils.KubeTypeRegistry;
+  get kubeLoader(): kubeUtils.ManifestLoader;
+  get project(): IProject | undefined;
+  init(): Promise<void>;
+  getProject(): IProject;
+  getProjects(): IProject[];
+}
+
 /**
  * The main class of the application.
  */
-export class Architect {
+export class Architect implements IArchitect {
   public static PATH: string = path.resolve(path.join(import.meta.dirname!, '..'));
 
   public static readonly TYPE_META_KEY = 'architect.glassway.net/type';
@@ -23,22 +38,22 @@ export class Architect {
   public static readonly TARGET_TYPE_META_KEY =
     'architect.glassway.net/target-type';
 
-  public project?: Project;
+  protected _project?: IProject;
 
-  public readonly ajv: Ajv;
-  public readonly pluginRegistry: PluginRegistry;
-  public readonly projectRegistry: TypeRegistry<Project>;
-  public readonly logger: logtape.Logger;
-  public readonly state: StateProvider;
-  public readonly cache: TargetCache;
-  public readonly kubeTypes: kubeUtils.KubeTypeRegistry;
-  public readonly kubeLoader: kubeUtils.ManifestLoader;
+  protected readonly _ajv: Ajv;
+  protected readonly _pluginRegistry: PluginRegistry;
+  protected readonly _projectRegistry: TypeRegistry<IProject>;
+  protected readonly _logger: logtape.Logger;
+  protected readonly _state: StateProvider;
+  protected readonly _cache: TargetCache;
+  protected readonly _kubeTypes: kubeUtils.KubeTypeRegistry;
+  protected readonly _kubeLoader: kubeUtils.ManifestLoader;
 
   private constructor(project?: ProjectClass, logLevel: logtape.LogLevel = 'info') {
-    this.ajv = new Ajv();
+    this._ajv = new Ajv();
 
-    this.projectRegistry = new TypeRegistry(this);
-    this.pluginRegistry = new PluginRegistry();
+    this._projectRegistry = new TypeRegistry(this);
+    this._pluginRegistry = new PluginRegistry();
 
     logtape.configure({
       sinks: { console: logtape.getConsoleSink() },
@@ -49,26 +64,36 @@ export class Architect {
       ]
     });
 
-    this.logger = logtape.getLogger(["architect"]);
+    this._logger = logtape.getLogger(["architect"]);
 
-    this.logger.debug(`initialised logging with level '${logLevel}'`);
+    this._logger.debug(`initialised logging with level '${logLevel}'`);
 
-    this.state = StateProvider.fromAppDirs();
-    this.cache = new TargetCache(this.state, this.logger);
+    this._state = StateProvider.fromAppDirs();
+    this._cache = new TargetCache(this._state, this._logger);
 
-    this.kubeTypes = new kubeUtils.KubeTypeRegistry(this.logger);
-    this.kubeLoader = new kubeUtils.ManifestLoader(this.kubeTypes);
+    this._kubeTypes = new kubeUtils.KubeTypeRegistry(this._logger);
+    this._kubeLoader = new kubeUtils.ManifestLoader(this._kubeTypes);
 
-    if (project) this.project = new project(this);
+    if (project) this._project = new project(this);
   }
 
+  public get ajv() { return this._ajv; }
+  public get pluginRegistry() { return this._pluginRegistry; }
+  public get projectRegistry() { return this._projectRegistry; }
+  public get logger() { return this._logger; }
+  public get state() { return this._state; }
+  public get cache() { return this._cache; }
+  public get kubeTypes() { return this._kubeTypes; }
+  public get kubeLoader() { return this._kubeLoader; }
+  public get project() { return this._project; }
+
   public async init() {
-    if (this.project) await this.project.load(true);
+    if (this._project) await this._project.load(true);
 
     for (const project of this.getProjects()) {
       // register plugins for all projects
       for (const plugin of project.getPlugins()) {
-        await this.pluginRegistry.register(plugin, this);
+        await this._pluginRegistry.register(plugin, this);
       }
 
       // register project modules against CRD registry
@@ -77,8 +102,8 @@ export class Architect {
       }
     }
 
-    await this.pluginRegistry.resolve();
-    await this.pluginRegistry.init();
+    await this._pluginRegistry.resolve();
+    await this._pluginRegistry.init();
   }
 
   public static async create(
@@ -95,13 +120,13 @@ export class Architect {
     return Reflect.metadata(Architect.CLASS_META_KEY, name);
   }
 
-  public getProject(): Project {
-    if (!this.project) throw new Error("Project is not available");
-    return this.project;
+  public getProject(): IProject {
+    if (!this._project) throw new Error("Project is not available");
+    return this._project;
   }
 
-  public getProjects(): Project[] {
-    const projects = this.project !== undefined ? [this.project] : [];
-    return projects.concat(...this.projectRegistry.data.map((p) => p.instance));
+  public getProjects(): IProject[] {
+    const projects = this._project !== undefined ? [this._project] : [];
+    return projects.concat(...this._projectRegistry.data.map((p) => p.instance));
   }
 }

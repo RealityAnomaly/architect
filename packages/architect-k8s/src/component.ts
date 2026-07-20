@@ -1,6 +1,7 @@
 import {
   architectGlasswayNet,
   CapabilityMatcher,
+  IComponent,
   Component,
   ComponentArgs,
   ComponentClass,
@@ -13,7 +14,6 @@ import {
   KubeResource,
   KubeResourceUtilities,
   Plugin,
-  Target,
 } from '@glassway/architect';
 
 import { JSONSchemaType } from 'ajv';
@@ -21,7 +21,7 @@ import * as api from '@glassway/kubernetes-models';
 import * as toolkit from '@es-toolkit/es-toolkit';
 import { CNICapability, DNSCapability } from './capabilities/index.ts';
 
-import { KubeTarget } from './target/target.ts';
+import { IKubeTarget } from './target/target.ts';
 import { KubeContext } from './context.ts';
 import { GitFetchOptions, HelmChartOpts, HttpFetchOptions, KustomizeOpts, } from './index.ts';
 import { KubeTargetIntrospection } from './target/intro.ts';
@@ -34,12 +34,20 @@ export interface KubeComponentGenericResources {
   result?: KubeResource[];
 }
 
+export interface IKubeComponent<
+  TResult extends object = KubeComponentGenericResources,
+  TArgs extends KubeComponentArgs = KubeComponentArgs,
+  TParent extends Component = Component,
+> extends IComponent<TResult, TArgs, TParent> {
+  get namespace(): string;
+}
+
 export abstract class KubeComponent<
   TResult extends object = KubeComponentGenericResources,
   TArgs extends KubeComponentArgs = KubeComponentArgs,
   TParent extends Component = Component,
-> extends Component<TResult, TArgs, TParent> {
-  declare protected readonly target: KubeTarget;
+> extends Component<TResult, TArgs, TParent> implements IKubeComponent<TResult, TArgs, TParent> {
+  declare protected readonly target: IKubeTarget;
 
   public override context: KubeContext;
 
@@ -49,7 +57,7 @@ export abstract class KubeComponent<
   protected standardRequirements = true;
 
   constructor(
-    target: Target,
+    target: IKubeTarget,
     context: KubeContext,
     props?: TArgs,
     parent?: TParent,
@@ -80,19 +88,13 @@ export abstract class KubeComponent<
     return this.target.getIntrospection();
   }
 
-  /**
-   * Marks a class as a component. This MUST be defined for all Architect components that are not dependent children.
-   * @param model The component model to use. Per the documentation, this should be imported from an `architect.json` file in the same folder as your component's code.
-   * @returns A decorator which sets the required properties.
-   */
-  public static decorate<T extends object>(
+  public static override decorate<T extends object>(
     model: KubeComponentModel,
   ): (target: T) => void {
     function decorator(target: T) {
       new ComponentMetadata<KubeComponentModel>(
         model,
         Plugin.TARGET_IDENTIFIERS.kubernetes,
-        model.class,
       ).assign(target);
     }
 
@@ -258,7 +260,7 @@ export abstract class KubeComponent<
 }
 
 export interface KubeComponentClass extends ComponentClass {
-  namespace(target: Target): string;
+  namespace(target: IKubeTarget): string;
 }
 
 export interface KubeComponentContext {

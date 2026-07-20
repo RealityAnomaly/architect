@@ -1,6 +1,6 @@
 import { Component, ResolvedComponent } from '@glassway/architect';
 import { kustomizeToolkitFluxcdIo } from '../../generated/crds/index.ts';
-import { KubeTarget } from '../../target/target.ts';
+import { IKubeTarget } from '../../target/target.ts';
 import { KubeContext } from '../../context.ts';
 
 interface FluxCDSourceRef {
@@ -15,9 +15,9 @@ export interface FluxCDMode {
 }
 
 export class FluxCDController {
-  public readonly target: KubeTarget;
+  public readonly target: IKubeTarget;
 
-  constructor(target: KubeTarget) {
+  constructor(target: IKubeTarget) {
     this.target = target;
   }
 

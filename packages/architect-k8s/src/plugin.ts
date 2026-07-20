@@ -1,4 +1,4 @@
-import { Architect, Plugin, TargetClass } from '@glassway/architect';
+import { type IArchitect, Plugin, TargetClass } from '@glassway/architect';
 import { CRDCommand } from './crds/cli.ts';
 import { CrdsConfig } from './crds/config.ts';
 import { CRDManager } from './crds/index.ts';
@@ -28,7 +28,7 @@ export class K8sPlugin extends Plugin {
   public httpBuilder: HttpBuilder;
   public kubeConfig: _client.KubeConfig | undefined;
 
-  constructor(parent: Architect) {
+  constructor(parent: IArchitect) {
     super(parent, "kubernetes");
     this.crds = new CRDManager(this);
     this.oci = new OCIHelper(this.logger);

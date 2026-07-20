@@ -1,4 +1,4 @@
-import { HashUtilities } from "./hashing.ts";
+import { HashUtilities } from "./../hashing.ts";
 import * as assert from "@std/assert";
 
 Deno.test("composite hash equality", () => {

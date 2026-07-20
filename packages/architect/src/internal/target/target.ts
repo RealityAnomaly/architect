@@ -17,6 +17,7 @@ import {
 import { Result } from '../result/index.ts';
 import { Context } from '../../utils/index.ts';
 import {
+  IArchitect,
   Architect,
   Capability,
   BuildPhase,
@@ -24,7 +25,7 @@ import {
   ICompileListener,
   VirtualCapability, TargetIntrospection,
 } from '../../index.ts';
-import { Project } from '../project/index.ts';
+import { IProject } from '../project/index.ts';
 
 export interface TargetParams {
 }
@@ -57,33 +58,130 @@ export interface TargetApplyParams extends TargetResolveParams {
   watch?: boolean;
 }
 
-/**
- * Represents a location to which rendered configuration or objects is applied against
- */
-export class Target {
-  public readonly project: Project;
-  public readonly model: architectGlasswayNet.v1alpha1.Target;
-  public readonly params: TargetParams;
-  public readonly components: TokenRegistry<Component> = new TokenRegistry<Component>();
-  public readonly capabilities: Capability<unknown>[] = [];
-
-  protected constructor(
-    model: architectGlasswayNet.v1alpha1.Target,
-    params: TargetParams = {},
-    project: Project,
-  ) {
-    this.model = model;
-    this.params = params;
-    this.project = project;
-  }
-
-  public get app(): Architect {
-    return this.project.app;
-  }
+export interface ITarget {
+  get app(): IArchitect;
+  get model(): architectGlasswayNet.v1alpha1.Target;
+  get params(): TargetParams;
+  get project(): IProject;
+  get components(): TokenRegistry<Component>;
+  get capabilities(): Capability<unknown>[];
 
   /**
    * Resolves the component dependency graph
    */
+  resolve(params: TargetResolveParams): Promise<DependencyGraph>;
+
+  /**
+   * Compiles all output resources
+   * @param params The parameters to use for resolution
+   * @param logger A logger to use for the invocation
+   * @param listener
+   */
+  compile(
+    params?: TargetResolveParams,
+    logger?: logtape.Logger,
+    listener?: ICompileListener,
+  ): Promise<Result | undefined>;
+
+  /**
+   * Applies the result of a compile operation
+   * @param result
+   * @param params
+   * @param logger
+   * @param listener
+   */
+  apply(
+    result: Result,
+    params?: TargetApplyParams,
+    logger?: logtape.Logger,
+    listener?: ICompileListener,
+  ): Promise<void>;
+
+  /**
+   * Registers and enables the specified component
+   */
+  enable<T extends Component>(
+    token: ComponentClass<T>,
+    config?: DeepLazySpec<DeepPartial<ExtractComponentArgs<T>>>,
+    context?: Partial<Context>,
+    weight?: number,
+    force?: boolean,
+    condition?: Condition,
+  ): void;
+
+  /**
+   * Registers an existing instance of a {@link Component}.
+   * @param token
+   * @param instance
+   * @param context
+   */
+  register<T extends Component>(
+    token: ComponentClass<T>,
+    instance: T,
+    context: Context,
+  ): void;
+
+  /**
+   * Requests the component identified by the specified token and context
+   */
+  component<T extends Component>(
+    token: ComponentClass<T>,
+    context?: Partial<Context>,
+    auto?: boolean,
+  ): T;
+
+  /**
+   * Declares the existence of a Capability not exposed by resources declared in this target.
+   */
+  declare(capability: Capability<unknown>): void;
+
+  defaultContext<T extends Component>(
+    token: Constructor<T>,
+    context?: Partial<Context>,
+    force?: boolean,
+  ): Partial<Context>;
+
+  toString(): string;
+  init(): Promise<void>;
+
+  getIntrospection(): TargetIntrospection<unknown> | undefined;
+}
+
+export interface TargetFake {
+  model: architectGlasswayNet.v1alpha1.Target,
+  state?: object
+}
+
+/**
+ * Represents a location to which rendered configuration or objects is applied against
+ */
+export class Target implements ITarget {
+  protected readonly _model: architectGlasswayNet.v1alpha1.Target;
+  protected readonly _params: TargetParams;
+  protected readonly _project: IProject;
+  protected readonly _components: TokenRegistry<Component> = new TokenRegistry<Component>();
+  protected readonly _capabilities: Capability<unknown>[] = [];
+
+  protected constructor(
+    model: architectGlasswayNet.v1alpha1.Target,
+    params: TargetParams = {},
+    project: IProject,
+  ) {
+    this._model = model;
+    this._params = params;
+    this._project = project;
+  }
+
+  public get app(): IArchitect { return this._project.app; }
+  public get model() { return this._model; }
+  public get params() { return this._params };
+  public get project() { return this._project };
+  public get components() { return this._components };
+
+  public get capabilities() {
+    return this._capabilities;
+  }
+
   public async resolve(
     params: TargetResolveParams = {},
   ): Promise<DependencyGraph> {
@@ -94,12 +192,6 @@ export class Target {
     );
   }
 
-  /**
-   * Compiles all output resources
-   * @param params The parameters to use for resolution
-   * @param logger A logger to use for the invocation
-   * @param listener
-   */
   public async compile(
     params?: TargetResolveParams,
     logger?: logtape.Logger,
@@ -168,13 +260,6 @@ export class Target {
     return result;
   }
 
-  /**
-   * Applies the result of a compile operation
-   * @param result
-   * @param params
-   * @param logger
-   * @param listener
-   */
   public async apply(
     result: Result,
     params?: TargetApplyParams,
@@ -184,9 +269,6 @@ export class Target {
     listener?.onPhaseChange(BuildPhase.Apply);
   }
 
-  /**
-   * Registers and enables the specified component
-   */
   public enable<T extends Component>(
     token: ComponentClass<T>,
     config?: DeepLazySpec<DeepPartial<ExtractComponentArgs<T>>>,
@@ -204,9 +286,14 @@ export class Target {
     );
   }
 
-  /**
-   * Requests the component identified by the specified token and context
-   */
+  public register<T extends Component>(
+    token: ComponentClass<T>,
+    instance: T,
+    context: Context,
+  ) {
+   this.components.register(token, instance, context);
+  }
+
   public component<T extends Component>(
     token: ComponentClass<T>,
     context?: Partial<Context>,
@@ -224,11 +311,8 @@ export class Target {
     return result! as T;
   }
 
-  /**
-   * Declares the existence of a Capability not exposed by resources declared in this target.
-   */
   public declare(capability: Capability<unknown>) {
-    this.capabilities.push(capability);
+    this._capabilities.push(capability);
   }
 
   public defaultContext<T extends Component>(
@@ -250,15 +334,15 @@ export class Target {
   }
 
   public toString(): string {
-    return this.model.metadata.name ?? "unnamed";
+    return this._model.metadata.name ?? "unnamed";
   }
 
   public async init() {
-    for (const def of this.model.spec.components || []) {
-      const token = await this.project.getComponent(def.class, true);
+    for (const def of this._model.spec.components || []) {
+      const token = await this._project.getComponent(def.class, true);
       if (!token) {
         this.app.logger.warn(
-          `Target ${this.model.metadata.name} references unknown component ${def.class}, skipping`,
+          `Target ${this._model.metadata.name} references unknown component ${def.class}, skipping`,
         );
         continue;
       }
@@ -266,8 +350,8 @@ export class Target {
       this.enable(token, def.options);
     }
 
-    for (const capability of this.model.spec.capabilities || []) {
-      this.capabilities.push(
+    for (const capability of this._model.spec.capabilities || []) {
+      this._capabilities.push(
         new VirtualCapability(capability.class, capability.options),
       );
     }
@@ -278,17 +362,12 @@ export class Target {
   }
 }
 
-export interface TargetFake {
-  model: architectGlasswayNet.v1alpha1.Target,
-  state?: object
-}
-
 export type TargetClass = {
   new (
     model: architectGlasswayNet.v1alpha1.Target,
     // deno-lint-ignore no-explicit-any
     params: any,
-    parent: Project,
+    parent: IProject,
   ): Target;
   fake(): TargetFake;
 };

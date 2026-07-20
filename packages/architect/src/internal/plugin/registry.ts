@@ -1,5 +1,5 @@
 import { TargetClass } from '../index.ts';
-import { Architect } from '../../app.ts';
+import { IArchitect, Architect } from '../../app.ts';
 import { Plugin, PluginClass } from './plugin.ts';
 
 export class PluginRegistry {
@@ -14,7 +14,7 @@ export class PluginRegistry {
     return results;
   }
 
-  public async register(plugin: PluginClass, parent: Architect): Promise<void> {
+  public async register(plugin: PluginClass, parent: IArchitect): Promise<void> {
     const clazz = Reflect.getMetadata(Architect.CLASS_META_KEY, plugin);
     this.data[clazz] = new plugin(parent);
   }
