@@ -11,15 +11,17 @@ import { StateProvider } from '../utils/state.ts';
 
 export class MockArchitect implements IArchitect {
   public _ajv: Ajv = new Ajv();
+  public _pluginRegistry: PluginRegistry = new PluginRegistry();
+  public _projectRegistry: TypeRegistry<IProject> = new TypeRegistry();
 
   get ajv(): Ajv {
     return this._ajv;
   }
   get pluginRegistry(): PluginRegistry {
-    throw new Error('Method not implemented.');
+    return this._pluginRegistry;
   }
   get projectRegistry(): TypeRegistry<IProject> {
-    throw new Error('Method not implemented.');
+    return this._projectRegistry;
   }
   get logger(): Logger {
     throw new Error('Method not implemented.');

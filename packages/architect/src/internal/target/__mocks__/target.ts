@@ -12,7 +12,7 @@ import {
   Component,
   ComponentClass,
   ExtractComponentArgs,
-  TokenRegistry, IProject
+  TokenRegistry, IProject, TargetFake
 } from '../../../index.ts';
 import { architectGlasswayNet } from '../../../kubernetes/crds/index.ts';
 import { DeepLazySpec, Condition } from '../../../utils/index.ts';
@@ -26,20 +26,36 @@ import { MockComponent } from '../../component/__mocks__/component.ts';
 
 export class MockTarget implements ITarget {
   public _project: IProject;
-  public _model: architectGlasswayNet.v1alpha1.Target = new architectGlasswayNet.v1alpha1.Target({
-    metadata: {
-      name: 'foobar'
-    },
-    spec: {}
-  });
-  public _params: TargetParams = {};
+  public _model: architectGlasswayNet.v1alpha1.Target;
+  public _params: TargetParams;
   public _context: Partial<Context> = {};
 
   public _capabilities: Capability<unknown>[] = [];
   public _introspection: TargetIntrospection<unknown> | undefined = undefined;
 
-  constructor(project: IProject) {
+  public static compileCalled = false;
+
+  constructor(model: architectGlasswayNet.v1alpha1.Target = new architectGlasswayNet.v1alpha1.Target({
+    metadata: {
+      name: 'foobar'
+    },
+    spec: {}
+  }), params: TargetParams = {}, project: IProject) {
+    this._model = model;
+    this._params = params;
     this._project = project;
+  }
+
+  public static fake(): TargetFake {
+    return {
+      model: new architectGlasswayNet.v1alpha1.Target({
+        metadata: {
+          name: 'foobar'
+        },
+        spec: {}
+      }),
+      state: {}
+    }
   }
 
   get app(): IArchitect { return this.project.app; }
@@ -57,24 +73,22 @@ export class MockTarget implements ITarget {
     throw new Error('Method not implemented.');
   }
 
-  compile(params?: TargetResolveParams, logger?: Logger, listener?: ICompileListener): Promise<Result | undefined> {
-    throw new Error('Method not implemented.');
+  async compile(params?: TargetResolveParams, logger?: Logger, listener?: ICompileListener): Promise<Result | undefined> {
+    MockTarget.compileCalled = true;
+    const graph = await DependencyGraph.resolve(this, []);
+    return new Result(graph, {});
   }
 
   apply(result: Result, params?: TargetApplyParams, logger?: Logger, listener?: ICompileListener): Promise<void> {
     throw new Error('Method not implemented.');
   }
 
-  enable<T extends Component>(token: ComponentClass<T>, config?: DeepLazySpec<DeepPartial<ExtractComponentArgs<T>>>, context?: Partial<Context>, weight?: number, force?: boolean, condition?: Condition): void {
-    throw new Error('Method not implemented.');
-  }
+  enable<T extends Component>(token: ComponentClass<T>, config?: DeepLazySpec<DeepPartial<ExtractComponentArgs<T>>>, context?: Partial<Context>, weight?: number, force?: boolean, condition?: Condition): void {}
 
-  register<T extends Component>(token: ComponentClass<T>, instance: T, context: Context): void {
-    throw new Error('Method not implemented.');
-  }
+  register<T extends Component>(token: ComponentClass<T>, instance: T, context: Context): void {}
 
   component<T extends Component>(token: ComponentClass<T>, context?: Partial<Context>, auto?: boolean): T {
-    return new MockComponent() as unknown as T;
+    return new token(this, context as Context, {});
   }
 
   declare(capability: Capability<unknown>): void {

@@ -1,9 +1,8 @@
 import fs from 'node:fs/promises';
-import path from 'node:path';
 import * as logtape from '@logtape/logtape';
-import { walk } from "jsr:@std/fs/walk";
+import { walk } from '@std/fs/walk';
 import { Plugin } from '../plugin/plugin.ts';
-import { Target } from './target.ts';
+import { ITarget } from './target.ts';
 import { Project } from '../project/index.ts';
 
 import { architectGlasswayNet } from '../../kubernetes/crds/index.ts';
@@ -17,7 +16,7 @@ export class TargetLoader {
     loader: ManifestLoader,
     input: string,
     logger?: logtape.Logger,
-  ): Promise<Target[]> {
+  ): Promise<ITarget[]> {
     try {
       const stat = await fs.stat(input);
       if (!stat.isDirectory()) return [];

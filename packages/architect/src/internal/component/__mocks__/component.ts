@@ -52,11 +52,10 @@ export class MockComponent implements IComponent {
   postBuild(data: object): Promise<object> {
     throw new Error('Method not implemented.');
   }
-  upgrade(_state: ComponentUpgradeState): Promise<boolean> {
-    throw new Error('Method not implemented.');
+  async upgrade(_state: ComponentUpgradeState): Promise<boolean> {
+    return true;
   }
   toString(): string {
     throw new Error('Method not implemented.');
   }
 }
-

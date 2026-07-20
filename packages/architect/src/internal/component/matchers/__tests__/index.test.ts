@@ -32,7 +32,7 @@ Deno.test.beforeEach(() => {
   context = { name: 'foobar' };
   app = new MockArchitect();
   project = new MockProject(app);
-  target = new MockTarget(project);
+  target = new MockTarget(undefined, undefined, project);
   matcher = new ComponentMatcher(TestComponent);
 });
 
