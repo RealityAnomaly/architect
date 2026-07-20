@@ -1,11 +1,12 @@
 import * as commander from 'commander';
 import 'reflect-metadata';
 
-import { IArchitect, Architect, TargetClass } from '../../index.ts';
+import { IArchitect, TargetClass } from '../../index.ts';
 import * as logtape from '@logtape/logtape';
 import Module from 'node:module';
 import { TypeUtilities } from '../../utils/types.ts';
 import { ModuleUtilities } from '../../utils/modules.ts';
+import { Constants } from '../constants.ts';
 
 /**
  * Represents an extension to Architect that defines new functionality.
@@ -32,8 +33,8 @@ export abstract class Plugin {
     clazz: string,
   ): (target: PluginClass<T>) => void {
     function decorator(target: PluginClass<T>) {
-      Reflect.defineMetadata(Architect.TYPE_META_KEY, "plugin", target);
-      Reflect.defineMetadata(Architect.CLASS_META_KEY, clazz, target);
+      Reflect.defineMetadata(Constants.TYPE_META_KEY, "plugin", target);
+      Reflect.defineMetadata(Constants.CLASS_META_KEY, clazz, target);
     }
 
     return decorator;
@@ -43,8 +44,8 @@ export abstract class Plugin {
   public static async collect(module: Module): Promise<PluginClass[]> {
     return ModuleUtilities.collectClasses(module, (clazz) => {
       return TypeUtilities.isObject(clazz) &&
-        Reflect.hasMetadata(Architect.TYPE_META_KEY, clazz) &&
-        Reflect.getMetadata(Architect.TYPE_META_KEY, clazz) === "plugin";
+        Reflect.hasMetadata(Constants.TYPE_META_KEY, clazz) &&
+        Reflect.getMetadata(Constants.TYPE_META_KEY, clazz) === "plugin";
     });
   }
 

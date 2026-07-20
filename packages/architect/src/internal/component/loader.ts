@@ -3,8 +3,8 @@ import 'reflect-metadata';
 import Module from 'node:module';
 import { ModuleUtilities } from '../../utils/modules.ts';
 import { TypeUtilities } from '../../utils/index.ts';
-import { Architect } from '../../app.ts';
 import { ComponentClass } from './component.ts';
+import { Constants } from '../constants.ts';
 
 export class ComponentLoader {
   /**
@@ -14,8 +14,8 @@ export class ComponentLoader {
   public static async fromModule(module: Module): Promise<ComponentClass[]> {
     return ModuleUtilities.collectClasses(module, (clazz) => {
       return TypeUtilities.isObject(clazz) &&
-        Reflect.hasMetadata(Architect.TYPE_META_KEY, clazz) &&
-        Reflect.getMetadata(Architect.TYPE_META_KEY, clazz) === 'component';
+        Reflect.hasMetadata(Constants.TYPE_META_KEY, clazz) &&
+        Reflect.getMetadata(Constants.TYPE_META_KEY, clazz) === 'component';
     });
   }
 }

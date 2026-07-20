@@ -1,3 +1,4 @@
+// deno-coverage-ignore-file
 // deno-lint-ignore-file no-unused-vars
 import { Logger } from '@logtape/logtape';
 import {
@@ -21,6 +22,7 @@ import { Constructor } from '../../../utils/types.ts';
 import { DependencyGraph } from '../../graph/index.ts';
 import { TargetIntrospection } from '../intro.ts';
 import { ITarget } from '../target.ts';
+import { MockComponent } from '../../component/__mocks__/component.ts';
 
 export class MockTarget implements ITarget {
   public _project: IProject;
@@ -72,7 +74,7 @@ export class MockTarget implements ITarget {
   }
 
   component<T extends Component>(token: ComponentClass<T>, context?: Partial<Context>, auto?: boolean): T {
-    throw new Error('Method not implemented.');
+    return new MockComponent() as T;
   }
 
   declare(capability: Capability<unknown>): void {

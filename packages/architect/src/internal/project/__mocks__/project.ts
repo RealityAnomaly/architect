@@ -1,3 +1,4 @@
+// deno-coverage-ignore-file
 // deno-lint-ignore-file no-unused-vars
 import { IArchitect, ITarget, ComponentClass, PluginClass } from '../../../index.ts';
 import { ProjectConfig } from '../config.ts';

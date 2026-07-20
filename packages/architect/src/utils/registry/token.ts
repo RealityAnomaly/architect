@@ -2,7 +2,7 @@ import objectHash from 'object-hash';
 import "reflect-metadata";
 
 import { Constructor, Context, ReflectionUtilities } from '../index.ts';
-import { Architect } from '../../index.ts';
+import { Constants } from '../../internal/constants.ts';
 
 /**
  * Similar to {TypeRegistry}, but uses the `architect.glassway.net/class` metadata key.
@@ -21,7 +21,7 @@ export class TokenRegistry<T> {
     if (!context) context = {};
     if (!context.name) {
       context.name = ReflectionUtilities.classToName(
-        Reflect.getMetadata(Architect.CLASS_META_KEY, token),
+        Reflect.getMetadata(Constants.CLASS_META_KEY, token),
       );
     }
 
