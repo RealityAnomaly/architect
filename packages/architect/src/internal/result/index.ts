@@ -2,7 +2,7 @@ import * as fs from 'node:fs/promises';
 import { CollectionUtilities } from '../../utils/index.ts';
 import { DependencyGraph } from '../graph/index.ts';
 
-export interface Writer {
+export interface IWriter {
   write(result: Result, dir: string): Promise<void>;
 }
 
@@ -23,7 +23,7 @@ export class Result {
   /**
    * Writer that will be used to write the result
    */
-  public writer?: Writer;
+  public writer?: IWriter;
 
   constructor(graph: DependencyGraph, components: Record<string, unknown>) {
     this.graph = graph;

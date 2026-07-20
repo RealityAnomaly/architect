@@ -6,6 +6,7 @@ import { IProject, Project } from '../index.ts';
 
 export class MockProject implements IProject {
   public _app: IArchitect;
+  public _root: string = '/foo/bar';
 
   constructor(app: IArchitect) {
     this._app = app;
@@ -48,6 +49,6 @@ export class MockProject implements IProject {
     throw new Error('Method not implemented.');
   }
   getRoot(): string {
-    throw new Error('Method not implemented.');
+    return this._root;
   }
 }

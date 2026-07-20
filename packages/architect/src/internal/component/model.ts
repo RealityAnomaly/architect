@@ -35,7 +35,7 @@ export class ComponentModelUtilities {
     for (const path of paths) {
       try {
         const stat = await fs.stat(path);
-        if (!stat.isDirectory()) return [];
+        if (!stat.isDirectory()) continue;
       } catch {
         continue;
       }

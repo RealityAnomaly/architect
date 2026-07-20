@@ -11,20 +11,45 @@ import { Constants } from '../constants.ts';
 /**
  * Represents an extension to Architect that defines new functionality.
  */
-export abstract class Plugin {
+export interface IPlugin {
+  /**
+   * Returns the owning app instance of the plugin.
+   */
+  get parent(): IArchitect;
+
+  /**
+   * Returns a mapping of target type identifiers to concrete target classes provided by this plugin.
+   */
+  get targets(): Record<string, TargetClass>;
+
+  /**
+   * Does some work to initialise the plugin. Called once at app init time, after the root project is loaded.
+   */
+  init(): Promise<void>;
+
+  /**
+   * Registers a command group to allow extending the CLI with plugin-specific commands.
+   * @param command The command to register.
+   */
+  registerCommand(command: commander.Command): Promise<void>;
+}
+
+export abstract class Plugin implements IPlugin {
   public static TARGET_IDENTIFIERS = {
     kubernetes: "target.architect.glassway.net/kubernetes",
   };
 
+  private readonly _parent: IArchitect;
   public readonly name: string;
-  public readonly parent: IArchitect;
   public readonly logger: logtape.Logger;
 
   protected constructor(parent: IArchitect, name: string) {
+    this._parent = parent;
     this.name = name;
-    this.parent = parent;
     this.logger = logtape.getLogger(['architect', 'plugin', name]);
   }
+
+  public get parent(): IArchitect { return this._parent; }
 
   public abstract get targets(): Record<string, TargetClass>;
 

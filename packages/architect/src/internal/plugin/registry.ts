@@ -1,10 +1,10 @@
 import { TargetClass } from '../index.ts';
 import { IArchitect } from '../../app.ts';
-import { Plugin, PluginClass } from './plugin.ts';
+import { IPlugin, PluginClass } from './plugin.ts';
 import { Constants } from '../constants.ts';
 
 export class PluginRegistry {
-  public readonly data: Record<string, Plugin> = {};
+  public readonly data: Record<string, IPlugin> = {};
 
   public get targetMap(): Record<string, TargetClass> {
     const results = {} as Record<string, TargetClass>;
@@ -20,15 +20,13 @@ export class PluginRegistry {
     this.data[clazz] = new plugin(parent);
   }
 
-  public async resolve(): Promise<void> {}
-
   public async init(): Promise<void> {
     for (const plugin of Object.values(this.data)) {
       await plugin.init();
     }
   }
 
-  public get(module: string): Plugin {
+  public get(module: string): IPlugin {
     return this.data[module];
   }
 }

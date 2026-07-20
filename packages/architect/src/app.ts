@@ -97,7 +97,6 @@ export class Architect implements IArchitect {
       }
     }
 
-    await this._pluginRegistry.resolve();
     await this._pluginRegistry.init();
   }
 

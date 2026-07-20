@@ -2,12 +2,12 @@ import path from 'node:path';
 import * as yaml from '@std/yaml';
 import * as fs from 'node:fs/promises';
 
-import { KubeResource, KubeResourceUtilities, Result, Writer, } from '@glassway/architect';
+import { KubeResource, KubeResourceUtilities, Result, IWriter, } from '@glassway/architect';
 import { IKubeTarget, KubeTargetOutputFormat } from './target/target.ts';
 import { KubeContext } from './context.ts';
 import { KubeComponent } from './index.ts';
 
-export class KubeWriter implements Writer {
+export class KubeWriter implements IWriter {
   private readonly target: IKubeTarget;
 
   constructor(target: IKubeTarget) {
