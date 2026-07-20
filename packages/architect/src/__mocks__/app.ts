@@ -1,3 +1,4 @@
+// deno-coverage-ignore-file
 import { Ajv } from 'ajv';
 import { Logger } from '@logtape/logtape';
 import { IArchitect } from '../app.ts';

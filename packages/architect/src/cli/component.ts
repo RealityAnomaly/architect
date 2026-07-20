@@ -1,7 +1,8 @@
 import { Command } from 'commander';
-import { App, AppCommandOptions, Architect, ComponentClass, } from '../index.ts';
+import { App, AppCommandOptions, ComponentClass, } from '../index.ts';
 import { Updater } from '../internal/index.ts';
 import "reflect-metadata";
+import { Constants } from '../internal/constants.ts';
 
 interface AppCommandComponentOptions extends AppCommandOptions {}
 
@@ -63,7 +64,7 @@ export class ComponentCommand extends Command {
       console.log('Current project:');
       for (const component of ourComponents) {
         console.log(
-          '  - ' + Reflect.getMetadata(Architect.CLASS_META_KEY, component),
+          '  - ' + Reflect.getMetadata(Constants.CLASS_META_KEY, component),
         );
       }
 
@@ -79,7 +80,7 @@ export class ComponentCommand extends Command {
       console.log(`Library ${library.config.name}:`);
       for (const component of components) {
         console.log(
-          '  - ' + Reflect.getMetadata(Architect.CLASS_META_KEY, component),
+          '  - ' + Reflect.getMetadata(Constants.CLASS_META_KEY, component),
         );
       }
 

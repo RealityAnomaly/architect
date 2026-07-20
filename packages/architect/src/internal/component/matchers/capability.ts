@@ -1,10 +1,10 @@
 import 'reflect-metadata';
 
-import { Architect } from '../../../app.ts';
 import { Constructor } from '../../../index.ts';
 import { Component } from '../index.ts';
 import { Capability } from '../capability.ts';
 import { IComponentMatcher } from './index.ts';
+import { Constants } from '../../constants.ts';
 
 type CapabilityCondition<T extends Capability<unknown>> = (
   capability: T,
@@ -25,7 +25,7 @@ export class CapabilityMatcher<T extends Capability<unknown>>
   }
 
   matchArray(capabilities: Capability<unknown>[]): boolean {
-    const clazz = Reflect.getMetadata(Architect.CLASS_META_KEY, this.token);
+    const clazz = Reflect.getMetadata(Constants.CLASS_META_KEY, this.token);
     const capability = capabilities.find((object) => {
       return object.clazz === clazz;
     });
@@ -38,7 +38,7 @@ export class CapabilityMatcher<T extends Capability<unknown>>
 
   constraint(): string {
     return `Capability("${
-      Reflect.getMetadata(Architect.CLASS_META_KEY, this.token)
+      Reflect.getMetadata(Constants.CLASS_META_KEY, this.token)
     }")`;
   }
 

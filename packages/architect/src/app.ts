@@ -10,6 +10,7 @@ import { TypeRegistry } from './utils/index.ts';
 import { StateProvider } from './utils/state.ts';
 import { ProjectClass } from './index.ts';
 import { PluginRegistry } from './internal/plugin/registry.ts';
+import { Constants } from './internal/constants.ts';
 
 export interface IArchitect {
   get ajv(): Ajv;
@@ -31,12 +32,6 @@ export interface IArchitect {
  */
 export class Architect implements IArchitect {
   public static PATH: string = path.resolve(path.join(import.meta.dirname!, '..'));
-
-  public static readonly TYPE_META_KEY = 'architect.glassway.net/type';
-  public static readonly MODEL_META_KEY = 'architect.glassway.net/model';
-  public static readonly CLASS_META_KEY = 'architect.glassway.net/class';
-  public static readonly TARGET_TYPE_META_KEY =
-    'architect.glassway.net/target-type';
 
   protected _project?: IProject;
 
@@ -117,7 +112,7 @@ export class Architect implements IArchitect {
   }
 
   public static class(name: string): any {
-    return Reflect.metadata(Architect.CLASS_META_KEY, name);
+    return Reflect.metadata(Constants.CLASS_META_KEY, name);
   }
 
   public getProject(): IProject {

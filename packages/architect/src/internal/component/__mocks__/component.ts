@@ -1,3 +1,4 @@
+// deno-coverage-ignore-file
 // deno-lint-ignore-file no-unused-vars
 import { Capability, ComponentMetadata, ComponentModel, IComponentMatcher, ConfigurationContext, ComponentUpgradeState } from '../../../index.ts';
 import { IComponent } from '../component.ts';

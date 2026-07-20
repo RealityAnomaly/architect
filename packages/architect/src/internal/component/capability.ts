@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { Architect } from '../../app.ts';
+import { Constants } from '../constants.ts';
 
 export abstract class Capability<T> {
   public readonly data?: T;
@@ -10,7 +10,7 @@ export abstract class Capability<T> {
   }
 
   public get clazz(): string {
-    return Reflect.getMetadata(Architect.CLASS_META_KEY, this.constructor);
+    return Reflect.getMetadata(Constants.CLASS_META_KEY, this.constructor);
   }
 }
 

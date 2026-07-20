@@ -18,7 +18,6 @@ import { Result } from '../result/index.ts';
 import { Context } from '../../utils/index.ts';
 import {
   IArchitect,
-  Architect,
   Capability,
   BuildPhase,
   DependencyGraph, ExtractComponentArgs,
@@ -26,6 +25,7 @@ import {
   VirtualCapability, TargetIntrospection,
 } from '../../index.ts';
 import { IProject } from '../project/index.ts';
+import { Constants } from '../constants.ts';
 
 export interface TargetParams {
 }
@@ -323,10 +323,10 @@ export class Target implements ITarget {
     if (!context) context = {};
     if (
       (!context.name || force) &&
-      Reflect.hasMetadata(Architect.CLASS_META_KEY, token)
+      Reflect.hasMetadata(Constants.CLASS_META_KEY, token)
     ) {
       context.name = ReflectionUtilities.classToName(
-        Reflect.getMetadata(Architect.CLASS_META_KEY, token),
+        Reflect.getMetadata(Constants.CLASS_META_KEY, token),
       );
     }
 
