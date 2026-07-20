@@ -2,7 +2,7 @@
   "version": "5",
   "specifiers": {
     "jsr:@es-toolkit/es-toolkit@^1.49.0": "1.49.0",
-    "jsr:@glassway/kubernetes-models@^1.36.4": "1.36.4",
+    "jsr:@glassway/kubernetes-models@^1.36.5": "1.36.5",
     "jsr:@glassway/kubernetes-types@^1.0.3": "1.0.3",
     "jsr:@logtape/logtape@^2.2.3": "2.2.4",
     "jsr:@match/match@0.1": "0.1.0",
@@ -56,8 +56,8 @@
     "@es-toolkit/es-toolkit@1.49.0": {
       "integrity": "65c5efb21703a5c7c4367d4428e2495d209804278ae32dd04d7a663a3104a40b"
     },
-    "@glassway/kubernetes-models@1.36.4": {
-      "integrity": "a45856d4ca28bc6da6d0a70efb690dbb05b68dfce64da0837ebcbce4f1f93d5c",
+    "@glassway/kubernetes-models@1.36.5": {
+      "integrity": "4df6d5fbf410bd3070772a4a0ca046e6138c01fd3b71953c944c999a9441a6e2",
       "dependencies": [
         "jsr:@es-toolkit/es-toolkit",
         "jsr:@glassway/kubernetes-types",
@@ -827,7 +827,7 @@
   "workspace": {
     "dependencies": [
       "jsr:@es-toolkit/es-toolkit@^1.49.0",
-      "jsr:@glassway/kubernetes-models@^1.36.4",
+      "jsr:@glassway/kubernetes-models@^1.36.5",
       "jsr:@glassway/kubernetes-types@^1.0.3",
       "jsr:@logtape/logtape@^2.2.3",
       "jsr:@std/assert@^1.0.9",
