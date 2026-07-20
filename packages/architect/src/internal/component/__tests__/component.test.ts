@@ -67,7 +67,7 @@ Deno.test.beforeEach(() => {
   context = { name: 'foobar' };
   app = new MockArchitect();
   project = new MockProject(app);
-  target = new MockTarget(project);
+  target = new MockTarget(undefined, undefined, project);
 
   component = new TestComponent(target, context);
   parent = new TestComponentParent(target, context);

@@ -1,3 +1,4 @@
+// deno-coverage-ignore-file
 /* @ts-self-types="./ArchitectGlasswayNetV1alpha1Target.d.ts" */
 export const validate = validate3;
 const schema3 = {"type":"object","properties":{"apiVersion":{"$ref":"HcvyTMgw51vgbZ9ry16Kf5jnbh0yNPNerD08c-MShBE"},"kind":{"$ref":"OvKWXaCYvqr2yWY12Y8T1dEHpq_EwFKzHwuOvEcsziw"},"metadata":{"$ref":"yYmnefnmsYn5-MOwxbbM2mBS0bwKIjMQRJHxUmcKHgU"},"spec":{"$ref":"2U7BxHgJYqgoQbHYPxKtJbrSBnk90F5gP6rWz3-eBeA"}},"required":["apiVersion","kind","metadata","spec"],"$id":"architect.glassway.net.v1alpha1.Target"};

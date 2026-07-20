@@ -368,6 +368,6 @@ export type TargetClass = {
     // deno-lint-ignore no-explicit-any
     params: any,
     parent: IProject,
-  ): Target;
+  ): ITarget;
   fake(): TargetFake;
 };

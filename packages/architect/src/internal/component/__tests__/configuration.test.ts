@@ -26,7 +26,7 @@ class TestComponent extends Component {}
 Deno.test.beforeEach(() => {
   app = new MockArchitect();
   project = new MockProject(app);
-  target = new MockTarget(project);
+  target = new MockTarget(undefined, undefined, project);
   context = new ConfigurationContext(target, Lazy.from(args));
   component = new TestComponent(target, ctx, props);
 });

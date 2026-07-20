@@ -54,7 +54,7 @@ export abstract class Plugin implements IPlugin {
   public abstract get targets(): Record<string, TargetClass>;
 
   // noinspection JSUnusedGlobalSymbols
-  public static decorate<T extends Plugin>(
+  public static decorate<T extends IPlugin>(
     clazz: string,
   ): (target: PluginClass<T>) => void {
     function decorator(target: PluginClass<T>) {
@@ -79,6 +79,6 @@ export abstract class Plugin implements IPlugin {
   public abstract registerCommand(command: commander.Command): Promise<void>;
 }
 
-export interface PluginClass<T extends Plugin = Plugin> {
+export interface PluginClass<T extends IPlugin = Plugin> {
   new (parent: IArchitect): T;
 }
