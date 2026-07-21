@@ -1,7 +1,8 @@
 import {
   CapabilityMatcher,
   CollectionUtilities,
-  IComponent, ITarget,
+  IComponent,
+  ITarget,
   ValidationError,
   ValidationErrorCount,
   ValidationErrorLevel,
@@ -159,17 +160,23 @@ export class DependencyGraph implements IDependencyGraph {
 
     const errors = this.countErrors();
 
-    let error = false;
+    let level = ValidationErrorLevel.INFO;
     let message = 'passed';
+
     if (errors.errors > 0) {
-      error = true;
+      level = ValidationErrorLevel.ERROR;
       message = 'failed';
+    } else if (errors.warnings > 0) {
+      level = ValidationErrorLevel.WARNING;
+      message = 'warnings';
     }
 
     const line = `validation ${message} for ${this.target.toString()}: ${errors.errors} errors, ${errors.warnings} warnings, ${errors.messages} messages`;
 
-    if (error) {
+    if (level === ValidationErrorLevel.ERROR) {
       logger?.error(line);
+    } else if (level === ValidationErrorLevel.WARNING) {
+      logger?.warn(line);
     } else {
       logger?.info(line);
     }

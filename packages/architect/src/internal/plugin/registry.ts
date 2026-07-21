@@ -15,7 +15,7 @@ export class PluginRegistry {
     return results;
   }
 
-  public async register(plugin: PluginClass, parent: IArchitect): Promise<void> {
+  public register(plugin: PluginClass, parent: IArchitect): void {
     const clazz = Reflect.getMetadata(Constants.CLASS_META_KEY, plugin);
     this.data[clazz] = new plugin(parent);
   }
