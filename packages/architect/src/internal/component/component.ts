@@ -24,54 +24,86 @@ export interface IComponent<
   // deno-lint-ignore no-explicit-any
   TParent extends IComponent = any,
 > {
+  /**
+   * The context of the component, defining its name.
+   * Each property of the context is a separate "dimension" for the build.
+   * For example, a Kubernetes context might include a namespace property.
+   */
   get context(): Context;
+
+  /**
+   * The target this component is attached to.
+   */
   get target(): ITarget;
+
+  /**
+   * The short name (slug) of the component.
+   */
   get name(): string;
 
+  /**
+   * The parent of the component, if it exists.
+   */
   get parent(): TParent | undefined;
+
+  /**
+   * The children of this component.
+   */
   get children(): Component[];
+
+  /**
+   * Whether this component is using "independent mode". Only of relevance for child components.
+   */
   get independent(): boolean;
 
   /**
-   * Returns the capabilities that this component declares
+   * Returns the capabilities that this component declares.
    */
   get capabilities(): Capability<unknown>[];
 
   /**
-   * Returns this component's logical classpath
+   * Returns this component's fully qualified namespaced classname, i.e. 'architect.glassway.net/foobar'.
    */
   get clazz(): string;
 
-  get meta(): ComponentMetadata;
-
+  /**
+   * The immutable component model, including the fully qualified classname and package dependencies.
+   */
   get model(): ComponentModel;
 
+  /**
+   * The runtime configuration tree.
+   */
   get props(): LazyAuto<TArgs>;
 
   /**
-   * Returns this component's short result ID (RID)
+   * Returns this component's short result ID (RID), i.e. 'foobar-b475d49'.
    */
   get rid(): string;
 
   /**
-   * Sets the parent in "independent" mode
+   * Sets the parent. Note that setting the parent using this method rather than the parent
+   * parameter on the constructor will cause the {@link independent} flag to be set. Set {@link addChild} for more details.
+   * @param parent The parent, or undefined to clear.
    */
   setParent(parent?: TParent): void;
 
   /**
-   * Returns the component types required by this component
+   * Returns a list of {@link IComponentMatcher} defining the runtime dependencies of this component.
    */
   getRequirements(): Promise<IComponentMatcher[]>;
 
   /**
-   * Constructs this component, setting properties on the Result object.
+   * Constructs the component's resources. The TResult passed in is used to stack resources from parent classes.
+   * @param result The provided resources plus the constructed resources.
    */
   // noinspection JSUnusedGlobalSymbols
   build(result?: TResult): Promise<TResult>;
 
   /**
-   * Invoked by the target during the build phase. Sets lazy properties on other components.
-   * Do not resolve configuration in this function, use references instead.
+   * Invoked by the target during the build phase; performs any configuration required by this component.
+   * Warning: Do not resolve configuration in this function, use references instead. Attempting to resolve will cause an infinite loop.
+   * @param context The configuration context.
    */
   configure(context: ConfigurationContext): void;
 
@@ -83,16 +115,18 @@ export interface IComponent<
 
   /**
    * Pass-through function that performs postprocessing on this component's build outputs
+   * @param data
    */
   postBuild(data: TResult): Promise<TResult>;
 
   /**
-   * This function is implemented in plugin components to upgrade the component's inputs. It is not normally used in the standard lifecycle.
+   * Upgrades the component's package dependencies. Used only by the updater and not the standard build process.
+   * @param _state The upgrade state.
    */
   upgrade(_state: ComponentUpgradeState): Promise<boolean>;
 
   /**
-   * Returns a prettified identifier of this component
+   * Returns a prettified identifier of this component.
    */
   toString(): string;
 }
@@ -114,13 +148,17 @@ export class Component<
   protected readonly _children: Component[] = [];
   protected readonly _independent: boolean;
 
-  /**
-   * The configuration model of the component as a {LazyAuto}
-   */
   protected readonly _props: LazyAuto<TArgs>;
   private _metadata?: ComponentMetadata;
   protected _validator?: ValidateFunction<unknown>;
 
+  /**
+   * Constructs the component instance.
+   * @param target The target to attach the component to.
+   * @param context The context, including the component's name.
+   * @param props Optional initialisation value for the component's configuration tree.
+   * @param parent The parent, for full parenting (non-independent) mode.
+   */
   constructor(
     target: ITarget,
     context: Context,
