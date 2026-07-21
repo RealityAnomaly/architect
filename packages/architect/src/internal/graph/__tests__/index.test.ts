@@ -85,6 +85,18 @@ Deno.test('target returns target', async () => {
   assert.assertEquals(graph.target, target);
 });
 
+Deno.test('info returned in logger', async () => {
+  const logger = logtape.getLogger(['test']);
+
+  const graph = await DependencyGraph.resolve(target, []);
+  const info = new ValidationError('dummy info', ValidationErrorLevel.INFO, 'info');
+  graph.addErrors(info);
+
+  const valid = graph.assertValid(logger);
+  assert.assertEquals(valid, true);
+  // TODO: logtape recorder
+});
+
 Deno.test('no errors assert correctly in logger', async () => {
   const logger = logtape.getLogger(['test']);
 
@@ -95,8 +107,8 @@ Deno.test('no errors assert correctly in logger', async () => {
 
   const valid = graph.assertValid(logger);
   assert.assertEquals(valid, true);
+  // TODO: logtape recorder
 });
-
 
 Deno.test('errors assert correctly in logger', async () => {
   const logger = logtape.getLogger(['test']);
@@ -109,4 +121,5 @@ Deno.test('errors assert correctly in logger', async () => {
 
   const valid = graph.assertValid(logger);
   assert.assertEquals(valid, false);
+  // TODO: logtape recorder
 });
