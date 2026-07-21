@@ -310,7 +310,6 @@ export class Component<
 
     if (independent) {
       instance.setParent(this);
-      this._target.enable(child)
       this._target.register(child, instance, instance._context);
     }
 
