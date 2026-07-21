@@ -1,3 +1,4 @@
+// deno-coverage-ignore-file
 import { Logger } from '@logtape/logtape';
 import { ITarget } from '../../../index.ts';
 import { ValidationError } from '../../../utils/index.ts';

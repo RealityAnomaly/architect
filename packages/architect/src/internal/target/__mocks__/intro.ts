@@ -1,3 +1,4 @@
+// deno-coverage-ignore-file
 import { TargetIntrospection } from '../intro.ts';
 
 export class MockTargetIntrospection extends TargetIntrospection<object> {
