@@ -37,7 +37,7 @@ export interface KubeComponentGenericResources {
 export interface IKubeComponent<
   TResult extends object = KubeComponentGenericResources,
   TArgs extends KubeComponentArgs = KubeComponentArgs,
-  TParent extends Component = Component,
+  TParent extends IComponent = IComponent,
 > extends IComponent<TResult, TArgs, TParent> {
   get namespace(): string;
 }
@@ -45,7 +45,7 @@ export interface IKubeComponent<
 export abstract class KubeComponent<
   TResult extends object = KubeComponentGenericResources,
   TArgs extends KubeComponentArgs = KubeComponentArgs,
-  TParent extends Component = Component,
+  TParent extends IComponent = IComponent,
 > extends Component<TResult, TArgs, TParent> implements IKubeComponent<TResult, TArgs, TParent> {
   declare protected readonly _target: IKubeTarget;
   declare protected readonly _context: KubeContext;

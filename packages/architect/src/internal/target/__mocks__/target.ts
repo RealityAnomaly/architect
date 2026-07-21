@@ -6,9 +6,11 @@ import {
   TargetParams,
   Capability,
   TargetResolveParams,
+  IDependencyGraph,
   ICompileListener,
   Result,
   TargetApplyParams,
+  IComponent,
   Component,
   ComponentClass,
   ExtractComponentArgs,
@@ -22,7 +24,6 @@ import { Constructor } from '../../../utils/types.ts';
 import { DependencyGraph } from '../../graph/index.ts';
 import { TargetIntrospection } from '../intro.ts';
 import { ITarget } from '../target.ts';
-import { MockComponent } from '../../component/__mocks__/component.ts';
 
 export class MockTarget implements ITarget {
   public _project: IProject;
@@ -69,7 +70,7 @@ export class MockTarget implements ITarget {
 
   get capabilities(): Capability<unknown>[] { return this._capabilities; }
 
-  resolve(params: TargetResolveParams): Promise<DependencyGraph> {
+  resolve(params: TargetResolveParams): Promise<IDependencyGraph> {
     throw new Error('Method not implemented.');
   }
 
@@ -83,11 +84,11 @@ export class MockTarget implements ITarget {
     throw new Error('Method not implemented.');
   }
 
-  enable<T extends Component>(token: ComponentClass<T>, config?: DeepLazySpec<DeepPartial<ExtractComponentArgs<T>>>, context?: Partial<Context>, weight?: number, force?: boolean, condition?: Condition): void {}
+  enable<T extends IComponent>(token: ComponentClass<T>, config?: DeepLazySpec<DeepPartial<ExtractComponentArgs<T>>>, context?: Partial<Context>, weight?: number, force?: boolean, condition?: Condition): void {}
 
-  register<T extends Component>(token: ComponentClass<T>, instance: T, context: Context): void {}
+  register<T extends IComponent>(token: ComponentClass<T>, instance: T, context: Context): void {}
 
-  component<T extends Component>(token: ComponentClass<T>, context?: Partial<Context>, auto?: boolean): T {
+  component<T extends IComponent>(token: ComponentClass<T>, context?: Partial<Context>, auto?: boolean): T {
     return new token(this, context as Context, {});
   }
 

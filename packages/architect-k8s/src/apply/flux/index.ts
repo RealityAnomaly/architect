@@ -1,4 +1,4 @@
-import { Component, ResolvedComponent } from '@glassway/architect';
+import { IComponent, ResolvedComponent } from '@glassway/architect';
 import { kustomizeToolkitFluxcdIo } from '../../generated/crds/index.ts';
 import { IKubeTarget } from '../../target/target.ts';
 import { KubeContext } from '../../context.ts';
@@ -49,7 +49,7 @@ export class FluxCDController {
     });
   }
 
-  private componentName(component: Component): string {
+  private componentName(component: IComponent): string {
     return `cid-${component.context.name}`;
   }
 }

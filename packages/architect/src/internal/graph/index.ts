@@ -1,7 +1,7 @@
 import {
   CapabilityMatcher,
   CollectionUtilities,
-  Component, ITarget,
+  IComponent, ITarget,
   ValidationError,
   ValidationErrorCount,
   ValidationErrorLevel,
@@ -10,43 +10,57 @@ import {
 import * as logtape from '@logtape/logtape';
 
 export interface ResolvedComponent {
-  component: Component;
-  dependencies: Component[];
+  component: IComponent;
+  dependencies: IComponent[];
   errors: ValidationError[];
 }
 
 /**
  * Result of a resolve operation, a dependency graph showing relationships between components and any dependency errors.
  */
-export class DependencyGraph {
-  public readonly target: ITarget;
+export interface IDependencyGraph {
+  get target(): ITarget;
 
   /**
    * Validation errors on the configuration tree
    */
-  public readonly errors: ValidationError[] = [];
+  get errors(): ValidationError[];
 
   /**
    * Component-specific resources
    */
-  public readonly components: Record<string, ResolvedComponent>;
+  get components(): Record<string, ResolvedComponent>;
+
+  /**
+   * Whether the graph is valid (there are no fatal errors)
+   */
+  get valid(): boolean;
+
+  countErrors(): ValidationErrorCount;
+  assertValid(logger?: logtape.Logger): boolean;
+}
+
+export class DependencyGraph implements IDependencyGraph {
+  private readonly _target: ITarget;
+  private readonly _errors: ValidationError[] = [];
+  private readonly _components: Record<string, ResolvedComponent>;
 
   private constructor(
     target: ITarget,
     components: Record<string, ResolvedComponent>,
   ) {
-    this.target = target;
-    this.components = components;
+    this._target = target;
+    this._components = components;
   }
 
   public static async resolve(
     target: ITarget,
-    components: Component[],
+    components: IComponent[],
     validate: boolean = true,
-  ): Promise<DependencyGraph> {
+  ): Promise<IDependencyGraph> {
     components = await CollectionUtilities.asyncFilter(
       components,
-      async (c: Component) => await c.props.enable.$resolve() === true,
+      async (c: IComponent) => await c.props.enable.$resolve() === true,
     );
     const results: Record<string, Partial<ResolvedComponent>> = Object
       .fromEntries(components.map((v): [string, Partial<ResolvedComponent>] => {
@@ -56,7 +70,7 @@ export class DependencyGraph {
     // validate dependency requirements
     await Promise.all(components.map(async (v) => {
       const requirements = await v.getRequirements();
-      results[v.rid].dependencies = requirements.reduce<Component[]>(
+      results[v.rid].dependencies = requirements.reduce<IComponent[]>(
         (prev, cur) => {
           const matches = components.filter((v2) => cur.match(v2));
 
@@ -90,6 +104,23 @@ export class DependencyGraph {
     );
   }
 
+  public get target(): ITarget {
+    return this._target;
+  }
+
+  public get errors(): ValidationError[] {
+    return this._errors;
+  }
+
+  public get components(): Record<string, ResolvedComponent> {
+    return this._components;
+  }
+
+  public get valid(): boolean {
+    const errors = this.countErrors();
+    return errors.errors <= 0;
+  }
+
   public countErrors(): ValidationErrorCount {
     const count: ValidationErrorCount = {
       messages: 0,
@@ -112,11 +143,6 @@ export class DependencyGraph {
     }
 
     return count;
-  }
-
-  public get valid(): boolean {
-    const errors = this.countErrors();
-    return errors.errors <= 0;
   }
 
   /**

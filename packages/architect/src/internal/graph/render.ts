@@ -4,8 +4,8 @@ import * as path from 'node:path';
 import * as util from 'node:util';
 import * as graphviz from 'ts-graphviz';
 import { execFile } from 'node:child_process';
-import { DependencyGraph } from './index.ts';
-import { Component } from '../../index.ts';
+import { IDependencyGraph } from './index.ts';
+import { IComponent } from '../../index.ts';
 
 export interface DependencyGraphRenderOptions {
   path: string;
@@ -13,7 +13,7 @@ export interface DependencyGraphRenderOptions {
 
 export class DependencyGraphRenderer {
   public static async render(
-    input: DependencyGraph,
+    input: IDependencyGraph,
     options: DependencyGraphRenderOptions,
   ) {
     // noinspection SpellCheckingInspection
@@ -35,7 +35,7 @@ export class DependencyGraphRenderer {
         //parentGraph = parentGraph.subgraph(`cluster_namespace_${ns}`, { label: ns });
 
         if (v.component.parent) {
-          const parent = v.component.parent as Component;
+          const parent = v.component.parent as IComponent;
           parentGraph = parentGraph.subgraph("cluster_" + parent.rid, {
             label: parent.name,
           });

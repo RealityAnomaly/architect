@@ -1,6 +1,6 @@
 import * as fs from 'node:fs/promises';
 import { CollectionUtilities } from '../../utils/index.ts';
-import { DependencyGraph } from '../graph/index.ts';
+import { IDependencyGraph } from '../graph/index.ts';
 
 export interface IWriter {
   write(result: Result, dir: string): Promise<void>;
@@ -13,7 +13,7 @@ export class Result {
   /**
    * The second stage dependency graph.
    */
-  public readonly graph: DependencyGraph;
+  public readonly graph: IDependencyGraph;
 
   /**
    * The resultant data from each component.
@@ -25,7 +25,7 @@ export class Result {
    */
   public writer?: IWriter;
 
-  constructor(graph: DependencyGraph, components: Record<string, unknown>) {
+  constructor(graph: IDependencyGraph, components: Record<string, unknown>) {
     this.graph = graph;
     this.components = components;
   }

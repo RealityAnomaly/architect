@@ -1,7 +1,7 @@
 import * as logtape from '@logtape/logtape';
 import { ProgressBar } from '../vendor/progress/index.ts';
 import { delay } from '@std/async';
-import { BuildPhase, Component, ICompileListener, ITarget } from '../internal/index.ts';
+import { BuildPhase, IComponent, ICompileListener, ITarget } from '../internal/index.ts';
 
 import { defaultConsoleFormatter } from '@logtape/logtape';
 
@@ -105,11 +105,11 @@ export class CompileProgressBar implements ICompileListener {
     this.total = total;
   }
 
-  public onComponentStart(component: Component) {
+  public onComponentStart(component: IComponent) {
     this.status = component.toString();
   }
 
-  public onComponentEnd(_component: Component) {
+  public onComponentEnd(_component: IComponent) {
     this.progress++;
   }
 

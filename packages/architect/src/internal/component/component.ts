@@ -28,6 +28,10 @@ export interface IComponent<
   get target(): ITarget;
   get name(): string;
 
+  get parent(): TParent | undefined;
+  get children(): Component[];
+  get independent(): boolean;
+
   /**
    * Returns the capabilities that this component declares
    */
@@ -41,6 +45,8 @@ export interface IComponent<
   get meta(): ComponentMetadata;
 
   get model(): ComponentModel;
+
+  get props(): LazyAuto<TArgs>;
 
   /**
    * Returns this component's short result ID (RID)
@@ -99,19 +105,19 @@ export class Component<
   TResult extends object = object,
   TArgs extends ComponentArgs = ComponentArgs,
   // deno-lint-ignore no-explicit-any
-  TParent extends Component = any,
+  TParent extends IComponent = any,
 > implements IComponent<TResult, TArgs, TParent> {
   protected readonly _context: Context;
   protected readonly _target: ITarget;
 
-  public parent?: TParent;
-  public readonly children: Component[] = [];
-  public readonly independent: boolean;
+  private _parent?: TParent;
+  protected readonly _children: Component[] = [];
+  protected readonly _independent: boolean;
 
   /**
    * The configuration model of the component as a {LazyAuto}
    */
-  public props: LazyAuto<TArgs>;
+  protected readonly _props: LazyAuto<TArgs>;
   private _metadata?: ComponentMetadata;
   protected _validator?: ValidateFunction<unknown>;
 
@@ -123,7 +129,7 @@ export class Component<
   ) {
     this._context = context as Context;
     this._target = target;
-    this.independent = parent === undefined;
+    this._independent = parent === undefined;
     this.setParent(parent);
 
     if (!props) props = {} as TArgs;
@@ -134,21 +140,17 @@ export class Component<
       );
     }
 
-    this.props = Lazy.from(props);
-    this.configure(new ConfigurationContext(target, this.props));
+    this._props = Lazy.from(props);
+    this.configure(new ConfigurationContext(target, this._props));
   }
 
-  public get context() {
-    return this._context;
-  }
+  public get context() { return this._context; }
+  public get target() { return this._target; }
+  public get name(): string { return this._context.name; }
 
-  public get target() {
-    return this._target;
-  }
-
-  public get name(): string {
-    return this._context.name;
-  }
+  public get parent() { return this._parent; }
+  public get children() { return this._children; }
+  public get independent() { return this._independent; }
 
   public get capabilities(): Capability<unknown>[] {
     return [];
@@ -173,6 +175,10 @@ export class Component<
     }
 
     return this.meta.model!;
+  }
+
+  public get props(): LazyAuto<TArgs> {
+    return this._props;
   }
 
   public get rid(): string {
@@ -201,7 +207,7 @@ export class Component<
   }
 
   public setParent(parent?: TParent) {
-    this.parent = parent;
+    this._parent = parent;
   }
 
   public async getRequirements(): Promise<IComponentMatcher[]> {
@@ -307,7 +313,7 @@ export class Component<
   }
 }
 
-export interface ComponentClass<T extends Component = Component> {
+export interface ComponentClass<T extends IComponent = Component> {
   new (
     // unavoidable because of recursive type
     // deno-lint-ignore no-explicit-any
@@ -315,6 +321,6 @@ export interface ComponentClass<T extends Component = Component> {
     context: Context,
     // deno-lint-ignore no-explicit-any
     props?: any,
-    parent?: Component,
+    parent?: IComponent,
   ): T;
 }
