@@ -86,6 +86,18 @@ Deno.test('name returns context name', () => {
   assert.assertStrictEquals(component.name, context.name);
 });
 
+Deno.test('parent returns parent', () => {
+  assert.assertStrictEquals(child.parent, parent);
+});
+
+Deno.test('children includes child', () => {
+  assert.assert(parent.children.includes(child));
+});
+
+Deno.test('independent set', () => {
+  assert.assert(parent.independent);
+});
+
 Deno.test('capabilities returns empty', () => {
   assert.assertEquals(component.capabilities, []);
 });
@@ -110,6 +122,10 @@ Deno.test('model returns parent model if parent set', () => {
 Deno.test('model returns own model if independent', () => {
   component.setParent(parent);
   assert.assertStrictEquals(component.model, model);
+});
+
+Deno.test('props returns props', async () => {
+  assert.assertEquals(await component.props.$resolve(), {});
 });
 
 Deno.test('rid returns vaid rid', () => {

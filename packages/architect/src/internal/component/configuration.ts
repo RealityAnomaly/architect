@@ -1,4 +1,4 @@
-import { Component,  } from './component.ts';
+import { Component } from './component.ts';
 import { Context } from '../../utils/index.ts';
 import { ITarget } from '../target/index.ts';
 import { _LazyProxy, Condition, Constructor, DeepLazySpec, DeepPartial, Lazy, LazyAuto, } from '../../utils/index.ts';

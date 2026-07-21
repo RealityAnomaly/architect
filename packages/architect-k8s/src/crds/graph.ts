@@ -1,5 +1,5 @@
 import {
-  Component,
+  IComponent,
   GVK,
   KubeResource,
   ResolvedComponent,
@@ -148,7 +148,7 @@ export class KubeCRDDependencyGraph {
   public applyDependencies() {
     Object.entries(this.data).forEach(([k, v]) => {
       // find the components that export the CRDs that this one needs
-      const dependencies: Component[] = v.requirements.reduce((prev, cur) => {
+      const dependencies: IComponent[] = v.requirements.reduce((prev, cur) => {
         let name: string | undefined = undefined;
         for (const [k2, v2] of Object.entries(this.data)) {
           const found = v2.exports.filter((e) => cur.compare(e));
@@ -165,7 +165,7 @@ export class KubeCRDDependencyGraph {
         if (prev.indexOf(component) !== -1) return prev;
 
         return prev.concat(component);
-      }, [] as Component[]);
+      }, [] as IComponent[]);
 
       const component = this.result.graph.components[k];
       dependencies.forEach((d) => {

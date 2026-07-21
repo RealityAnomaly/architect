@@ -1,6 +1,6 @@
-import { Component } from './component.ts';
+import { IComponent } from './component.ts';
 
-export type ExtractComponentArgs<T extends Component> = T extends Component<object, infer A> ? A : never;
+export type ExtractComponentArgs<T extends IComponent> = T extends IComponent<object, infer A> ? A : never;
 
 export interface ComponentArgs<TInput = unknown> {
   /**

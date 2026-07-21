@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { App, AppCommandOptions, Component } from '../index.ts';
+import { App, AppCommandOptions, IComponent } from '../index.ts';
 
 interface AppCommandTargetOptions extends AppCommandOptions {}
 interface AppCommandTargetListOptions extends AppCommandTargetOptions {}
@@ -55,10 +55,10 @@ export class TargetCommand extends Command {
     console.log('Components:');
     for (
       const [_, v] of Object.entries(
-        target.components.data as Record<string, Component>,
+        target.components.data as Record<string, IComponent>,
       )
     ) {
-      const component = v as Component;
+      const component = v as IComponent;
       console.log(`  - ${component.context.name}`);
     }
   }

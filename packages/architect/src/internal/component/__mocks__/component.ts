@@ -2,7 +2,7 @@
 // deno-lint-ignore-file no-unused-vars
 import {
   Capability, ComponentMetadata, ComponentModel, IComponentMatcher, ConfigurationContext, ComponentUpgradeState,
-  ITarget, Context
+  ITarget, Context, LazyAuto, ComponentArgs
 } from '../../../index.ts';
 import { IComponent } from '../component.ts';
 
@@ -19,16 +19,28 @@ export class MockComponent implements IComponent {
   get name(): string {
     return this.context.name;
   }
+  public get parent() {
+    return undefined;
+  }
+  public get children() {
+    return [];
+  }
+  public get independent() {
+    return true;
+  }
   get capabilities(): Capability<unknown>[] {
     return this._capabilities;
   }
   get clazz(): string {
     throw new Error('Method not implemented.');
   }
-  get meta(): ComponentMetadata<ComponentModel<unknown, unknown>> {
+  get meta(): ComponentMetadata {
     throw new Error('Method not implemented.');
   }
-  get model(): ComponentModel<unknown, unknown> {
+  get model(): ComponentModel {
+    throw new Error('Method not implemented.');
+  }
+  get props(): LazyAuto<ComponentArgs> {
     throw new Error('Method not implemented.');
   }
   get rid(): string {

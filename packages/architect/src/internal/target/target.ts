@@ -3,7 +3,7 @@ import * as logtape from '@logtape/logtape';
 
 import { architectGlasswayNet } from '../../kubernetes/crds/index.ts';
 
-import { Component, ComponentClass,  } from '../component/index.ts';
+import { Component, ComponentClass, IComponent } from '../component/index.ts';
 import {
   Condition,
   Constructor,
@@ -20,7 +20,9 @@ import {
   IArchitect,
   Capability,
   BuildPhase,
-  DependencyGraph, ExtractComponentArgs,
+  IDependencyGraph,
+  DependencyGraph,
+  ExtractComponentArgs,
   ICompileListener,
   VirtualCapability, TargetIntrospection,
 } from '../../index.ts';
@@ -63,13 +65,13 @@ export interface ITarget {
   get model(): architectGlasswayNet.v1alpha1.Target;
   get params(): TargetParams;
   get project(): IProject;
-  get components(): TokenRegistry<Component>;
+  get components(): TokenRegistry<IComponent>;
   get capabilities(): Capability<unknown>[];
 
   /**
    * Resolves the component dependency graph
    */
-  resolve(params: TargetResolveParams): Promise<DependencyGraph>;
+  resolve(params: TargetResolveParams): Promise<IDependencyGraph>;
 
   /**
    * Compiles all output resources
@@ -159,7 +161,7 @@ export class Target implements ITarget {
   protected readonly _model: architectGlasswayNet.v1alpha1.Target;
   protected readonly _params: TargetParams;
   protected readonly _project: IProject;
-  protected readonly _components: TokenRegistry<Component> = new TokenRegistry<Component>();
+  protected readonly _components: TokenRegistry<IComponent> = new TokenRegistry<IComponent>();
   protected readonly _capabilities: Capability<unknown>[] = [];
 
   protected constructor(
@@ -184,7 +186,7 @@ export class Target implements ITarget {
 
   public async resolve(
     params: TargetResolveParams = {},
-  ): Promise<DependencyGraph> {
+  ): Promise<IDependencyGraph> {
     return await DependencyGraph.resolve(
       this,
       Object.values(this.components.data),
