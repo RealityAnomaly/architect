@@ -36,7 +36,6 @@ export interface IDependencyGraph {
    */
   get valid(): boolean;
 
-  countErrors(): ValidationErrorCount;
   assertValid(logger?: logtape.Logger): boolean;
 }
 
@@ -121,7 +120,7 @@ export class DependencyGraph implements IDependencyGraph {
     return errors.errors <= 0;
   }
 
-  public countErrors(): ValidationErrorCount {
+  protected countErrors(): ValidationErrorCount {
     const count: ValidationErrorCount = {
       messages: 0,
       warnings: 0,
