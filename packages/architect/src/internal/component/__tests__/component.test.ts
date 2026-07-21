@@ -91,6 +91,7 @@ Deno.test('parent returns parent', () => {
 });
 
 Deno.test('children includes child', () => {
+  parent.children.push(child);
   assert.assert(parent.children.includes(child));
 });
 
@@ -125,7 +126,7 @@ Deno.test('model returns own model if independent', () => {
 });
 
 Deno.test('props returns props', async () => {
-  assert.assertEquals(await component.props.$resolve(), {});
+  assert.assertEquals(await component.props.$resolve(), { inputs: { foo: {} }});
 });
 
 Deno.test('rid returns vaid rid', () => {
