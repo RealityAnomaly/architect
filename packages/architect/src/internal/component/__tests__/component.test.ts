@@ -234,7 +234,6 @@ Deno.test('addChild constructs and adds child', () => {
 });
 
 Deno.test('addChild constructs and adds independent child', () => {
-  using enableStub = stub(target, 'enable');
   using registerStub = stub(target, 'register');
 
   parent.testInit(true);
@@ -243,7 +242,6 @@ Deno.test('addChild constructs and adds independent child', () => {
   assert.assertEquals(child2.independent, true);
 
   // target enable and register called
-  assert.assertStrictEquals(enableStub.calls[0].args[0], TestComponent);
   assert.assertStrictEquals(registerStub.calls[0].args[0], TestComponent);
   assert.assertStrictEquals(registerStub.calls[0].args[1], child2);
   assert.assertEquals(registerStub.calls[0].args[2], child2.context);

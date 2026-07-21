@@ -38,6 +38,9 @@ export class ComponentMetadata<TModel extends ComponentModel = ComponentModel> {
     Reflect.defineMetadata(Constants.TYPE_META_KEY, 'component', target);
     Reflect.defineMetadata(Constants.MODEL_META_KEY, this.model, target);
     Reflect.defineMetadata(Constants.TARGET_TYPE_META_KEY, this.target, target);
+    if (this.model?.class) {
+      Reflect.defineMetadata(Constants.CLASS_META_KEY, this.model?.class, target);
+    }
   }
 
   public validate(parent: string, ajv: Ajv, validator?: ValidateFunction) {

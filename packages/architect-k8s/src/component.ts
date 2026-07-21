@@ -1,7 +1,7 @@
 import {
   architectGlasswayNet,
   CapabilityMatcher,
-  IComponent,
+  type IComponent,
   Component,
   ComponentArgs,
   ComponentClass,
@@ -21,8 +21,8 @@ import * as api from '@glassway/kubernetes-models';
 import * as toolkit from '@es-toolkit/es-toolkit';
 import { CNICapability, DNSCapability } from './capabilities/index.ts';
 
-import { IKubeTarget } from './target/target.ts';
-import { KubeContext } from './context.ts';
+import type { IKubeTarget } from './target/target.ts';
+import type { KubeContext } from './context.ts';
 import { GitFetchOptions, HelmChartOpts, HttpFetchOptions, KustomizeOpts, } from './index.ts';
 import { KubeTargetIntrospection } from './target/intro.ts';
 
@@ -353,9 +353,14 @@ const KubeComponentModelInputSchema: JSONSchemaType<KubeComponentModelInput> = {
 
 @KubeComponent.decorate({ class: 'architect.glassway.net/prelude' })
 export class KubePreludeComponent extends KubeComponent {
-  private readonly resources: KubeResource[] = [];
+  private readonly resources: KubeResource[];
 
-  public override async build(resources: KubeComponentGenericResources = {}): Promise<any> {
+  constructor(target: IKubeTarget, context: KubeContext, props?: KubeComponentArgs, parent?: IComponent) {
+    super(target, context, props, parent);
+    this.resources = [];
+  }
+
+  public override async build(resources: KubeComponentGenericResources = {}): Promise<KubeComponentGenericResources> {
     resources.result = this.resources;
     return super.build(resources);
   }
