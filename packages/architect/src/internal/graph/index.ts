@@ -24,7 +24,7 @@ export interface IDependencyGraph {
   /**
    * Validation errors on the configuration tree
    */
-  get errors(): ValidationError[];
+  get errors(): ReadonlyArray<ValidationError>;
 
   /**
    * Component-specific resources
@@ -35,6 +35,8 @@ export interface IDependencyGraph {
    * Whether the graph is valid (there are no fatal errors)
    */
   get valid(): boolean;
+
+  addErrors(...errors: ValidationError[]): void;
 
   assertValid(logger?: logtape.Logger): boolean;
 }
@@ -107,8 +109,13 @@ export class DependencyGraph implements IDependencyGraph {
     return this._target;
   }
 
-  public get errors(): ValidationError[] {
-    return this._errors;
+  public get errors(): ReadonlyArray<ValidationError> {
+    const result = [...this._errors];
+    for (const component of Object.values(this.components)) {
+      result.push(...component.errors);
+    }
+
+    return result;
   }
 
   public get components(): Record<string, ResolvedComponent> {
@@ -118,6 +125,10 @@ export class DependencyGraph implements IDependencyGraph {
   public get valid(): boolean {
     const errors = this.countErrors();
     return errors.errors <= 0;
+  }
+
+  public addErrors(...errors: ValidationError[]) {
+    this._errors.push(...errors);
   }
 
   protected countErrors(): ValidationErrorCount {
@@ -133,14 +144,6 @@ export class DependencyGraph implements IDependencyGraph {
       if (error.level == ValidationErrorLevel.INFO) count.messages++;
     }
 
-    for (const component of Object.values(this.components)) {
-      for (const error of component.errors) {
-        if (error.level == ValidationErrorLevel.WARNING) count.warnings++;
-        if (error.level == ValidationErrorLevel.ERROR) count.errors++;
-        if (error.level == ValidationErrorLevel.INFO) count.messages++;
-      }
-    }
-
     return count;
   }
 
@@ -151,12 +154,6 @@ export class DependencyGraph implements IDependencyGraph {
     if (logger) {
       for (const error of this.errors) {
         error.assert(logger);
-      }
-
-      for (const component of Object.values(this.components)) {
-        for (const error of component.errors) {
-          error.assert(logger);
-        }
       }
     }
 
