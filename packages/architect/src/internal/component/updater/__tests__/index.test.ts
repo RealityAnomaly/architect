@@ -1,5 +1,6 @@
 import * as assert from '@std/assert';
 import * as mock from '@std/testing/mock';
+import fs from 'node:fs/promises';
 
 import { ComponentUpgradeState, Updater } from '../index.ts';
 import { MockProject } from '../../../project/__mocks__/project.ts';
@@ -11,7 +12,7 @@ import { type ITarget } from '../../../target/index.ts';
 import { type Context } from '../../../../utils/index.ts';
 import { type ComponentArgs } from '../../arguments.ts';
 import { ComponentMetadata } from '../../metadata.ts';
-import { MockTarget } from '../../../target/__mocks__/target.ts';
+import { MockTarget, MockTargetForIntrospection, MockTargetReturnsInvalid } from '../../../target/__mocks__/target.ts';
 
 class ValidComponent extends Component {
   public static ctorCalled = false;
@@ -67,6 +68,7 @@ Deno.test.beforeEach(() => {
 
 Deno.test('calls compile if component changes', async () => {
   using modelCollect = mock.stub(ComponentModelUtilities, 'collect', async () => { return [fileInstance]; });
+  using writeFile = mock.stub(fs, 'writeFile');
 
   ValidComponent.upgradeReturn = true;
   MockTarget.compileCalled = false;
@@ -78,9 +80,53 @@ Deno.test('calls compile if component changes', async () => {
   assert.assertEquals(MockTarget.compileCalled, true);
   assert.assertEquals(ValidComponent.ctorCalled, true);
   assert.assertEquals(ValidComponent.upgradeCalled, true);
+  assert.assertEquals(writeFile.calls.length, 0);
+});
 
-  // check throws if graph not valid
-  // TODO: need to mock in graph
+Deno.test('throws if graph fails to validate', async () => {
+  using _ = mock.stub(ComponentModelUtilities, 'collect', async () => { return [fileInstance]; });
+
+  ValidComponent.upgradeReturn = true;
+  plugin._targets[MockPlugin.MOCK_TARGET_IDENTIFIER] = MockTargetReturnsInvalid;
+  assert.assertRejects(async () => {
+    await updater.update([ValidComponent]);
+  });
+});
+
+Deno.test('sets introspection state on fake target', async () => {
+  using _ = mock.stub(ComponentModelUtilities, 'collect', async () => { return [fileInstance]; });
+
+  ValidComponent.upgradeReturn = false;
+  plugin._targets[MockPlugin.MOCK_TARGET_IDENTIFIER] = MockTargetForIntrospection;
+  using setState = mock.stub(MockTargetForIntrospection.introspection, 'setState');
+  await updater.update([ValidComponent]);
+  assert.assertEquals(setState.calls.length, 1);
+  assert.assertEquals(setState.calls[0].args[0], MockTargetForIntrospection.fake().state);
+});
+
+Deno.test('writes file if component changes', async () => {
+  const fi = {
+    path: 'foo/bar.json',
+    dirty: true,
+    model: {
+      'test': {
+        class: 'architect.glassway.net/test-component'
+      }
+    }
+  };
+
+  using _ = mock.stub(ComponentModelUtilities, 'collect', async () => { return [fi]; });
+  using writeFile = mock.stub(fs, 'writeFile');
+
+  ValidComponent.upgradeReturn = false;
+  await updater.update([ValidComponent]);
+  assert.assertEquals(writeFile.calls.length, 1);
+  assert.assertEquals(writeFile.calls[0].args[0], 'foo/bar.json');
+  assert.assertEquals(writeFile.calls[0].args[1], JSON.stringify(fi.model, undefined, 2));
+
+  // ensure dry run doesn't write
+  await updater.update([ValidComponent], true);
+  assert.assertEquals(writeFile.calls.length, 1);
 });
 
 Deno.test('does not call compile if component did not change', async () => {

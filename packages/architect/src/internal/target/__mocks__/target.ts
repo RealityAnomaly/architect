@@ -21,9 +21,19 @@ import { DeepLazySpec, Condition } from '../../../utils/index.ts';
 import { DeepPartial } from '../../../utils/index.ts';
 import { Context } from '../../../utils/index.ts';
 import { Constructor } from '../../../utils/types.ts';
-import { DependencyGraph } from '../../graph/index.ts';
 import { TargetIntrospection } from '../intro.ts';
 import { ITarget } from '../target.ts';
+import { MockDependencyGraph } from '../../graph/__mocks__/index.ts';
+import { MockTargetIntrospection } from './intro.ts';
+
+function getDefaultModel() {
+  return new architectGlasswayNet.v1alpha1.Target({
+    metadata: {
+      name: 'foobar'
+    },
+    spec: {}
+  });
+}
 
 export class MockTarget implements ITarget {
   public _project: IProject;
@@ -36,12 +46,7 @@ export class MockTarget implements ITarget {
 
   public static compileCalled = false;
 
-  constructor(model: architectGlasswayNet.v1alpha1.Target = new architectGlasswayNet.v1alpha1.Target({
-    metadata: {
-      name: 'foobar'
-    },
-    spec: {}
-  }), params: TargetParams = {}, project: IProject) {
+  constructor(model: architectGlasswayNet.v1alpha1.Target = getDefaultModel(), params: TargetParams = {}, project: IProject) {
     this._model = model;
     this._params = params;
     this._project = project;
@@ -55,7 +60,9 @@ export class MockTarget implements ITarget {
         },
         spec: {}
       }),
-      state: {}
+      state: {
+        blah: 'foo'
+      }
     }
   }
 
@@ -76,7 +83,7 @@ export class MockTarget implements ITarget {
 
   async compile(params?: TargetResolveParams, logger?: Logger, listener?: ICompileListener): Promise<Result | undefined> {
     MockTarget.compileCalled = true;
-    const graph = await DependencyGraph.resolve(this, []);
+    const graph = new MockDependencyGraph(this);
     return new Result(graph, {});
   }
 
@@ -104,4 +111,21 @@ export class MockTarget implements ITarget {
   async init(): Promise<void> {}
 
   getIntrospection(): TargetIntrospection<unknown> | undefined { return this._introspection; }
+}
+
+export class MockTargetReturnsInvalid extends MockTarget {
+  override async compile(params?: TargetResolveParams, logger?: Logger, listener?: ICompileListener): Promise<Result | undefined> {
+    const graph = new MockDependencyGraph(this);
+    graph._valid = false;
+    return new Result(graph, {});
+  }
+}
+
+export class MockTargetForIntrospection extends MockTarget {
+  public static introspection = new MockTargetIntrospection();
+
+  constructor(model: architectGlasswayNet.v1alpha1.Target = getDefaultModel(), params: TargetParams = {}, project: IProject) {
+    super(model, params, project);
+    this._introspection = MockTargetForIntrospection.introspection;
+  }
 }
