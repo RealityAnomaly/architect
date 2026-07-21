@@ -2,13 +2,17 @@
 // deno-lint-ignore-file no-unused-vars
 import {
   Capability, ComponentMetadata, ComponentModel, IComponentMatcher, ConfigurationContext, ComponentUpgradeState,
-  ITarget, Context, LazyAuto, ComponentArgs
+  ITarget, Context, LazyAuto, ComponentArgs, Lazy
 } from '../../../index.ts';
 import { IComponent } from '../component.ts';
 
 export class MockComponent implements IComponent {
   public _context: Context = { name: 'blah123' };
   public _capabilities: Capability<unknown>[] = [];
+
+  constructor(context: Context = { name: 'blah123' }) {
+    this._context = context;
+  }
 
   get context(): Context {
     return this._context;
@@ -41,16 +45,16 @@ export class MockComponent implements IComponent {
     throw new Error('Method not implemented.');
   }
   get props(): LazyAuto<ComponentArgs> {
-    throw new Error('Method not implemented.');
+    return Lazy.from({ enable: true } as ComponentArgs);
   }
   get rid(): string {
-    return 'foobar-b475d49';
+    return `${this.name}-b475d49`;
   }
   setParent(parent?: any): void {
     throw new Error('Method not implemented.');
   }
-  getRequirements(): Promise<IComponentMatcher[]> {
-    throw new Error('Method not implemented.');
+  async getRequirements(): Promise<IComponentMatcher[]> {
+    return [];
   }
   build(result?: object | undefined): Promise<object> {
     throw new Error('Method not implemented.');
@@ -68,6 +72,6 @@ export class MockComponent implements IComponent {
     return true;
   }
   toString(): string {
-    throw new Error('Method not implemented.');
+    return this._context.name;
   }
 }

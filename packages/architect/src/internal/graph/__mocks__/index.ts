@@ -30,6 +30,10 @@ export class MockDependencyGraph implements IDependencyGraph {
     return this._valid;
   }
 
+  addErrors(..._errors: ValidationError[]) {
+    return;
+  }
+
   assertValid(_logger?: Logger): boolean {
     return this._valid;
   }

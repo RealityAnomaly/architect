@@ -20,5 +20,5 @@ Deno.test('component does not match', () => {
 });
 
 Deno.test('toString returns', () => {
-  assert.assertEquals(matcher.toString(), 'ComponentInstance("foobar-b475d49")')
+  assert.assertEquals(matcher.toString(), 'ComponentInstance("blah123-b475d49")')
 });
