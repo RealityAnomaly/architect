@@ -257,7 +257,7 @@ export class KubeTarget extends Target implements IKubeTarget {
           await item.validate();
         } catch (e) {
           if (e instanceof Error) {
-            result.graph.errors.push(
+            result.graph.addErrors(
               new ValidationError(
                 e.message,
                 ValidationErrorLevel.ERROR,

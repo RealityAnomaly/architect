@@ -1,8 +1,6 @@
 import * as api from '@glassway/kubernetes-models';
 import * as fs from 'node:fs/promises';
-import * as os from 'node:os';
 import * as path from 'node:path';
-import * as yaml from '@std/yaml';
 import * as crdGenerate from '@glassway/kubernetes-models/generate/crd-generate'
 import { ManifestLoader } from './yaml.ts';
 import { walk } from '../utils/files.ts';

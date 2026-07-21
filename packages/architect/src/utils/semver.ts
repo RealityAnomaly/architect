@@ -1,6 +1,7 @@
 import * as semver from 'semver';
 import { Logger } from '@logtape/logtape';
 
+// noinspection JSUnusedGlobalSymbols
 export function getLatestSemVer(versions: string[], constraint?: string, logger?: Logger): string | undefined {
   let latest: semver.SemVer | undefined = undefined;
   let original: string | undefined = undefined;
