@@ -106,7 +106,7 @@ export class KubeCRDDependencyGraph {
         );
         if (both.length <= 0) return;
 
-        this.result.graph.errors.push(
+        this.result.graph.addErrors(
           new ValidationError(
             `both components ${k} and ${k2} export CRDs for resources ${
               both.join(", ")
@@ -152,9 +152,7 @@ export class KubeCRDDependencyGraph {
         let name: string | undefined = undefined;
         for (const [k2, v2] of Object.entries(this.data)) {
           const found = v2.exports.filter((e) => cur.compare(e));
-          if (found.length <= 0) {
-            continue;
-          } else {
+          if (found.length > 0) {
             name = k2;
             break;
           }
