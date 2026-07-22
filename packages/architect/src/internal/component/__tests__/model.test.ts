@@ -7,20 +7,20 @@ import { runInTempDir } from '../../../utils/test/helpers.ts';
 Deno.test('finds architect.json', async () => {
   await runInTempDir(async (dir) => {
     const dirTest = path.join(dir, 'dirtest');
-    fs.mkdir(dirTest);
+    await fs.mkdir(dirTest);
 
     const fileTest = path.join(dir, 'filetest')
-    fs.writeFile(fileTest, JSON.stringify({'foo': 'bar'}))
+    await fs.writeFile(fileTest, JSON.stringify({'foo': 'bar'}))
 
     const dirTest2 = path.join(dirTest, 'dirtest2')
-    fs.mkdir(dirTest2);
+    await fs.mkdir(dirTest2);
 
     const wrongFile = path.join(dirTest, 'wrong.json')
     const rightFile = path.join(dirTest, 'architect.json')
     const rightFile2 = path.join(dirTest2, 'architect.json')
-    fs.writeFile(wrongFile, JSON.stringify({'foo': 'bar'}))
-    fs.writeFile(rightFile, JSON.stringify({'foo': 'bar2'}))
-    fs.writeFile(rightFile2, JSON.stringify({'foo': 'bar3'}))
+    await fs.writeFile(wrongFile, JSON.stringify({'foo': 'bar'}))
+    await fs.writeFile(rightFile, JSON.stringify({'foo': 'bar2'}))
+    await fs.writeFile(rightFile2, JSON.stringify({'foo': 'bar3'}))
 
     const results = await ComponentModelUtilities.collect([dirTest,  fileTest, 'notfound']);
     assert.assertEquals(results.length, 2);

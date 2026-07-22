@@ -59,7 +59,7 @@ export default class ProgressBar {
   private encoder = new TextEncoder();
   // private writer: WritableStreamDefaultWriter<Uint8Array>;
   // private writer: Writer;
-  private writer: typeof Deno.stdout | typeof Deno.stderr;
+  private readonly writer: typeof Deno.stdout | typeof Deno.stderr;
 
   /**
    * Title, total, complete, incomplete, can also be set or changed in the render method

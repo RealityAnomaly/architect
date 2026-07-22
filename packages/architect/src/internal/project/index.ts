@@ -2,7 +2,6 @@ import path from 'node:path';
 import 'reflect-metadata';
 
 import {
-  ArchitectCoreProject,
   ComponentClass,
   ComponentLoader,
   ComponentMetadata,
@@ -15,6 +14,7 @@ import { IArchitect } from '../../app.ts';
 import { ProjectConfig, ProjectConfigLoader } from './config.ts';
 import { ProjectUtils } from './utils.ts';
 import * as yaml from '@std/yaml';
+import * as crds from './../../kubernetes/crds/index.ts';
 import { ProjectMetadata } from './meta.ts';
 
 export interface IProject {
@@ -38,11 +38,6 @@ export interface IProject {
    * @param topLevel Whether this project is the top level in the hierarchy (current workspace project)
    */
   load(topLevel?: boolean): Promise<void>;
-
-  /**
-   * Configure your project by overriding this method and calling addModules, addImports, or addPlugins.
-   */
-  configure(): Promise<void>;
 
   /**
    * Saves the project configuration file
@@ -186,7 +181,10 @@ export abstract class Project implements IProject {
     this.loaded = true;
   }
 
-  public async configure() {
+  /**
+   * Configure your project by overriding this method and calling addModules, addImports, or addPlugins.
+   */
+  protected async configure() {
     this.addImports(ArchitectCoreProject);
   }
 
@@ -294,6 +292,15 @@ export abstract class Project implements IProject {
   // noinspection JSUnusedGlobalSymbols
   protected addPlugins(...plugins: PluginClass[]) {
     this.plugins.push(...plugins);
+  }
+}
+
+@Project.decorate({
+  name: '@glassway/architect',
+})
+export class ArchitectCoreProject extends Project {
+  public override async configure(): Promise<void> {
+    this.addModules(crds);
   }
 }
 

@@ -30,9 +30,10 @@ export class DependencyGraphRenderer {
       for (const [k, v] of Object.entries(input.components)) {
         if (k.includes("prelude")) continue;
 
-        //const ns = (v.component.context as any).namespace;
+        // TODO: support more here than just Kubernetes namespaces
+        const ns = v.component.context['namespace'] as string || undefined;
         let parentGraph: graphviz.GraphBaseModel = g;
-        //parentGraph = parentGraph.subgraph(`cluster_namespace_${ns}`, { label: ns });
+        parentGraph = ns ? parentGraph.subgraph(`cluster_namespace_${ns}`, { label: ns }) : parentGraph;
 
         if (v.component.parent) {
           const parent = v.component.parent as IComponent;
