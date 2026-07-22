@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 
 import { Ajv, JSONSchemaType, ValidateFunction } from "ajv";
-import { walk } from "../../index.ts";
+import { walk } from "@std/fs/walk";
 
 export interface ComponentModel<
   TContext = unknown,
@@ -41,16 +41,16 @@ export class ComponentModelUtilities {
       }
 
       for await (const p of walk(path)) {
-        if (!p.endsWith("architect.json")) continue;
+        if (!p.name.endsWith("architect.json")) continue;
 
-        const content = JSON.parse(await fs.readFile(p, "utf-8"));
+        const content = JSON.parse(await fs.readFile(p.path, "utf-8"));
         // if (!validator(content)) {
         //   logger.error(`failed to parse configuration file at ${p}: ${validator.errors}`);
         //   continue;
         // };
 
         results.push({
-          path: p,
+          path: p.path,
           dirty: false,
           model: content,
         });

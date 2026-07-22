@@ -12,6 +12,7 @@ import { MockCompileListener } from '../__mocks__/progress.ts';
 import { MockComponent } from '../../component/__mocks__/component.ts';
 import { BuildPhase } from '../progress.ts';
 import { Capability, Component, VirtualCapability } from '../../component/index.ts';
+import { ContextUtils } from '../../../utils/index.ts';
 
 let app: MockArchitect;
 let project: MockProject;
@@ -191,10 +192,10 @@ Deno.test('declare adds capability', () => {
   assert.assertEquals(target.capabilities, [capability]);
 });
 
-Deno.test('defaultContext returns context', () => {
-  assert.assertEquals(target.defaultContext(TestComponent, undefined, false), { name: 'test' });
-  assert.assertEquals(target.defaultContext(TestComponent, { name: 'foo' }, false), { name: 'foo' });
-  assert.assertEquals(target.defaultContext(TestComponent, { name: 'foo' }, true), { name: 'test' });
+Deno.test('defaultContext calls ContextUtils', () => {
+  using defaultContext = stub(ContextUtils, 'defaultContext');
+  target.defaultContext(TestComponent, { name: 'foo' }, true);
+  assert.assertStrictEquals(defaultContext.calls.length, 1);
 });
 
 Deno.test('init registers all defined components and capabilities', async () => {

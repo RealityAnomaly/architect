@@ -6,7 +6,7 @@ import { architectGlasswayNet } from '../../kubernetes/crds/index.ts';
 import { Component, ComponentClass, IComponent } from '../component/index.ts';
 import {
   Condition,
-  Constructor,
+  Constructor, ContextUtils,
   DeepLazySpec,
   DeepPartial,
   ReflectionUtilities,
@@ -321,17 +321,7 @@ export class Target implements ITarget {
     context?: Partial<Context>,
     force?: boolean,
   ): Partial<Context> {
-    if (!context) context = {};
-    if (
-      (!context.name || force) &&
-      Reflect.hasMetadata(Constants.CLASS_META_KEY, token)
-    ) {
-      context.name = ReflectionUtilities.classToName(
-        Reflect.getMetadata(Constants.CLASS_META_KEY, token),
-      );
-    }
-
-    return context as Context;
+    return ContextUtils.defaultContext(token, context, force);
   }
 
   public toString(): string {

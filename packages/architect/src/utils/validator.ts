@@ -1,6 +1,6 @@
 import * as logtape from '@logtape/logtape';
 
-interface Validator {
+export interface Validator {
   validate(): void | Promise<void>;
 }
 
