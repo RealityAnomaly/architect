@@ -3,7 +3,8 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import * as util from 'node:util';
 import { execFile } from 'node:child_process';
-import { KubeResource, walk } from '@glassway/architect';
+import { KubeResource } from '@glassway/architect';
+import { walk } from "@std/fs/walk";
 
 import { Builder, BuilderParams } from './builder.ts';
 
@@ -43,8 +44,8 @@ export class GitBuilder extends Builder {
         await fs.stat(p);
 
         for await (const file of walk(p)) {
-          if (!(file.endsWith(".yaml") || file.endsWith(".yml"))) continue;
-          const text = await fs.readFile(file, "utf-8");
+          if (!(file.name.endsWith(".yaml") || file.name.endsWith(".yml"))) continue;
+          const text = await fs.readFile(file.path, "utf-8");
           result.push(...this.loader.loadString(text));
         }
       }

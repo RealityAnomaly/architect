@@ -1,6 +1,15 @@
 // noinspection SpellCheckingInspection
 import * as assert from '@std/assert';
-import { TypeUtilities } from './../types.ts';
+import { ReflectionUtilities, TypeUtilities } from './../types.ts';
+
+class Foobar {}
+
+Deno.test('isObject', async () => {
+  assert.assertEquals(TypeUtilities.isObject({ foo: 'bar' }), true);
+  assert.assertEquals(TypeUtilities.isObject(new Foobar()), true);
+  assert.assertEquals(TypeUtilities.isObject('bar'), false);
+  assert.assertEquals(TypeUtilities.isObject(() => {}), true);
+});
 
 Deno.test('isRecord', async () => {
   assert.assertEquals(TypeUtilities.isRecord({ foo: 'bar' }), true);
@@ -17,11 +26,17 @@ Deno.test('notEmpty', async () => {
   assert.assertEquals(TypeUtilities.notEmpty(undefined), false);
 });
 
-Deno.test('isEmptyObject', async () => {
-  assert.assertEquals(TypeUtilities.isEmptyObject({ foo: 'bar' }), false);
-  assert.assertEquals(TypeUtilities.isEmptyObject({}), true);
-  // deno-lint-ignore no-explicit-any
-  assert.assertEquals(TypeUtilities.isEmptyObject(null as any), true);
-  // deno-lint-ignore no-explicit-any
-  assert.assertEquals(TypeUtilities.isEmptyObject(undefined as any), true);
+Deno.test('isObjectDeepKeys', async () => {
+  assert.assertEquals(TypeUtilities.isObjectDeepKeys('blah'), false);
+  assert.assertEquals(TypeUtilities.isObjectDeepKeys(null), false);
+  assert.assertEquals(TypeUtilities.isObjectDeepKeys(undefined), false);
+  assert.assertEquals(TypeUtilities.isObjectDeepKeys(() => {}), false);
+  assert.assertEquals(TypeUtilities.isObjectDeepKeys({ foo: 'bar' }), true);
+  assert.assertEquals(TypeUtilities.isObjectDeepKeys([]), false);
+  assert.assertEquals(TypeUtilities.isObjectDeepKeys(new Foobar()), false);
+});
+
+Deno.test('classToName', async () => {
+  assert.assertEquals(ReflectionUtilities.classToName('architect.glassway.net/foobar'), 'foobar');
+  assert.assertEquals(ReflectionUtilities.classToName('foobar2'), 'foobar2');
 });

@@ -1,3 +1,4 @@
+// deno-coverage-ignore-file
 import * as fs from "node:fs/promises";
 
 export class DummyWriter {

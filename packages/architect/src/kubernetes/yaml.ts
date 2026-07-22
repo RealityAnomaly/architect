@@ -36,7 +36,6 @@ export class ManifestLoader {
       const gvk = GVK.fromAK(object.apiVersion, object.kind);
       const Constructor = this.types.getConstructor(gvk);
       const resource = Constructor ? new Constructor(object) : object;
-      if (!resource) continue;
 
       resources.push(resource);
     }

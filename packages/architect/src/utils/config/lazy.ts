@@ -317,7 +317,16 @@ export class Lazy<T> {
     const property = LazyProxy.is(_value) ? async () => _value : _value;
 
     // do not collapse object values if we're forcing the value, treat it as atomic
-    if (!TypeUtilities.isObjectDeepKeys(property) || TypeUtilities.isEmptyObject(property) || force) {
+    if (TypeUtilities.isObjectDeepKeys(property) && Object.keys(property).length > 0 && !force) {
+      for (const [k, v] of Object.entries(property)) {
+        this.set(path.concat(k), v, weight, force, condition);
+      }
+    } else if (Array.isArray(property) && property.length > 0 && !force) {
+      for (let i = 0; i < property.length; i++) {
+        this.set(path.concat(-1), property[i], weight, force, condition);
+      }
+    } else {
+      // atomic merge
       this.values.push({
         condition: condition,
         force: force,
@@ -325,14 +334,6 @@ export class Lazy<T> {
         value: property,
         weight: weight,
       });
-    } else if (Array.isArray(property)) {
-      for (let i = 0; i < property.length; i++) {
-        this.set(path.concat(-1), property[i], weight, force, condition);
-      }
-    } else {
-      for (const [k, v] of Object.entries(property)) {
-        this.set(path.concat(k), v, weight, force, condition);
-      }
     }
   }
 

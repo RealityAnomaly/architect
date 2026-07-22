@@ -70,6 +70,16 @@ Deno.test('recursiveMerge and recursiveMergeThese', async () => {
     'foo',
     'baz',
   ]);
+
+  // test merging undefined
+  // @ts-ignore: test
+  assert.assertEquals(CollectionUtilities.recursiveMerge(undefined, {}), {});
+  // @ts-ignore: test
+  assert.assertEquals(CollectionUtilities.recursiveMerge(null, {}), {});
+  // @ts-ignore: test
+  assert.assertEquals(CollectionUtilities.recursiveMerge({}, undefined), {});
+  // @ts-ignore: test
+  assert.assertEquals(CollectionUtilities.recursiveMerge({}, null), {});
 });
 
 Deno.test('asyncFilter', async () => {

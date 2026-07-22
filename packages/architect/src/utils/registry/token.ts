@@ -1,8 +1,6 @@
 import objectHash from 'object-hash';
-import "reflect-metadata";
 
-import { Constructor, Context, ReflectionUtilities } from '../index.ts';
-import { Constants } from '../../internal/constants.ts';
+import { Constructor, Context, ContextUtils } from '../index.ts';
 
 /**
  * Similar to {TypeRegistry}, but uses the `architect.glassway.net/class` metadata key.
@@ -14,33 +12,19 @@ export class TokenRegistry<T> {
     return `${context.name}-${objectHash(context)}`;
   }
 
-  private static defaultContext(
-    token: Constructor<unknown>,
-    context?: Partial<Context>,
-  ): Context {
-    if (!context) context = {};
-    if (!context.name) {
-      context.name = ReflectionUtilities.classToName(
-        Reflect.getMetadata(Constants.CLASS_META_KEY, token),
-      );
-    }
-
-    return context as Context;
-  }
-
   /**
    * Registers an instance of T with the options provided.
    */
   public register(
-    token: Constructor<unknown>,
+    token: Constructor<T>,
     instance: T,
     _context?: Partial<Context>,
   ) {
-    const context = TokenRegistry.defaultContext(token, _context);
+    const context = ContextUtils.defaultContext(token, _context);
     const ident = TokenRegistry.ident(context);
 
     if (ident in this.data) {
-      throw Error(`${ident} already exists in this Registry`);
+      throw Error(`${ident} already exists in this ${this.constructor.name}`);
     }
 
     this.data[ident] = instance;
@@ -55,7 +39,7 @@ export class TokenRegistry<T> {
     token: Constructor<unknown>,
     _context?: Partial<Context>,
   ): T | undefined {
-    const context = TokenRegistry.defaultContext(token, _context);
+    const context = ContextUtils.defaultContext(token, _context);
     const ident = TokenRegistry.ident(context);
 
     if (!(ident in this.data)) return undefined;

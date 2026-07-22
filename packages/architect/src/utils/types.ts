@@ -40,19 +40,10 @@ export class TypeUtilities {
     return !(value === null || value === undefined);
   }
 
-  /**
-   * Returns whether the specified object is either an empty object or an empty array
-   */
-  public static isEmptyObject(obj: object): boolean {
-    if (!this.notEmpty(obj)) return true;
-    if (Array.isArray(obj)) return obj.length === 0;
-    return Object.keys(obj).length === 0;
-  }
-
   public static isObjectDeepKeys(value: unknown): value is object {
-    // TODO: this should NOT Include classes!!!
     if (typeof value !== "object") return false;
-    return !toolkit.isFunction(value);
+    if (toolkit.isFunction(value) || value === undefined || value === null) return false;
+    return value.constructor === Object;
   }
 }
 

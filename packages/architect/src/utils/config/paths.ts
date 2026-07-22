@@ -1,3 +1,5 @@
+import { TypeUtilities } from '../types.ts';
+
 export type ValuePathKey = string | symbol | number;
 export type ValuePath = ValuePathKey[];
 
@@ -64,7 +66,16 @@ export class PathResultBuilder<T> {
 
     let result = target.value;
 
-    if (Array.isArray(value)) {
+    if (TypeUtilities.isObjectDeepKeys(value)) {
+      if (typeof result !== "object" || Array.isArray(result)) {
+        result = {};
+      }
+
+      const obj = result as Record<string | symbol, PathResultValue<T>>;
+      for (const [k, v] of Object.entries(value as object)) {
+        obj[k] = this.mergeValues(obj[k], path.concat(k), v, force, weight);
+      }
+    } else if (Array.isArray(value)) {
       if (!Array.isArray(result)) {
         result = [];
       }
@@ -75,15 +86,6 @@ export class PathResultBuilder<T> {
           this.mergeValues(undefined, path.concat(-1), v, force, weight),
         )
       );
-    } else if (typeof value === "object") {
-      if (typeof result !== "object" || Array.isArray(result)) {
-        result = {};
-      }
-
-      const obj = result as Record<string | symbol, PathResultValue<T>>;
-      for (const [k, v] of Object.entries(value as object)) {
-        obj[k] = this.mergeValues(obj[k], path.concat(k), v, force, weight);
-      }
     } else {
       result = value;
     }
