@@ -164,7 +164,7 @@ export class Target implements ITarget {
   protected readonly _components: TokenRegistry<IComponent> = new TokenRegistry<IComponent>();
   protected readonly _capabilities: Capability<unknown>[] = [];
 
-  protected constructor(
+  public constructor(
     model: architectGlasswayNet.v1alpha1.Target,
     params: TargetParams = {},
     project: IProject,
@@ -208,6 +208,7 @@ export class Target implements ITarget {
 
     const graph = await this.resolve(params);
     if (params?.validateOnly) {
+      listener?.onPhaseChange(BuildPhase.Validate);
       graph.assertValid(logger);
       return undefined;
     }
@@ -250,9 +251,7 @@ export class Target implements ITarget {
 
     if (validate) {
       listener?.onPhaseChange(BuildPhase.Validate);
-      if (!result.graph.assertValid(logger)) {
-        return result;
-      }
+      graph.assertValid(logger);
     } else {
       logger?.warn(
         `validation skipped for target ${this.toString()}`,
@@ -336,7 +335,7 @@ export class Target implements ITarget {
   }
 
   public toString(): string {
-    return this._model.metadata.name ?? "unnamed";
+    return this._model.metadata.name!;
   }
 
   public async init() {

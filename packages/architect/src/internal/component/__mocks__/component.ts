@@ -9,6 +9,7 @@ import { IComponent } from '../component.ts';
 export class MockComponent implements IComponent {
   public _context: Context = { name: 'blah123' };
   public _capabilities: Capability<unknown>[] = [];
+  public _result = (() => { return { foo: 'result' } });
 
   constructor(context: Context = { name: 'blah123' }) {
     this._context = context;
@@ -50,24 +51,17 @@ export class MockComponent implements IComponent {
   get rid(): string {
     return `${this.name}-b475d49`;
   }
-  setParent(parent?: any): void {
-    throw new Error('Method not implemented.');
-  }
+  // deno-lint-ignore no-explicit-any
+  setParent(parent?: any): void {}
   async getRequirements(): Promise<IComponentMatcher[]> {
     return [];
   }
-  build(result?: object | undefined): Promise<object> {
-    throw new Error('Method not implemented.');
+  async build(result?: object | undefined): Promise<object> {
+    return this._result();
   }
-  configure(context: ConfigurationContext): void {
-    throw new Error('Method not implemented.');
-  }
-  init(): void {
-    throw new Error('Method not implemented.');
-  }
-  postBuild(data: object): Promise<object> {
-    throw new Error('Method not implemented.');
-  }
+  configure(context: ConfigurationContext): void {}
+  init(): void {}
+  async postBuild(data: object): Promise<object> { return data; }
   async upgrade(_state: ComponentUpgradeState): Promise<boolean> {
     return true;
   }
