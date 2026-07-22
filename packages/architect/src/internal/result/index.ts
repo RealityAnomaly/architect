@@ -1,4 +1,3 @@
-import * as fs from 'node:fs/promises';
 import { CollectionUtilities } from '../../utils/index.ts';
 import { IDependencyGraph } from '../graph/index.ts';
 
@@ -45,7 +44,7 @@ export class Result {
   public async write(dir: string): Promise<void> {
     if (!this.writer) return;
 
-    await fs.mkdir(dir, { recursive: true });
+    await Deno.mkdir(dir, { recursive: true });
     await this.writer.write(this, dir);
   }
 }

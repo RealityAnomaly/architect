@@ -1,9 +1,8 @@
-import fs from 'node:fs/promises';
 import * as logtape from '@logtape/logtape';
 import { walk } from '@std/fs/walk';
 import { Plugin } from '../plugin/plugin.ts';
 import { ITarget } from './target.ts';
-import { Project } from '../project/index.ts';
+import { IProject } from '../project/index.ts';
 
 import { architectGlasswayNet } from '../../kubernetes/crds/index.ts';
 import { ManifestLoader } from '../../kubernetes/index.ts';
@@ -11,15 +10,15 @@ import { PluginRegistry } from '../plugin/registry.ts';
 
 export class TargetLoader {
   public static async collectFolder(
-    project: Project,
+    project: IProject,
     plugins: PluginRegistry,
     loader: ManifestLoader,
     input: string,
     logger?: logtape.Logger,
   ): Promise<ITarget[]> {
     try {
-      const stat = await fs.stat(input);
-      if (!stat.isDirectory()) return [];
+      const stat = await Deno.stat(input);
+      if (!stat.isDirectory) return [];
     } catch {
       return [];
     }

@@ -1,4 +1,3 @@
-import fs from 'node:fs/promises';
 import path from 'node:path';
 
 import * as logtape from '@logtape/logtape';
@@ -79,7 +78,7 @@ export class Updater {
     for (const component of map) {
       await this.updateComponent(component);
       if (dry || !component.file.dirty) continue;
-      await fs.writeFile(component.file.path, JSON.stringify(component.file.model, null, 2));
+      await Deno.writeTextFile(component.file.path, JSON.stringify(component.file.model, null, 2));
     }
 
     if (dry) {
