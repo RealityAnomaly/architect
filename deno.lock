@@ -6,14 +6,19 @@
     "jsr:@glassway/kubernetes-types@^1.0.3": "1.0.3",
     "jsr:@logtape/logtape@^2.2.3": "2.2.4",
     "jsr:@match/match@0.1": "0.1.0",
+    "jsr:@std/assert@0.221": "0.221.0",
+    "jsr:@std/assert@0.221.0": "0.221.0",
     "jsr:@std/assert@^1.0.19": "1.0.19",
     "jsr:@std/assert@^1.0.9": "1.0.19",
     "jsr:@std/async@*": "1.0.11",
+    "jsr:@std/async@0.221.0": "0.221.0",
     "jsr:@std/async@^1.4.0": "1.5.0",
     "jsr:@std/async@^1.5.0": "1.5.0",
     "jsr:@std/bytes@^1.0.6": "1.0.6",
     "jsr:@std/data-structures@^1.1.0": "1.1.1",
     "jsr:@std/data-structures@^1.1.1": "1.1.1",
+    "jsr:@std/fmt@0.221": "0.221.0",
+    "jsr:@std/fmt@0.221.0": "0.221.0",
     "jsr:@std/fmt@1.0.3": "1.0.3",
     "jsr:@std/fs@*": "1.0.24",
     "jsr:@std/fs@^1.0.24": "1.0.24",
@@ -87,6 +92,12 @@
     "@match/match@0.1.0": {
       "integrity": "d98fdfe9b241c662f3b1ce2aca601a17033350fb2549e212abbe7d3c29170656"
     },
+    "@std/assert@0.221.0": {
+      "integrity": "a5f1aa6e7909dbea271754fd4ab3f4e687aeff4873b4cef9a320af813adb489a",
+      "dependencies": [
+        "jsr:@std/fmt@0.221"
+      ]
+    },
     "@std/assert@1.0.11": {
       "integrity": "2461ef3c368fe88bc60e186e7744a93112f16fd110022e113a0849e94d1c83c1",
       "dependencies": [
@@ -97,6 +108,12 @@
       "integrity": "eaada96ee120cb980bc47e040f82814d786fe8162ecc53c91d8df60b8755991e",
       "dependencies": [
         "jsr:@std/internal@^1.0.12"
+      ]
+    },
+    "@std/async@0.221.0": {
+      "integrity": "f5519861754a1bb2898d227dd8ccb545abc975534aa9063e53911d6cb4e365cf",
+      "dependencies": [
+        "jsr:@std/assert@0.221"
       ]
     },
     "@std/async@1.0.11": {
@@ -113,6 +130,9 @@
     },
     "@std/data-structures@1.1.1": {
       "integrity": "7e1fcf19771fb9c6dbcd7f65039d6d42ef8dc023cfbc0c4cdc74b24e09229380"
+    },
+    "@std/fmt@0.221.0": {
+      "integrity": "379fed69bdd9731110f26b9085aeb740606b20428ce6af31ef6bd45ef8efa62a"
     },
     "@std/fmt@1.0.3": {
       "integrity": "97765c16aa32245ff4e2204ecf7d8562496a3cb8592340a80e7e554e0bb9149f"
@@ -824,6 +844,13 @@
     "ws@8.21.0": {
       "integrity": "sha512-Vsp28b7DRcimFQvrqu2Wek3z1iYxDCWqHYB8Qsnk/S4RfaCQzPGPyBNuVjJV3cd6UiKtUtp6sNM77gWvzcCH+g=="
     }
+  },
+  "remote": {
+    "https://deno.land/x/rx_webstreams@0.2.0/lib/sources/timerSource.ts": "5c865b96c6be813678b30370d5434772c5b7ecd9a6ad2e214b0c7276c7bc61dd",
+    "https://deno.land/x/rx_webstreams@0.2.0/lib/targets/simpleCallbackTarget.ts": "ab364908ac1aa8eecb32e6d1dee1d1588550b65ca1debc888257593a688ac382",
+    "https://deno.land/x/rx_webstreams@0.2.0/mod.ts": "9fee999a0ef4f3ee0d20fd2e64da1dd666c5e27299c074fbd4a70a65c41e78e8",
+    "https://deno.land/x/simple_timer_stream@1.0.2/lib/simpleTimerStream.ts": "a498f228c14f10de8675a502111339974dc81b180655b5ebc63cfc9e1a4b9d9d",
+    "https://deno.land/x/simple_timer_stream@1.0.2/mod.ts": "7714c9be289af1c7209608c98214ab909790b4bb3d5792a27c05c95828bbecd9"
   },
   "workspace": {
     "dependencies": [

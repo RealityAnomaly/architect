@@ -3,4 +3,5 @@
  */
 export interface Context {
   name: string;
+  [p: string]: unknown;
 }

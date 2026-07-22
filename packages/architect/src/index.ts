@@ -5,8 +5,6 @@ process.on("warning", n => {
 });
 
 import { App } from './cli/index.ts';
-import { Project } from './internal/project/index.ts';
-import * as crds from './kubernetes/crds/index.ts';
 
 export * from './cli/index.ts';
 export * from './kubernetes/crds/index.ts';
@@ -22,15 +20,7 @@ export * from './internal/project/index.ts';
 
 export { ProjectMetadata } from './internal/project/meta.ts';
 export { PluginRegistry } from './internal/plugin/registry.ts';
-
-@Project.decorate({
-  name: '@glassway/architect',
-})
-export class ArchitectCoreProject extends Project {
-  public override async configure(): Promise<void> {
-    this.addModules(crds);
-  }
-}
+import { ArchitectCoreProject } from './internal/project/index.ts';
 
 if (import.meta.main) {
   await App.run(ArchitectCoreProject);
