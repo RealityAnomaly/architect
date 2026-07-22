@@ -1,6 +1,5 @@
 import * as assert from '@std/assert';
 import * as mock from '@std/testing/mock';
-import fs from 'node:fs/promises';
 
 import { ComponentUpgradeState, Updater } from '../index.ts';
 import { MockProject } from '../../../project/__mocks__/project.ts';
@@ -68,7 +67,7 @@ Deno.test.beforeEach(() => {
 
 Deno.test('calls compile if component changes', async () => {
   using modelCollect = mock.stub(ComponentModelUtilities, 'collect', async () => { return [fileInstance]; });
-  using writeFile = mock.stub(fs, 'writeFile');
+  using writeFile = mock.stub(Deno, 'writeTextFile');
 
   ValidComponent.upgradeReturn = true;
   MockTarget.compileCalled = false;
@@ -116,7 +115,7 @@ Deno.test('writes file if component changes', async () => {
   };
 
   using _ = mock.stub(ComponentModelUtilities, 'collect', async () => { return [fi]; });
-  using writeFile = mock.stub(fs, 'writeFile');
+  using writeFile = mock.stub(Deno, 'writeTextFile');
 
   ValidComponent.upgradeReturn = false;
   await updater.update([ValidComponent]);

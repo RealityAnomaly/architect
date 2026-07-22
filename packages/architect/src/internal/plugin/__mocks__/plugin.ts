@@ -35,3 +35,15 @@ export class MockPlugin implements IPlugin {
     this._commands.push(_command);
   }
 }
+
+export class TestPluginBase extends Plugin {
+  constructor(parent: IArchitect) {
+    super(parent, 'test');
+  }
+
+  public override get targets(): Record<string, TargetClass> {
+    return {'foobar': MockTarget, [Plugin.TARGET_IDENTIFIERS.kubernetes]: MockTarget}
+  }
+  public override async init(): Promise<void> {}
+  public override async registerCommand(_command: Command): Promise<void> {}
+}

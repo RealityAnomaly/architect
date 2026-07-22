@@ -4,10 +4,14 @@ import { stub } from "@std/testing/mock";
 import { MockTarget } from '../../target/__mocks__/target.ts';
 import { MockArchitect } from '../../../__mocks__/app.ts';
 import { PluginRegistry } from '../registry.ts';
-import { TestPlugin } from './plugin.test.ts';
+import { Plugin } from '../plugin.ts';
+import { TestPluginBase } from '../__mocks__/plugin.ts';
 
 let app: MockArchitect;
 let registry: PluginRegistry;
+
+@Plugin.decorate('architect.glassway.net/foobar')
+class TestPlugin extends TestPluginBase {}
 
 Deno.test.beforeEach(() => {
   app = new MockArchitect();

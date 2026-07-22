@@ -2,31 +2,19 @@ import * as assert from '@std/assert';
 import { stub } from "@std/testing/mock";
 
 import { MockArchitect } from '../../../__mocks__/app.ts';
-import { Command } from 'commander';
-import { Constructor, type IArchitect, TargetClass } from '../../../index.ts';
+import { Constructor } from '../../../index.ts';
 import { Plugin } from '../plugin.ts';
 import { MockTarget } from '../../target/__mocks__/target.ts';
 import { Constants } from '../../constants.ts';
 import { ModuleUtilities } from '../../../utils/modules.ts';
-
-abstract class TestPluginBase extends Plugin {
-  constructor(parent: IArchitect) {
-    super(parent, 'test');
-  }
-
-  public override get targets(): Record<string, TargetClass> {
-    return {'foobar': MockTarget}
-  }
-  public override async init(): Promise<void> {}
-  public override async registerCommand(_command: Command): Promise<void> {}
-}
+import { TestPluginBase } from '../__mocks__/plugin.ts';
 
 @Plugin.decorate('architect.glassway.net/foobar')
-export class TestPlugin extends TestPluginBase {}
+class TestPlugin extends TestPluginBase {}
 
-export class TestPlugin2 extends TestPluginBase {}
+class TestPlugin2 extends TestPluginBase {}
 
-export class TestPluginWrongType extends TestPluginBase {}
+class TestPluginWrongType extends TestPluginBase {}
 Reflect.defineMetadata(Constants.TYPE_META_KEY, 'foobar', TestPluginWrongType);
 
 let app: MockArchitect;
