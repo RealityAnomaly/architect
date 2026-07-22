@@ -353,6 +353,13 @@ Deno.test("fallback resolution", async () => {
   });
 });
 
+Deno.test("fallback persistent", async () => {
+  const tree = Lazy.from({ fuck: "off" });
+  tree.$setFallback({ the: "fuck" } as any);
+  const resolved1 = await tree.$resolve();
+  assert.assertEquals(resolved1, { fuck: "off", the: "fuck" } as any);
+});
+
 Deno.test("fallback refs", async () => {
   const lazy = Lazy.from({
     get: "fucked",
@@ -500,4 +507,13 @@ Deno.test("max recursion depth throws error", async () => {
     Error,
     "Maximum evaluation depth of 100 exceeded",
   );
+});
+
+Deno.test("transform test", async () => {
+  const lazy1 = Lazy.from({ foo: true });
+  const transformed = lazy1.$transform((lazy) => {
+    return { bar: lazy.foo };
+  });
+
+  assert.assertEquals(await transformed(), { bar: true });
 });
