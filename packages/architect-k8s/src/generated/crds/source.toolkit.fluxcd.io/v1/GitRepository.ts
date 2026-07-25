@@ -380,6 +380,7 @@ export class GitRepository extends Model<IGitRepository> implements IGitReposito
 static apiVersion: IGitRepository["apiVersion"] = "source.toolkit.fluxcd.io/v1";
 static kind: IGitRepository["kind"] = "GitRepository";
 static is: TypeMetaGuard<IGitRepository> = createTypeMetaGuard<IGitRepository>(GitRepository);
+static scope: string = "Namespaced";
 
 constructor(data?: ModelData<IGitRepository>) {
   super();

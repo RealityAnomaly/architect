@@ -146,6 +146,7 @@ export class Provider extends Model<IProvider> implements IProvider {
 static apiVersion: IProvider["apiVersion"] = "notification.toolkit.fluxcd.io/v1beta3";
 static kind: IProvider["kind"] = "Provider";
 static is: TypeMetaGuard<IProvider> = createTypeMetaGuard<IProvider>(Provider);
+static scope: string = "Namespaced";
 
 constructor(data?: ModelData<IProvider>) {
   super();

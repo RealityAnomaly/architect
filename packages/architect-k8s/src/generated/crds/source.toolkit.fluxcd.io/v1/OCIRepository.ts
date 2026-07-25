@@ -342,6 +342,7 @@ export class OCIRepository extends Model<IOCIRepository> implements IOCIReposito
 static apiVersion: IOCIRepository["apiVersion"] = "source.toolkit.fluxcd.io/v1";
 static kind: IOCIRepository["kind"] = "OCIRepository";
 static is: TypeMetaGuard<IOCIRepository> = createTypeMetaGuard<IOCIRepository>(OCIRepository);
+static scope: string = "Namespaced";
 
 constructor(data?: ModelData<IOCIRepository>) {
   super();

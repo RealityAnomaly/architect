@@ -1,11 +1,13 @@
 import { IObjectMeta } from "@glassway/kubernetes-models/apimachinery/apis/meta/v1/ObjectMeta";
 import * as toolkit from "@es-toolkit/es-toolkit";
+import { GVK } from './types/index.ts';
 
 /**
  * Non-exhaustive blacklist of Kubernetes resources that may not have attached namespaces
  */
 const RESOURCE_NAMESPACE_BLACKLIST: string[] = [
   // kubernetes API
+  // kubectl api-resources --namespaced=false
   "ComponentStatus",
   "Namespace",
   "Node",
@@ -84,7 +86,10 @@ export interface KubeUnkResource extends KubeResource {
 /**
  * Represents the constructor of a resource
  */
-export type KubeResourceConstructor = new (data: KubeResource) => KubeResource;
+export interface KubeResourceConstructor {
+  new (data: KubeResource): KubeResource;
+  scope: 'Cluster' | 'Namespaced' | '\\*';
+}
 
 /**
  * Represents a recursive set or map of resources
@@ -151,9 +156,12 @@ export class KubeResourceUtilities {
    * Applies a default namespace to a resource if it is namespaced and does not already have one defined
    */
   static defaultNamespace(resource: KubeResource, def?: string): KubeResource {
-    if (RESOURCE_NAMESPACE_BLACKLIST.includes(resource.kind)) {
-      return resource;
-    }
+    // find the CRD by the GVK and check its scope
+    const gvk = GVK.fromResource(resource);
+    if (gvk.isAPIModel() && RESOURCE_NAMESPACE_BLACKLIST.includes(resource.kind)) return resource;
+
+    const ctor = gvk.constructor as KubeResourceConstructor;
+    if (ctor.scope && ctor.scope === 'Cluster') return resource;
 
     const namespace = resource.metadata?.namespace;
     if (namespace === null || namespace === undefined) {

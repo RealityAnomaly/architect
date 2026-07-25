@@ -82,6 +82,7 @@ export class Target extends Model<ITarget> implements ITarget {
 static apiVersion: ITarget["apiVersion"] = "architect.glassway.net/v1alpha1";
 static kind: ITarget["kind"] = "Target";
 static is: TypeMetaGuard<ITarget> = createTypeMetaGuard<ITarget>(Target);
+static scope: string = "Namespaced";
 
 constructor(data?: ModelData<ITarget>) {
   super();

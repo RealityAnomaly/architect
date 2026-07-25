@@ -149,6 +149,7 @@ export class ExternalArtifact extends Model<IExternalArtifact> implements IExter
 static apiVersion: IExternalArtifact["apiVersion"] = "source.toolkit.fluxcd.io/v1";
 static kind: IExternalArtifact["kind"] = "ExternalArtifact";
 static is: TypeMetaGuard<IExternalArtifact> = createTypeMetaGuard<IExternalArtifact>(ExternalArtifact);
+static scope: string = "Namespaced";
 
 constructor(data?: ModelData<IExternalArtifact>) {
   super();

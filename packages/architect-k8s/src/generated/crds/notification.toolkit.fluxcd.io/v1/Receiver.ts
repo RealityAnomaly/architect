@@ -249,6 +249,7 @@ export class Receiver extends Model<IReceiver> implements IReceiver {
 static apiVersion: IReceiver["apiVersion"] = "notification.toolkit.fluxcd.io/v1";
 static kind: IReceiver["kind"] = "Receiver";
 static is: TypeMetaGuard<IReceiver> = createTypeMetaGuard<IReceiver>(Receiver);
+static scope: string = "Namespaced";
 
 constructor(data?: ModelData<IReceiver>) {
   super();

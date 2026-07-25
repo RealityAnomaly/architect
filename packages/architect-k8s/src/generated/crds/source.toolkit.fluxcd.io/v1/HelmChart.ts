@@ -262,6 +262,7 @@ export class HelmChart extends Model<IHelmChart> implements IHelmChart {
 static apiVersion: IHelmChart["apiVersion"] = "source.toolkit.fluxcd.io/v1";
 static kind: IHelmChart["kind"] = "HelmChart";
 static is: TypeMetaGuard<IHelmChart> = createTypeMetaGuard<IHelmChart>(HelmChart);
+static scope: string = "Namespaced";
 
 constructor(data?: ModelData<IHelmChart>) {
   super();

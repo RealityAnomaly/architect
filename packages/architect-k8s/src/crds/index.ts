@@ -34,7 +34,7 @@ export class CRDManager {
   }
 
   private get dataDir(): string {
-    return path.join(this.plugin.parent.getProject().getRoot(), 'src/generated/crds');
+    return path.join(this.plugin.parent.getProject().getRoot(), 'data/crds');
   }
 
   public async add(crd: CrdsConfig): Promise<void> {

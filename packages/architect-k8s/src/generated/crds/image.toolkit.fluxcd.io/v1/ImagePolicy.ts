@@ -225,6 +225,7 @@ export class ImagePolicy extends Model<IImagePolicy> implements IImagePolicy {
 static apiVersion: IImagePolicy["apiVersion"] = "image.toolkit.fluxcd.io/v1";
 static kind: IImagePolicy["kind"] = "ImagePolicy";
 static is: TypeMetaGuard<IImagePolicy> = createTypeMetaGuard<IImagePolicy>(ImagePolicy);
+static scope: string = "Namespaced";
 
 constructor(data?: ModelData<IImagePolicy>) {
   super();
