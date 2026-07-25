@@ -2,3 +2,4 @@ node_modules/
 lerna-debug.log
 .yarn
 .DS_Store
+coverage

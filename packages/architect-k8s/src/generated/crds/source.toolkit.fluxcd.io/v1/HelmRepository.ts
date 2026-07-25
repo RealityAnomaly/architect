@@ -251,6 +251,7 @@ export class HelmRepository extends Model<IHelmRepository> implements IHelmRepos
 static apiVersion: IHelmRepository["apiVersion"] = "source.toolkit.fluxcd.io/v1";
 static kind: IHelmRepository["kind"] = "HelmRepository";
 static is: TypeMetaGuard<IHelmRepository> = createTypeMetaGuard<IHelmRepository>(HelmRepository);
+static scope: string = "Namespaced";
 
 constructor(data?: ModelData<IHelmRepository>) {
   super();

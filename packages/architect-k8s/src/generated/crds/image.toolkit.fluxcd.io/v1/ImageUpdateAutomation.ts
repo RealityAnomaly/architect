@@ -356,6 +356,7 @@ export class ImageUpdateAutomation extends Model<IImageUpdateAutomation> impleme
 static apiVersion: IImageUpdateAutomation["apiVersion"] = "image.toolkit.fluxcd.io/v1";
 static kind: IImageUpdateAutomation["kind"] = "ImageUpdateAutomation";
 static is: TypeMetaGuard<IImageUpdateAutomation> = createTypeMetaGuard<IImageUpdateAutomation>(ImageUpdateAutomation);
+static scope: string = "Namespaced";
 
 constructor(data?: ModelData<IImageUpdateAutomation>) {
   super();

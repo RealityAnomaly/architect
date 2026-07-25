@@ -653,6 +653,7 @@ export class Kustomization extends Model<IKustomization> implements IKustomizati
 static apiVersion: IKustomization["apiVersion"] = "kustomize.toolkit.fluxcd.io/v1";
 static kind: IKustomization["kind"] = "Kustomization";
 static is: TypeMetaGuard<IKustomization> = createTypeMetaGuard<IKustomization>(Kustomization);
+static scope: string = "Namespaced";
 
 constructor(data?: ModelData<IKustomization>) {
   super();

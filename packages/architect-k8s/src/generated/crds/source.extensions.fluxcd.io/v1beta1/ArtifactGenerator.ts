@@ -232,6 +232,7 @@ export class ArtifactGenerator extends Model<IArtifactGenerator> implements IArt
 static apiVersion: IArtifactGenerator["apiVersion"] = "source.extensions.fluxcd.io/v1beta1";
 static kind: IArtifactGenerator["kind"] = "ArtifactGenerator";
 static is: TypeMetaGuard<IArtifactGenerator> = createTypeMetaGuard<IArtifactGenerator>(ArtifactGenerator);
+static scope: string = "Namespaced";
 
 constructor(data?: ModelData<IArtifactGenerator>) {
   super();

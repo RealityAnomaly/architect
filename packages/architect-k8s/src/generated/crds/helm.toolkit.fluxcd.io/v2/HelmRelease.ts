@@ -1237,6 +1237,7 @@ export class HelmRelease extends Model<IHelmRelease> implements IHelmRelease {
 static apiVersion: IHelmRelease["apiVersion"] = "helm.toolkit.fluxcd.io/v2";
 static kind: IHelmRelease["kind"] = "HelmRelease";
 static is: TypeMetaGuard<IHelmRelease> = createTypeMetaGuard<IHelmRelease>(HelmRelease);
+static scope: string = "Namespaced";
 
 constructor(data?: ModelData<IHelmRelease>) {
   super();

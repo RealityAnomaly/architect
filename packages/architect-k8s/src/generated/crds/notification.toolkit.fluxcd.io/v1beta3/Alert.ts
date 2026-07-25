@@ -119,6 +119,7 @@ export class Alert extends Model<IAlert> implements IAlert {
 static apiVersion: IAlert["apiVersion"] = "notification.toolkit.fluxcd.io/v1beta3";
 static kind: IAlert["kind"] = "Alert";
 static is: TypeMetaGuard<IAlert> = createTypeMetaGuard<IAlert>(Alert);
+static scope: string = "Namespaced";
 
 constructor(data?: ModelData<IAlert>) {
   super();

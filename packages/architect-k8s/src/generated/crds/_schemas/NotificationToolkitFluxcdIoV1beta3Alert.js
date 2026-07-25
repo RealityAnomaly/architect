@@ -1,3 +1,4 @@
+// deno-coverage-ignore-file
 /* @ts-self-types="./NotificationToolkitFluxcdIoV1beta3Alert.d.ts" */
 export const validate = validate5;
 const schema3 = {"type":"object","properties":{"apiVersion":{"$ref":"FDO61L2EGWtAu8DEHokPFMq1oB_uZaf0Js0o3DWGqmo"},"kind":{"$ref":"rULfQLLmeDPUqRt36-D3khayW1NlIepp5UB9TKOuQuo"},"metadata":{"$ref":"P3srTZpWadQH4s4N9KfJR0iCqydQo9YAz7xMB2qf0GQ"},"spec":{"$ref":"Pw80m9OQTAwa0VkTC-i6QK4sq--wEDNSqHEsZ-xXZNU"}},"required":["apiVersion","kind"],"$id":"notification.toolkit.fluxcd.io.v1beta3.Alert"};

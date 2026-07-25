@@ -1,3 +1,4 @@
+// deno-coverage-ignore-file
 /* @ts-self-types="./KustomizeToolkitFluxcdIoV1Kustomization.d.ts" */
 import { formats } from "@glassway/kubernetes-types/validate";
 export const validate = validate19;

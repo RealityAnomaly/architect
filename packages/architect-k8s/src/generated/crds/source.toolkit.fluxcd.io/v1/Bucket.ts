@@ -296,6 +296,7 @@ export class Bucket extends Model<IBucket> implements IBucket {
 static apiVersion: IBucket["apiVersion"] = "source.toolkit.fluxcd.io/v1";
 static kind: IBucket["kind"] = "Bucket";
 static is: TypeMetaGuard<IBucket> = createTypeMetaGuard<IBucket>(Bucket);
+static scope: string = "Namespaced";
 
 constructor(data?: ModelData<IBucket>) {
   super();

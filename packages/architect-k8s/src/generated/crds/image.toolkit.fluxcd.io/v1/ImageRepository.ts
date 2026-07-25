@@ -232,6 +232,7 @@ export class ImageRepository extends Model<IImageRepository> implements IImageRe
 static apiVersion: IImageRepository["apiVersion"] = "image.toolkit.fluxcd.io/v1";
 static kind: IImageRepository["kind"] = "ImageRepository";
 static is: TypeMetaGuard<IImageRepository> = createTypeMetaGuard<IImageRepository>(ImageRepository);
+static scope: string = "Namespaced";
 
 constructor(data?: ModelData<IImageRepository>) {
   super();
