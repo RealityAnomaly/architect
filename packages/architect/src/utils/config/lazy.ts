@@ -166,7 +166,7 @@ class LazyProxy {
     });
 
     function accessor(target: _LazyProxy<unknown>, key: ValuePathKey) {
-      const _path = internal.$__path__.concat(key.toString());
+      const _path = internal.$__path__.concat(key);
       return LazyProxy.from(internal.$__root__, target, _path);
     }
 
@@ -323,7 +323,7 @@ export class Lazy<T> {
       }
     } else if (Array.isArray(property) && property.length > 0 && !force) {
       for (let i = 0; i < property.length; i++) {
-        this.set(path.concat(-1), property[i], weight, force, condition);
+        this.set(path.concat(Symbol()), property[i], weight, force, condition);
       }
     } else {
       // atomic merge

@@ -117,10 +117,22 @@ export class PathResultBuilder<T> {
     }
 
     // do we have an array key or a normal key?
-    if (typeof curr === "number") {
-      if (!Array.isArray(target.value)) target.value = [];
+    if (typeof curr === "symbol") {
+      if (target.value === undefined)
+        target.value = [];
+      if (target.indices === undefined)
+        target.indices = new Map<ValuePathKey, number>();
+
       const array = target.value as PathResultValue<T>[];
-      array.push(this.merge(undefined, next, fullPath, value, force, weight));
+      const keys = target.indices!;
+
+      let idx = keys.get(curr);
+      if (idx === undefined) {
+        idx = array.length;
+        keys.set(curr, idx);
+      }
+
+      array[idx] = this.merge(array[idx], next, fullPath, value, force, weight);
     } else {
       if (typeof target.value !== "object") target.value = {};
       const obj = target.value as Record<string | symbol, PathResultValue<T>>;
@@ -138,4 +150,5 @@ export interface PathResultValue<T> {
     | PathResultValue<T>[]
     | Record<string | symbol, PathResultValue<T>>;
   weight: number;
+  indices?: Map<ValuePathKey, number>;
 }
