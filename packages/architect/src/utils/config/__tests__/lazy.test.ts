@@ -517,3 +517,17 @@ Deno.test("transform test", async () => {
 
   assert.assertEquals(await transformed(), { bar: true });
 });
+
+Deno.test("list of dict", async () => {
+  const original = {
+    blah1: {
+      foo: [
+        { hello: 'world', blah: 'abcd' },
+        { hello: 'test', blah: 'sddsd' }
+      ]
+    }
+  };
+
+  const whatever = Lazy.from(original);
+  assert.assertEquals(await whatever.$resolve(), original);
+});
