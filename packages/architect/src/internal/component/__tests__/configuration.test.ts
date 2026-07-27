@@ -33,7 +33,7 @@ Deno.test.beforeEach(() => {
 
 Deno.test('component returns target component args', async () => {
   using componentStub = stub(target, 'component', (_class, _context, _enable) => new TestComponent(target, ctx, props));
-  const args = context.component(TestComponent);
+  const args = context.component(TestComponent)!;
   assert.assertStrictEquals(componentStub.calls[0].args[0], TestComponent);
   assert.assertEquals(await args.$resolve(), props);
 });

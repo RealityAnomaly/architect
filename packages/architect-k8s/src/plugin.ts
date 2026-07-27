@@ -1,4 +1,4 @@
-import { type IArchitect, Plugin, TargetClass } from '@glassway/architect';
+import { type IArchitect, Plugin, TargetClass, architectGlasswayNet } from '@glassway/architect';
 import { CRDCommand } from './crds/cli.ts';
 import { CrdsConfig } from './crds/config.ts';
 import { CRDManager } from './crds/index.ts';
@@ -16,6 +16,12 @@ export const K8S_PLUGIN_CLASS = "plugin.architect.glassway.net/kubernetes";
 export class K8sPluginConfig {
   crds?: CrdsConfig[];
 }
+
+export type K8sPluginProps = NonNullable<
+  NonNullable<
+    architectGlasswayNet.v1alpha1.Target['spec']['plugins']
+  >['kubernetes']
+>;
 
 @Plugin.decorate(K8S_PLUGIN_CLASS)
 export class K8sPlugin extends Plugin {

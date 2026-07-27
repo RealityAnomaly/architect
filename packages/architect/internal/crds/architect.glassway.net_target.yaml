@@ -81,6 +81,41 @@ spec:
                         flavor:
                           type: string
                           enum: [ "docker-desktop", "kind", "k3s", "talos" ]
+                        gitops:
+                          description: Configuration for GitOps plugins
+                          minProperties: 1
+                          properties:
+                            flux:
+                              properties:
+                                sources:
+                                  minProperties: 1
+                                  maxProperties: 1
+                                  properties:
+                                    oci:
+                                      properties:
+                                        registry:
+                                          type: string
+                                        prefix:
+                                          type: string
+                                      required:
+                                        - registry
+                                sourceRef:
+                                  properties:
+                                    apiVersion:
+                                      type: string
+                                    kind:
+                                      type: string
+                                      enum: [ "OCIRepository", "GitRepository", "Bucket" ]
+                                    name:
+                                      type: string
+                                    namespace:
+                                      type: string
+                                  required:
+                                    - kind
+                                    - name
+                              required:
+                                - sources
+                                - sourceRef
                       required:
                         - client
                         - dns

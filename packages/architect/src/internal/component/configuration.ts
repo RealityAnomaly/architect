@@ -25,10 +25,11 @@ export class ConfigurationContext {
   public component<T extends Component>(
     token: Constructor<T>,
     context?: Partial<Context>,
-  ): LazyAuto<ExtractComponentArgs<T>> {
-    return this.target.component(token, context, true).props as LazyAuto<
+  ): LazyAuto<ExtractComponentArgs<T>> | undefined {
+    const component = this.target.component(token, context, true);
+    return component ? component.props as LazyAuto<
       ExtractComponentArgs<T>
-    >;
+    > : undefined;
   }
 
   public enable<T extends Component>(
@@ -49,11 +50,11 @@ export class ConfigurationContext {
     force?: boolean,
     condition = this.enabler,
   ) {
-    this.component<T>(token, undefined).$set(value, weight, force, condition);
+    this.component<T>(token, undefined)!.$set(value, weight, force, condition);
   }
 
   public mkIf(
-    condition: _LazyProxy<boolean>,
+    condition: Condition,
     configurator: (context: ConfigurationContext) => void,
   ) {
     const enabler = Lazy.combineConditions(this.enabler, condition);

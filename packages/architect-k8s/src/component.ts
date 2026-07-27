@@ -1,5 +1,4 @@
 import {
-  architectGlasswayNet,
   CapabilityMatcher,
   type IComponent,
   Component,
@@ -23,7 +22,7 @@ import { CNICapability, DNSCapability } from './capabilities/index.ts';
 
 import type { IKubeTarget } from './target/target.ts';
 import type { KubeContext } from './context.ts';
-import { GitFetchOptions, HelmChartOpts, HttpFetchOptions, KustomizeOpts, } from './index.ts';
+import { GitFetchOptions, HelmChartOpts, HttpFetchOptions, K8sPluginProps, KustomizeOpts, } from './index.ts';
 import { KubeTargetIntrospection } from './target/intro.ts';
 
 export interface KubeComponentArgs
@@ -83,11 +82,7 @@ export abstract class KubeComponent<
     return this.context.namespace ?? 'default';
   }
 
-  protected get cluster(): NonNullable<
-    NonNullable<
-      architectGlasswayNet.v1alpha1.Target['spec']['plugins']
-    >['kubernetes']
-  > {
+  protected get cluster(): K8sPluginProps {
     return this.target.cluster;
   }
 

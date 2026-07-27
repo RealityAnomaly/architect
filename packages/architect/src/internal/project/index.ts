@@ -16,6 +16,7 @@ import { ProjectUtils } from './utils.ts';
 import * as yaml from '@std/yaml';
 import * as crds from './../../kubernetes/crds/index.ts';
 import { ProjectMetadata } from './meta.ts';
+import { ProjectGitHelper, ProjectGitInfo } from './git.ts';
 
 export interface IProject {
   /**
@@ -87,6 +88,11 @@ export interface IProject {
    * Returns the filesystem root of the project.
    */
   getRoot(): string;
+
+  /**
+   * Returns information about the project's Git repo
+   */
+  getGitInfo(): Promise<ProjectGitInfo>;
 }
 
 /**
@@ -98,6 +104,7 @@ export abstract class Project implements IProject {
    * The root path of the project. Only set if this project is the currently active workspace.
    */
   private _root?: string;
+  private _gitInfo?: ProjectGitInfo;
   private readonly _app: IArchitect;
 
   /**
@@ -264,6 +271,14 @@ export abstract class Project implements IProject {
     }
 
     return this._root;
+  }
+
+  public async getGitInfo(): Promise<ProjectGitInfo> {
+    if (!this._gitInfo) {
+      this._gitInfo = await ProjectGitHelper.resolve(this.getRoot());
+    }
+
+    return this._gitInfo;
   }
 
   /**

@@ -3,6 +3,7 @@
 import { IArchitect, ITarget, ComponentClass, PluginClass } from '../../../index.ts';
 import { ProjectConfig } from '../config.ts';
 import { IProject, Project } from '../index.ts';
+import { ProjectGitInfo } from '../git.ts';
 
 export class MockProject implements IProject {
   public _app: IArchitect;
@@ -50,5 +51,8 @@ export class MockProject implements IProject {
   }
   getRoot(): string {
     return this._root;
+  }
+  getGitInfo(): Promise<ProjectGitInfo> {
+    throw new Error('Method not implemented.');
   }
 }

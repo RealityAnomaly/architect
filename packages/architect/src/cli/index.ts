@@ -173,6 +173,8 @@ export class App {
       const result = await v.compile(params, logger, bar);
       if (result == null) return;
 
+      result.graph.assertValid(logger);
+
       if (apply) {
         if (!result.graph.valid) {
           if (ignoreErrors) {

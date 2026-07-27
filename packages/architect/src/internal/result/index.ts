@@ -1,8 +1,10 @@
 import { CollectionUtilities } from '../../utils/index.ts';
 import { IDependencyGraph } from '../graph/index.ts';
 
-export interface IWriter {
-  write(result: Result, dir: string): Promise<void>;
+export interface WriterParams {}
+
+export interface IWriter<T extends WriterParams = WriterParams> {
+  write(result: Result, dir: string, params?: T): Promise<void>;
 }
 
 /**
