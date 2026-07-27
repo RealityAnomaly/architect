@@ -1,6 +1,7 @@
 {
   "imports": {
     "@es-toolkit/es-toolkit": "jsr:@es-toolkit/es-toolkit@^1.49.0",
+    "@std/collections": "jsr:@std/collections@^1.3.0",
     "appdirsjs": "npm:appdirsjs@^1.2.7"
   },
   "exports": {
