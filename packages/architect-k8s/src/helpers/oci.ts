@@ -1,5 +1,7 @@
+import * as path from '@std/path';
 import * as client from 'oci-client';
 import * as toolkit from '@es-toolkit/es-toolkit';
+import { userInfo } from "node:os";
 
 import { Logger } from '@logtape/logtape';
 import { getImageReferenceParameters } from "oci-client/dist/parse-uri.js";
@@ -11,11 +13,59 @@ export interface OCIVersions {
   tags: string[]
 }
 
+interface DockerConfig {
+  credHelpers?: Record<string, string>;
+}
+
+interface DockerCredentialOutput {
+  'ServerURL': string,
+  'Username': string;
+  'Secret': string;
+}
+
 export class OCIHelper {
   protected readonly logger: Logger;
 
   constructor(logger: Logger) {
     this.logger = logger;
+  }
+
+  public async getCredentials(registry: string) : Promise<DockerCredentialOutput | undefined> {
+    // strip off any port suffix
+    registry = registry.split(':')[0];
+    const configPath = path.join(userInfo().homedir, ".docker/config.json");
+
+    try {
+      const result = await Deno.stat(configPath);
+      if (!result.isFile) return undefined;
+
+      const config = JSON.parse(await Deno.readTextFile(configPath)) as DockerConfig;
+      if (!config.credHelpers || !(registry in config.credHelpers)) return undefined;
+      const helper = config.credHelpers[registry];
+
+      const command = new Deno.Command(`docker-credential-${helper}`, {
+        args: ['get'],
+        stdin: 'piped',
+        stdout: 'piped',
+        stderr: 'piped',
+      });
+
+      const process = command.spawn();
+      const writer = process.stdin.getWriter();
+      await writer.write(new TextEncoder().encode(registry));
+      await writer.close();
+
+      const status = await process.status;
+      if (!status.success) {
+        this.logger.debug(`Failed to run credential helper: ${await process.stderr.text()}`);
+        return undefined;
+      }
+
+      return await process.stdout.json();
+    } catch (e) {
+      this.logger.debug(`Failed to run credential helper: ${e}`)
+      return undefined;
+    }
   }
 
   private async fetchAuthenticate(url: string, headers?: Record<string, string>) {

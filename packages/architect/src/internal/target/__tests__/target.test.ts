@@ -157,7 +157,7 @@ Deno.test('register registers component', () => {
 Deno.test('component gets component already exists',  async () => {
   const component = new TestComponent(target, { name: 'foo' });
   using request = stub(target.components, 'request', (_token, _context) => component);
-  const result = target.component(TestComponent);
+  const result = target.component(TestComponent)!;
   assert.assertEquals(result, component);
   assert.assertEquals(request.calls.length, 1);
 
@@ -169,7 +169,7 @@ Deno.test('component gets component already exists',  async () => {
 Deno.test('component gets component not existing with auto', () => {
   using request = stub(target.components, 'request', (_token, _context) => undefined);
   using register = stub(target.components, 'register');
-  const result = target.component(TestComponent, {}, true);
+  const result = target.component(TestComponent, {}, true)!;
 
   assert.assertEquals(result.constructor, TestComponent);
   assert.assertEquals(request.calls.length, 1);
@@ -179,7 +179,7 @@ Deno.test('component gets component not existing with auto', () => {
 Deno.test('component gets component not existing without auto', () => {
   using request = stub(target.components, 'request', (_token, _context) => undefined);
   using register = stub(target.components, 'register');
-  const result = target.component(TestComponent, {}, false);
+  const result = target.component(TestComponent, {}, false)!;
 
   assert.assertFalse(result);
   assert.assertEquals(request.calls.length, 1);

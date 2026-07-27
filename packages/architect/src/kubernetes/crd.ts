@@ -15,7 +15,6 @@ export class CRDModelGenerator {
   }
 
   public async generate(yamlDir: string, outDir: string) {
-    console.log(yamlDir, outDir);
     await fs.rm(outDir, { recursive: true, force: true });
     await fs.mkdir(yamlDir, { recursive: true });
     await fs.mkdir(outDir, { recursive: true });
@@ -23,7 +22,6 @@ export class CRDModelGenerator {
     // read all files in src yaml dir
     const crds = [] as api.apiextensionsK8sIo.v1.CustomResourceDefinition[];
     for await (const file of walk(yamlDir)) {
-      console.log(file);
       if (!file.name.endsWith('.yaml')) continue;
       const text = await fs.readFile(file.path, 'utf-8');
       const resources = this.loader.loadString(text);

@@ -24,43 +24,23 @@ import * as logtape from '@logtape/logtape';
 import * as _client from '@kubernetes/client-node';
 import * as yaml from '@std/yaml';
 
-import { FluxCDController, FluxCDMode } from '../apply/flux/index.ts';
 import { KubeComponentModel, KubePreludeComponent } from '../component.ts';
 import { CrdsComponent } from '../components/index.ts';
 import { KubeWriter } from '../writer.ts';
-import { K8S_PLUGIN_CLASS, K8sPlugin } from '../plugin.ts';
+import { K8S_PLUGIN_CLASS, K8sPlugin, K8sPluginProps } from '../plugin.ts';
 import { KubeContext } from '../context.ts';
 import { KubeCRDDependencyGraph } from '../crds/graph.ts';
 import { NamespaceDefaults, NamespaceRef } from '../types/scn.ts';
 import { KubeResourceUtilities, TargetApplyParams, TargetFake } from '@glassway/architect';
 import { getFakeState, getFakeTarget } from './fake.ts';
 import { KubeTargetIntrospection } from './intro.ts';
+import { GitOpsHelpers } from '../gitops/helpers.ts';
 
-export enum KubeTargetOutputFormat {
-  SingleFile,
-  PerResource,
-  PerComponent,
-}
-
-export interface KubeTargetParams extends TargetParams {
-  modes: {
-    flux?: FluxCDMode;
-  };
-  output?: {
-    format?: KubeTargetOutputFormat;
-  };
-}
+export interface KubeTargetParams extends TargetParams {}
 
 export interface IKubeTarget extends ITarget {
   get params(): KubeTargetParams;
-  get flux(): FluxCDController;
-
-  get cluster(): NonNullable<
-    NonNullable<
-      architectGlasswayNet.v1alpha1.Target['spec']['plugins']
-    >['kubernetes']
-  >;
-
+  get cluster(): K8sPluginProps;
   get plugin(): K8sPlugin;
 
   defaultContext<T extends Component>(
@@ -103,7 +83,6 @@ export interface IKubeTarget extends ITarget {
  */
 export class KubeTarget extends Target implements IKubeTarget {
   declare protected readonly _params: KubeTargetParams;
-  protected readonly _flux: FluxCDController;
   public client: _client.KubernetesObjectApi | undefined;
 
   protected introspection: KubeTargetIntrospection | undefined;
@@ -112,12 +91,7 @@ export class KubeTarget extends Target implements IKubeTarget {
 
   constructor(
     model: architectGlasswayNet.v1alpha1.Target,
-    params: KubeTargetParams = {
-      modes: {},
-      output: {
-        format: KubeTargetOutputFormat.PerComponent,
-      },
-    },
+    params: KubeTargetParams = {},
     project: IProject,
   ) {
     const defaults = {
@@ -135,8 +109,6 @@ export class KubeTarget extends Target implements IKubeTarget {
     model.spec = CollectionUtilities.recursiveMerge(defaults, model.spec);
     super(model, params, project);
 
-    this._flux = new FluxCDController(this);
-
     this.enable(KubePreludeComponent);
     this.enable(CrdsComponent);
 
@@ -147,15 +119,7 @@ export class KubeTarget extends Target implements IKubeTarget {
     return this._params;
   }
 
-  public get flux(): FluxCDController {
-    return this._flux;
-  }
-
-  public get cluster(): NonNullable<
-    NonNullable<
-      architectGlasswayNet.v1alpha1.Target['spec']['plugins']
-    >['kubernetes']
-  > {
+  public get cluster(): K8sPluginProps {
     return this.model.spec.plugins!.kubernetes!;
   }
 
@@ -164,7 +128,7 @@ export class KubeTarget extends Target implements IKubeTarget {
   }
 
   private get prelude(): KubePreludeComponent {
-    return this.component(KubePreludeComponent);
+    return this.component(KubePreludeComponent)!;
   }
 
   public static fake(): TargetFake {
@@ -208,7 +172,7 @@ export class KubeTarget extends Target implements IKubeTarget {
     if (mark === true) {
       this.markedCRDGVKs.push(gvk);
     } else {
-      this.component(CrdsComponent).enableGVK(gvk);
+      this.component(CrdsComponent)!.enableGVK(gvk);
     }
   }
 
@@ -220,7 +184,7 @@ export class KubeTarget extends Target implements IKubeTarget {
     if (mark === true) {
       this.markedCRDGroups.push(group);
     } else {
-      this.component(CrdsComponent).enableGroup(group);
+      this.component(CrdsComponent)!.enableGroup(group);
     }
 
     if (subgroups) this.enableCRDGroup(`*.${group}`, false, mark);
@@ -245,7 +209,7 @@ export class KubeTarget extends Target implements IKubeTarget {
     const result = await super.compile(params, logger, listener);
     if (!result) return result;
 
-    result.writer = new KubeWriter(this);
+    result.writer = new KubeWriter();
 
     // TODO: handle objects, too
     if (params?.validate !== false && Array.isArray(result.all)) {
@@ -316,7 +280,7 @@ export class KubeTarget extends Target implements IKubeTarget {
 
           logger?.error(`${resourceName}: apply failed: ${message}`);
         } else {
-          throw e;
+          logger?.error(`${resourceName}: unknown error: ${e}`);
         }
       }
 
@@ -333,6 +297,9 @@ export class KubeTarget extends Target implements IKubeTarget {
     await super.apply(result, params, logger, listener);
     const resources = result.all as KubeResource[];
     listener?.setTotal(resources.length);
+
+    const gitops = GitOpsHelpers.resolve(this);
+    if (gitops) return gitops.apply(result, params, logger, listener);
 
     // namespaces and CRDs must be applied first
     const client = this.getClient();
@@ -372,8 +339,7 @@ export class KubeTarget extends Target implements IKubeTarget {
 
   public override getIntrospection(): KubeTargetIntrospection {
     if (!this.introspection) {
-      const config = this.getConfig();
-      this.introspection = new KubeTargetIntrospection(config);
+      this.introspection = new KubeTargetIntrospection(() => this.getConfig());
     }
 
     return this.introspection;

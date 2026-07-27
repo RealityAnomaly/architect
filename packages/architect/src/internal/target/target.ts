@@ -9,7 +9,6 @@ import {
   Constructor, ContextUtils,
   DeepLazySpec,
   DeepPartial,
-  ReflectionUtilities,
   TokenRegistry,
   ValidationError,
   ValidationErrorLevel,
@@ -27,7 +26,6 @@ import {
   VirtualCapability, TargetIntrospection,
 } from '../../index.ts';
 import { IProject } from '../project/index.ts';
-import { Constants } from '../constants.ts';
 
 export interface TargetParams {
 }
@@ -130,7 +128,22 @@ export interface ITarget {
     token: ComponentClass<T>,
     context?: Partial<Context>,
     auto?: boolean,
-  ): T;
+  ): T | undefined;
+
+  /**
+   * Attempts to locate the first registered capability matching the condition
+   * @param token
+   * @param condition
+   */
+  capability<T, R extends Capability<T>>(
+    token: Constructor<R>,
+    condition?: (capability: R) => boolean
+  ): Promise<R | undefined>;
+
+  capabilityEnabler<T, R extends Capability<T>>(
+    token: Constructor<R>,
+    condition?: (capability: R) => boolean
+  ): () => Promise<boolean>;
 
   /**
    * Declares the existence of a Capability not exposed by resources declared in this target.
@@ -209,7 +222,6 @@ export class Target implements ITarget {
     const graph = await this.resolve(params);
     if (params?.validateOnly) {
       listener?.onPhaseChange(BuildPhase.Validate);
-      graph.assertValid(logger);
       return undefined;
     }
 
@@ -251,7 +263,6 @@ export class Target implements ITarget {
 
     if (validate) {
       listener?.onPhaseChange(BuildPhase.Validate);
-      graph.assertValid(logger);
     } else {
       logger?.warn(
         `validation skipped for target ${this.toString()}`,
@@ -278,7 +289,7 @@ export class Target implements ITarget {
     force?: boolean,
     condition?: Condition,
   ) {
-    const result = this.component(token, context, true);
+    const result = this.component(token, context, true)!;
     result.props.$set(
       { enable: true, ...config || {} },
       weight,
@@ -299,7 +310,7 @@ export class Target implements ITarget {
     token: ComponentClass<T>,
     context?: Partial<Context>,
     auto: boolean = false,
-  ): T {
+  ): T | undefined {
     context = this.defaultContext(token, context);
     let result = this.components.request(token, context);
     if (result === undefined && auto) {
@@ -309,7 +320,33 @@ export class Target implements ITarget {
       this.components.register(token, result, context);
     }
 
-    return result! as T;
+    return result as T;
+  }
+
+  public async capability<T, R extends Capability<T>>(
+    token: Constructor<R>,
+    condition?: (capability: R) => boolean
+  ): Promise<R | undefined> {
+    // merge capabilities from target and all components
+    const capabilities = [...this.capabilities];
+    for (const component of Object.values(this.components.data)) {
+      if (await component.props.enable.$resolve())
+        capabilities.push(...component.capabilities);
+    }
+
+    for (const capability of this.capabilities) {
+      if (ContextUtils.compareTokens(token, capability.constructor as Constructor<R>)
+        && (!condition || condition(capability as R))) return capability as R;
+    }
+
+    return undefined;
+  }
+
+  public capabilityEnabler<T, R extends Capability<T>>(
+    token: Constructor<R>,
+    condition?: (capability: R) => boolean
+  ): () => Promise<boolean> {
+    return async () => !!(await this.capability(token, condition));
   }
 
   public declare(capability: Capability<unknown>) {
@@ -333,7 +370,7 @@ export class Target implements ITarget {
       const token = await this._project.getComponent(def.class, true);
       if (!token) {
         this.app.logger.warn(
-          `Target ${this._model.metadata.name} references unknown component ${def.class}, skipping`,
+          `target ${this._model.metadata.name} references unknown component ${def.class}, skipping`,
         );
         continue;
       }

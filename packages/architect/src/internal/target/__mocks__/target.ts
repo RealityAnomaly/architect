@@ -99,6 +99,13 @@ export class MockTarget implements ITarget {
     return new token(this, context as Context, {});
   }
 
+  async capability<T, R extends Capability<T>>(
+    token: Constructor<R>,
+    condition?: (capability: R) => boolean
+  ): Promise<R | undefined> {
+    return undefined;
+  }
+
   declare(capability: Capability<unknown>): void {
     throw new Error('Method not implemented.');
   }
@@ -111,6 +118,13 @@ export class MockTarget implements ITarget {
   async init(): Promise<void> {}
 
   getIntrospection(): TargetIntrospection<unknown> | undefined { return this._introspection; }
+
+  public async hasCapability<T, R extends Capability<T>>(
+    token: Constructor<R>,
+    condition?: (capability: R) => boolean
+  ): Promise<boolean> {
+    return !!(await this.capability(token, condition));
+  }
 }
 
 export class MockTargetReturnsInvalid extends MockTarget {

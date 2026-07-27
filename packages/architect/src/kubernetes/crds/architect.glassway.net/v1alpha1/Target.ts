@@ -46,6 +46,25 @@ export interface ITarget {
 "services"?: string;
 };
 "flavor": "docker-desktop" | "kind" | "k3s" | "talos";
+/**
+ * Configuration for GitOps plugins
+ */
+"gitops"?: {
+  "flux"?: {
+  "sources": {
+  "oci"?: {
+  "registry": string;
+"prefix"?: string;
+};
+};
+"sourceRef": {
+  "apiVersion"?: string;
+"kind": "OCIRepository" | "GitRepository" | "Bucket";
+"name": string;
+"namespace"?: string;
+};
+};
+};
 };
 };
 /**

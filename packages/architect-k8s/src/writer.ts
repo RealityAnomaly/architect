@@ -2,38 +2,37 @@ import path from 'node:path';
 import * as yaml from '@std/yaml';
 import * as fs from 'node:fs/promises';
 
-import { KubeResource, KubeResourceUtilities, Result, IWriter, } from '@glassway/architect';
-import { IKubeTarget, KubeTargetOutputFormat } from './target/target.ts';
+import { KubeResource, KubeResourceUtilities, Result, IWriter, WriterParams } from '@glassway/architect';
 import { KubeContext } from './context.ts';
 import { KubeComponent } from './index.ts';
 
-export class KubeWriter implements IWriter {
-  private readonly target: IKubeTarget;
+export enum KubeWriterOutputFormat {
+  SingleFile,
+  PerResource,
+  PerComponent,
+}
 
-  constructor(target: IKubeTarget) {
-    this.target = target;
-  }
+export interface KubeWriterParams extends WriterParams {
+  format?: KubeWriterOutputFormat;
+  filterNamespaces?: boolean;
+}
 
-  protected stringify(resource: KubeResource): string {
+export class KubeWriter implements IWriter<KubeWriterParams> {
+  public stringify(resource: KubeResource): string {
     return yaml.stringify(resource, {
       skipInvalid: true
     });
   }
 
-  public async write(result: Result, dir: string) {
-    if (this.target.params.modes?.flux) {
-      await this.writeFluxCD(result, dir);
-      return;
-    }
-
-    const format = this.target.params.output?.format ??
-      KubeTargetOutputFormat.PerComponent;
-    if (format === KubeTargetOutputFormat.SingleFile) {
+  public async write(result: Result, dir: string, params?: KubeWriterParams) {
+    const format = params?.format ??
+      KubeWriterOutputFormat.PerComponent;
+    if (format === KubeWriterOutputFormat.SingleFile) {
       await this.writeSingleFile(result, dir);
-    } else if (format === KubeTargetOutputFormat.PerResource) {
+    } else if (format === KubeWriterOutputFormat.PerResource) {
       await this.writePerResource(result, dir);
-    } else if (format === KubeTargetOutputFormat.PerComponent) {
-      await this.writePerComponent(result, dir);
+    } else if (format === KubeWriterOutputFormat.PerComponent) {
+      await this.writePerComponent(result, dir, params);
     } else {
       throw new Error("invalid KubeTargetOutputFormat specified");
     }
@@ -59,7 +58,7 @@ export class KubeWriter implements IWriter {
   private async writePerComponent(
     result: Result,
     dir: string,
-    flux: boolean = false,
+    params?: KubeWriterParams,
   ) {
     await Promise.all(
       Object.entries(result.components).map(async ([k, v]) => {
@@ -71,7 +70,7 @@ export class KubeWriter implements IWriter {
 
         // namespaces are handled separately in flux mode
         let resources = v as KubeResource[] ?? [];
-        if (flux) resources = resources.filter((r) => r.kind !== "Namespace");
+        if (params?.filterNamespaces) resources = resources.filter((r) => r.kind !== "Namespace");
         if (resources.length <= 0) return;
 
         await Promise.all(resources.map(async (r) => {
@@ -80,47 +79,6 @@ export class KubeWriter implements IWriter {
 
           await fs.writeFile(path.join(rd, name), resource);
         }));
-      }),
-    );
-  }
-
-  private async writeFluxCD(result: Result, dir: string) {
-    // write all the components
-    await this.writePerComponent(result, path.join(dir, "components"), true);
-
-    // write the cluster dir
-    const clusterDir = path.join(dir, "cluster");
-    await fs.mkdir(clusterDir);
-
-    // write kustomization objects
-    await Promise.all(
-      Object.entries(result.components).map(async ([k, v]) => {
-        const component = result.graph.components[k];
-        const resource = this.target.flux.componentObject(
-          component,
-          this.target.params.modes.flux!,
-        );
-        await fs.writeFile(
-          path.join(
-            clusterDir,
-            `${KubeResourceUtilities.resourceId(resource)}.yaml`,
-          ),
-          this.stringify(resource),
-        );
-
-        // extract and write any namespaces the component declares to the cluster dir
-        const namespaces = (v as KubeResource[] ?? []).filter((r) =>
-          r.kind === "Namespace"
-        );
-        await Promise.all(namespaces.map((r) =>
-          fs.writeFile(
-            path.join(
-              clusterDir,
-              `${KubeResourceUtilities.resourceId(r)}.yaml`,
-            ),
-            this.stringify(r),
-          )
-        ));
       }),
     );
   }

@@ -109,7 +109,7 @@ export class Updater {
       introspection.setState(fake.state);
     }
 
-    const instance = target.component(component.clazz, undefined, true);
+    const instance = target.component(component.clazz, undefined, true)!;
     const changed = await instance.upgrade(component);
     if (changed) {
       const params = {requirements: false};

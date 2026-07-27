@@ -19,13 +19,20 @@ export interface KubeTargetState {
  * Provides access to the deployed properties of a Kubernetes cluster
  */
 export class KubeTargetIntrospection extends TargetIntrospection<KubeTargetState> {
-  protected readonly config: _client.KubeConfig;
-  protected readonly api: _client.CoreV1Api;
+  protected readonly config: () => _client.KubeConfig;
+  protected _api: _client.CoreV1Api | undefined;
 
-  constructor(config: _client.KubeConfig) {
+  constructor(config: () => _client.KubeConfig) {
     super();
     this.config = config;
-    this.api = config.makeApiClient(_client.CoreV1Api);
+  }
+
+  protected get api(): _client.CoreV1Api {
+    if (!this._api) {
+      this._api = this.config().makeApiClient(_client.CoreV1Api);
+    }
+
+    return this._api;
   }
 
   public override async loadState(): Promise<KubeTargetState> {
@@ -39,7 +46,7 @@ export class KubeTargetIntrospection extends TargetIntrospection<KubeTargetState
   }
 
   protected async getVersion(): Promise<string> {
-    const api = this.config.makeApiClient(_client.VersionApi);
+    const api = this.config().makeApiClient(_client.VersionApi);
     const response = await api.getCode();
     return response['gitVersion'];
   }

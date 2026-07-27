@@ -21,6 +21,7 @@ interface CRDCommandSyncOptions extends CRDCommandOptions {
   domain?: string;
   dryRun: boolean;
   fetchOnly: boolean;
+  buildOnly: boolean;
 }
 
 export class CRDCommand extends Command {
@@ -71,6 +72,11 @@ export class CRDCommand extends Command {
       .option(
         "-f, --fetch-only",
         "Skip model generation and only fetch YAML definitions",
+        false,
+      )
+      .option(
+        "-b, --build-only",
+        "Skip model fetching and only build models",
         false,
       )
       .option("--domain <domain>", "Only fetch these CRD domains")
@@ -138,16 +144,20 @@ export class CRDCommand extends Command {
       fetchOnly: options.fetchOnly,
     } as CRDSyncOptions;
 
-    if (options.domain) {
-      const domains = options.domain.split(",");
-      for (const domain of domains) {
-        const crd = this.plugin.crds.get(domain);
-        if (crd === undefined) continue;
-
-        await this.plugin.crds.sync(crd, syncOptions);
-      }
+    if (options.buildOnly) {
+      this.plugin.crds.markDirty();
     } else {
-      await this.plugin.crds.syncAll(syncOptions);
+      if (options.domain) {
+        const domains = options.domain.split(",");
+        for (const domain of domains) {
+          const crd = this.plugin.crds.get(domain);
+          if (crd === undefined) continue;
+
+          await this.plugin.crds.sync(crd, syncOptions);
+        }
+      } else {
+        await this.plugin.crds.syncAll(syncOptions);
+      }
     }
 
     if (!options.dryRun) {

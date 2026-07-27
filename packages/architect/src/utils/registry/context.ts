@@ -29,4 +29,9 @@ export class ContextUtils {
 
     return context as Context;
   }
+
+  public static compareTokens<T>(lhs: Constructor<T>, rhs: Constructor<T>): boolean {
+    if (!Reflect.hasMetadata(Constants.CLASS_META_KEY, lhs) || !Reflect.hasMetadata(Constants.CLASS_META_KEY, rhs)) return false;
+    return Reflect.getMetadata(Constants.CLASS_META_KEY, lhs) === Reflect.getMetadata(Constants.CLASS_META_KEY, rhs);
+  }
 }

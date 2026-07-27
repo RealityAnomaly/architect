@@ -37,6 +37,10 @@ export class CRDManager {
     return path.join(this.plugin.parent.getProject().getRoot(), 'data/crds');
   }
 
+  public markDirty(): void {
+    this.modelsDirty = true;
+  }
+
   public async add(crd: CrdsConfig): Promise<void> {
     if (this.exists(crd.name)) {
       throw Error(
