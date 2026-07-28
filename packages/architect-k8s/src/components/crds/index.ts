@@ -1,5 +1,6 @@
 import { CRDModelGenerator, GVK, TypeUtilities } from '@glassway/architect';
 import * as api from '@glassway/kubernetes-models';
+import wcmatch from 'wildcard-match'
 import { KubeComponent, KubeComponentGenericResources, } from '../../component.ts';
 
 import model from './architect.json' with { type: 'json' };
@@ -39,9 +40,11 @@ export class CrdsComponent extends KubeComponent {
           > => {
             const gvk = GVK.fromCRD(resource);
             if (
-              gvk.some((g) =>
-                this.enabledGVKs.findIndex((g2) => g2.compare(g)) > -1
-              )
+              gvk.some((g) => {
+                if (this.enabledGVKs.findIndex((g2) => g2.compare(g)) > -1) return true;
+                // @ts-ignore: CommonJS bullshit
+                return g.group && this.enabledGroups.some(group => wcmatch(group)(g.group!));
+              })
             ) return resource;
 
             // no matches found, this CRD is not enabled
