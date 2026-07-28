@@ -150,6 +150,7 @@ export abstract class KubeComponent<
     const metadata = new api.v1.ConfigMap({
       metadata: {
         name: `${this.context.name}-metadata`,
+        namespace: this.context.namespace
       },
       data: {
         name: this.context.name,

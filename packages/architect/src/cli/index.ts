@@ -25,6 +25,8 @@ interface AppCommandCompileOptions extends AppCommandOptions {
 }
 
 interface AppCommandApplyOptions extends AppCommandCompileOptions {
+  direct: boolean;
+  force: boolean;
 }
 
 export class App {
@@ -100,6 +102,14 @@ export class App {
           '-c, --component [components...]',
           'list of component names to apply',
           [],
+        )
+        .option(
+          '-d, --direct',
+          'applies in direct mode, skipping any proxy such as GitOps'
+        )
+        .option(
+          '-f, --force',
+          'forcible apply, bypassing any checks'
         )
         .option('--no-validate', 'skips resource validation')
         .option('--no-requirements', 'skips requirement validation')
@@ -185,7 +195,12 @@ export class App {
           }
         }
 
-        await v.apply(result, params, logger, bar);
+        const applyOptions = options as AppCommandApplyOptions;
+        await v.apply(result, {
+          direct: applyOptions.direct,
+          force: applyOptions.force,
+          ...params,
+        }, logger, bar);
       } else {
         const output = path.join(options.output, v.model.metadata.name!);
         await fs.rm(output, {recursive: true, force: true});
