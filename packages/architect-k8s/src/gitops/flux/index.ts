@@ -100,7 +100,7 @@ export class FluxCDController extends GitOpsController {
     // write the cluster dir
     const clusterDir = path.join(dir, "cluster");
     await Deno.mkdir(clusterDir);
-    const resources = await this.clusterObjects();
+    const resources: KubeResource[] = [];
 
     // write kustomization objects
     await Promise.all(
