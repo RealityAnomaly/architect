@@ -264,7 +264,7 @@ export class KubeTarget extends Target implements IKubeTarget {
   ): Promise<void> {
     await Promise.all(resources.map(async (r) => {
       const resourceName = KubeResourceUtilities.resourceName(r);
-      listener?.setStatus(r ? r.toString() : resourceName);
+      listener?.setStatus(resourceName ?? r.toString());
 
       // hate this serdes but https://github.com/kubernetes-client/javascript/issues/2483 breaks it otherwise
       const data = yaml.stringify(r, { skipInvalid: true });

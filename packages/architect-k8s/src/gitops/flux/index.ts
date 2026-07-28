@@ -55,12 +55,12 @@ export class FluxCDController extends GitOpsController {
       await Promise.all(Object.entries(result.components).map(async ([k, _]) => {
         const resolved = result.graph.components[k];
         const ctx = resolved.component.context as KubeContext;
-        listener?.setStatus(`OCI Image for ${resolved.component.toString()}`);
-        await this.uploadOCI(path.join(dir, 'components', ctx.namespace!, name), this.componentName(resolved.component));
+        listener?.setStatus(`Pushing OCI Image for ${resolved.component.toString()}`);
+        await this.uploadOCI(path.join(dir, 'components', ctx.namespace!, ctx.name), this.componentName(resolved.component));
         listener?.onResourceEnd();
       }));
 
-      listener?.setStatus('Cluster OCI Image');
+      listener?.setStatus('Pushing Cluster OCI Image');
       await this.uploadOCI(path.join(dir, 'cluster'), 'cluster');
       listener?.onResourceEnd();
     } else {
