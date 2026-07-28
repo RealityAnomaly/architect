@@ -106,6 +106,15 @@ export class MockTarget implements ITarget {
     return undefined;
   }
 
+  capabilityEnabler<T, R extends Capability<T>>(
+    token: Constructor<R>,
+    condition?: (capability: R) => boolean
+  ): () => Promise<boolean> {
+    return async () => {
+      return true;
+    };
+  }
+
   declare(capability: Capability<unknown>): void {
     throw new Error('Method not implemented.');
   }

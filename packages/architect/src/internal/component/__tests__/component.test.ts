@@ -217,7 +217,7 @@ Deno.test('upgrade returns false', async () => {
 });
 
 Deno.test('toString returns name', () => {
-  assert.assertEquals(component.toString(), 'Component foobar');
+  assert.assertEquals(component.toString(), 'foobar');
 });
 
 Deno.test('addChild constructs and adds child', () => {

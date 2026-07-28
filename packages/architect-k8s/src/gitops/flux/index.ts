@@ -38,24 +38,31 @@ export class FluxCDController extends GitOpsController {
 
     try {
       await this.write(result, tmpdir);
-      await this.upload(result, tmpdir);
+      await this.upload(result, tmpdir, listener);
       await this.reconcile();
     } finally {
       await Deno.remove(tmpdir, {
         recursive: true
-      })
+      });
     }
   }
 
-  private async upload(result: Result, dir: string): Promise<void> {
+  private async upload(result: Result, dir: string, listener?: ICompileListener): Promise<void> {
     if (this.params.sources.oci) {
-      Object.entries(result.components).map(async ([k, _]) => {
+      const entries = Object.entries(result.components);
+      listener?.setTotal(entries.length + 1);
+
+      await Promise.all(Object.entries(result.components).map(async ([k, _]) => {
         const resolved = result.graph.components[k];
         const ctx = resolved.component.context as KubeContext;
+        listener?.setStatus(`OCI Image for ${resolved.component.toString()}`);
         await this.uploadOCI(path.join(dir, 'components', ctx.namespace!, name), this.componentName(resolved.component));
-      });
+        listener?.onResourceEnd();
+      }));
 
+      listener?.setStatus('Cluster OCI Image');
       await this.uploadOCI(path.join(dir, 'cluster'), 'cluster');
+      listener?.onResourceEnd();
     } else {
       throw new Error('unsupported flux source type');
     }

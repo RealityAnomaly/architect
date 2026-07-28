@@ -120,7 +120,7 @@ export abstract class KubeComponent<
   }
 
   public override toString(): string {
-    return `component ${this.context.namespace + '/' + this.context.name}`;
+    return `${this.context.namespace + '/' + this.context.name}`;
   }
 
   public override async build(result?: TResult): Promise<TResult> {

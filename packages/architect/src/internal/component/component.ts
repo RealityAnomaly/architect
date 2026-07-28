@@ -285,7 +285,7 @@ export class Component<
   }
 
   public toString(): string {
-    return `Component ${this._context.name}`;
+    return this._context.name;
   }
 
   /**
