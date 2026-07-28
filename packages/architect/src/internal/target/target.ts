@@ -231,7 +231,7 @@ export class Target implements ITarget {
     const results: Record<string, unknown> = {};
     await Promise.all(
       Object.values(graph.components).map(async (v): Promise<void> => {
-        listener?.onComponentStart(v.component);
+        listener?.setStatus(v.component.toString());
 
         let result = undefined;
         try {
@@ -251,7 +251,7 @@ export class Target implements ITarget {
         if (result === undefined) return;
 
         results[v.component.rid] = await v.component.postBuild(result);
-        listener?.onComponentEnd(v.component);
+        listener?.onResourceEnd();
       }),
     );
 

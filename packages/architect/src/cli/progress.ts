@@ -105,23 +105,15 @@ export class CompileProgressBar implements ICompileListener {
     this.total = total;
   }
 
-  public onComponentStart(component: IComponent) {
-    this.status = component.toString();
+  public setStatus(status: string) {
+    this.status = status;
   }
 
-  public onComponentEnd(_component: IComponent) {
+  public onResourceEnd() {
     this.progress++;
   }
 
-  public onResourceStart(resource: object, description?: string) {
-    this.status = description ?? resource.toString();
-  }
-
-  public onResourceEnd(_resource: object) {
-    this.progress++;
-  }
-
-  public onPhaseChange(phase: BuildPhase) {
+  public onPhaseChange(phase: BuildPhase, override?: string) {
     this.progress = 0;
     this.status = undefined;
 
@@ -141,7 +133,7 @@ export class CompileProgressBar implements ICompileListener {
         break;
     }
 
-    this.title = `${prefix} Target ${this.target}`;
+    this.title = override ? override : `${prefix} Target ${this.target}`;
   }
 
   public setTarget(target: ITarget | undefined) {
