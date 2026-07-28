@@ -16,7 +16,6 @@ export interface AppCommandOptions {
 }
 
 interface AppCommandCompileOptions extends AppCommandOptions {
-  target?: string;
   output: string;
   components: string[];
   graph: boolean;
@@ -70,11 +69,10 @@ export class App {
       );
 
     if (this._projectClass) {
-      program.command('compile')
+      program.command('compile [target]')
         .description(
           'Compiles resources for the specified target or all targets',
         )
-        .option('-t, --target <target>', 'the target to compile for')
         .option(
           '-o, --output <dir>',
           'output directory',
@@ -90,9 +88,8 @@ export class App {
         .option('--no-requirements', 'skips requirement validation')
         .action(this.compile.bind(this));
 
-      program.command('apply')
+      program.command('apply [target]')
         .description('Applies compiled resources to infrastructure')
-        .requiredOption('-t, --target <target>', 'the target to deploy to')
         .option(
           '-o, --output <dir>',
           'output directory',
@@ -151,7 +148,7 @@ export class App {
     }
   }
 
-  private async run(options: AppCommandCompileOptions | AppCommandApplyOptions, apply: boolean) {
+  private async run(target: string | undefined, options: AppCommandCompileOptions | AppCommandApplyOptions, apply: boolean) {
     const params: TargetResolveParams = {
       requirements: options.requirements,
       validate: options.validate,
@@ -163,8 +160,8 @@ export class App {
     }
 
     const ignoreErrors = false;
-    const targets = (options.target
-      ? [await this.project.getTarget(options.target)]
+    const targets = (target
+      ? [await this.project.getTarget(target)]
       : await this.project.getTargets()).filter((t) => !!t);
 
     if (targets.length <= 0) {
@@ -224,11 +221,11 @@ export class App {
     await Promise.all(promises);
   }
 
-  private async compile(options: AppCommandCompileOptions) {
-    await this.run(options, false);
+  private async compile(target: string | undefined, options: AppCommandCompileOptions) {
+    await this.run(target, options, false);
   }
 
-  private async apply(options: AppCommandApplyOptions) {
-    await this.run(options, true);
+  private async apply(target: string | undefined, options: AppCommandApplyOptions) {
+    await this.run(target, options, true);
   }
 }
