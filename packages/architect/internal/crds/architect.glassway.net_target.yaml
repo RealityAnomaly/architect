@@ -97,25 +97,17 @@ spec:
                                           type: string
                                         prefix:
                                           type: string
+                                        secretRef:
+                                          properties:
+                                            name:
+                                              type: string
+                                          required:
+                                            - name
                                       required:
                                         - registry
-                                sourceRef:
-                                  properties:
-                                    apiVersion:
-                                      type: string
-                                    kind:
-                                      type: string
-                                      enum: [ "OCIRepository", "GitRepository", "Bucket" ]
-                                    name:
-                                      type: string
-                                    namespace:
-                                      type: string
-                                  required:
-                                    - kind
-                                    - name
+                                        - secretRef
                               required:
                                 - sources
-                                - sourceRef
                       required:
                         - client
                         - dns

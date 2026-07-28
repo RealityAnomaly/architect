@@ -5,6 +5,7 @@ import * as fs from 'node:fs/promises';
 import { KubeResource, KubeResourceUtilities, Result, IWriter, WriterParams } from '@glassway/architect';
 import { KubeContext } from './context.ts';
 import { KubeComponent } from './index.ts';
+import { HashUtilities } from '../../architect/src/index.ts';
 
 export enum KubeWriterOutputFormat {
   SingleFile,
@@ -14,7 +15,7 @@ export enum KubeWriterOutputFormat {
 
 export interface KubeWriterParams extends WriterParams {
   format?: KubeWriterOutputFormat;
-  filterNamespaces?: boolean;
+  gitops?: boolean;
 }
 
 export class KubeWriter implements IWriter<KubeWriterParams> {
@@ -70,7 +71,15 @@ export class KubeWriter implements IWriter<KubeWriterParams> {
 
         // namespaces are handled separately in flux mode
         let resources = v as KubeResource[] ?? [];
-        if (params?.filterNamespaces) resources = resources.filter((r) => r.kind !== "Namespace");
+        if (params?.gitops) resources = resources.filter(
+          (r) => {
+            if (r.kind === "Namespace") return false;
+            if ('architect.glassway.net/gitops-exclude' in (r.metadata?.annotations ?? {})) return false;
+
+            return true;
+          }
+        );
+
         if (resources.length <= 0) return;
 
         await Promise.all(resources.map(async (r) => {
@@ -79,6 +88,9 @@ export class KubeWriter implements IWriter<KubeWriterParams> {
 
           await fs.writeFile(path.join(rd, name), resource);
         }));
+
+        //const hash = HashUtilities.compositeHash(resources);
+        //await fs.writeFile(path.join(rd, '.hash'), hash);
       }),
     );
   }

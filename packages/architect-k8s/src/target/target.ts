@@ -35,6 +35,8 @@ import { KubeResourceUtilities, TargetApplyParams, TargetFake } from '@glassway/
 import { getFakeState, getFakeTarget } from './fake.ts';
 import { KubeTargetIntrospection } from './intro.ts';
 import { GitOpsHelpers } from '../gitops/helpers.ts';
+import { GitOpsController } from '../gitops/base.ts';
+import { GitOpsComponent } from '../components/gitops.ts';
 
 export interface KubeTargetParams extends TargetParams {}
 
@@ -42,6 +44,7 @@ export interface IKubeTarget extends ITarget {
   get params(): KubeTargetParams;
   get cluster(): K8sPluginProps;
   get plugin(): K8sPlugin;
+  get gitops(): GitOpsController | undefined;
 
   defaultContext<T extends Component>(
     token: Constructor<T>,
@@ -83,6 +86,7 @@ export interface IKubeTarget extends ITarget {
  */
 export class KubeTarget extends Target implements IKubeTarget {
   declare protected readonly _params: KubeTargetParams;
+  protected _gitops: GitOpsController | undefined;
   public client: _client.KubernetesObjectApi | undefined;
 
   protected introspection: KubeTargetIntrospection | undefined;
@@ -111,6 +115,8 @@ export class KubeTarget extends Target implements IKubeTarget {
 
     this.enable(KubePreludeComponent);
     this.enable(CrdsComponent);
+    if (this.gitops)
+      this.enable(GitOpsComponent);
 
     this.createDefaultResources();
   }
@@ -129,6 +135,11 @@ export class KubeTarget extends Target implements IKubeTarget {
 
   private get prelude(): KubePreludeComponent {
     return this.component(KubePreludeComponent)!;
+  }
+
+  public get gitops(): GitOpsController | undefined {
+    if (!this._gitops) this._gitops = GitOpsHelpers.resolve(this);
+    return this._gitops;
   }
 
   public static fake(): TargetFake {
@@ -265,7 +276,7 @@ export class KubeTarget extends Target implements IKubeTarget {
           undefined,
           params?.dryRun ? "All" : undefined,
           "architect.glassway.net", // field manager
-          false,
+          params?.force,
           "application/apply-patch+yaml" // SSA
         );
       } catch (e) {
@@ -280,7 +291,7 @@ export class KubeTarget extends Target implements IKubeTarget {
 
           logger?.error(`${resourceName}: apply failed: ${message}`);
         } else {
-          logger?.error(`${resourceName}: unknown error: ${e}`);
+          logger?.error(`${resourceName}: ${e}`);
         }
       }
 
@@ -298,8 +309,8 @@ export class KubeTarget extends Target implements IKubeTarget {
     const resources = result.all as KubeResource[];
     listener?.setTotal(resources.length);
 
-    const gitops = GitOpsHelpers.resolve(this);
-    if (gitops) return gitops.apply(result, params, logger, listener);
+    if (this.gitops && !params?.direct)
+      return this.gitops.apply(result, params, logger, listener);
 
     // namespaces and CRDs must be applied first
     const client = this.getClient();

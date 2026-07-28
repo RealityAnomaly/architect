@@ -53,6 +53,7 @@ export interface TargetResolveParams {
 }
 
 export interface TargetApplyParams extends TargetResolveParams {
+  direct?: boolean;
   force?: boolean;
   dryRun?: boolean;
   watch?: boolean;

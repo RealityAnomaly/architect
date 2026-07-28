@@ -55,13 +55,10 @@ export interface ITarget {
   "oci"?: {
   "registry": string;
 "prefix"?: string;
+"secretRef": {
+  "name": string;
 };
 };
-"sourceRef": {
-  "apiVersion"?: string;
-"kind": "OCIRepository" | "GitRepository" | "Bucket";
-"name": string;
-"namespace"?: string;
 };
 };
 };
