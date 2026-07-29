@@ -1,10 +1,11 @@
-import { Component, KubeResourceTree } from '@glassway/architect';
+import { Component, KubeResource, KubeResourceTree } from '@glassway/architect';
 import { HelmChartOpts } from '../../builders/helm.ts';
 import { KubeComponent, KubeComponentArgs, KubeComponentGenericResources, } from '../../component.ts';
 
 export interface KubeComponentHelmResources
   extends KubeComponentGenericResources {
   release?: KubeResourceTree;
+  extra?: KubeResource[];
 }
 
 export interface KubeComponentHelmOptions extends KubeComponentArgs {
