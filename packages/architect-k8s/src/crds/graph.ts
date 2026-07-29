@@ -9,6 +9,7 @@ import {
 } from '@glassway/architect';
 
 import * as api from '@glassway/kubernetes-models';
+import wcmatch from 'wildcard-match'
 
 export interface KubeCRDRequirement {
   component: ResolvedComponent;
@@ -120,7 +121,8 @@ export class KubeCRDDependencyGraph {
       // validate requirement validity
       const missing = v.requirements.filter((r) => {
         if (r.isAPIModel()) return false;
-        //if ((this.options.ignoredCRDGroups || []).some(g => wcmatch(g)(r.group!))) return false;
+        // @ts-ignore: CommonJS bullshit
+        if ((this.options.ignoredCRDGroups || []).some(g => wcmatch(g)(r.group!))) return false;
         if ((this.options.ignoredGVKs || []).some((g) => g.compare(r))) {
           return false;
         }

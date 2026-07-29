@@ -1,4 +1,5 @@
 import objectHash from 'object-hash';
+import * as logtape from '@logtape/logtape';
 
 import { Capability } from './capability.ts';
 import { ConfigurationContext } from './configuration.ts';
@@ -82,6 +83,11 @@ export interface IComponent<
   get rid(): string;
 
   /**
+   * Returns the logger for this component.
+   */
+  get logger(): logtape.Logger;
+
+  /**
    * Sets the parent. Note that setting the parent using this method rather than the parent
    * parameter on the constructor will cause the {@link independent} flag to be set. Set {@link addChild} for more details.
    * @param parent The parent, or undefined to clear.
@@ -150,6 +156,7 @@ export class Component<
 
   protected readonly _props: LazyAuto<TArgs>;
   private _metadata?: ComponentMetadata;
+  private _logger: logtape.Logger;
   protected _validator?: ValidateFunction<unknown>;
 
   /**
@@ -168,6 +175,7 @@ export class Component<
     this._context = context as Context;
     this._target = target;
     this._independent = parent === undefined;
+    this._logger = logtape.getLogger(['architect', 'component', this.name]);
     this.setParent(parent);
 
     if (!props) props = {} as TArgs;
@@ -226,6 +234,11 @@ export class Component<
   public static rid(name: string, context?: object): string {
     return `${name}-${objectHash(context as object).slice(0, 7)}`;
   }
+
+  public get logger(): logtape.Logger {
+    return this._logger;
+  }
+
   /**
    * Marks a class as a component. This MUST be defined for all Architect components that are not dependent children.
    * @param model The component model to use. Per the documentation, this should be imported from an `architect.json` file in the same folder as your component's code.

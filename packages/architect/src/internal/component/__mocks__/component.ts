@@ -5,11 +5,13 @@ import {
   ITarget, Context, LazyAuto, ComponentArgs, Lazy
 } from '../../../index.ts';
 import { IComponent } from '../component.ts';
+import * as logtape from '@logtape/logtape';
 
 export class MockComponent implements IComponent {
   public _context: Context = { name: 'blah123' };
   public _capabilities: Capability<unknown>[] = [];
   public _result = (() => { return { foo: 'result' } });
+  public _logger = logtape.getLogger('test');
 
   constructor(context: Context = { name: 'blah123' }) {
     this._context = context;
@@ -50,6 +52,9 @@ export class MockComponent implements IComponent {
   }
   get rid(): string {
     return `${this.name}-b475d49`;
+  }
+  get logger(): logtape.Logger {
+    return this._logger;
   }
   // deno-lint-ignore no-explicit-any
   setParent(parent?: any): void {}

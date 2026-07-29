@@ -14,18 +14,21 @@ export class ManifestLoader {
 
   public loadArray(
     content: unknown[],
+    skipInvalid: boolean = false
   ): KubeResource[] {
     content = content.filter((x: unknown) => x !== null && x !== undefined);
     const resources: KubeResource[] = [];
 
     for (const object of content) {
       if (!TypeUtilities.isRecord(object)) {
+        if (skipInvalid) continue;
         throw new Error(
           `The value is not an object: ${JSON.stringify(object)}`,
         );
       }
 
       if (!KubeResourceUtilities.isResource(object)) {
+        if (skipInvalid) continue;
         throw new Error(
           `The value is not a Kubernetes API resource (apiVersion and kind required): ${
             JSON.stringify(object)
@@ -45,19 +48,21 @@ export class ManifestLoader {
 
   public loadString(
     content: string,
+    skipInvalid: boolean = false,
     // options: ManifestLoadOptions = {}
   ): KubeResource[] {
-    return this.loadArray(parseAll(content));
+    return this.loadArray(parseAll(content), skipInvalid);
   }
 
   /**
    * Loads a YAML manifest from the specified path.
    *
    * @param path Path to the manifest file to load.
+   * @param skipInvalid Whether to silently skip non-Kubernetes documents instead of failing
    * @public
    */
-  public async loadFile(path: string): Promise<KubeResource[]> {
+  public async loadFile(path: string, skipInvalid: boolean = false): Promise<KubeResource[]> {
     const content = await fs.readFile(path, 'utf-8');
-    return this.loadString(content);
+    return this.loadString(content, skipInvalid);
   }
 }
