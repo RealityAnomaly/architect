@@ -5,7 +5,6 @@ import * as fs from 'node:fs/promises';
 import { KubeResource, KubeResourceUtilities, Result, IWriter, WriterParams } from '@glassway/architect';
 import { KubeContext } from './context.ts';
 import { KubeComponent } from './index.ts';
-import { HashUtilities } from '../../architect/src/index.ts';
 
 export enum KubeWriterOutputFormat {
   SingleFile,
@@ -21,7 +20,10 @@ export interface KubeWriterParams extends WriterParams {
 export class KubeWriter implements IWriter<KubeWriterParams> {
   public stringify(resource: KubeResource): string {
     return yaml.stringify(resource, {
-      skipInvalid: true
+      skipInvalid: true,
+      // Prevent line wrapping
+      // Very important so we don't fuck up config maps
+      lineWidth: -1
     });
   }
 
