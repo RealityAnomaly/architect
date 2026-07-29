@@ -50,7 +50,10 @@ export class Helm extends Builder {
     const valuesFile = path.join(dir, "values.yaml");
 
     try {
-      await fs.writeFile(valuesFile, yaml.stringify(values));
+      await fs.writeFile(valuesFile, yaml.stringify(values, {
+        skipInvalid: true,
+        lineWidth: -1
+      }));
       const execFileAsync = util.promisify(execFile);
 
       const buf = await execFileAsync(

@@ -225,7 +225,10 @@ export class KubeTarget extends Target implements IKubeTarget {
     // TODO: handle objects, too
     if (params?.validate !== false && Array.isArray(result.all)) {
       for (const item of result.all) {
-        const resource = item as KubeResource;
+        const resource = item as KubeResource
+        // TODO: stupid hack - don't validate CRDs now because we can't validate additionalProperties
+        // i.e. operatorcommands.kubescape.io: data/spec/versions/0/schema/openAPIV3Schema/properties/spec/properties/args/additionalProperties must be object
+        if (resource.kind === 'CustomResourceDefinition') continue;
         if (!isValidator(item)) continue;
 
         try {
@@ -267,7 +270,10 @@ export class KubeTarget extends Target implements IKubeTarget {
       listener?.setStatus(resourceName ?? r.toString());
 
       // hate this serdes but https://github.com/kubernetes-client/javascript/issues/2483 breaks it otherwise
-      const data = yaml.stringify(r, { skipInvalid: true });
+      const data = yaml.stringify(r, {
+        skipInvalid: true,
+        lineWidth: -1
+      });
       const parsed = _client.loadYaml(data) as _client.KubernetesObject;
 
       try {

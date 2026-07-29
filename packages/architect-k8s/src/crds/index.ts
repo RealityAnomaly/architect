@@ -102,7 +102,10 @@ export class CRDManager {
       await Promise.all(resources.map(async (r) => {
         const name = `${r.spec.group}_${r.spec.names.singular!}.yaml`;
         delete r["status"];
-        await fs.writeFile(path.join(dir, name), yaml.stringify(r));
+        await fs.writeFile(path.join(dir, name), yaml.stringify(r, {
+          skipInvalid: true,
+          lineWidth: -1
+        }));
       }));
     }
 
