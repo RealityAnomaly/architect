@@ -343,6 +343,19 @@ export class KubeTarget extends Target implements IKubeTarget {
 
     // if context is unset, attempt to find context by dns address
     if (!context) {
+      // GitLab has a special way of setting the context, try to find it via that first
+      if (Deno.env.has('GITLAB_CI')) {
+        const contextInfo = config.getContexts().find(c => {
+          const spl = c.name.split(':');
+          if (spl.length < 2) return false;
+          return spl[1] === this.model.metadata.name;
+        });
+
+        context = contextInfo?.name;
+      }
+    }
+
+    if (!context) {
       const cluster = config.getClusters().find(c => (new URL(c.server).hostname) === this.cluster.dns);
       const contextInfo = cluster ? config.getContexts().find(c => c.cluster === cluster.name) : undefined;
       context = contextInfo?.name;
