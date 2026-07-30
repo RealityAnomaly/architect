@@ -30,11 +30,13 @@ interface AppCommandApplyOptions extends AppCommandCompileOptions {
 
 export class App {
   public instance?: Architect;
+  public program: commander.Command;
   private readonly _projectClass?: ProjectClass;
   private pluginCommand?: commander.Command;
 
   constructor(_projectClass?: ProjectClass) {
     this._projectClass = _projectClass;
+    this.program = new commander.Command();
   }
 
   protected get project(): IProject {
@@ -53,10 +55,9 @@ export class App {
   }
 
   protected async build(): Promise<commander.Command> {
-    const program = new commander.Command();
-    program.hook('preSubcommand', this.preSubcommand.bind(this));
+    this.program.hook('preSubcommand', this.preSubcommand.bind(this));
 
-    program
+    this.program
       .name('architect')
       .description(
         'Architect is a framework for generating structured configuration trees in TypeScript.',
@@ -69,7 +70,7 @@ export class App {
       );
 
     if (this._projectClass) {
-      program.command('compile [target]')
+      this.program.command('compile [target]')
         .description(
           'Compiles resources for the specified target or all targets',
         )
@@ -88,7 +89,7 @@ export class App {
         .option('--no-requirements', 'skips requirement validation')
         .action(this.compile.bind(this));
 
-      program.command('apply [target]')
+      this.program.command('apply [target]')
         .description('Applies compiled resources to infrastructure')
         .option(
           '-o, --output <dir>',
@@ -112,14 +113,14 @@ export class App {
         .option('--no-requirements', 'skips requirement validation')
         .action(this.apply.bind(this));
 
-      program.addCommand(new ComponentCommand(this));
-      program.addCommand(new TargetCommand(this));
+      this.program.addCommand(new ComponentCommand(this));
+      this.program.addCommand(new TargetCommand(this));
     }
 
-    this.pluginCommand = program.command('plugin')
+    this.pluginCommand = this.program.command('plugin')
       .description('Commands for plugin modules');
 
-    return program;
+    return this.program;
   }
 
   private increaseVerbosity(_dummyValue: string, previous: number): number {
@@ -156,7 +157,7 @@ export class App {
     };
 
     if (apply && params?.validateOnly) {
-      throw Error("validateOnly cannot be used at the same time as apply");
+      this.program.error('validateOnly cannot be used at the same time as apply', { exitCode: 2 });
     }
 
     const ignoreErrors = false;
@@ -165,8 +166,7 @@ export class App {
       : await this.project.getTargets()).filter((t) => !!t);
 
     if (targets.length <= 0) {
-      console.log(`Unable to find any targets`);
-      return;
+      this.program.error('unable to find any targets', { exitCode: 2 });
     }
 
     // currently the bar only works when we're not rendering multiple targets in parallel
@@ -185,10 +185,10 @@ export class App {
       if (apply) {
         if (!result.graph.valid) {
           if (ignoreErrors) {
-            logger.warn(`validation errors occurred, but continuing anyway as the ignore option was specified`)
+            logger.warn(`validation errors occurred, but continuing anyway as the ignore option was specified`);
           } else {
             bar?.setCompleted();
-            return;
+            this.program.error('validation errors occurred', { exitCode: 2 });
           }
         }
 
