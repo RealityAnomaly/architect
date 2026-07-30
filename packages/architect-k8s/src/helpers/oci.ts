@@ -15,6 +15,7 @@ export interface OCIVersions {
 }
 
 interface DockerConfig {
+  auths?: Record<string, DockerCredentials>;
   credHelpers?: Record<string, string>;
 }
 
@@ -24,6 +25,11 @@ interface DockerCredentialOutput {
   'Secret': string;
 }
 
+interface DockerCredentials {
+  username: string;
+  password: string;
+}
+
 export class OCIHelper {
   protected readonly logger: Logger;
 
@@ -31,9 +37,7 @@ export class OCIHelper {
     this.logger = logger;
   }
 
-  public async getCredentials(registry: string) : Promise<DockerCredentialOutput | undefined> {
-    // strip off any port suffix
-    registry = registry.split(':')[0];
+  public async getCredentials(registry: string) : Promise<DockerCredentials | undefined> {
     const configPath = path.join(userInfo().homedir, ".docker/config.json");
 
     try {
@@ -41,6 +45,14 @@ export class OCIHelper {
       if (!result.isFile) return undefined;
 
       const config = JSON.parse(await Deno.readTextFile(configPath)) as DockerConfig;
+      // try auth value first
+      if (config.auths && registry in config.auths) {
+        const auth = config.auths[registry];
+        if ('username' in auth && 'password' in auth) return auth;
+      }
+
+      // strip off any port suffix
+      registry = registry.split(':')[0];
       if (!config.credHelpers || !(registry in config.credHelpers)) return undefined;
       const helper = config.credHelpers[registry];
 
@@ -62,7 +74,12 @@ export class OCIHelper {
         return undefined;
       }
 
-      return await process.stdout.json();
+      const output: DockerCredentialOutput = await process.stdout.json();
+
+      return {
+        username: output['Username'],
+        password: output['Secret']
+      }
     } catch (e) {
       this.logger.debug(`Failed to run credential helper: ${e}`)
       return undefined;

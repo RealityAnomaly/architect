@@ -82,7 +82,7 @@ export class FluxCDController extends GitOpsController {
 
     await this.shim.pushArtifact(path, {
       ...this.buildFluxOptions(),
-      creds: creds ? `${creds['Username']}:${creds['Secret']}` : undefined,
+      creds: creds ? `${creds.username}:${creds.password}` : undefined,
       path: dir,
       source: git.origin!,
       reproducible: true,
