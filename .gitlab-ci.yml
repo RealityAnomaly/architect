@@ -21,7 +21,7 @@ build-job:
 unit-test-job:
   stage: test
   script:
-    - deno task test
+    - deno test -A
 
 lint-test-job:
   stage: test

@@ -1,6 +1,7 @@
 import { Architect, Capability } from '@glassway/architect';
 
 export enum IngressFlavor {
+  Cilium = "cilium",
   Nginx = "nginx",
   Istio = "istio",
   Pomerium = "pomerium",
