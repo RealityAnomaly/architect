@@ -65,8 +65,6 @@ spec:
                           properties:
                             context:
                               type: string
-                          required:
-                            - context
                         dns:
                           type: string
                         ns:
@@ -109,7 +107,6 @@ spec:
                               required:
                                 - sources
                       required:
-                        - client
                         - dns
                         - flavor
                 capabilities:

@@ -33,8 +33,8 @@ export interface ITarget {
  * Configuration for the Kubernetes plugin
  */
 "kubernetes"?: {
-  "client": {
-  "context": string;
+  "client"?: {
+  "context"?: string;
 };
 "dns": string;
 /**
