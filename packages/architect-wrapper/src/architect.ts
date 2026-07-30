@@ -34,12 +34,12 @@ export function trimSuffix(s: string, suffix: string): string {
 }
 
 const allowed_dirs = [
-  dirs.cache,dirs.config,dirs.data,dirs.runtime,tmpdir,
+  dirs.cache,dirs.config,dirs.data,dirs.runtime,tmpdir,'/tmp',
   path.join(home, '.kube'),
   path.join(home, '.docker', 'config.json')
 ]
-  .filter(x => x !== undefined)
-  .map(x => trimSuffix(x, "/"));
+  .filter(x => (x !== undefined && x !== ""))
+  .map(x => trimSuffix(x!, "/"));
 
 const allowed_addrs = [
   'github.com:443',
