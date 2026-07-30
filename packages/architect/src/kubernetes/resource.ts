@@ -84,6 +84,18 @@ export type KubeResourceTree =
   | KubeResource[]
   | Record<string, KubeResource>;
 
+export interface KubeResourceFilter {
+  /**
+   * List of cluster-wide resource types to permit
+   */
+  clusterTypes?: string[];
+
+  /**
+   * List of external namespaces to permit
+   */
+  namespaces?: string[];
+}
+
 export class KubeResourceUtilities {
   /**
    * Returns whether this anonymous value is a resource
@@ -137,16 +149,51 @@ export class KubeResourceUtilities {
     return result;
   }
 
+  static filterResources(resources: KubeResource[], namespace: string | undefined, context: string, filter?: KubeResourceFilter, throws: boolean = true): KubeResource[] {
+    if (!namespace) {
+      if (throws) {
+        throw new Error(`${context} has filtering enabled but no namespace was provided for validation`);
+      }
+
+      return resources;
+    }
+
+    // Ensure all namespaced resources have a default namespace
+    resources = resources.map(r => KubeResourceUtilities.defaultNamespace(r, namespace));
+
+    return resources.filter(resource => {
+      const name = KubeResourceUtilities.resourceName(resource);
+
+      if (!this.isNamespaced(resource)) {
+        if (!filter?.clusterTypes?.includes(resource.kind)) {
+          if (throws) throw new Error(`${context} creates disallowed cluster-wide resource: ${name}`);
+          return false;
+        }
+      } else if (resource.metadata?.namespace !== namespace) {
+        if (!filter?.namespaces?.includes(resource.metadata!.namespace!)) {
+          if (throws) throw new Error(`${context} creates resource outside its namespace: ${name} (expected ${namespace}, got ${resource.metadata?.namespace})`);
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }
+
+  static isNamespaced(resource: KubeResource): boolean {
+    // find the CRD by the GVK and check its scope
+    const gvk = GVK.fromResource(resource);
+    if (gvk.isAPIModel() && RESOURCE_NAMESPACE_BLACKLIST.includes(resource.kind)) return false;
+
+    const ctor = resource.constructor as KubeResourceConstructor;
+    return !(ctor.scope && ctor.scope === 'Cluster');
+  }
+
   /**
    * Applies a default namespace to a resource if it is namespaced and does not already have one defined
    */
   static defaultNamespace(resource: KubeResource, def?: string): KubeResource {
-    // find the CRD by the GVK and check its scope
-    const gvk = GVK.fromResource(resource);
-    if (gvk.isAPIModel() && RESOURCE_NAMESPACE_BLACKLIST.includes(resource.kind)) return resource;
-
-    const ctor = resource.constructor as KubeResourceConstructor;
-    if (ctor.scope && ctor.scope === 'Cluster') return resource;
+    if (!this.isNamespaced(resource)) return resource;
 
     const namespace = resource.metadata?.namespace;
     if (namespace === null || namespace === undefined) {
