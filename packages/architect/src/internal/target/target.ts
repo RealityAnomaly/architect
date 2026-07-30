@@ -189,12 +189,12 @@ export class Target implements ITarget {
   }
 
   public get app(): IArchitect { return this._project.app; }
-  public get model() { return this._model; }
-  public get params() { return this._params };
-  public get project() { return this._project };
-  public get components() { return this._components };
+  public get model(): architectGlasswayNet.v1alpha1.Target { return this._model; }
+  public get params(): TargetParams { return this._params };
+  public get project(): IProject { return this._project };
+  public get components(): TokenRegistry<IComponent> { return this._components };
 
-  public get capabilities() {
+  public get capabilities(): Capability<unknown>[] {
     return this._capabilities;
   }
 
@@ -274,9 +274,9 @@ export class Target implements ITarget {
   }
 
   public async apply(
-    result: Result,
-    params?: TargetApplyParams,
-    logger?: logtape.Logger,
+    _result: Result,
+    _params?: TargetApplyParams,
+    _logger?: logtape.Logger,
     listener?: ICompileListener,
   ): Promise<void> {
     listener?.onPhaseChange(BuildPhase.Apply);

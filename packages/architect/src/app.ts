@@ -72,15 +72,15 @@ export class Architect implements IArchitect {
     if (project) this._project = new project(this);
   }
 
-  public get ajv() { return this._ajv; }
-  public get pluginRegistry() { return this._pluginRegistry; }
-  public get projectRegistry() { return this._projectRegistry; }
-  public get logger() { return this._logger; }
-  public get state() { return this._state; }
-  public get cache() { return this._cache; }
-  public get kubeTypes() { return this._kubeTypes; }
-  public get kubeLoader() { return this._kubeLoader; }
-  public get project() { return this._project; }
+  public get ajv(): Ajv { return this._ajv; }
+  public get pluginRegistry(): PluginRegistry { return this._pluginRegistry; }
+  public get projectRegistry(): TypeRegistry<IProject> { return this._projectRegistry; }
+  public get logger(): logtape.Logger { return this._logger; }
+  public get state(): StateProvider { return this._state; }
+  public get cache(): TargetCache { return this._cache; }
+  public get kubeTypes(): kubeUtils.KubeTypeRegistry { return this._kubeTypes; }
+  public get kubeLoader(): kubeUtils.ManifestLoader { return this._kubeLoader; }
+  public get project(): IProject | undefined { return this._project; }
 
   public async init() {
     if (this._project) await this._project.load(true);
