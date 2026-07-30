@@ -3,6 +3,7 @@
     "@es-toolkit/es-toolkit": "jsr:@es-toolkit/es-toolkit@^1.49.0",
     "@kubernetes/client-node": "npm:@kubernetes/client-node@^1.4.0",
     "@match/match": "jsr:@match/match@^0.1.0",
+    "@std/encoding": "jsr:@std/encoding@^1.0.11",
     "@types/js-yaml": "npm:@types/js-yaml@^4.0.9",
     "@types/lodash": "npm:@types/lodash@^4.17.24",
     "@types/object-hash": "npm:@types/object-hash@^3.0.6",
