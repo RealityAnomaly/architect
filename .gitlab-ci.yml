@@ -1,9 +1,9 @@
 default:
-  image: fedora:latest
+  image: fedora:44
   before_script:
-    - echo "@scope:registry=https://${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/" > .npmrc
-    - echo "//${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${CI_JOB_TOKEN}" >> .npmrc
     - dnf install -y unzip npm
+    - npm config set @glassway:registry "https://${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/"
+    - npm config set -- "//${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${CI_JOB_TOKEN}"
     - curl -fsSL https://deno.land/install.sh | sh
     - export PATH="$PATH:$HOME/.deno/bin"
 

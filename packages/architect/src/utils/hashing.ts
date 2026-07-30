@@ -27,7 +27,7 @@ export class Hash {
     return this.value === encodeHex(hashBuffer);
   }
 
-  public static parse(encoded: string) {
+  public static parse(encoded: string): Hash {
     const parts = encoded.split(':');
     if (parts.length != 2) throw Error(`Invalid hash string: ${encoded}`);
     return new Hash(parts[0] as HashKind, parts[1]);

@@ -190,13 +190,13 @@ export class Component<
     this.configure(new ConfigurationContext(target, this._props));
   }
 
-  public get context() { return this._context; }
-  public get target() { return this._target; }
+  public get context(): Context { return this._context; }
+  public get target(): ITarget { return this._target; }
   public get name(): string { return this._context.name; }
 
-  public get parent() { return this._parent; }
-  public get children() { return this._children; }
-  public get independent() { return this._independent; }
+  public get parent(): TParent | undefined { return this._parent; }
+  public get children(): Component[] { return this._children; }
+  public get independent(): boolean { return this._independent; }
 
   public get capabilities(): Capability<unknown>[] {
     return [];
