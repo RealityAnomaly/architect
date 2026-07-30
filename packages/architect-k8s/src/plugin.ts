@@ -72,9 +72,14 @@ export class K8sPlugin extends Plugin {
   public getKubeConfig(): _client.KubeConfig {
     if (this.kubeConfig) return this.kubeConfig;
 
-    const home = userInfo().homedir;
+    let configPath = Deno.env.get('KUBECONFIG')
+    if (!configPath) {
+      const home = userInfo().homedir;
+      configPath = path.join(home, ".kube/config");
+    }
+
     const config = new _client.KubeConfig();
-    config.loadFromFile(path.join(home, ".kube/config"));
+    config.loadFromFile(configPath);
 
     this.kubeConfig = config;
     return this.kubeConfig;
