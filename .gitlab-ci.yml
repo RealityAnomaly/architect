@@ -31,10 +31,14 @@ lint-test-job:
 # TODO: deno bump-version patch
 deploy-job:
   stage: deploy
+  when: manual
   script:
     - cd packages
     - cd architect && deno pack --output result.tgz
     - npm publish ./result.tgz
     - cd ./../
     - cd architect-k8s && deno pack --output result.tgz
+    - npm publish ./result.tgz
+    - cd ./../
+    - cd architect-wrapper && deno pack --output result.tgz
     - npm publish ./result.tgz
