@@ -28,7 +28,7 @@ Deno.test('finds version with constraint', () => {
   const latest = getLatestSemVer([
     'v1.6.7',
     'v1.7.8',
-  ], '<=v1.6.7', logger)
+  ], { constraint: '<=v1.6.7' }, logger)
 
   assert.assertEquals(latest, 'v1.6.7');
 });

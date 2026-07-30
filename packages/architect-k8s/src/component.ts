@@ -181,10 +181,13 @@ export abstract class KubeComponent<
         const latest = await this.target.plugin.helm.getLatestVersion(
           input.helm.name,
           input.helm.repo,
-          input.helm.constraint,
+          {
+            coerce: input.helm.coerce,
+            constraint: input.helm.constraint
+          }
         );
-        if (!latest) continue;
 
+        if (!latest) continue;
         if (input.helm.version !== latest) {
           changed = true;
           state.logger?.info(
@@ -193,9 +196,12 @@ export abstract class KubeComponent<
           input.helm.version = latest;
         }
       } else if (input.oci) {
-        const latest = await this.target.plugin.oci.getLatestVersion(input.oci.name, input.oci.constraint)
-        if (!latest) continue;
+        const latest = await this.target.plugin.oci.getLatestVersion(input.oci.name, {
+          coerce: input.oci.coerce,
+          constraint: input.oci.constraint,
+        });
 
+        if (!latest) continue;
         if (input.oci.version !== latest) {
           changed = true;
           state.logger?.info(
@@ -273,6 +279,7 @@ export interface KubeComponentContext {
 export interface KubeComponentInputOCIModel {
   name: string;
   version: string;
+  coerce?: boolean;
   constraint?: string;
 }
 
@@ -280,6 +287,7 @@ export interface KubeComponentInputHelmModel {
   name: string;
   repo: string;
   version: string;
+  coerce?: boolean;
   constraint?: string;
 }
 
@@ -318,6 +326,10 @@ const KubeComponentModelInputSchema: JSONSchemaType<KubeComponentModelInput> = {
         version: {
           type: 'string',
         },
+        coerce: {
+          type: 'boolean',
+          nullable: true,
+        },
         constraint: {
           type: 'string',
           nullable: true,
@@ -337,6 +349,10 @@ const KubeComponentModelInputSchema: JSONSchemaType<KubeComponentModelInput> = {
         },
         version: {
           type: 'string',
+        },
+        coerce: {
+          type: 'boolean',
+          nullable: true,
         },
         constraint: {
           type: 'string',

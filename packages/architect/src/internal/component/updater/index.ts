@@ -76,8 +76,8 @@ export class Updater {
     }
 
     for (const component of map) {
-      await this.updateComponent(component);
-      if (dry || !component.file.dirty) continue;
+      const result = await this.updateComponent(component);
+      if (dry || !result || !component.file.dirty) continue;
       await Deno.writeTextFile(component.file.path, JSON.stringify(component.file.model, null, 2));
     }
 
@@ -88,7 +88,7 @@ export class Updater {
     }
   }
 
-  private async updateComponent(component: ComponentUpgradeState) {
+  private async updateComponent(component: ComponentUpgradeState): Promise<boolean> {
     // Create the fake target, which is used to build the component in isolation for testing
     // The fake target is an approximation and is not intended to simulate all use cases, component requirements are also disabled
     const targetType =
@@ -116,11 +116,9 @@ export class Updater {
       const resolved = await target.compile(params);
 
       const logger = logtape.getLogger(['architect', 'updater', 'validator']);
-      if (resolved && !resolved.graph.assertValid(logger)) {
-        throw new Error(
-          `failed to validate component ${component.clazz.name} after input upgrade`,
-        );
-      }
+      if (resolved && !resolved.graph.assertValid(logger)) return false;
     }
+
+    return true;
   }
 }

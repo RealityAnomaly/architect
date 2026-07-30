@@ -9,7 +9,7 @@ import { KubeResource, KubeResourceFilter, getLatestSemVer } from '@glassway/arc
 
 import { OCIHelper } from '../helpers/oci.ts';
 import { Builder, BuilderParams } from './builder.ts';
-import { KubeResourceUtilities } from '../../../architect/src/index.ts';
+import { KubeResourceUtilities, SemVerOptions } from '../../../architect/src/index.ts';
 
 export class Helm extends Builder {
   private readonly indexCache: Record<string, HelmIndex> = {};
@@ -107,11 +107,11 @@ export class Helm extends Builder {
   public async getLatestVersion(
     chart: string,
     repository: string,
-    constraint?: string,
+    options?: SemVerOptions
   ): Promise<string | undefined> {
     if (repository.startsWith("oci://")) {
       const path = this.getChartRepositoryPath(repository, chart);
-      return await this.oci.getLatestVersion(path, constraint);
+      return await this.oci.getLatestVersion(path, options);
     }
 
     const index = await this.getIndex(repository);
@@ -126,12 +126,12 @@ export class Helm extends Builder {
 
     // first, try and locate the latest version by semver
     const variants = index.entries[chart];
-    let version = getLatestSemVer(variants.map(v => v.version), constraint);
+    let version = getLatestSemVer(variants.map(v => v.version), options);
     if (version) return version;
 
-    if (constraint) {
+    if (options?.constraint) {
       this.logger.error(
-        `failed to find any semantic version that satisfies the constraint ${constraint} for chart ${chart}`,
+        `failed to find any semantic version that satisfies the constraint ${options?.constraint} for chart ${chart}`,
       );
       return undefined;
     }
