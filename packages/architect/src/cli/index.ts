@@ -212,6 +212,10 @@ export class App {
       }
 
       bar?.setCompleted();
+
+      if (!result.graph.valid) {
+        this.program.error('validation errors occurred', { exitCode: 2 });
+      }
     });
 
     if (bar != undefined) {
