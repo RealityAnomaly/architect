@@ -92,8 +92,7 @@ export class ComponentCommand extends Command {
     const context = this.cli.instance!;
     const component = await context.getProject().getComponent(options.class, true);
     if (!component) {
-      console.log(`Unable to find any component with class ${options.class}`);
-      return;
+      this.cli.program.error(`unable to find any component with class ${options.class}`);
     }
 
     console.log(options.class);
@@ -110,8 +109,7 @@ export class ComponentCommand extends Command {
     }
 
     if (components.length <= 0) {
-      console.log(`Unable to find any components to upgrade`);
-      return;
+      this.cli.program.error('unable to find any components to upgrade');
     }
 
     const updater = new Updater(context.getProject());
