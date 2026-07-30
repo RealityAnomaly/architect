@@ -145,7 +145,7 @@ export class KubeResourceUtilities {
     const gvk = GVK.fromResource(resource);
     if (gvk.isAPIModel() && RESOURCE_NAMESPACE_BLACKLIST.includes(resource.kind)) return resource;
 
-    const ctor = gvk.constructor as KubeResourceConstructor;
+    const ctor = resource.constructor as KubeResourceConstructor;
     if (ctor.scope && ctor.scope === 'Cluster') return resource;
 
     const namespace = resource.metadata?.namespace;
