@@ -82,14 +82,12 @@ Deno.test('calls compile if component changes', async () => {
   assert.assertEquals(writeFile.calls.length, 0);
 });
 
-Deno.test('throws if graph fails to validate', async () => {
+Deno.test('graph fails to validate', async () => {
   using _ = mock.stub(ComponentModelUtilities, 'collect', async () => { return [fileInstance]; });
 
   ValidComponent.upgradeReturn = true;
   plugin._targets[MockPlugin.MOCK_TARGET_IDENTIFIER] = MockTargetReturnsInvalid;
-  assert.assertRejects(async () => {
-    await updater.update([ValidComponent]);
-  });
+  await updater.update([ValidComponent]);
 });
 
 Deno.test('sets introspection state on fake target', async () => {

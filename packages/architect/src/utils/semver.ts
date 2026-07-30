@@ -1,8 +1,13 @@
 import * as semver from 'semver';
 import { Logger } from '@logtape/logtape';
 
+export interface SemVerOptions {
+  constraint?: string;
+  coerce?: boolean;
+}
+
 // noinspection JSUnusedGlobalSymbols
-export function getLatestSemVer(versions: string[], constraint?: string, logger?: Logger): string | undefined {
+export function getLatestSemVer(versions: string[], options?: SemVerOptions, logger?: Logger): string | undefined {
   let latest: semver.SemVer | undefined = undefined;
   let original: string | undefined = undefined;
 
@@ -10,9 +15,11 @@ export function getLatestSemVer(versions: string[], constraint?: string, logger?
     let parsed: semver.SemVer;
 
     try {
-      parsed = new semver.SemVer(semver.coerce(version, {
+      const coerced = options?.coerce ? semver.coerce(version, {
         includePrerelease: true
-      }), { loose: true });
+      }) : version;
+
+      parsed = new semver.SemVer(coerced, { loose: true });
     } catch (exception) {
       // logger?.trace(
       //   `failed to parse version as semver for chart ${name}: ${exception}`,
@@ -27,7 +34,7 @@ export function getLatestSemVer(versions: string[], constraint?: string, logger?
       (!latest || parsed.compare(latest) === 1) &&
       parsed.prerelease.length <= 0
     ) {
-      if (constraint && !semver.satisfies(parsed, constraint)) continue;
+      if (options?.constraint && !semver.satisfies(parsed, options.constraint)) continue;
 
       latest = parsed;
       original = version;

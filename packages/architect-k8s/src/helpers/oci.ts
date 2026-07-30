@@ -7,6 +7,7 @@ import { Logger } from '@logtape/logtape';
 import { getImageReferenceParameters } from "oci-client/dist/parse-uri.js";
 import { generateAuthenticationHeaders } from "oci-client/dist/util/generate-authentication-headers.js";
 import { getLatestSemVer } from '@glassway/architect';
+import { SemVerOptions } from '../../../architect/src/index.ts';
 
 export interface OCIVersions {
   name: string,
@@ -125,7 +126,7 @@ export class OCIHelper {
     return await manifestResponse.json() as OCIVersions;
   }
 
-  public async getLatestVersion(repository: string, constraint?: string): Promise<string | undefined> {
+  public async getLatestVersion(repository: string, options?: SemVerOptions): Promise<string | undefined> {
     repository = repository.replace("oci://", "");
     const parts = repository.split('/');
     if (parts.length < 2) {
@@ -149,6 +150,6 @@ export class OCIHelper {
       return undefined;
     }
 
-    return getLatestSemVer(versions.tags, constraint, this.logger);
+    return getLatestSemVer(versions.tags, options, this.logger);
   }
 }
