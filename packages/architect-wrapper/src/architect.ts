@@ -119,6 +119,9 @@ if (!root) {
   Deno.exit(1);
 }
 
+const rwPaths = ['.'];
+allowed_dirs.push(...rwPaths);
+
 let privileges = await readPrivilegesFile(path.join(root, 'deno.privileges.json'));
 // deno-lint-ignore no-explicit-any
 privileges = deepMerge(privileges as any, {
@@ -137,9 +140,6 @@ privileges = deepMerge(privileges as any, {
     write: ['deno.privileges.json']
   }
 });
-
-const rwPaths = ['.'];
-allowed_dirs.push(...rwPaths);
 
 //console.log(buildPrivilegesParams(privileges))
 
