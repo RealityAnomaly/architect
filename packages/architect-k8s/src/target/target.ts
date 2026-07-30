@@ -337,10 +337,18 @@ export class KubeTarget extends Target implements IKubeTarget {
   public getConfig(): _client.KubeConfig {
     const config = new _client.KubeConfig();
     config.mergeConfig(this.plugin.getKubeConfig());
+    config.getClusters();
 
-    const context = this.cluster.client?.context;
+    let context = this.cluster.client?.context;
+
+    // if context is unset, attempt to find context by dns address
+    if (!context) {
+      const cluster = config.getClusters().find(c => (new URL(c.server).hostname) === this.cluster.dns);
+      const contextInfo = cluster ? config.getContexts().find(c => c.cluster === cluster.name) : undefined;
+      context = contextInfo?.name;
+    }
+
     if (!context) throw Error("Cluster context must be defined to use client");
-
     config.setCurrentContext(context);
     return config;
   }
