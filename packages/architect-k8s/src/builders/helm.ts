@@ -5,10 +5,11 @@ import * as path from 'node:path';
 import * as util from 'node:util';
 import * as yaml from '@std/yaml';
 import * as url from '@std/url';
-import { KubeResource, getLatestSemVer } from '@glassway/architect';
+import { KubeResource, KubeResourceFilter, getLatestSemVer } from '@glassway/architect';
 
 import { OCIHelper } from '../helpers/oci.ts';
 import { Builder, BuilderParams } from './builder.ts';
+import { KubeResourceUtilities } from '../../../architect/src/index.ts';
 
 export class Helm extends Builder {
   private readonly indexCache: Record<string, HelmIndex> = {};
@@ -17,6 +18,10 @@ export class Helm extends Builder {
   constructor(params: BuilderParams, oci: OCIHelper) {
     super(params, "helm");
     this.oci = oci;
+  }
+
+  private filter(chart: string, config: HelmChartOpts, resources: KubeResource[]) {
+    return config.privileged ? resources : KubeResourceUtilities.filterResources(resources, config.namespace, `Chart ${chart}`, config.filter);
   }
 
   /**
@@ -44,7 +49,7 @@ export class Helm extends Builder {
     // consult our cache for the input values plus the params
     const hashInput = [values, params];
     const cacheResult = await this.tryFetchCache(hashInput);
-    if (cacheResult) return cacheResult;
+    if (cacheResult) return this.filter(chart, config, cacheResult);
 
     const dir = await fs.mkdtemp(path.join(os.tmpdir(), "architect-"));
     const valuesFile = path.join(dir, "values.yaml");
@@ -65,7 +70,7 @@ export class Helm extends Builder {
       let documents = yaml.parseAll(buf.stdout) as Record<string, unknown>[];
       // OCI charts include Pulled and Digest entries as the first document
       documents = documents.filter(resource => resource && !("Pulled" in resource) && !("Digest" in resource));
-      const resources = this.loader.loadArray(documents);
+      const resources = this.filter(chart, config, this.loader.loadArray(documents));
 
       // cache the result from the inputs
       await this.storeCache(hashInput, buf.stdout);
@@ -286,6 +291,16 @@ interface HelmIndex {
 }
 
 export interface HelmChartOpts {
+  /**
+   * allow creating resources outside the namespace passed to the build function
+   */
+  privileged?: boolean;
+
+  /**
+   * Filter to use to permit and deny resource types
+   */
+  filter?: KubeResourceFilter;
+
   /**
    * Kubernetes api versions used for Capabilities.APIVersions
    */
