@@ -14,7 +14,7 @@ import {
   Component,
   ComponentClass,
   ExtractComponentArgs,
-  TokenRegistry, IProject, TargetFake
+  TokenRegistry, IProject, TargetFake, ContextUtils
 } from '../../../index.ts';
 import { architectGlasswayNet } from '../../../kubernetes/crds/index.ts';
 import { DeepLazySpec, Condition } from '../../../utils/index.ts';
@@ -96,7 +96,7 @@ export class MockTarget implements ITarget {
   register<T extends IComponent>(token: ComponentClass<T>, instance: T, context: Context): void {}
 
   component<T extends IComponent>(token: ComponentClass<T>, context?: Partial<Context>, auto?: boolean): T {
-    return new token(this, context as Context, {});
+    return new token(this, ContextUtils.defaultContext(token, context));
   }
 
   async capability<T, R extends Capability<T>>(
