@@ -161,7 +161,7 @@ export class FluxCDController extends GitOpsController {
           name: cid,
           namespace: 'flux-system'
         },
-        wait: true
+        wait: false
       },
     }));
 

@@ -85,6 +85,8 @@ export type KubeResourceTree =
   | Record<string, KubeResource>;
 
 export interface KubeResourceFilter {
+  predicate?: (v: KubeResource) => boolean;
+
   /**
    * List of cluster-wide resource types to permit
    */
@@ -157,6 +159,8 @@ export class KubeResourceUtilities {
 
       return resources;
     }
+
+    if (filter?.predicate) resources = resources.filter(filter?.predicate);
 
     // Ensure all namespaced resources have a default namespace
     resources = resources.map(r => KubeResourceUtilities.defaultNamespace(r, namespace));
