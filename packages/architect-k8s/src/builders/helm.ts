@@ -10,6 +10,7 @@ import { KubeResource, KubeResourceFilter, getLatestSemVer } from '@glassway/arc
 import { OCIHelper } from '../helpers/oci.ts';
 import { Builder, BuilderParams } from './builder.ts';
 import { KubeResourceUtilities, SemVerOptions } from '../../../architect/src/index.ts';
+import { KubeWriter } from '../writer.ts';
 
 export class Helm extends Builder {
   private readonly indexCache: Record<string, HelmIndex> = {};
@@ -73,7 +74,8 @@ export class Helm extends Builder {
       const resources = this.filter(chart, config, this.loader.loadArray(documents));
 
       // cache the result from the inputs
-      await this.storeCache(hashInput, buf.stdout);
+      const output = resources.map((r) => KubeWriter.stringify(r)).join("\n---\n");
+      await this.storeCache(hashInput, output);
       return resources;
     } finally {
       await fs.rm(dir, {

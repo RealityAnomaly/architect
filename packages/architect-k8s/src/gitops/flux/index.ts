@@ -129,7 +129,7 @@ export class FluxCDController extends GitOpsController {
           clusterDir,
           `${KubeResourceUtilities.resourceId(resource)}.yaml`,
         ),
-        writer.stringify(resource),
+        KubeWriter.stringify(resource),
       );
     }
   }
@@ -221,9 +221,7 @@ export class FluxCDController extends GitOpsController {
           sourceRef: {
             kind: 'OCIRepository',
             name: 'cluster',
-          },
-          wait: true,
-          timeout: '15m0s'
+          }
         }
       }));
     }

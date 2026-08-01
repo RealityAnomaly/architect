@@ -18,7 +18,7 @@ export interface KubeWriterParams extends WriterParams {
 }
 
 export class KubeWriter implements IWriter<KubeWriterParams> {
-  public stringify(resource: KubeResource): string {
+  public static stringify(resource: KubeResource): string {
     return yaml.stringify(resource, {
       skipInvalid: true,
       // Prevent line wrapping
@@ -43,7 +43,7 @@ export class KubeWriter implements IWriter<KubeWriterParams> {
 
   private async writeSingleFile(result: Result, dir: string) {
     const resources = result.all as KubeResource[] ?? [];
-    const resource = resources.map((r) => this.stringify(r)).join("\n---\n");
+    const resource = resources.map((r) => KubeWriter.stringify(r)).join("\n---\n");
 
     await fs.writeFile(path.join(dir, "resources.yaml"), resource);
   }
@@ -52,7 +52,7 @@ export class KubeWriter implements IWriter<KubeWriterParams> {
     const resources = result.all as KubeResource[] ?? [];
     await Promise.all(resources.map(async (r) => {
       const name = `${KubeResourceUtilities.resourceId(r)}.yaml`;
-      const resource = this.stringify(r);
+      const resource = KubeWriter.stringify(r);
 
       await fs.writeFile(path.join(dir, name), resource);
     }));
@@ -86,7 +86,7 @@ export class KubeWriter implements IWriter<KubeWriterParams> {
 
         await Promise.all(resources.map(async (r) => {
           const name = `${KubeResourceUtilities.resourceId(r)}.yaml`;
-          const resource = this.stringify(r);
+          const resource = KubeWriter.stringify(r);
 
           await fs.writeFile(path.join(rd, name), resource);
         }));
