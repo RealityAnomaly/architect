@@ -174,6 +174,8 @@ export class App {
 
     const architect = this.instanceAsserted();
     const logger = architect.logger;
+    let errors = false;
+
     let promises = targets.map(async (v): Promise<void> => {
       if (!v) return;
 
@@ -188,7 +190,8 @@ export class App {
             logger.warn(`validation errors occurred, but continuing anyway as the ignore option was specified`);
           } else {
             bar?.setCompleted();
-            this.program.error('validation errors occurred', { exitCode: 2 });
+            errors = true;
+            return;
           }
         }
 
@@ -214,7 +217,7 @@ export class App {
       bar?.setCompleted();
 
       if (!result.graph.valid) {
-        this.program.error('validation errors occurred', { exitCode: 2 });
+        errors = true;
       }
     });
 
@@ -223,6 +226,10 @@ export class App {
     }
 
     await Promise.all(promises);
+
+    if (errors) {
+      Deno.exit(2);
+    }
   }
 
   private async compile(target: string | undefined, options: AppCommandCompileOptions) {
