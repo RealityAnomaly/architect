@@ -1,6 +1,9 @@
 import { IObjectMeta } from "@glassway/kubernetes-models/apimachinery/apis/meta/v1/ObjectMeta";
+import { Model } from "@glassway/kubernetes-types/model";
 import * as toolkit from "@es-toolkit/es-toolkit";
 import { GVK } from './types/index.ts';
+import { Constructor } from '../utils/index.ts';
+import { KubeContext } from './context.ts';
 
 /**
  * Non-exhaustive blacklist of Kubernetes resources that may not have attached namespaces
@@ -73,6 +76,8 @@ export interface KubeUnkResource extends KubeResource {
  */
 export interface KubeResourceConstructor {
   new (data: KubeResource): KubeResource;
+  apiVersion: string;
+  kind: string;
   scope: 'Cluster' | 'Namespaced' | '\\*';
 }
 
@@ -182,6 +187,32 @@ export class KubeResourceUtilities {
 
       return true;
     });
+  }
+
+  static findResource<V, T extends Model<V>>(resources: KubeResource[], clazz: Constructor<T>, context?: KubeContext, predicate?: (value: KubeResource) => boolean): T | undefined {
+    const ctor = clazz as unknown as KubeResourceConstructor;
+
+    for (const resource of resources) {
+      if (resource.apiVersion !== ctor.apiVersion || resource.kind !== ctor.kind) continue;
+      if (context) {
+        if (context.namespace && resource.metadata?.namespace !== context.namespace) continue;
+        if (resource.metadata?.name !== context.name) continue;
+      }
+
+      if (predicate && !predicate(resource)) continue;
+      return resource as unknown as T;
+    }
+
+    return undefined;
+  }
+
+  static findResourceAsserted<V, T extends Model<V>>(resources: KubeResource[], clazz: Constructor<T>, context?: KubeContext, predicate?: (value: KubeResource) => boolean): T {
+    const resource = KubeResourceUtilities.findResource(resources, clazz, context, predicate);
+    const ctor = clazz as unknown as KubeResourceConstructor;
+    const gvk = GVK.fromAK(ctor.apiVersion, ctor.kind);
+    if (!resource) throw new Error(`Unable to find resource with type ${gvk}!`)
+
+    return resource;
   }
 
   static isNamespaced(resource: KubeResource): boolean {

@@ -1,9 +1,8 @@
 import * as path from '@std/path';
 import * as logtape from '@logtape/logtape';
 
-import { IComponent, ResolvedComponent, KubeResourceUtilities, KubeResource, Result } from '@glassway/architect';
+import { IComponent, ResolvedComponent, KubeContext, KubeResourceUtilities, KubeResource, Result } from '@glassway/architect';
 import { kustomizeToolkitFluxcdIo, sourceToolkitFluxcdIo } from '../../generated/crds/index.ts';
-import { KubeContext } from '../../context.ts';
 import { GitOpsController, K8sPluginGitOpsProps } from '../base.ts';
 import { KubeWriter, KubeWriterOutputFormat } from '../../writer.ts';
 import { IKubeTarget } from '../../target/index.ts';

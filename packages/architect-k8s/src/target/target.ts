@@ -7,6 +7,7 @@ import {
   GVK,
   ICompileListener,
   isValidator,
+  KubeContext,
   KubeResource,
   IProject,
   Result,
@@ -28,7 +29,6 @@ import { KubeComponentModel, KubePreludeComponent } from '../component.ts';
 import { CrdsComponent } from '../components/index.ts';
 import { KubeWriter } from '../writer.ts';
 import { K8S_PLUGIN_CLASS, K8sPlugin, K8sPluginProps } from '../plugin.ts';
-import { KubeContext } from '../context.ts';
 import { KubeCRDDependencyGraph } from '../crds/graph.ts';
 import { NamespaceDefaults, NamespaceRef } from '../types/scn.ts';
 import { KubeResourceUtilities, TargetApplyParams, TargetFake } from '@glassway/architect';
