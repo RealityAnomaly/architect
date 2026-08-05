@@ -10,6 +10,7 @@ import {
   ComponentModelUtilities,
   ComponentUpgradeState,
   IComponentMatcher,
+  type KubeContext,
   KubeResource,
   KubeResourceUtilities,
   Plugin,
@@ -21,7 +22,6 @@ import * as toolkit from '@es-toolkit/es-toolkit';
 import { CNICapability, DNSCapability } from './capabilities/index.ts';
 
 import type { IKubeTarget } from './target/target.ts';
-import type { KubeContext } from './context.ts';
 import { GitFetchOptions, HelmChartOpts, HttpFetchOptions, K8sPluginProps, KustomizeOpts, } from './index.ts';
 import { KubeTargetIntrospection } from './target/intro.ts';
 

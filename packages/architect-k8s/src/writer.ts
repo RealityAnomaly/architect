@@ -2,8 +2,7 @@ import path from 'node:path';
 import * as yaml from '@std/yaml';
 import * as fs from 'node:fs/promises';
 
-import { KubeResource, KubeResourceUtilities, Result, IWriter, WriterParams } from '@glassway/architect';
-import { KubeContext } from './context.ts';
+import { KubeContext, KubeResource, KubeResourceUtilities, Result, IWriter, WriterParams } from '@glassway/architect';
 import { KubeComponent } from './index.ts';
 
 export enum KubeWriterOutputFormat {
