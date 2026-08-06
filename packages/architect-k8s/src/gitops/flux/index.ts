@@ -2,13 +2,14 @@ import * as path from '@std/path';
 import * as logtape from '@logtape/logtape';
 
 import { IComponent, ResolvedComponent, KubeContext, KubeResourceUtilities, KubeResource, Result } from '@glassway/architect';
-import { kustomizeToolkitFluxcdIo, sourceToolkitFluxcdIo } from '../../generated/crds/index.ts';
+import { kustomizeToolkitFluxcdIo, sourceToolkitFluxcdIo, helmToolkitFluxcdIo } from '../../generated/crds/index.ts';
 import { GitOpsController, K8sPluginGitOpsProps } from '../base.ts';
 import { KubeWriter, KubeWriterOutputFormat } from '../../writer.ts';
 import { IKubeTarget } from '../../target/index.ts';
 import { ICompileListener, TargetApplyParams } from '../../../../architect/src/index.ts';
 import { FluxCDOptions, FluxCDShim } from './shim.ts';
 import { OCIHelper } from '../../helpers/oci.ts';
+import { HelmChartOpts } from '../../builders/index.ts';
 
 export type FluxCDControllerParams = NonNullable<K8sPluginGitOpsProps['flux']>;
 
@@ -17,6 +18,7 @@ export class FluxCDController extends GitOpsController {
   protected readonly shim: FluxCDShim;
   protected readonly logger: logtape.Logger;
   private readonly oci: OCIHelper;
+  private readonly helmRepos: Set<string> = new Set<string>();
 
   public constructor(target: IKubeTarget, params: FluxCDControllerParams) {
     super(target);
@@ -32,7 +34,7 @@ export class FluxCDController extends GitOpsController {
     }
   }
 
-  public async apply(result: Result, params?: TargetApplyParams, logger?: logtape.Logger, listener?: ICompileListener): Promise<void> {
+  public async apply(result: Result, _params?: TargetApplyParams, _logger?: logtape.Logger, listener?: ICompileListener): Promise<void> {
     const tmpdir = await Deno.makeTempDir();
 
     try {
@@ -225,7 +227,67 @@ export class FluxCDController extends GitOpsController {
       }));
     }
 
+    // add in helm repos (deduplicated clusterwide)
+    resources.push(...this.helmRepoResources());
+
     return resources;
+  }
+
+  public override async helmResources(chart: string, values: object, config: HelmChartOpts): Promise<KubeResource[]> {
+    const url = new URL(config.repo);
+    const ident = this.urlToChartIdent(url);
+    this.helmRepos.add(config.repo);
+
+    //each resource adds to repo set, then all repos are created in flux-system
+    const resource = new helmToolkitFluxcdIo.v2.HelmRelease({
+      metadata: {
+        name: chart
+      },
+      spec: {
+        chart: {
+          spec: {
+            chart: chart,
+            version: config.version,
+            sourceRef: {
+              kind: 'HelmRepository',
+              namespace: 'flux-system',
+              name: ident
+            },
+            interval: '5m'
+          }
+        },
+        // TODO: make configurable somehow?
+        interval: '15m',
+        timeout: '5m',
+        releaseName: config.releaseName,
+        test: {
+          enable: !config.skipTests
+        },
+        values: values
+      }
+    });
+
+    return [resource];
+  }
+
+  private helmRepoResources(): KubeResource[] {
+    return Array.from(this.helmRepos).map(r => new sourceToolkitFluxcdIo.v1.HelmRepository({
+      metadata: {
+        namespace: 'flux-system',
+        name: this.urlToChartIdent(new URL(r))
+      },
+      spec: {
+        interval: '15m',
+        url: r
+      }
+    }));
+  }
+
+  private urlToChartIdent(url: URL): string {
+    const protocol = url.protocol.replaceAll(':', '-');
+    const hostname = url.hostname.replaceAll('.', '-');
+    const pathname = url.pathname.replace(/\/$/, '').replaceAll('/', '-');
+    return protocol + hostname + pathname;
   }
 
   private componentName(component: IComponent): string {

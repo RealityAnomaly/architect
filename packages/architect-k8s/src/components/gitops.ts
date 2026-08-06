@@ -4,6 +4,7 @@ import { KubeComponent, KubeComponentGenericResources } from '../component.ts';
 export class GitOpsComponent extends KubeComponent {
   public override init(): void {
     this.standardRequirements = false;
+    this.setWeight(1000); // evaluate after all others
   }
 
   public override async build(resources: KubeComponentGenericResources = {}): Promise<KubeComponentGenericResources> {
