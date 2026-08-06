@@ -10,4 +10,6 @@ Architect is a TypeScript-based IaC tool powered by [Deno](https://deno.com), bu
 
 Architect is currently in the prototype (pre-Alpha) stage, and is still in an early phase of development. It's not yet production-ready, and the API surface is not stable, but contributions are appreciated! Currently, there is a plugin for Kubernetes that represents the first Architect plugin, present under the `packages` folder as `architect-k8s`.
 
-All contributions to Architect are governed by the [Contributor Covenant 3.0](https://www.contributor-covenant.org/version/3/0/code_of_conduct/). AI-generated contributions will not be accepted.
+All contributions to Architect are governed by the [Contributor Covenant 3.0](https://www.contributor-covenant.org/version/3/0/code_of_conduct/).
+AI-generated contributions will not be accepted; you accept full responsibility for your contributions to the project, and certify them as your own.
+The usage of IDE autocomplete and other so-called "AI-assisted" tools are not prohibited under this rule, but they do not preclude you from any responsibility.
