@@ -15,6 +15,7 @@ import { KubeWriter } from '../writer.ts';
 export class Helm extends Builder {
   private readonly indexCache: Record<string, HelmIndex> = {};
   private readonly oci: OCIHelper;
+  private static hooksWarned = false;
 
   constructor(params: BuilderParams, oci: OCIHelper) {
     super(params, "helm");
@@ -36,8 +37,12 @@ export class Helm extends Builder {
     ).filter(h => h !== undefined && h !== null));
 
     if (collected.size > 0) {
+      if (!Helm.hooksWarned) {
+        this.logger.warn('Architect does not currently support running Helm hooks. Consider using an alternative controller to deploy the chart, such as the FluxCD Helm Controller.')
+        Helm.hooksWarned = true;
+      }
+
       this.logger.warn(`The following Helm hooks were detected for chart ${chart} and will not run: ${Array.from(collected).join(', ')}.`)
-      this.logger.warn('Architect does not currently support running Helm hooks. Consider using an alternative controller to deploy the chart, such as the FluxCD Helm Controller.')
     }
   }
 
