@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Vertex X7-53
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 import { stub, returnsNext } from '@std/testing/mock';
 import * as assert from '@std/assert';
 import * as yaml from '@std/yaml';

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Vertex X7-53
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 import { Command } from 'commander';
 import { App, AppCommandOptions, ComponentClass, } from '../index.ts';
 import { Updater } from '../internal/index.ts';

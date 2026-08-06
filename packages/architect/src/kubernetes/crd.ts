@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Vertex X7-53
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 import { walk } from "@std/fs/walk";
 import * as api from '@glassway/kubernetes-models';
 import * as fs from 'node:fs/promises';

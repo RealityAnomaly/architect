@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Vertex X7-53
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 // deno-coverage-ignore-file
 import { Logger } from '@logtape/logtape';
 import { ITarget } from '../../../index.ts';

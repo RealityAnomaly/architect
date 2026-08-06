@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Vertex X7-53
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 import { Component } from './component.ts';
 import { Context } from '../../utils/index.ts';
 import { ITarget } from '../target/index.ts';

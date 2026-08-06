@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Vertex X7-53
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 import { Command } from 'npm:commander@15.0.0'
 import { K8sPlugin } from '../plugin.ts';
 import { CrdsConfig } from './config.ts';

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Vertex X7-53
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 import { ProjectConfig, ProjectConfigLoader } from './config.ts';
 import { Project, ProjectClass } from './index.ts';
 import { Constants } from '../constants.ts';

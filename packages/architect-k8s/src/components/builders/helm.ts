@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Vertex X7-53
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 import { Component, KubeResource } from '@glassway/architect';
 import { HelmChartOpts } from '../../builders/helm.ts';
 import { KubeComponent, KubeComponentArgs, KubeComponentGenericResources, } from '../../component.ts';

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Vertex X7-53
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 import appDirs from 'npm:appdirsjs@1.2.7';
 import path from 'node:path';
 import { userInfo } from "node:os";

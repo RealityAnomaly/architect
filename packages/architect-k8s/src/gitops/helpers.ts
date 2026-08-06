@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Vertex X7-53
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 import { GitOpsController } from './base.ts';
 import { IKubeTarget } from '../target/index.ts';
 import { FluxCDController } from './flux/index.ts';

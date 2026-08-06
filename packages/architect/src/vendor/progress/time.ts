@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2020 zfx
+//
+// SPDX-License-Identifier: MIT
+
 /**
  * prettyTime options
  * - withSpaces Whether to use spaces to separate times, `1d2h3m5s` or `1d 2h 3m 5s`, default false

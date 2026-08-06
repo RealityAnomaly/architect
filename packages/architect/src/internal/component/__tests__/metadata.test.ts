@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Vertex X7-53
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 import * as assert from '@std/assert';
 import { stub, spy } from '@std/testing/mock';
 import { Ajv } from 'ajv';

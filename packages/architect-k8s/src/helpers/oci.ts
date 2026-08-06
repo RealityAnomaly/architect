@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Vertex X7-53
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 import * as path from '@std/path';
 import * as client from 'oci-client';
 import * as toolkit from '@es-toolkit/es-toolkit';

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Vertex X7-53
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 import { TargetClass } from '../index.ts';
 import { IArchitect } from '../../app.ts';
 import { IPlugin, PluginClass } from './plugin.ts';

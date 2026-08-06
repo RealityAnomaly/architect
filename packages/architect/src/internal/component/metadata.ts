@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Vertex X7-53
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 import { ComponentModel, ComponentModelUtilities } from './model.ts';
 import { Component, ComponentClass } from './component.ts';
 import { Constants } from '../constants.ts';

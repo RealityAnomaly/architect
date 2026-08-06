@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Vertex X7-53
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 import * as crypto from "node:crypto";
 import objectHash from "object-hash";
 import { encodeHex } from '@std/encoding/hex';

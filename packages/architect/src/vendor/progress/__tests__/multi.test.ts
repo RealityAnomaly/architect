@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2020 zfx
+//
+// SPDX-License-Identifier: MIT
+
 import { MultiProgressBar } from "../mod.ts";
 import { delay } from "../deps.example.ts";
 import { DummyWriter } from '../../../utils/test/helpers.ts';
