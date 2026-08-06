@@ -247,7 +247,6 @@ export abstract class KubeComponent<
       namespace: this.context.namespace,
       kubeVersion: state.version,
       includeCRDs: true,
-      noHooks: true,
       skipTests: true,
     } as Partial<HelmChartOpts>, config);
 

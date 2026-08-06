@@ -25,6 +25,22 @@ export class Helm extends Builder {
     return config.privileged ? resources : KubeResourceUtilities.filterResources(resources, config.namespace, `Chart ${chart}`, config.filter);
   }
 
+  private filterHooks(chart: string, resources: KubeResource[]) {
+    this.assertNoHooks(chart, resources);
+    return resources.filter(r => !(r.metadata?.annotations && "helm.sh/hook" in r.metadata.annotations));
+  }
+
+  private assertNoHooks(chart: string, resources: KubeResource[]) {
+    const collected = new Set(resources.map(
+      r => (r.metadata?.annotations ?? {})['helm.sh/hook']
+    ).filter(h => h !== undefined && h !== null));
+
+    if (collected.size > 0) {
+      this.logger.warn(`The following Helm hooks were detected for chart ${chart} and will not run: ${Array.from(collected).join(', ')}.`)
+      this.logger.warn('Architect does not currently support running Helm hooks. Consider using an alternative controller to deploy the chart, such as the FluxCD Helm Controller.')
+    }
+  }
+
   /**
    * Renders a Helm chart from parameters
    */
@@ -50,7 +66,7 @@ export class Helm extends Builder {
     // consult our cache for the input values plus the params
     const hashInput = [values, params];
     const cacheResult = await this.tryFetchCache(hashInput);
-    if (cacheResult) return this.filter(chart, config, cacheResult);
+    if (cacheResult) return this.filterHooks(chart, this.filter(chart, config, cacheResult));
 
     const dir = await fs.mkdtemp(path.join(os.tmpdir(), "architect-"));
     const valuesFile = path.join(dir, "values.yaml");
@@ -76,7 +92,7 @@ export class Helm extends Builder {
       // cache the result from the inputs
       const output = resources.map((r) => KubeWriter.stringify(r)).join("\n---\n");
       await this.storeCache(hashInput, output);
-      return resources;
+      return this.filterHooks(chart, resources);
     } finally {
       await fs.rm(dir, {
         force: true,
