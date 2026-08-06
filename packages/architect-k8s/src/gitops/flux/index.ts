@@ -265,7 +265,7 @@ export class FluxCDController extends GitOpsController {
         timeout: '5m',
         releaseName: config.releaseName,
         test: {
-          enable: !config.skipTests
+          enable: !(config.skipTests === false)
         },
         values: values
       }
