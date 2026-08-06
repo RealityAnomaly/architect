@@ -83,6 +83,11 @@ export interface IComponent<
   get rid(): string;
 
   /**
+   * Returns the weight of the component.
+   */
+  get weight(): number;
+
+  /**
    * Returns the logger for this component.
    */
   get logger(): logtape.Logger;
@@ -93,6 +98,12 @@ export interface IComponent<
    * @param parent The parent, or undefined to clear.
    */
   setParent(parent?: TParent): void;
+
+  /**
+   * Sets the component's weight. Components with higher weights are evaluated after components with lower weights.
+   * @param weight The weight to set.
+   */
+  setWeight(weight: number): void;
 
   /**
    * Returns a list of {@link IComponentMatcher} defining the runtime dependencies of this component.
@@ -149,6 +160,7 @@ export class Component<
 > implements IComponent<TResult, TArgs, TParent> {
   protected readonly _context: Context;
   protected readonly _target: ITarget;
+  protected _weight: number = 0;
 
   private _parent?: TParent;
   protected readonly _children: Component[] = [];
@@ -156,7 +168,7 @@ export class Component<
 
   protected readonly _props: LazyAuto<TArgs>;
   private _metadata?: ComponentMetadata;
-  private _logger: logtape.Logger;
+  private readonly _logger: logtape.Logger;
   protected _validator?: ValidateFunction<unknown>;
 
   /**
@@ -235,6 +247,10 @@ export class Component<
     return `${name}-${objectHash(context as object).slice(0, 7)}`;
   }
 
+  public get weight(): number {
+    return this._weight;
+  }
+
   public get logger(): logtape.Logger {
     return this._logger;
   }
@@ -255,6 +271,10 @@ export class Component<
     }
 
     return decorator;
+  }
+
+  public setWeight(weight: number) {
+    this._weight = weight;
   }
 
   public setParent(parent?: TParent) {

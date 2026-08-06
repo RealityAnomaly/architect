@@ -229,31 +229,38 @@ export class Target implements ITarget {
     listener?.onPhaseChange(BuildPhase.Build);
 
     const results: Record<string, unknown> = {};
-    await Promise.all(
-      Object.values(graph.components).map(async (v): Promise<void> => {
-        listener?.setStatus(v.component.toString());
+    // collect component weight values and evaluate sequentially
+    const buckets =
+      Array.from(Map.groupBy(Object.values(graph.components), c => c.component.weight).entries())
+        .sort(([a], [b]) => a - b)
+        .map(([, value]) => value);
 
-        let result = undefined;
-        try {
-          result = await v.component.build();
-        } catch (e) {
-          const message = e instanceof Error ? e.message : 'Unknown exception';
+    for (const bucket of buckets) {
+      await Promise.all(bucket.map(async (v): Promise<void> => {
+          listener?.setStatus(v.component.toString());
 
-          graph.components[v.component.rid].errors.push(
-            new ValidationError(
-              'build exception thrown: ' + message,
-              ValidationErrorLevel.ERROR,
-              v.component.toString(),
-            ),
-          );
-        }
+          let result = undefined;
+          try {
+            result = await v.component.build();
+          } catch (e) {
+            const message = e instanceof Error ? e.message : 'Unknown exception';
 
-        if (result === undefined) return;
+            graph.components[v.component.rid].errors.push(
+              new ValidationError(
+                'build exception thrown: ' + message,
+                ValidationErrorLevel.ERROR,
+                v.component.toString(),
+              ),
+            );
+          }
 
-        results[v.component.rid] = await v.component.postBuild(result);
-        listener?.onResourceEnd();
-      }),
-    );
+          if (result === undefined) return;
+
+          results[v.component.rid] = await v.component.postBuild(result);
+          listener?.onResourceEnd();
+        }),
+      );
+    }
 
     const result = new Result(graph, results);
     logger?.info(

@@ -26,8 +26,11 @@ export class Helm extends Builder {
     return config.privileged ? resources : KubeResourceUtilities.filterResources(resources, config.namespace, `Chart ${chart}`, config.filter);
   }
 
-  private filterHooks(chart: string, resources: KubeResource[]) {
-    this.assertNoHooks(chart, resources);
+  private filterHooks(chart: string, config: HelmChartOpts, resources: KubeResource[]) {
+    // don't complain about hooks in gitops mode because we assume the provider can handle them
+    if (!config.gitops || config.gitops === HelmGitOpsMode.Disabled)
+      this.assertNoHooks(chart, resources);
+
     return resources.filter(r => !(r.metadata?.annotations && "helm.sh/hook" in r.metadata.annotations));
   }
 
@@ -71,7 +74,7 @@ export class Helm extends Builder {
     // consult our cache for the input values plus the params
     const hashInput = [values, params];
     const cacheResult = await this.tryFetchCache(hashInput);
-    if (cacheResult) return this.filterHooks(chart, this.filter(chart, config, cacheResult));
+    if (cacheResult) return this.filterHooks(chart, config, this.filter(chart, config, cacheResult));
 
     const dir = await fs.mkdtemp(path.join(os.tmpdir(), "architect-"));
     const valuesFile = path.join(dir, "values.yaml");
@@ -97,7 +100,7 @@ export class Helm extends Builder {
       // cache the result from the inputs
       const output = resources.map((r) => KubeWriter.stringify(r)).join("\n---\n");
       await this.storeCache(hashInput, output);
-      return this.filterHooks(chart, resources);
+      return this.filterHooks(chart, config, resources);
     } finally {
       await fs.rm(dir, {
         force: true,
@@ -313,6 +316,24 @@ interface HelmIndex {
   serverInfo: object;
 }
 
+export enum HelmGitOpsMode {
+  /**
+   * GitOps is not used, all rendering is done by Architect
+   */
+  Disabled = 'disabled',
+
+  /**
+   * GitOps is used and all rendering is done server-side
+   */
+  Enabled = 'full',
+
+  /**
+   * Both Architect and the GitOps provider render the resources.
+   * Allows the usage of resource filtering but requires version pinning
+   */
+  Hybrid = 'hybrid'
+}
+
 export interface HelmChartOpts {
   /**
    * allow creating resources outside the namespace passed to the build function
@@ -323,6 +344,13 @@ export interface HelmChartOpts {
    * Filter to use to permit and deny resource types
    */
   filter?: KubeResourceFilter;
+
+  /**
+   * Whether to use the GitOps provider to install the chart, if available.
+   * Note that if GitOps is used to install the chart, helmTemplate will instead return the GitOps chart resource,
+   * and resource filtering will not be performed, which may have security implications.
+   */
+  gitops?: HelmGitOpsMode;
 
   /**
    * Kubernetes api versions used for Capabilities.APIVersions

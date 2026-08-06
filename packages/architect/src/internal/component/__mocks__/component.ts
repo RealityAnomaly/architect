@@ -26,6 +26,9 @@ export class MockComponent implements IComponent {
   get name(): string {
     return this.context.name;
   }
+  public get weight() {
+    return 0;
+  }
   public get parent() {
     return undefined;
   }
@@ -56,6 +59,7 @@ export class MockComponent implements IComponent {
   get logger(): logtape.Logger {
     return this._logger;
   }
+  setWeight(weight: number): void {}
   // deno-lint-ignore no-explicit-any
   setParent(parent?: any): void {}
   async getRequirements(): Promise<IComponentMatcher[]> {

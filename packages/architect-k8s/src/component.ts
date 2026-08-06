@@ -1,6 +1,5 @@
 import {
   CapabilityMatcher,
-  type IComponent,
   Component,
   ComponentArgs,
   ComponentClass,
@@ -9,6 +8,8 @@ import {
   ComponentModel,
   ComponentModelUtilities,
   ComponentUpgradeState,
+  GVK,
+  type IComponent,
   IComponentMatcher,
   type KubeContext,
   KubeResource,
@@ -22,7 +23,14 @@ import * as toolkit from '@es-toolkit/es-toolkit';
 import { CNICapability, DNSCapability } from './capabilities/index.ts';
 
 import type { IKubeTarget } from './target/target.ts';
-import { GitFetchOptions, HelmChartOpts, HttpFetchOptions, K8sPluginProps, KustomizeOpts, } from './index.ts';
+import {
+  GitFetchOptions,
+  HelmChartOpts,
+  HelmGitOpsMode,
+  HttpFetchOptions,
+  K8sPluginProps,
+  KustomizeOpts,
+} from './index.ts';
 import { KubeTargetIntrospection } from './target/intro.ts';
 
 export interface KubeComponentArgs
@@ -238,8 +246,7 @@ export abstract class KubeComponent<
   protected async helmTemplate(
     chart: string,
     values: object,
-    config: HelmChartOpts,
-    filter?: (v: KubeResource) => boolean,
+    config: HelmChartOpts
   ): Promise<KubeResource[]> {
     const state = await this.introspection.getState();
 
@@ -250,8 +257,26 @@ export abstract class KubeComponent<
       skipTests: true,
     } as Partial<HelmChartOpts>, config);
 
-    let result = await this.target.plugin.helm.template(chart, values, config);
-    if (filter !== undefined) result = result.filter(filter);
+    const result: KubeResource[] = [];
+    let mode = config.gitops ?? HelmGitOpsMode.Disabled;
+    if (!this.target.gitops) mode = HelmGitOpsMode.Disabled;
+
+    // Create the GitOps chart definition
+    if (mode !== HelmGitOpsMode.Disabled) {
+      result.push(...await this.target.gitops!.helmResources(chart, values, config));
+    }
+
+    if (mode !== HelmGitOpsMode.Enabled) {
+      const rendered = await this.target.plugin.helm.template(chart, values, config);
+      if (mode === HelmGitOpsMode.Disabled) result.push(...rendered);
+      if (mode === HelmGitOpsMode.Hybrid) {
+        // mark all the CRDs installed by the chart as present
+        rendered.filter(r => r.kind === 'CustomResourceDefinition')
+          .forEach(r => GVK.fromCRD(r as api.apiextensionsK8sIo.v1.CustomResourceDefinition)
+            .forEach(g => this.target.enableCRD(g, true))
+          );
+      }
+    }
 
     return result;
   }
