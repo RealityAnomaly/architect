@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2020 zfx
+//
+// SPDX-License-Identifier: MIT
+
 import ProgressBar from "../mod.ts";
 import { simpleTimerStream } from "../deps.test.ts";
 import { DummyWriter } from '../../../utils/test/helpers.ts';

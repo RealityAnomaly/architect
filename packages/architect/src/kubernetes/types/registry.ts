@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Vertex X7-53
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 import { KubeResourceConstructor } from '../resource.ts';
 import { GVK } from './gvk.ts';
 import * as logtape from '@logtape/logtape';

@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Vertex X7-53
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 import * as toolkit from '@es-toolkit/es-toolkit';
 
 export class CollectionUtilities {

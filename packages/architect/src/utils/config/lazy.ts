@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Vertex X7-53
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 import * as toolkit from '@es-toolkit/es-toolkit';
 import { PathResultBuilder, ValuePath, ValuePathKey } from './paths.ts';
 import { DeepPartial, Resolver, Value, ValueResult } from './value.ts';

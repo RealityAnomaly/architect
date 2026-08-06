@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2020 zfx
+//
+// SPDX-License-Identifier: MIT
+
 import { bgGreen, bgWhite, stripAnsiCode } from "./deps.ts";
 import { writeAll } from "./deps.ts";
 // import type { Writer } from "./deps.ts";

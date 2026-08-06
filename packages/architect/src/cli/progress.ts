@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Vertex X7-53
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 import * as logtape from '@logtape/logtape';
 import { ProgressBar } from '../vendor/progress/index.ts';
 import { delay } from '@std/async';

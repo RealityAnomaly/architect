@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Vertex X7-53
+//
+// SPDX-License-Identifier: GPL-3.0-or-later
+
 export type Resolver<T> = () => Promise<T>;
 export type Value<T> = T | Resolver<T>;
 

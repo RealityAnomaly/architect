@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2020 zfx
+//
+// SPDX-License-Identifier: MIT
+
 import { prettyTime } from "../time.ts";
 import { assertEquals } from "../deps.test.ts";
 
