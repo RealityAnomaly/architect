@@ -10,8 +10,7 @@ import { userInfo } from "node:os";
 import { Logger } from '@logtape/logtape';
 import { getImageReferenceParameters } from "oci-client/dist/parse-uri.js";
 import { generateAuthenticationHeaders } from "oci-client/dist/util/generate-authentication-headers.js";
-import { getLatestSemVer } from '@glassway/architect';
-import { SemVerOptions } from '../../../architect/src/index.ts';
+import { getLatestSemVer, SemVerOptions } from '@glassway/architect';
 
 export interface OCIVersions {
   name: string,

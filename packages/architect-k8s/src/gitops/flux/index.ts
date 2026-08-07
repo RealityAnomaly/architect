@@ -2,11 +2,12 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+import * as yaml from '@std/yaml';
 import * as path from '@std/path';
 import * as logtape from '@logtape/logtape';
 import * as api from '@glassway/kubernetes-models';
 
-import { IComponent, GVK, ResolvedComponent, KubeContext, KubeResourceUtilities, KubeResource, TargetApplyParams, ICompileListener, Result } from '@glassway/architect';
+import { CollectionUtilities, Constructor, IComponent, GVK, ResolvedComponent, KubeContext, KubeResourceUtilities, KubeResource, TargetApplyParams, ICompileListener, Result } from '@glassway/architect';
 import { kustomizeToolkitFluxcdIo, sourceToolkitFluxcdIo, helmToolkitFluxcdIo, fluxcdControlplaneIo } from '../../generated/crds/index.ts';
 import { GitOpsController, K8sPluginGitOpsProps } from '../base.ts';
 import { KubeWriter, KubeWriterOutputFormat } from '../../writer.ts';
@@ -14,7 +15,6 @@ import { IKubeTarget } from '../../target/index.ts';
 import { FluxCDOptions, FluxCDShim } from './shim.ts';
 import { OCIHelper } from '../../helpers/oci.ts';
 import { HelmChartOpts } from '../../builders/index.ts';
-import { CollectionUtilities, Constructor } from '../../../../architect/src/index.ts';
 import { KubeComponent } from '../../component.ts';
 
 export type FluxCDControllerParams = NonNullable<K8sPluginGitOpsProps['flux']>;
@@ -334,6 +334,19 @@ export class FluxCDController extends GitOpsController {
             interval: '5m'
           }
         },
+        postRenderers: [{
+          kustomize: {
+            patches: (config.patches ?? []).map(p => {
+              return {
+                target: p.target,
+                patch: yaml.stringify(p.patch, {
+                  skipInvalid: true,
+                  lineWidth: -1
+                })
+              }
+            })
+          }
+        }].filter(k => k.kustomize.patches.length > 0),
         // TODO: make configurable somehow?
         interval: '15m',
         timeout: '5m',
