@@ -1,3 +1,4 @@
+export * as fluxcdControlplaneIo from "./fluxcd.controlplane.io/index.ts";
 export * as sourceExtensionsFluxcdIo from "./source.extensions.fluxcd.io/index.ts";
 export * as sourceToolkitFluxcdIo from "./source.toolkit.fluxcd.io/index.ts";
 export * as notificationToolkitFluxcdIo from "./notification.toolkit.fluxcd.io/index.ts";

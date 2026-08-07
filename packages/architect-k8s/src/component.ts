@@ -66,6 +66,8 @@ export abstract class KubeComponent<
    */
   protected standardRequirements = true;
 
+  private _prune = true;
+
   constructor(
     target: IKubeTarget,
     context: KubeContext,
@@ -94,12 +96,24 @@ export abstract class KubeComponent<
     return this.context.namespace ?? 'default';
   }
 
+  /**
+   * Whether the component's resources should be pruned automatically on removal from the cluster
+   * @protected
+   */
+  public get prune(): boolean {
+    return this._prune;
+  }
+
   protected get cluster(): K8sPluginProps {
     return this.target.cluster;
   }
 
   protected get introspection(): KubeTargetIntrospection {
     return this.target.getIntrospection();
+  }
+
+  protected setPrune(prune: boolean): void {
+    this._prune = prune;
   }
 
   public static override decorate<T extends object>(
@@ -159,12 +173,12 @@ export abstract class KubeComponent<
 
     // adds the metadata ConfigMap
     const resolved = await this.props.$resolve();
-    const metadata = new api.v1.ConfigMap({
+    const metadata = new api.v1.Secret({
       metadata: {
         name: `${this.context.name}-metadata`,
         namespace: this.context.namespace
       },
-      data: {
+      stringData: {
         name: this.context.name,
         class: this.clazz,
         context: JSON.stringify(this.context),

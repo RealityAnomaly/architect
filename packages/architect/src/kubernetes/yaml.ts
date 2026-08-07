@@ -44,7 +44,7 @@ export class ManifestLoader {
       const Constructor = this.types.getConstructor(gvk);
       const resource = Constructor ? new Constructor(object) : object;
 
-      resources.push(resource);
+      resources.push(resource as KubeResource);
     }
 
     return resources;

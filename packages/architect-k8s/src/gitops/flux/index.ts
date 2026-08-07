@@ -4,16 +4,18 @@
 
 import * as path from '@std/path';
 import * as logtape from '@logtape/logtape';
+import * as api from '@glassway/kubernetes-models';
 
-import { IComponent, ResolvedComponent, KubeContext, KubeResourceUtilities, KubeResource, Result } from '@glassway/architect';
-import { kustomizeToolkitFluxcdIo, sourceToolkitFluxcdIo, helmToolkitFluxcdIo } from '../../generated/crds/index.ts';
+import { IComponent, GVK, ResolvedComponent, KubeContext, KubeResourceUtilities, KubeResource, TargetApplyParams, ICompileListener, Result } from '@glassway/architect';
+import { kustomizeToolkitFluxcdIo, sourceToolkitFluxcdIo, helmToolkitFluxcdIo, fluxcdControlplaneIo } from '../../generated/crds/index.ts';
 import { GitOpsController, K8sPluginGitOpsProps } from '../base.ts';
 import { KubeWriter, KubeWriterOutputFormat } from '../../writer.ts';
 import { IKubeTarget } from '../../target/index.ts';
-import { ICompileListener, TargetApplyParams } from '../../../../architect/src/index.ts';
 import { FluxCDOptions, FluxCDShim } from './shim.ts';
 import { OCIHelper } from '../../helpers/oci.ts';
 import { HelmChartOpts } from '../../builders/index.ts';
+import { CollectionUtilities, Constructor } from '../../../../architect/src/index.ts';
+import { KubeComponent } from '../../component.ts';
 
 export type FluxCDControllerParams = NonNullable<K8sPluginGitOpsProps['flux']>;
 
@@ -106,7 +108,7 @@ export class FluxCDController extends GitOpsController {
     const writer = result.writer as KubeWriter;
     await writer.write(result, path.join(dir, "components"), {
       format: KubeWriterOutputFormat.PerComponent,
-      gitops: true
+      gitops: this
     });
 
     // write the cluster dir
@@ -114,17 +116,11 @@ export class FluxCDController extends GitOpsController {
     await Deno.mkdir(clusterDir);
     const resources: KubeResource[] = [];
 
-    // write kustomization objects
+    // write resource sets
     await Promise.all(
       Object.entries(result.components).map(async ([k, v]) => {
         const component = result.graph.components[k];
-        resources.push(...await this.componentObjects(component));
-
-        // extract and write any namespaces the component declares to the cluster dir
-        const namespaces = (v as KubeResource[] ?? []).filter((r) =>
-          r.kind === "Namespace"
-        );
-        resources.push(...namespaces);
+        resources.push(await this.componentResourceSet(component, v as KubeResource[]));
       }),
     );
 
@@ -139,14 +135,58 @@ export class FluxCDController extends GitOpsController {
     }
   }
 
-  private async componentObjects(
+  private async componentResourceSet(
     resolved: ResolvedComponent,
-  ): Promise<KubeResource[]> {
-    const ctx = resolved.component.context as KubeContext;
-    const resources: KubeResource[] = [];
+    resources: KubeResource[]
+  ): Promise<fluxcdControlplaneIo.v1.ResourceSet> {
+    const component = resolved.component as KubeComponent;
+    const ctx = component.context;
     const cid = this.componentName(resolved.component);
 
-    resources.push(new kustomizeToolkitFluxcdIo.v1.Kustomization({
+    const resourceCopy = Array.from(resources);
+    const namespaces = CollectionUtilities.takeFrom(resourceCopy, r => {
+      return this.resourceSatisfiesAny(r, [api.v1.Namespace]);
+    });
+
+    const prelude = CollectionUtilities.takeFrom(resourceCopy, r => {
+      return (r.metadata?.labels ?? {})['architect.glassway.net/position'] === 'prelude';
+    });
+
+    // Disable pruning for all namespaces if requested
+    if (!component.prune) {
+      namespaces.forEach(n => {
+        if (!n.metadata) n.metadata = {};
+        if (!n.metadata.annotations) n.metadata.annotations = {};
+
+        n.metadata.annotations['fluxcd.controlplane.io/prune'] = 'disabled';
+      });
+    }
+
+    // const sources = CollectionUtilities.takeFrom(resourceCopy, r => {
+    //   return this.resourceSatisfiesAny(r, [
+    //     sourceToolkitFluxcdIo.v1.HelmRepository,
+    //     sourceToolkitFluxcdIo.v1.GitRepository,
+    //     sourceToolkitFluxcdIo.v1.OCIRepository,
+    //     sourceToolkitFluxcdIo.v1.Bucket,
+    //     sourceToolkitFluxcdIo.v1.ExternalArtifact
+    //   ]);
+    // });
+
+    const sources: KubeResource[] = [];
+    const kustomizations = CollectionUtilities.takeFrom(resourceCopy, r => {
+      return this.resourceSatisfiesAny(r, [kustomizeToolkitFluxcdIo.v1.Kustomization]);
+    });
+
+    const charts = CollectionUtilities.takeFrom(resourceCopy, r => {
+      return this.resourceSatisfiesAny(r, [helmToolkitFluxcdIo.v2.HelmRelease]);
+    });
+
+    const primary: kustomizeToolkitFluxcdIo.v1.Kustomization[] = [];
+    const prologue = CollectionUtilities.takeFrom(resourceCopy, r => {
+      return (r.metadata?.labels ?? {})['architect.glassway.net/position'] === 'prologue';
+    });
+
+    primary.push(new kustomizeToolkitFluxcdIo.v1.Kustomization({
       metadata: {
         name: cid,
         namespace: ctx.namespace
@@ -159,7 +199,7 @@ export class FluxCDController extends GitOpsController {
           };
         }),
         interval: "10m0s",
-        prune: true,
+        prune: component.prune,
         sourceRef: {
           // TODO: should not be static
           kind: 'OCIRepository',
@@ -171,7 +211,7 @@ export class FluxCDController extends GitOpsController {
     }));
 
     if (this.params.sources.oci) {
-      resources.push(new sourceToolkitFluxcdIo.v1.OCIRepository({
+      sources.push(new sourceToolkitFluxcdIo.v1.OCIRepository({
         metadata: {
           name: cid,
           namespace: 'flux-system'
@@ -187,7 +227,41 @@ export class FluxCDController extends GitOpsController {
       }));
     }
 
-    return resources;
+    const labels = {
+      'architect.glassway.net/component': resolved.component.context.name
+    };
+
+    return new fluxcdControlplaneIo.v1.ResourceSet({
+      metadata: {
+        name: cid,
+        namespace: 'flux-system',
+        labels: labels
+      },
+      spec: {
+        commonMetadata: {
+          labels: labels
+        },
+        dependsOn: resolved.dependencies.map((d) => {
+          return {
+            apiVersion: 'fluxcd.controlplane.io/v1',
+            kind: 'ResourceSet',
+            name: this.componentName(d),
+            namespace: 'flux-system',
+            ready: true
+          };
+        }),
+        wait: true,
+        steps: [
+          { name: 'namespaces', timeout: '1m', resources: namespaces },
+          { name: 'prelude', timeout: '1m', resources: prelude },
+          { name: 'sources', timeout: '2m', resources: sources },
+          { name: 'kustomizations', timeout: '15m', resources: kustomizations },
+          { name: 'charts', timeout: '15m', resources: charts },
+          { name: 'resources', timeout: '15m', resources: primary },
+          { name: 'prologue', timeout: '1m', resources: prologue }
+        ].filter(s => s.resources.length > 0)
+      }
+    });
   }
 
   public override async clusterObjects(): Promise<KubeResource[]> {
@@ -264,6 +338,16 @@ export class FluxCDController extends GitOpsController {
         interval: '15m',
         timeout: '5m',
         releaseName: config.releaseName,
+        install: {
+          remediation: {
+            retries: 3
+          }
+        },
+        upgrade: {
+          remediation: {
+            retries: 3
+          }
+        },
         test: {
           enable: !(config.skipTests === false)
         },
@@ -285,6 +369,22 @@ export class FluxCDController extends GitOpsController {
         url: r
       }
     }));
+  }
+
+  public override managesResource(resource: KubeResource): boolean {
+    if (super.managesResource(resource)) return true;
+    const managed = [
+      helmToolkitFluxcdIo.v2.HelmRelease,
+      kustomizeToolkitFluxcdIo.v1.Kustomization
+    ];
+
+    return this.resourceSatisfiesAny(resource, managed);
+  }
+
+  // deno-lint-ignore no-explicit-any
+  private resourceSatisfiesAny(resource: KubeResource, ctors: Constructor<any>[]) {
+    const gvk = GVK.fromResource(resource);
+    return ctors.some(r => gvk.compare(GVK.fromCtor(r)));
   }
 
   private urlToChartIdent(url: URL): string {

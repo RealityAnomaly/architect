@@ -8,6 +8,7 @@ import * as fs from 'node:fs/promises';
 
 import { KubeContext, KubeResource, KubeResourceUtilities, Result, IWriter, WriterParams } from '@glassway/architect';
 import { KubeComponent } from './index.ts';
+import { GitOpsController } from './gitops/base.ts';
 
 export enum KubeWriterOutputFormat {
   SingleFile,
@@ -17,7 +18,7 @@ export enum KubeWriterOutputFormat {
 
 export interface KubeWriterParams extends WriterParams {
   format?: KubeWriterOutputFormat;
-  gitops?: boolean;
+  gitops?: GitOpsController;
 }
 
 export class KubeWriter implements IWriter<KubeWriterParams> {
@@ -78,7 +79,7 @@ export class KubeWriter implements IWriter<KubeWriterParams> {
         let resources = v as KubeResource[] ?? [];
         if (params?.gitops) resources = resources.filter(
           (r) => {
-            if (r.kind === "Namespace") return false;
+            if (params.gitops!.managesResource(r)) return false;
             if ('architect.glassway.net/gitops-exclude' in (r.metadata?.annotations ?? {})) return false;
 
             return true;

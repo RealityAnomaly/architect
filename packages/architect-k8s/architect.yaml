@@ -13,3 +13,7 @@ plugins:
         http:
           paths:
             - https://github.com/fluxcd/flux2/releases/latest/download/install.yaml
+      - name: fluxcd.controlplane.io
+        http:
+          paths:
+            - https://github.com/controlplaneio-fluxcd/flux-operator/releases/download/v0.57.0/install.yaml
