@@ -4,6 +4,7 @@
 
 export * from './config/index.ts';
 export * from './registry/index.ts';
+export * from './structs/index.ts';
 export * from './collections.ts';
 export * from './hashing.ts';
 export * from './semver.ts';

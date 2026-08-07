@@ -3,27 +3,30 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import { execFile } from 'node:child_process';
+import objectHash from 'object-hash';
 import * as fs from 'node:fs/promises';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import * as util from 'node:util';
 import * as yaml from '@std/yaml';
 import * as url from '@std/url';
-import { KubeResource, KubeResourceFilter, getLatestSemVer } from '@glassway/architect';
+import { KubeResource, KubeResourceFilter, KubeResourceUtilities, SemVerOptions, getLatestSemVer } from '@glassway/architect';
 
 import { OCIHelper } from '../helpers/oci.ts';
 import { Builder, BuilderParams } from './builder.ts';
-import { KubeResourceUtilities, SemVerOptions } from '../../../architect/src/index.ts';
 import { KubeWriter } from '../writer.ts';
+import { Kustomize, KustomizePatch } from './kustomize.ts';
 
 export class Helm extends Builder {
   private readonly indexCache: Record<string, HelmIndex> = {};
   private readonly oci: OCIHelper;
+  private readonly kustomize: Kustomize;
   private static hooksWarned = false;
 
   constructor(params: BuilderParams, oci: OCIHelper) {
     super(params, "helm");
     this.oci = oci;
+    this.kustomize = new Kustomize(params);
   }
 
   private filter(chart: string, config: HelmChartOpts, resources: KubeResource[]) {
@@ -78,7 +81,7 @@ export class Helm extends Builder {
     // consult our cache for the input values plus the params
     const hashInput = [values, params];
     const cacheResult = await this.tryFetchCache(hashInput);
-    if (cacheResult) return this.filterHooks(chart, config, this.filter(chart, config, cacheResult));
+    if (cacheResult) return await this.postRender(chart, config, this.filter(chart, config, cacheResult));
 
     const dir = await fs.mkdtemp(path.join(os.tmpdir(), "architect-"));
     const valuesFile = path.join(dir, "values.yaml");
@@ -104,11 +107,53 @@ export class Helm extends Builder {
       // cache the result from the inputs
       const output = resources.map((r) => KubeWriter.stringify(r)).join("\n---\n");
       await this.storeCache(hashInput, output);
-      return this.filterHooks(chart, config, resources);
+      return await this.postRender(chart, config, resources);
     } finally {
       await fs.rm(dir, {
         force: true,
         recursive: true,
+      });
+    }
+  }
+
+  private async postRender(
+    chart: string,
+    config: HelmChartOpts,
+    resources: KubeResource[]
+  ): Promise<KubeResource[]> {
+    const result = this.filterHooks(chart, config, resources);
+    // no patches, no reason to invoke kustomize
+    if (!config.patches || config.patches.length <= 0) return result;
+    const all = resources.map((r) => KubeWriter.stringify(r)).join("\n---\n");
+    const patches = config.patches.map(p => {
+      return { file: objectHash(p) + '.yaml', target: p.target, patch: p.patch }
+    });
+
+    const kustomization = {
+      resources: ['all.yaml'],
+      patches: patches.map(p => {
+        return { path: p.file, target: p.target };
+      })
+    };
+
+    const tmpdir = await Deno.makeTempDir();
+
+    try {
+      await Deno.writeTextFile(path.join(tmpdir, 'all.yaml'), all);
+      for (const patch of patches) {
+        await Deno.writeTextFile(path.join(tmpdir, patch.file), yaml.stringify(patch.patch, {
+          skipInvalid: true, lineWidth: -1
+        }));
+      }
+
+      await Deno.writeTextFile(path.join(tmpdir, 'kustomization.yaml'), yaml.stringify(kustomization, {
+        skipInvalid: true, lineWidth: -1
+      }));
+
+      return await this.kustomize.build(tmpdir);
+    } finally {
+      await Deno.remove(tmpdir, {
+        recursive: true
       });
     }
   }
@@ -355,6 +400,11 @@ export interface HelmChartOpts {
    * and resource filtering will not be performed, which may have security implications.
    */
   gitops?: HelmGitOpsMode;
+
+  /**
+   * A list of patches for the Kustomize post renderer
+   */
+  patches?: KustomizePatch[];
 
   /**
    * Kubernetes api versions used for Capabilities.APIVersions

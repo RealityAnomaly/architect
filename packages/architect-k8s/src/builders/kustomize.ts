@@ -5,8 +5,28 @@
 import { execFile } from 'node:child_process';
 import * as util from 'node:util';
 
-import { KubeResource } from '@glassway/architect';
+import { JSONPatch, KubeResource } from '@glassway/architect';
 import { Builder, BuilderParams } from './builder.ts';
+
+
+export interface KustomizePatchTarget {
+  group?: string;
+  version?: string;
+  kind?: string;
+  name?: string;
+  namespace?: string;
+  labelSelector?: string;
+  annotationSelector?: string;
+}
+
+export interface KustomizePatch {
+  target: KustomizePatchTarget;
+
+  /**
+   * Either a strategic merge patch or list of JSON6902 patches
+   */
+  patch: object | JSONPatch[];
+}
 
 export class Kustomize extends Builder {
   constructor(params: BuilderParams) {

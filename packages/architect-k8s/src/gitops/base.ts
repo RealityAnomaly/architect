@@ -5,10 +5,9 @@
 import * as logtape from '@logtape/logtape';
 import * as api from '@glassway/kubernetes-models';
 
-import { GVK, Result } from '@glassway/architect';
+import { GVK, Result, ICompileListener, KubeResource, TargetApplyParams } from '@glassway/architect';
 import { IKubeTarget } from '../target/index.ts';
 import { K8sPluginProps } from '../plugin.ts';
-import { ICompileListener, KubeResource, TargetApplyParams } from '../../../architect/src/index.ts';
 import { HelmChartOpts } from '../builders/index.ts';
 
 export type K8sPluginGitOpsProps = NonNullable<K8sPluginProps['gitops']>;
