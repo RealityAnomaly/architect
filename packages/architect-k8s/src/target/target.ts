@@ -209,6 +209,9 @@ export class KubeTarget extends Target implements IKubeTarget {
     const namespace = new api.v1.Namespace({
       metadata: {
         name: name,
+        annotations: {
+          'kustomize.toolkit.fluxcd.io/prune': 'disabled'
+        }
       },
     });
 

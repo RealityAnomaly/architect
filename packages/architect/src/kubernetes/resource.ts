@@ -79,10 +79,10 @@ export interface KubeUnkResource extends KubeResource {
  * Represents the constructor of a resource
  */
 export interface KubeResourceConstructor {
-  new (data: KubeResource): KubeResource;
+  new (data: unknown): unknown;
   apiVersion: string;
   kind: string;
-  scope: 'Cluster' | 'Namespaced' | '\\*';
+  scope: 'Cluster' | 'Namespaced' | '\\*' | string;
 }
 
 /**

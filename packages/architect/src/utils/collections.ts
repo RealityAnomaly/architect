@@ -59,4 +59,21 @@ export class CollectionUtilities {
     const results = await Promise.all(arr.map(predicate));
     return arr.filter((_v, index) => results[index]);
   }
+
+  /**
+   * Takes a number of values from a list according to a predicate
+   * @param source
+   * @param predicate
+   */
+  public static takeFrom<T>(source: T[], predicate: (value: T) => boolean): T[] {
+    const results: T[] = [];
+    let i = source.length;
+    while (i--) {
+      if (predicate(source[i])) {
+        results.push(...source.splice(i, 1));
+      }
+    }
+
+    return results;
+  }
 }

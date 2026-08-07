@@ -1,3 +1,7 @@
+export * as FluxcdControlplaneIoV1FluxReport from "./FluxcdControlplaneIoV1FluxReport.js"
+export * as FluxcdControlplaneIoV1FluxInstance from "./FluxcdControlplaneIoV1FluxInstance.js"
+export * as FluxcdControlplaneIoV1ResourceSet from "./FluxcdControlplaneIoV1ResourceSet.js"
+export * as FluxcdControlplaneIoV1ResourceSetInputProvider from "./FluxcdControlplaneIoV1ResourceSetInputProvider.js"
 export * as SourceExtensionsFluxcdIoV1beta1ArtifactGenerator from "./SourceExtensionsFluxcdIoV1beta1ArtifactGenerator.js"
 export * as SourceToolkitFluxcdIoV1OCIRepository from "./SourceToolkitFluxcdIoV1OCIRepository.js"
 export * as NotificationToolkitFluxcdIoV1Receiver from "./NotificationToolkitFluxcdIoV1Receiver.js"

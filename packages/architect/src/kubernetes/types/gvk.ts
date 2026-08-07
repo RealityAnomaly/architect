@@ -3,7 +3,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import { apiextensionsK8sIo } from '@glassway/kubernetes-models';
-import { KubeResource } from '../resource.ts';
+import { KubeResource, KubeResourceConstructor } from '../resource.ts';
+import { Constructor } from '../../utils/index.ts';
 
 /**
  * Represents a group-value-kind unique resource type identifier
@@ -24,6 +25,12 @@ export class GVK {
    */
   public static fromResource(resource: KubeResource): GVK {
     return GVK.fromAK(resource.apiVersion, resource.kind);
+  }
+
+  // deno-lint-ignore no-explicit-any
+  public static fromCtor(ctor: Constructor<any>): GVK {
+    const _ctor = ctor as KubeResourceConstructor;
+    return GVK.fromAK(_ctor.apiVersion, _ctor.kind);
   }
 
   /**
