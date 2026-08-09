@@ -46,7 +46,7 @@ export class KubeWriter implements IWriter<KubeWriterParams> {
 
     // encrypt SOPS secrets
     if (GVK.fromResource(resource).compare(GVK.fromCtor(api.v1.Secret))
-      && this.secrets?.['sops-public'] && !(
+      && this.secrets?.['sops-public'] && (
         params?.gitops && params.gitops.handlesSOPSSecrets
       ) && !('architect.glassway.net/sops-exclude' in (resource.metadata?.annotations ?? {}))) {
       str = await this.sops.encryptString(str, {

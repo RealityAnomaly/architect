@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+import * as yaml from '@std/yaml';
 import { Shim } from './../shim.ts'
 
 /**
@@ -166,5 +167,14 @@ export class SOPSShim extends Shim {
 
   public async encryptString(data: string, options: SOPSOptions): Promise<string> {
     return this.decoder.decode(await this.encrypt(this.encoder.encode(data), options));
+  }
+
+  // deno-lint-ignore no-explicit-any
+  public async decryptYaml(data: string, options: Partial<SOPSOptions> = {}): Promise<any> {
+    return yaml.parse(await this.decryptString(data, {
+      inputType: 'yaml',
+      outputType: 'yaml',
+      ...options
+    }));
   }
 }

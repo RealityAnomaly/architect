@@ -13,11 +13,11 @@ export class GitOpsComponent extends KubeComponent {
     this.setWeight(1000); // evaluate after all others
   }
 
-  public override async build(_context: KubeBuildContext, resources: KubeComponentGenericResources = {}):
+  public override async build(context: KubeBuildContext, resources: KubeComponentGenericResources = {}):
     Promise<KubeComponentGenericResources> {
     if (!this.target.gitops) return resources;
 
-    resources.result = await this.target.gitops.clusterObjects();
+    resources.result = await this.target.gitops.clusterObjects(context);
     return resources;
   }
 }

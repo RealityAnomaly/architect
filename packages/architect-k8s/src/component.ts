@@ -37,7 +37,7 @@ import {
 } from './index.ts';
 import { KubeTargetIntrospection } from './target/intro.ts';
 import { KubeBuildContext } from './target/index.ts';
-import { AsyncHelpers } from '../../architect/src/index.ts';
+import { AsyncHelpers, SOPSShim } from '../../architect/src/index.ts';
 
 export interface KubeComponentArgs
   extends ComponentArgs<KubeComponentModelInput> {
@@ -62,6 +62,7 @@ export abstract class KubeComponent<
 > extends Component<TResult, TArgs, TParent> implements IKubeComponent<TResult, TArgs, TParent> {
   declare protected readonly _target: IKubeTarget;
   declare protected readonly _context: KubeContext;
+  protected readonly sops: SOPSShim = new SOPSShim();
 
   /**
    * Whether to enable adding standard requirements such as CNI and DNS

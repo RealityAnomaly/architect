@@ -77,6 +77,7 @@ export interface ITarget {
   "flux"?: {
   "decryption"?: {
   "provider": "sops";
+"provision"?: boolean;
 "secretRef": {
   "name": string;
 };
