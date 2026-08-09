@@ -57,6 +57,7 @@ export interface IKubeTarget extends ITarget {
   get cluster(): K8sPluginProps;
   get plugin(): K8sPlugin;
   get gitops(): GitOpsController | undefined;
+  get encryption(): KubeTargetEncryption;
 
   defaultContext<T extends Component>(
     token: Constructor<T>,
@@ -98,9 +99,9 @@ export interface IKubeTarget extends ITarget {
  */
 export class KubeTarget extends Target implements IKubeTarget {
   declare protected readonly _params: KubeTargetParams;
+  protected readonly _encryption: KubeTargetEncryption;
   protected _gitops: GitOpsController | undefined;
   public client: _client.KubernetesObjectApi | undefined;
-  public encryption: KubeTargetEncryption;
 
   protected readonly logger: logtape.Logger;
   protected introspection: KubeTargetIntrospection | undefined;
@@ -134,7 +135,7 @@ export class KubeTarget extends Target implements IKubeTarget {
     super(model, params, project);
 
     this.logger = logtape.getLogger(['architect', 'target', this.model.metadata.name!]);
-    this.encryption = new KubeTargetEncryption(this.model, this.params, this.logger);
+    this._encryption = new KubeTargetEncryption(this.model, this.params, this.logger);
     this.enable(KubePreludeComponent);
     this.enable(CrdsComponent);
     if (this.gitops)
@@ -162,6 +163,10 @@ export class KubeTarget extends Target implements IKubeTarget {
   public get gitops(): GitOpsController | undefined {
     if (!this._gitops) this._gitops = GitOpsHelpers.resolve(this);
     return this._gitops;
+  }
+
+  public get encryption(): KubeTargetEncryption {
+    return this._encryption;
   }
 
   public static fake(): TargetFake {
@@ -297,6 +302,9 @@ export class KubeTarget extends Target implements IKubeTarget {
     listener?: ICompileListener,
   ): Promise<void> {
     await Promise.all(resources.map(async (r) => {
+      // in bootstrap mode, only apply resources marked with the bootstrap tag
+      if (params?.bootstrap && !('architect.glassway.net/bootstrap' in (r.metadata?.annotations ?? {}))) return;
+
       const resourceName = KubeResourceUtilities.resourceName(r);
       listener?.setStatus(resourceName ?? r.toString());
 
@@ -346,7 +354,8 @@ export class KubeTarget extends Target implements IKubeTarget {
     const resources = result.all as KubeResource[];
     listener?.setTotal(resources.length);
 
-    if (this.gitops && !params?.direct)
+    // TODO: gitops components should be filtered to bootstrap resources only
+    if (this.gitops && (!params?.direct || params?.bootstrap))
       return this.gitops.apply(result, params, logger, listener);
 
     // namespaces and CRDs must be applied first

@@ -6,7 +6,7 @@ import * as logtape from '@logtape/logtape';
 import * as api from '@glassway/kubernetes-models';
 
 import { GVK, Result, ICompileListener, KubeResource, TargetApplyParams } from '@glassway/architect';
-import { IKubeTarget } from '../target/index.ts';
+import { IKubeTarget, KubeBuildContext } from '../target/index.ts';
 import { K8sPluginProps } from '../plugin.ts';
 import { HelmChartOpts } from '../builders/index.ts';
 
@@ -20,7 +20,7 @@ export abstract class GitOpsController {
   }
 
   public abstract apply(result: Result, params?: TargetApplyParams, logger?: logtape.Logger, listener?: ICompileListener): Promise<void>;
-  public async clusterObjects(): Promise<KubeResource[]> { return []; }
+  public async clusterObjects(_context: KubeBuildContext): Promise<KubeResource[]> { return []; }
 
   public async helmResources(_chart: string, _values: object, _config: HelmChartOpts): Promise<KubeResource[]> {
     throw new Error('Helm resources are not implemented for this GitOps controller');

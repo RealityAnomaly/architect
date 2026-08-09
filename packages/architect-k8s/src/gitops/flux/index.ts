@@ -11,7 +11,7 @@ import { CollectionUtilities, Constructor, IComponent, GVK, ResolvedComponent, K
 import { kustomizeToolkitFluxcdIo, sourceToolkitFluxcdIo, helmToolkitFluxcdIo, fluxcdControlplaneIo } from '../../generated/crds/index.ts';
 import { GitOpsController, K8sPluginGitOpsProps } from '../base.ts';
 import { KubeWriter, KubeWriterOutputFormat } from '../../writer.ts';
-import { IKubeTarget } from '../../target/index.ts';
+import { IKubeTarget, KubeBuildContext } from '../../target/index.ts';
 import { FluxCDOptions, FluxCDShim } from './shim.ts';
 import { OCIHelper } from '../../helpers/oci.ts';
 import { HelmChartOpts } from '../../builders/index.ts';
@@ -267,7 +267,7 @@ export class FluxCDController extends GitOpsController {
     });
   }
 
-  public override async clusterObjects(): Promise<KubeResource[]> {
+  public override async clusterObjects(context: KubeBuildContext): Promise<KubeResource[]> {
     const resources: KubeResource[] = [];
 
     if (this.params.sources.oci) {
@@ -314,6 +314,27 @@ export class FluxCDController extends GitOpsController {
 
     // add in helm repos (deduplicated clusterwide)
     resources.push(...this.helmRepoResources());
+
+    // if provision option is set for sops keys, and bootstrap is on, perform decryption bootstrapping
+    if (context.bootstrap && this.params.decryption && this.params.decryption.provider === 'sops' && this.params.decryption.provision) {
+      const secrets = await this.target.encryption.getClusterSecrets(true);
+
+      resources.push(new api.v1.Secret({
+        metadata: {
+          name: 'flux-sops-v1',
+          annotations: {
+            'architect.glassway.net/bootstrap': 'true',
+            'architect.glassway.net/gitops-exclude': 'true',
+            'replicator.v1.mittwald.de/replicate-to': 'flux-system',
+            'replicator.v1.mittwald.de/replicate-to-matching': 'architect.glassway.net/replicate-secrets'
+          }
+        },
+        stringData: {
+          public: secrets!['sops-public']!,
+          private: secrets!['sops-private']!,
+        }
+      }));
+    }
 
     return resources;
   }

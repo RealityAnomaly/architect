@@ -127,6 +127,8 @@ spec:
                                     provider:
                                       type: string
                                       enum: [ "sops" ]
+                                    provision:
+                                      type: boolean
                                     secretRef:
                                       properties:
                                         name:
