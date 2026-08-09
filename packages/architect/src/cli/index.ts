@@ -23,12 +23,13 @@ interface AppCommandCompileOptions extends AppCommandOptions {
   output: string;
   components: string[];
   graph: boolean;
+  direct: boolean;
+  bootstrap: boolean;
   validate: boolean;
   requirements: boolean;
 }
 
 interface AppCommandApplyOptions extends AppCommandCompileOptions {
-  direct: boolean;
   force: boolean;
 }
 
@@ -88,6 +89,14 @@ export class App {
           'list of component names to compile',
           [],
         )
+        .option(
+          '-d, --direct',
+          'skips transforms for any GitOps providers'
+        )
+        .option(
+          '-b, --bootstrap',
+          'performs transforms for bootstrapping'
+        )
         .option('-g, --graph', 'render and write a dependency graph')
         .option('--no-validate', 'skips resource validation')
         .option('--no-requirements', 'skips requirement validation')
@@ -106,12 +115,16 @@ export class App {
           [],
         )
         .option(
+          '-f, --force',
+          'forcible apply, bypassing any checks'
+        )
+        .option(
           '-d, --direct',
           'applies in direct mode, skipping any proxy such as GitOps'
         )
         .option(
-          '-f, --force',
-          'forcible apply, bypassing any checks'
+          '-b, --bootstrap',
+          'applies only resources marked for bootstrapping the target'
         )
         .option('--no-validate', 'skips resource validation')
         .option('--no-requirements', 'skips requirement validation')
@@ -155,6 +168,8 @@ export class App {
 
   private async run(target: string | undefined, options: AppCommandCompileOptions | AppCommandApplyOptions, apply: boolean) {
     const params: TargetResolveParams = {
+      direct: options.direct,
+      bootstrap: options.bootstrap,
       requirements: options.requirements,
       validate: options.validate,
       graph: options.graph,
@@ -201,7 +216,6 @@ export class App {
 
         const applyOptions = options as AppCommandApplyOptions;
         await v.apply(result, {
-          direct: applyOptions.direct,
           force: applyOptions.force,
           ...params,
         }, logger, bar);

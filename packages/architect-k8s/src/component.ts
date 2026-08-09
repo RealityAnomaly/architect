@@ -33,9 +33,11 @@ import {
   HelmGitOpsMode,
   HttpFetchOptions,
   K8sPluginProps,
-  KustomizeOpts,
+  KustomizeOpts, SOPSSecret,
 } from './index.ts';
 import { KubeTargetIntrospection } from './target/intro.ts';
+import { KubeBuildContext } from './target/index.ts';
+import { AsyncHelpers } from '../../architect/src/index.ts';
 
 export interface KubeComponentArgs
   extends ComponentArgs<KubeComponentModelInput> {
@@ -66,6 +68,7 @@ export abstract class KubeComponent<
    */
   protected standardRequirements = true;
 
+  private _bootstrap = false;
   private _prune = true;
 
   constructor(
@@ -98,10 +101,16 @@ export abstract class KubeComponent<
 
   /**
    * Whether the component's resources should be pruned automatically on removal from the cluster
-   * @protected
    */
   public get prune(): boolean {
     return this._prune;
+  }
+
+  /**
+   * Whether to mark all resources of this component as bootstrap resources
+   */
+  public get bootstrap(): boolean {
+    return this._bootstrap;
   }
 
   protected get cluster(): K8sPluginProps {
@@ -114,6 +123,10 @@ export abstract class KubeComponent<
 
   protected setPrune(prune: boolean): void {
     this._prune = prune;
+  }
+
+  protected setBootstrap(bootstrap: boolean): void {
+    this._bootstrap = bootstrap;
   }
 
   public static override decorate<T extends object>(
@@ -149,8 +162,8 @@ export abstract class KubeComponent<
     return `${this.context.namespace + '/' + this.context.name}`;
   }
 
-  public override async build(result?: TResult): Promise<TResult> {
-    result = await super.build(result);
+  public override async build(context: KubeBuildContext, result?: TResult): Promise<TResult> {
+    result = await super.build(context, result);
 
     // properly namespace resources, because postBuild doesn't run for children individually
     const resources = KubeResourceUtilities.normaliseResources(result);
@@ -167,7 +180,7 @@ export abstract class KubeComponent<
     return result;
   }
 
-  public override async postBuild(data: TResult): Promise<TResult> {
+  public override async postBuild(context: KubeBuildContext, data: TResult): Promise<TResult> {
     // run post-build resource fixup at the top level
     let resources = KubeResourceUtilities.normaliseResources(data);
 
@@ -188,12 +201,20 @@ export abstract class KubeComponent<
 
     resources.push(metadata);
 
-    resources = resources.map((obj) => {
+    resources = await AsyncHelpers.sequential(resources.map(async (obj) => {
       obj = KubeResourceUtilities.fixupResource(obj);
-      return obj;
-    });
 
-    return super.postBuild(resources as TResult);
+      // label all resources produced by this component as bootstrap resources
+      if (this.bootstrap) {
+        KubeResourceUtilities.annotate(obj, {
+          'architect.glassway.net/bootstrap': 'true'
+        });
+      }
+
+      return obj;
+    }));
+
+    return super.postBuild(context, resources as TResult);
   }
 
   public override async upgrade(
@@ -405,18 +426,19 @@ const KubeComponentModelInputSchema: JSONSchemaType<KubeComponentModelInput> = {
   },
 };
 
-@KubeComponent.decorate({ class: 'architect.glassway.net/prelude' })
+@KubeComponent.decorate({ class: 'architect.glassway.net/prelude', context: { namespace: '$features$' } })
 export class KubePreludeComponent extends KubeComponent {
   private readonly resources: KubeResource[];
 
   constructor(target: IKubeTarget, context: KubeContext, props?: KubeComponentArgs, parent?: IComponent) {
     super(target, context, props, parent);
+    this.setBootstrap(true);
     this.resources = [];
   }
 
-  public override async build(resources: KubeComponentGenericResources = {}): Promise<KubeComponentGenericResources> {
+  public override async build(context: KubeBuildContext, resources: KubeComponentGenericResources = {}): Promise<KubeComponentGenericResources> {
     resources.result = this.resources;
-    return super.build(resources);
+    return super.build(context, resources);
   }
 
   public push(...items: KubeResource[]) {

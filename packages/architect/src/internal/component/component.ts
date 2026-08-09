@@ -9,7 +9,7 @@ import { Capability } from './capability.ts';
 import { ConfigurationContext } from './configuration.ts';
 import { ComponentArgs, ComponentModel, ComponentUpgradeState } from './index.ts';
 import { ValidateFunction } from 'ajv';
-import { ITarget } from '../index.ts';
+import { BuildContext, ITarget } from '../index.ts';
 import {
   CollectionUtilities,
   Constructor,
@@ -116,15 +116,16 @@ export interface IComponent<
 
   /**
    * Constructs the component's resources. The TResult passed in is used to stack resources from parent classes.
+   * @param context The context for the build.
    * @param result The provided resources plus the constructed resources.
    */
   // noinspection JSUnusedGlobalSymbols
-  build(result?: TResult): Promise<TResult>;
+  build(context: BuildContext, result?: TResult): Promise<TResult>;
 
   /**
    * Invoked by the target during the build phase; performs any configuration required by this component.
    * Warning: Do not resolve configuration in this function, use references instead. Attempting to resolve will cause an infinite loop.
-   * @param context The configuration context.
+   * @param context The context for the configuration.
    */
   configure(context: ConfigurationContext): void;
 
@@ -136,9 +137,10 @@ export interface IComponent<
 
   /**
    * Pass-through function that performs postprocessing on this component's build outputs
+   * @param context
    * @param data
    */
-  postBuild(data: TResult): Promise<TResult>;
+  postBuild(context: BuildContext, data: TResult): Promise<TResult>;
 
   /**
    * Upgrades the component's package dependencies. Used only by the updater and not the standard build process.
@@ -295,10 +297,10 @@ export class Component<
   }
 
   // noinspection JSUnusedGlobalSymbols
-  public async build(result: TResult = {} as TResult): Promise<TResult> {
+  public async build(context: BuildContext, result: TResult = {} as TResult): Promise<TResult> {
     for (const c of this.children) {
       if (c.independent) continue;
-      result = await c.build(result) as TResult;
+      result = await c.build(context, result) as TResult;
     }
 
     return result;
@@ -313,7 +315,7 @@ export class Component<
 
   public init() {}
 
-  public async postBuild(data: TResult): Promise<TResult> {
+  public async postBuild(_context: BuildContext, data: TResult): Promise<TResult> {
     return data;
   }
 

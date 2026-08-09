@@ -8,6 +8,7 @@ import wcmatch from 'wildcard-match'
 import { KubeComponent, KubeComponentGenericResources, } from '../../component.ts';
 
 import model from './architect.json' with { type: 'json' };
+import { KubeBuildContext } from '../../target/index.ts';
 
 @KubeComponent.decorate(model)
 export class CrdsComponent extends KubeComponent {
@@ -15,10 +16,12 @@ export class CrdsComponent extends KubeComponent {
   private readonly enabledGVKs: GVK[] = [];
 
   public override init(): void {
+    this.setBootstrap(true);
     this.standardRequirements = false;
   }
 
-  public override async build(resources: KubeComponentGenericResources = {}): Promise<KubeComponentGenericResources> {
+  public override async build(context: KubeBuildContext, resources: KubeComponentGenericResources = {}):
+    Promise<KubeComponentGenericResources> {
     const crds: api.apiextensionsK8sIo.v1.CustomResourceDefinition[] = [];
     const projects = this.target.project.app.getProjects();
     const modules = projects.reduce((v, p) => v.concat(p.getModules()), [] as object[]);
@@ -60,7 +63,7 @@ export class CrdsComponent extends KubeComponent {
     }
 
     resources.result = crds;
-    return super.build(resources);
+    return super.build(context, resources);
   }
 
   public enableGroup(group: string) {

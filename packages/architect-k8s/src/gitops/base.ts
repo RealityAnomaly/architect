@@ -31,4 +31,8 @@ export abstract class GitOpsController {
     if (GVK.fromResource(resource).compare(GVK.fromCtor(api.v1.Namespace))) return true;
     return !!(resource.metadata?.labels ?? {})['architect.glassway.net/position'];
   }
+
+  public get handlesSOPSSecrets(): boolean {
+    return false;
+  }
 }

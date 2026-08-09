@@ -5,6 +5,7 @@
 import { Component, KubeResource } from '@glassway/architect';
 import { HelmChartOpts } from '../../builders/helm.ts';
 import { KubeComponent, KubeComponentArgs, KubeComponentGenericResources, } from '../../component.ts';
+import { KubeBuildContext } from '../../target/index.ts';
 
 export interface KubeComponentHelmResources
   extends KubeComponentGenericResources {
@@ -22,7 +23,7 @@ export abstract class KubeComponentHelm<
   TArgs extends KubeComponentHelmOptions = KubeComponentHelmOptions,
   TParent extends Component = Component,
 > extends KubeComponent<TResult, TArgs, TParent> {
-  public override async build(resources: TResult = {} as TResult): Promise<TResult> {
+  public override async build(context: KubeBuildContext, resources: TResult = {} as TResult): Promise<TResult> {
     const props = await this.props.$resolve();
     const chart = props.inputs!.chart.helm!;
 
@@ -36,6 +37,6 @@ export abstract class KubeComponentHelm<
       },
     );
 
-    return super.build(resources as TResult);
+    return super.build(context, resources as TResult);
   }
 }

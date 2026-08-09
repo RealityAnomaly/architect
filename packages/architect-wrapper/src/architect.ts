@@ -134,7 +134,7 @@ privileges = deepMerge(privileges as any, {
     write: allowed_dirs,
     env: ['*'],
     net: allowed_addrs,
-    run: ['kustomize', 'helm', 'git', 'flux'],
+    run: ['kustomize', 'helm', 'git', 'flux', 'sops'],
     sys: ['homedir', 'userInfo', 'uid', 'gid']
   },
   deny: {
