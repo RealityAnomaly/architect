@@ -155,10 +155,9 @@ export class FluxCDController extends GitOpsController {
     // Disable pruning for all namespaces if requested
     if (!component.prune) {
       namespaces.forEach(n => {
-        if (!n.metadata) n.metadata = {};
-        if (!n.metadata.annotations) n.metadata.annotations = {};
-
-        n.metadata.annotations['fluxcd.controlplane.io/prune'] = 'disabled';
+        KubeResourceUtilities.annotate(n, {
+          'fluxcd.controlplane.io/prune': 'disabled'
+        });
       });
     }
 
@@ -198,6 +197,10 @@ export class FluxCDController extends GitOpsController {
             namespace: (d.context as KubeContext).namespace
           };
         }),
+        decryption: this.params.decryption ? {
+          provider: this.params.decryption.provider,
+          secretRef: this.params.decryption.secretRef
+        } : undefined,
         interval: "10m0s",
         prune: component.prune,
         sourceRef: {
@@ -297,6 +300,10 @@ export class FluxCDController extends GitOpsController {
         spec: {
           interval: '1m0s',
           prune: true,
+          decryption: this.params.decryption ? {
+            provider: this.params.decryption.provider,
+            secretRef: this.params.decryption.secretRef
+          } : undefined,
           sourceRef: {
             kind: 'OCIRepository',
             name: 'cluster',
@@ -392,6 +399,10 @@ export class FluxCDController extends GitOpsController {
     ];
 
     return this.resourceSatisfiesAny(resource, managed);
+  }
+
+  public override get handlesSOPSSecrets(): boolean {
+    return !!this.params.decryption;
   }
 
   // deno-lint-ignore no-explicit-any

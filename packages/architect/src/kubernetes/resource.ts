@@ -256,11 +256,9 @@ export class KubeResourceUtilities {
       resource.kind === "CustomResourceDefinition" ||
       resource.kind === "PersistentVolumeClaim"
     ) {
-      if (metadata.annotations == null) {
-        metadata.annotations = {};
-      }
-
-      metadata.annotations["kustomize.toolkit.fluxcd.io/prune"] = "disabled";
+      KubeResourceUtilities.annotate(resource, {
+        'kustomize.toolkit.fluxcd.io/prune': 'disabled'
+      });
     }
 
     resource = toolkit.merge(resource, { metadata: metadata });
@@ -315,5 +313,17 @@ export class KubeResourceUtilities {
     }
 
     return resource;
+  }
+
+  static label(resource: KubeResource, labels: Record<string, string>) {
+    if (!resource.metadata) resource.metadata = {};
+    if (!resource.metadata.labels) resource.metadata.labels = {};
+    resource.metadata.labels = { ...resource.metadata.labels, ...labels };
+  }
+
+  static annotate(resource: KubeResource, annotations: Record<string, string>) {
+    if (!resource.metadata) resource.metadata = {};
+    if (!resource.metadata.annotations) resource.metadata.annotations = {};
+    resource.metadata.annotations = { ...resource.metadata.annotations, ...annotations };
   }
 }

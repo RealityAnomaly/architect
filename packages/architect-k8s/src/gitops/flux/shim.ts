@@ -2,6 +2,8 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+import { Shim } from '@glassway/architect';
+
 export interface FluxCDOptions {
   as?: string;
   asGroup?: string[];
@@ -41,22 +43,9 @@ export interface FluxCDPushArtifactOptions extends FluxCDOptions {
   source?: string;
 }
 
-export class FluxCDShim {
-  private async run(params: string[]): Promise<Deno.ChildProcess> {
-    const command = new Deno.Command('flux', {
-      args: params,
-      stdout: "piped",
-      stderr: "piped",
-    });
-
-    const process = command.spawn();
-    const status = await process.status;
-
-    if (!status.success) throw new Error('Failed to run flux', {
-      cause: await process.stderr.text()
-    });
-
-    return process;
+export class FluxCDShim extends Shim {
+  constructor(binary: string = 'flux') {
+    super(binary);
   }
 
   private buildCommonParams(options: FluxCDOptions): string[] {

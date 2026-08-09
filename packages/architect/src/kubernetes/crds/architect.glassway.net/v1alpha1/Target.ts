@@ -41,9 +41,33 @@ export interface ITarget {
  * Configuration for default cluster namespaces
  */
 "ns"?: {
-  "features"?: string;
-"operators"?: string;
-"services"?: string;
+  "features"?: {
+  "name"?: string;
+"annotations"?: {
+  [key: string]: string;
+};
+"labels"?: {
+  [key: string]: string;
+};
+};
+"operators"?: {
+  "name"?: string;
+"annotations"?: {
+  [key: string]: string;
+};
+"labels"?: {
+  [key: string]: string;
+};
+};
+"services"?: {
+  "name"?: string;
+"annotations"?: {
+  [key: string]: string;
+};
+"labels"?: {
+  [key: string]: string;
+};
+};
 };
 "flavor": "docker-desktop" | "kind" | "k3s" | "talos";
 /**
@@ -51,12 +75,32 @@ export interface ITarget {
  */
 "gitops"?: {
   "flux"?: {
-  "sources": {
+  "decryption"?: {
+  "provider": "sops";
+"secretRef": {
+  "name": string;
+};
+};
+"sources": {
   "oci"?: {
   "registry": string;
 "prefix"?: string;
 "secretRef": {
   "name": string;
+};
+"signing"?: {
+  "cosign"?: {
+  "key"?: {
+  "file": string;
+"path": string;
+};
+};
+"notation"?: {
+  "key"?: {
+  "file": string;
+"path": string;
+};
+};
 };
 };
 };

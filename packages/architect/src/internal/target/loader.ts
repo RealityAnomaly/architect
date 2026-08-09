@@ -2,6 +2,7 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+import * as path from '@std/path';
 import * as logtape from '@logtape/logtape';
 import { walk } from '@std/fs/walk';
 import { Plugin } from '../plugin/plugin.ts';
@@ -49,7 +50,9 @@ export class TargetLoader {
         if (r.spec.plugins?.kubernetes) {
           return new plugins.targetMap[Plugin.TARGET_IDENTIFIERS.kubernetes](
             r,
-            {},
+            {
+              path: path.dirname(entry.path)
+            },
             project,
           );
         } else {

@@ -1,3 +1,6 @@
 {
-  "class": "architect.glassway.net/crds"
+  "class": "architect.glassway.net/crds",
+  "context": {
+    "namespace": "$features$"
+  }
 }

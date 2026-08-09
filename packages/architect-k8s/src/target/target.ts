@@ -41,6 +41,14 @@ import { KubeTargetIntrospection } from './intro.ts';
 import { GitOpsHelpers } from '../gitops/helpers.ts';
 import { GitOpsController } from '../gitops/base.ts';
 import { GitOpsComponent } from '../components/gitops.ts';
+import { KubeBuildContext } from './context.ts';
+import { KubeTargetEncryption } from './encryption.ts';
+
+interface NamespaceSpec {
+  name?: string;
+  annotations?: Record<string, string>;
+  labels?: Record<string, string>;
+}
 
 export interface KubeTargetParams extends TargetParams {}
 
@@ -78,7 +86,7 @@ export interface IKubeTarget extends ITarget {
   /**
    * Creates a new namespace and returns it
    */
-  createNamespace(name: string): api.v1.Namespace;
+  createNamespace(ns?: NamespaceSpec): api.v1.Namespace;
 
   getConfig(): _client.KubeConfig;
   getClient(): _client.KubernetesObjectApi;
@@ -92,7 +100,9 @@ export class KubeTarget extends Target implements IKubeTarget {
   declare protected readonly _params: KubeTargetParams;
   protected _gitops: GitOpsController | undefined;
   public client: _client.KubernetesObjectApi | undefined;
+  public encryption: KubeTargetEncryption;
 
+  protected readonly logger: logtape.Logger;
   protected introspection: KubeTargetIntrospection | undefined;
   private readonly markedCRDGVKs: GVK[] = [];
   private readonly markedCRDGroups: string[] = [];
@@ -106,17 +116,25 @@ export class KubeTarget extends Target implements IKubeTarget {
       plugins: {
         kubernetes: {
           ns: {
-            features: NamespaceDefaults.features,
-            operators: NamespaceDefaults.operators,
-            services: NamespaceDefaults.services,
-          },
-        },
-      },
+            features: {
+              name: NamespaceDefaults.features
+            },
+            operators: {
+              name: NamespaceDefaults.operators
+            },
+            services: {
+              name: NamespaceDefaults.services
+            }
+          }
+        }
+      }
     } as Partial<architectGlasswayNet.v1alpha1.Target['spec']>;
 
     model.spec = CollectionUtilities.recursiveMerge(defaults, model.spec);
     super(model, params, project);
 
+    this.logger = logtape.getLogger(['architect', 'target', this.model.metadata.name!]);
+    this.encryption = new KubeTargetEncryption(this.model, this.params, this.logger);
     this.enable(KubePreludeComponent);
     this.enable(CrdsComponent);
     if (this.gitops)
@@ -164,7 +182,7 @@ export class KubeTarget extends Target implements IKubeTarget {
     const replacements: Record<string, string> = {};
     for (const [k, v] of Object.entries(NamespaceRef)) {
       // @ts-ignore: dynamic lookup of namespace ref
-      replacements[v] = this.cluster.ns![k]!;
+      replacements[v] = this.cluster.ns![k].name!;
     }
 
     if (!context.namespace || force) {
@@ -205,12 +223,17 @@ export class KubeTarget extends Target implements IKubeTarget {
     if (subgroups) this.enableCRDGroup(`*.${group}`, false, mark);
   }
 
-  public createNamespace(name: string): api.v1.Namespace {
+  public createNamespace(ns: NamespaceSpec): api.v1.Namespace {
     const namespace = new api.v1.Namespace({
       metadata: {
-        name: name,
+        name: ns.name,
         annotations: {
-          'kustomize.toolkit.fluxcd.io/prune': 'disabled'
+          // TODO: only if flux
+          'kustomize.toolkit.fluxcd.io/prune': 'disabled',
+          ...(ns.annotations ?? {})
+        },
+        labels: {
+          ...(ns.labels ?? {})
         }
       },
     });
@@ -227,7 +250,8 @@ export class KubeTarget extends Target implements IKubeTarget {
     const result = await super.compile(params, logger, listener);
     if (!result) return result;
 
-    result.writer = new KubeWriter();
+    const secrets = await this.encryption.getClusterSecrets();
+    result.writer = new KubeWriter(secrets);
 
     // TODO: handle objects, too
     if (params?.validate !== false && Array.isArray(result.all)) {
@@ -336,9 +360,9 @@ export class KubeTarget extends Target implements IKubeTarget {
   }
 
   private createDefaultResources() {
-    this.createNamespace(this.cluster.ns!.features!);
-    this.createNamespace(this.cluster.ns!.operators!);
-    this.createNamespace(this.cluster.ns!.services!);
+    this.createNamespace(this.cluster.ns?.features ?? {});
+    this.createNamespace(this.cluster.ns?.operators ?? {});
+    this.createNamespace(this.cluster.ns?.services ?? {});
   }
 
   public getConfig(): _client.KubeConfig {
@@ -380,6 +404,13 @@ export class KubeTarget extends Target implements IKubeTarget {
     // client.patch, etc, server side apply
     this.client = _client.KubernetesObjectApi.makeApiClient(config);
     return this.client;
+  }
+
+  protected override getBuildContext(params: TargetResolveParams): KubeBuildContext {
+    return {
+      bootstrap: params.bootstrap,
+      gitops: this.gitops && !params.direct
+    }
   }
 
   public override getIntrospection(): KubeTargetIntrospection {

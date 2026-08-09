@@ -27,14 +27,29 @@ import {
   DependencyGraph,
   ExtractComponentArgs,
   ICompileListener,
-  VirtualCapability, TargetIntrospection,
+  VirtualCapability, TargetIntrospection, BuildContext,
 } from '../../index.ts';
 import { IProject } from '../project/index.ts';
 
 export interface TargetParams {
+  /**
+   * Location of the target configuration file.
+   * For backend-loaded targets this is always undefined
+   */
+  path?: string;
 }
 
 export interface TargetResolveParams {
+  /**
+   * Bypass any GitOps providers
+   */
+  direct?: boolean;
+
+  /**
+   * Applies only resources marked for bootstrapping the target
+   */
+  bootstrap?: boolean;
+
   /**
    * Enable or disable validating requirements
    */
@@ -57,7 +72,6 @@ export interface TargetResolveParams {
 }
 
 export interface TargetApplyParams extends TargetResolveParams {
-  direct?: boolean;
   force?: boolean;
   dryRun?: boolean;
   watch?: boolean;
@@ -239,13 +253,15 @@ export class Target implements ITarget {
         .sort(([a], [b]) => a - b)
         .map(([, value]) => value);
 
+    const context = this.getBuildContext(params ?? {});
+
     for (const bucket of buckets) {
       await Promise.all(bucket.map(async (v): Promise<void> => {
           listener?.setStatus(v.component.toString());
 
           let result = undefined;
           try {
-            result = await v.component.build();
+            result = await v.component.build(context);
           } catch (e) {
             const message = e instanceof Error ? e.message : 'Unknown exception';
 
@@ -260,7 +276,7 @@ export class Target implements ITarget {
 
           if (result === undefined) return;
 
-          results[v.component.rid] = await v.component.postBuild(result);
+          results[v.component.rid] = await v.component.postBuild(context, result);
           listener?.onResourceEnd();
         }),
       );
@@ -395,6 +411,10 @@ export class Target implements ITarget {
         new VirtualCapability(capability.class, capability.options),
       );
     }
+  }
+
+  protected getBuildContext(_params: TargetResolveParams): BuildContext {
+    return {};
   }
 
   public getIntrospection(): TargetIntrospection<unknown> | undefined {

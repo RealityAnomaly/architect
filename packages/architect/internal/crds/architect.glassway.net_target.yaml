@@ -75,11 +75,44 @@ spec:
                           description: Configuration for default cluster namespaces
                           properties:
                             features:
-                              type: string
+                              properties:
+                                name:
+                                  type: string
+                                annotations:
+                                  additionalProperties:
+                                    type: string
+                                  type: object
+                                labels:
+                                  additionalProperties:
+                                    type: string
+                                  type: object
+                              type: object
                             operators:
-                              type: string
+                              properties:
+                                name:
+                                  type: string
+                                annotations:
+                                  additionalProperties:
+                                    type: string
+                                  type: object
+                                labels:
+                                  additionalProperties:
+                                    type: string
+                                  type: object
+                              type: object
                             services:
-                              type: string
+                              properties:
+                                name:
+                                  type: string
+                                annotations:
+                                  additionalProperties:
+                                    type: string
+                                  type: object
+                                labels:
+                                  additionalProperties:
+                                    type: string
+                                  type: object
+                              type: object
                         flavor:
                           type: string
                           enum: [ "docker-desktop", "kind", "k3s", "talos" ]
@@ -89,6 +122,20 @@ spec:
                           properties:
                             flux:
                               properties:
+                                decryption:
+                                  properties:
+                                    provider:
+                                      type: string
+                                      enum: [ "sops" ]
+                                    secretRef:
+                                      properties:
+                                        name:
+                                          type: string
+                                      required:
+                                        - name
+                                  required:
+                                    - provider
+                                    - secretRef
                                 sources:
                                   minProperties: 1
                                   maxProperties: 1
@@ -105,6 +152,25 @@ spec:
                                               type: string
                                           required:
                                             - name
+                                        signing:
+                                          minProperties: 1
+                                          maxProperties: 1
+                                          properties:
+                                            cosign:
+                                              properties:
+                                                key: &secretType
+                                                  properties:
+                                                    # key ref from the root of the repository
+                                                    file:
+                                                      type: string
+                                                    path:
+                                                      type: string
+                                                  required:
+                                                    - file
+                                                    - path
+                                            notation:
+                                              properties:
+                                                key: *secretType
                                       required:
                                         - registry
                                         - secretRef

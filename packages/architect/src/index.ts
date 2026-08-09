@@ -12,7 +12,6 @@ import { App } from './cli/index.ts';
 
 export * from './cli/index.ts';
 export * from './kubernetes/crds/index.ts';
-export * from './kubernetes/crds/index.ts';
 export * from './internal/graph/index.ts';
 export * from './kubernetes/index.ts';
 export * from './utils/index.ts';

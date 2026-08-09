@@ -11,6 +11,7 @@ export * from "./components/index.ts";
 export * from "./types/index.ts";
 export * from "./component.ts";
 export * from "./plugin.ts";
+export * from "./target/context.ts";
 export * from "./target/target.ts";
 
 import { App, Project } from '@glassway/architect';

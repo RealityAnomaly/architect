@@ -165,7 +165,7 @@ Deno.test('getRequirements returns parent instance matcher if parent set', async
 Deno.test('build calls build on parent', async () => {
   parent.children.push(child);
   using buildStub = stub(child, 'build', async (_result?) => { return buildResult; });
-  const result = await parent.build({'blah': 'blah2'});
+  const result = await parent.build({}, {'blah': 'blah2'});
   assert.assertEquals(result, buildResult);
   assert.assertStrictEquals(buildStub.calls.length, 1);
 });
@@ -174,7 +174,7 @@ Deno.test('build does not call build on parent if independent', async () => {
   parent.children.push(component);
   component.setParent(component);
   using buildStub = stub(component, 'build', async (_result?) => { return buildResult; });
-  const result = await parent.build({'blah': 'blah2'});
+  const result = await parent.build({}, {'blah': 'blah2'});
   assert.assertEquals(result, {'blah': 'blah2'});
   assert.assertStrictEquals(buildStub.calls.length, 0);
 });
@@ -201,7 +201,7 @@ Deno.test('init succeeds', () => {
 });
 
 Deno.test('postBuild returns data', async () => {
-  const result = await component.postBuild(buildResult);
+  const result = await component.postBuild({}, buildResult);
   assert.assertEquals(result, buildResult);
 });
 
