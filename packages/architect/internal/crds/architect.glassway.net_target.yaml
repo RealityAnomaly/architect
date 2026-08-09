@@ -127,8 +127,10 @@ spec:
                                     provider:
                                       type: string
                                       enum: [ "sops" ]
+                                      description: Type of the encryption provider
                                     provision:
                                       type: boolean
+                                      description: Whether to provision the private key in the cluster
                                     secretRef:
                                       properties:
                                         name:
@@ -146,8 +148,10 @@ spec:
                                       properties:
                                         registry:
                                           type: string
+                                          description: Path to the OCI registry to publish to
                                         prefix:
                                           type: string
+                                          description: Prefix for uploaded OCI images
                                         secretRef:
                                           properties:
                                             name:
@@ -160,19 +164,21 @@ spec:
                                           properties:
                                             cosign:
                                               properties:
-                                                key: &secretType
+                                                key:
+                                                  type: string
+                                                  description: Reference to the encrypted keyfile from the root of the repository
+                                                provision:
+                                                  type: boolean
+                                                  description: Whether to provision the cosign public key into the cluster
+                                                secretRef:
                                                   properties:
-                                                    # key ref from the root of the repository
-                                                    file:
-                                                      type: string
-                                                    path:
+                                                    name:
                                                       type: string
                                                   required:
-                                                    - file
-                                                    - path
-                                            notation:
-                                              properties:
-                                                key: *secretType
+                                                    - name
+                                              required:
+                                                - key
+                                                - secretRef
                                       required:
                                         - registry
                                         - secretRef

@@ -76,7 +76,13 @@ export interface ITarget {
 "gitops"?: {
   "flux"?: {
   "decryption"?: {
-  "provider": "sops";
+  /**
+ * Type of the encryption provider
+ */
+"provider": "sops";
+/**
+ * Whether to provision the private key in the cluster
+ */
 "provision"?: boolean;
 "secretRef": {
   "name": string;
@@ -84,22 +90,29 @@ export interface ITarget {
 };
 "sources": {
   "oci"?: {
-  "registry": string;
+  /**
+ * Path to the OCI registry to publish to
+ */
+"registry": string;
+/**
+ * Prefix for uploaded OCI images
+ */
 "prefix"?: string;
 "secretRef": {
   "name": string;
 };
 "signing"?: {
   "cosign"?: {
-  "key"?: {
-  "file": string;
-"path": string;
-};
-};
-"notation"?: {
-  "key"?: {
-  "file": string;
-"path": string;
+  /**
+ * Reference to the encrypted keyfile from the root of the repository
+ */
+"key": string;
+/**
+ * Whether to provision the cosign public key into the cluster
+ */
+"provision"?: boolean;
+"secretRef": {
+  "name": string;
 };
 };
 };
