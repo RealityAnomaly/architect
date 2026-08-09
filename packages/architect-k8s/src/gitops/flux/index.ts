@@ -7,7 +7,7 @@ import * as path from '@std/path';
 import * as logtape from '@logtape/logtape';
 import * as api from '@glassway/kubernetes-models';
 
-import { CollectionUtilities, Constructor, IComponent, GVK, ResolvedComponent, KubeContext, KubeResourceUtilities, KubeResource, TargetApplyParams, ICompileListener, Result } from '@glassway/architect';
+import { CollectionUtilities, Constructor, IComponent, GVK, ResolvedComponent, KubeContext, KubeResourceUtilities, KubeResource, TargetApplyParams, ICompileListener, Result, SOPSShim } from '@glassway/architect';
 import { kustomizeToolkitFluxcdIo, sourceToolkitFluxcdIo, helmToolkitFluxcdIo, fluxcdControlplaneIo } from '../../generated/crds/index.ts';
 import { GitOpsController, K8sPluginGitOpsProps } from '../base.ts';
 import { KubeWriter, KubeWriterOutputFormat } from '../../writer.ts';
@@ -16,21 +16,28 @@ import { FluxCDOptions, FluxCDShim } from './shim.ts';
 import { OCIHelper } from '../../helpers/oci.ts';
 import { HelmChartOpts } from '../../builders/index.ts';
 import { KubeComponent } from '../../component.ts';
+import { CosignShim } from '../../utils/shims/cosign.ts';
 
 export type FluxCDControllerParams = NonNullable<K8sPluginGitOpsProps['flux']>;
 
 export class FluxCDController extends GitOpsController {
   protected readonly params: FluxCDControllerParams;
   protected readonly shim: FluxCDShim;
+  protected readonly sops: SOPSShim;
+  protected readonly cosign: CosignShim;
   protected readonly logger: logtape.Logger;
   private readonly oci: OCIHelper;
   private readonly helmRepos: Set<string> = new Set<string>();
+
+  private _cosignKey: Record<string, string> | undefined;
 
   public constructor(target: IKubeTarget, params: FluxCDControllerParams) {
     super(target);
     this.logger = logtape.getLogger(['architect', 'kubernetes', 'gitops', 'flux']);
     this.params = params;
     this.shim = new FluxCDShim();
+    this.sops = new SOPSShim();
+    this.cosign = new CosignShim();
     this.oci = new OCIHelper(this.logger);
   }
 
@@ -56,6 +63,10 @@ export class FluxCDController extends GitOpsController {
 
   private async upload(result: Result, dir: string, listener?: ICompileListener): Promise<void> {
     if (this.params.sources.oci) {
+      // HACK: precache cosign key to prevent decryption prompt from being spammed
+      if (this.params.sources.oci.signing?.cosign)
+        await this.getCosignKey();
+
       const entries = Object.entries(result.components);
       listener?.setTotal(entries.length + 1);
 
@@ -80,6 +91,16 @@ export class FluxCDController extends GitOpsController {
     return `oci://${oci.registry}/${oci.prefix ?? ''}${this.target.model.metadata.name!}`;
   }
 
+  private async getCosignKey(): Promise<Record<string, string>> {
+    if (this._cosignKey) return this._cosignKey;
+    const root = this.target.project.getRoot();
+    const suffix = this.params.sources.oci?.signing?.cosign?.key!
+    const content = await Deno.readTextFile(path.join(root, suffix));
+
+    this._cosignKey = await this.sops.decryptYaml(content) as Record<string, string>;
+    return this._cosignKey;
+  }
+
   private async uploadOCI(dir: string, name: string): Promise<void> {
     const oci = this.params.sources.oci!;
     const git = await this.target.project.getGitInfo();
@@ -87,7 +108,8 @@ export class FluxCDController extends GitOpsController {
     const path = `${await this.getOCIPrefix()}:${name}`;
     const creds = await this.oci.getCredentials(oci.registry);
 
-    await this.shim.pushArtifact(path, {
+    // wants repository + @ + digest
+    const result = await this.shim.pushArtifact(path, {
       ...this.buildFluxOptions(),
       creds: creds ? `${creds.username}:${creds.password}` : undefined,
       path: dir,
@@ -95,6 +117,20 @@ export class FluxCDController extends GitOpsController {
       reproducible: true,
       revision: `${git.branch!}@sha1:${git.revision!}`
     });
+
+    if (this.params.sources.oci?.signing?.cosign) {
+      const key = await this.getCosignKey();
+      await this.cosign.sign(`${result.repository}@${result.digest}`, {
+        key: 'env://COSIGN_KEY',
+        registryUsername: creds?.username,
+        registryPassword: creds?.password
+      }, {
+        env: {
+          COSIGN_KEY: key['private'],
+          COSIGN_PASSWORD: key['password']
+        }
+      })
+    }
 
     this.logger.debug(`successfully pushed OCI artifact to ${path}`);
   }
@@ -214,6 +250,8 @@ export class FluxCDController extends GitOpsController {
     }));
 
     if (this.params.sources.oci) {
+      const oci = this.params.sources.oci;
+
       sources.push(new sourceToolkitFluxcdIo.v1.OCIRepository({
         metadata: {
           name: cid,
@@ -225,7 +263,11 @@ export class FluxCDController extends GitOpsController {
           ref: {
             tag: cid
           },
-          secretRef: this.params.sources.oci.secretRef
+          verify: oci.signing?.cosign ? {
+            provider: 'cosign',
+            secretRef: oci.signing.cosign.secretRef
+          } : undefined,
+          secretRef: oci.secretRef
         }
       }));
     }
@@ -271,6 +313,7 @@ export class FluxCDController extends GitOpsController {
     const resources: KubeResource[] = [];
 
     if (this.params.sources.oci) {
+      const oci = this.params.sources.oci;
       resources.push(new sourceToolkitFluxcdIo.v1.OCIRepository({
         metadata: {
           name: 'cluster',
@@ -285,7 +328,11 @@ export class FluxCDController extends GitOpsController {
           ref: {
             tag: 'cluster'
           },
-          secretRef: this.params.sources.oci.secretRef
+          verify: oci.signing?.cosign ? {
+            provider: 'cosign',
+            secretRef: oci.signing.cosign.secretRef
+          } : undefined,
+          secretRef: oci.secretRef
         }
       }));
 
@@ -321,9 +368,8 @@ export class FluxCDController extends GitOpsController {
 
       resources.push(new api.v1.Secret({
         metadata: {
-          name: 'flux-sops-v1',
+          name: this.params.decryption.secretRef.name,
           annotations: {
-            'architect.glassway.net/bootstrap': 'true',
             'architect.glassway.net/gitops-exclude': 'true',
             'replicator.v1.mittwald.de/replicate-to': 'flux-system',
             'replicator.v1.mittwald.de/replicate-to-matching': 'architect.glassway.net/replicate-secrets'
@@ -332,6 +378,24 @@ export class FluxCDController extends GitOpsController {
         stringData: {
           public: secrets!['sops-public']!,
           private: secrets!['sops-private']!,
+        }
+      }));
+    }
+
+    const cosign = this.params.sources.oci?.signing?.cosign;
+    if (cosign?.provision) {
+      const key = await this.getCosignKey();
+      // key.public
+      resources.push(new api.v1.Secret({
+        metadata: {
+          name: cosign.secretRef.name,
+          annotations: {
+            'replicator.v1.mittwald.de/replicate-to': 'flux-system',
+            'replicator.v1.mittwald.de/replicate-to-matching': 'architect.glassway.net/replicate-secrets'
+          }
+        },
+        stringData: {
+          'cosign.pub': key['public']
         }
       }));
     }

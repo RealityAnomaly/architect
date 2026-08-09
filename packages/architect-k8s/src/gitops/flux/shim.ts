@@ -43,6 +43,13 @@ export interface FluxCDPushArtifactOptions extends FluxCDOptions {
   source?: string;
 }
 
+export interface FluxCDPushArtifactResult {
+  url: string; // full url
+  repository: string; // without oci prefix
+  tag: string; // cluster
+  digest: string; // sha256:hash
+}
+
 export class FluxCDShim extends Shim {
   constructor(binary: string = 'flux') {
     super(binary);
@@ -77,7 +84,8 @@ export class FluxCDShim extends Shim {
     return params;
   }
 
-  public async pushArtifact(image: string, options: FluxCDPushArtifactOptions): Promise<void> {
+  public async pushArtifact(image: string, options: FluxCDPushArtifactOptions): Promise<FluxCDPushArtifactResult> {
+    options.output = 'json';
     const params = this.buildCommonParams(options);
 
     params.push(image);
@@ -93,6 +101,7 @@ export class FluxCDShim extends Shim {
     if (options.source) params.push('--source', options.source);
 
     params.unshift('push', 'artifact');
-    await this.run(params);
+    const res = await this.run(params);
+    return await res.stdout.json() as FluxCDPushArtifactResult;
   }
 }

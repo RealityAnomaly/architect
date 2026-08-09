@@ -15,9 +15,9 @@ export class GitOpsComponent extends KubeComponent {
 
   public override async build(context: KubeBuildContext, resources: KubeComponentGenericResources = {}):
     Promise<KubeComponentGenericResources> {
-    if (!this.target.gitops) return resources;
+    if (!this.target.gitops) return super.build(context, resources);
 
     resources.result = await this.target.gitops.clusterObjects(context);
-    return resources;
+    return super.build(context, resources);
   }
 }

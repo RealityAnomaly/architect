@@ -62,14 +62,8 @@ export interface SOPSOptions {
 }
 
 export class SOPSShim extends Shim {
-  private readonly encoder: TextEncoder;
-  private readonly decoder: TextDecoder;
-
   constructor(binary: string = 'sops') {
     super(binary);
-
-    this.encoder = new TextEncoder();
-    this.decoder = new TextDecoder();
   }
 
   private buildCommonParams(options: SOPSOptions): string[] {
@@ -132,13 +126,15 @@ export class SOPSShim extends Shim {
     const tmpdir = await Deno.makeTempDir();
 
     try {
-      const process = await this.run(params, async (p) => {
+      const process = await this.run(params, {
+        cwd: tmpdir,
+      }, async (p) => {
         if (typeof data === 'string') return;
 
         const writer = p.stdin.getWriter();
         await writer.write(data);
         await writer.close();
-      }, tmpdir);
+      });
 
       return await process.stdout.bytes();
     } finally {
