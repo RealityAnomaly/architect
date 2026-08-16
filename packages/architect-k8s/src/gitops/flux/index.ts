@@ -69,7 +69,7 @@ export class FluxCDController extends GitOpsController {
       if (this.params.sources.oci.signing?.cosign)
         await this.getCosignKey();
 
-      const entries = Object.entries(result.components);
+      const entries = Object.keys(result.components);
       listener?.setTotal(entries.length + 1);
 
       const push = async (k: string) => {
@@ -80,11 +80,7 @@ export class FluxCDController extends GitOpsController {
         listener?.onResourceEnd();
       }
 
-      const promises = Object.entries(result.components).map((async ([k, _]) => await push(k)));
-      // await the first promise first to avoid race condition with oauth tokens
-      if (promises.length > 0) await promises[0];
-      await Promise.all(promises);
-
+      await Promise.all(entries.map(async e => await push(e)));
       listener?.setStatus('Pushing Cluster OCI Image');
       await this.uploadOCI(path.join(dir, 'cluster'), 'cluster');
       listener?.onResourceEnd();
@@ -130,12 +126,13 @@ export class FluxCDController extends GitOpsController {
       await this.cosign.sign(`${result.repository}@${result.digest}`, {
         key: 'env://COSIGN_KEY',
         registryUsername: creds?.username,
-        registryPassword: creds?.password
+        registryPassword: creds?.password,
       }, {
         env: {
           COSIGN_KEY: key['private'],
           COSIGN_PASSWORD: key['password']
-        }
+        },
+        retries: 3
       })
     }
 

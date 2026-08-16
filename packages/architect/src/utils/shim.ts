@@ -5,6 +5,7 @@
 export interface ShimProcessOptions {
   cwd?: string;
   env?: Record<string, string>;
+  retries?: number;
 }
 
 export class Shim {
@@ -29,23 +30,32 @@ export class Shim {
     });
 
     const process: Deno.ChildProcess = command.spawn();
+    let lastError: Error;
 
-    try {
-      if (work) await work(process);
-      if (!process.stdin.locked)
-        await process.stdin.close();
-    } catch (e) {
-      await process.status;
-      throw new Error(`Failed to feed process ${this.binary}: ${e}`, {
-        cause: await process.stderr.text()
-      });
+    for (let retry = 0; retry <= (processOptions?.retries ?? 0); retry++) {
+      try {
+        if (work) await work(process);
+        if (!process.stdin.locked)
+          await process.stdin.close();
+      } catch (e) {
+        await process.status;
+        lastError = new Error(`Failed to feed process ${this.binary}: ${e}`, {
+          cause: await process.stderr.text()
+        });
+        continue;
+      }
+
+      const status = await process.status;
+      if (!status.success) {
+        lastError = new Error(`Failed to run ${this.binary}`, {
+          cause: await process.stderr.text()
+        });
+        continue;
+      }
+
+      return process;
     }
 
-    const status = await process.status;
-    if (!status.success) throw new Error(`Failed to run ${this.binary}`, {
-      cause: await process.stderr.text()
-    });
-
-    return process;
+    throw lastError!;
   }
 }
