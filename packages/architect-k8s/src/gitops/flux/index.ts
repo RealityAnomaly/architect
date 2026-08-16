@@ -221,8 +221,8 @@ export class FluxCDController extends GitOpsController {
     });
 
     const primary: kustomizeToolkitFluxcdIo.v1.Kustomization[] = [];
-    const prologue = CollectionUtilities.takeFrom(resourceCopy, r => {
-      return (r.metadata?.labels ?? {})['architect.glassway.net/position'] === 'prologue';
+    const epilogue = CollectionUtilities.takeFrom(resourceCopy, r => {
+      return (r.metadata?.labels ?? {})['architect.glassway.net/position'] === 'epilogue';
     });
 
     primary.push(new kustomizeToolkitFluxcdIo.v1.Kustomization({
@@ -307,7 +307,7 @@ export class FluxCDController extends GitOpsController {
           { name: 'kustomizations', timeout: '15m', resources: kustomizations },
           { name: 'charts', timeout: '15m', resources: charts },
           { name: 'resources', timeout: '15m', resources: primary },
-          { name: 'prologue', timeout: '1m', resources: prologue }
+          { name: 'epilogue', timeout: '1m', resources: epilogue }
         ].filter(s => s.resources.length > 0)
       }
     });

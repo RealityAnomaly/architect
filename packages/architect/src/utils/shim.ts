@@ -29,10 +29,11 @@ export class Shim {
       env: processOptions?.env,
     });
 
-    const process: Deno.ChildProcess = command.spawn();
     let lastError: Error;
 
     for (let retry = 0; retry <= (processOptions?.retries ?? 0); retry++) {
+      const process: Deno.ChildProcess = command.spawn();
+
       try {
         if (work) await work(process);
         if (!process.stdin.locked)
