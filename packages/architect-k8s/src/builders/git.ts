@@ -50,7 +50,7 @@ export class GitBuilder extends Builder {
         for await (const file of walk(p)) {
           if (!(file.name.endsWith(".yaml") || file.name.endsWith(".yml"))) continue;
           const text = await fs.readFile(file.path, "utf-8");
-          result.push(...this.loader.loadString(text));
+          result.push(...this.loader.loadString(text, true));
         }
       }
     } finally {
