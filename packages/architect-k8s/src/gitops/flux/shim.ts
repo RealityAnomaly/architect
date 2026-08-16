@@ -101,7 +101,7 @@ export class FluxCDShim extends Shim {
     if (options.source) params.push('--source', options.source);
 
     params.unshift('push', 'artifact');
-    const res = await this.run(params);
+    const res = await this.run(params, { retries: 3 });
     return await res.stdout.json() as FluxCDPushArtifactResult;
   }
 }
