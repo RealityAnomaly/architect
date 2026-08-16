@@ -62,6 +62,8 @@ export class FluxCDController extends GitOpsController {
   }
 
   private async upload(result: Result, dir: string, listener?: ICompileListener): Promise<void> {
+
+
     if (this.params.sources.oci) {
       // HACK: precache cosign key to prevent decryption prompt from being spammed
       if (this.params.sources.oci.signing?.cosign)
@@ -70,13 +72,18 @@ export class FluxCDController extends GitOpsController {
       const entries = Object.entries(result.components);
       listener?.setTotal(entries.length + 1);
 
-      await Promise.all(Object.entries(result.components).map(async ([k, _]) => {
+      const push = async (k: string) => {
         const resolved = result.graph.components[k];
         const ctx = resolved.component.context as KubeContext;
         listener?.setStatus(`Pushing OCI Image for ${resolved.component.toString()}`);
         await this.uploadOCI(path.join(dir, 'components', ctx.namespace!, ctx.name), this.componentName(resolved.component));
         listener?.onResourceEnd();
-      }));
+      }
+
+      const promises = Object.entries(result.components).map((async ([k, _]) => await push(k)));
+      // await the first promise first to avoid race condition with oauth tokens
+      if (promises.length > 0) await promises[0];
+      await Promise.all(promises);
 
       listener?.setStatus('Pushing Cluster OCI Image');
       await this.uploadOCI(path.join(dir, 'cluster'), 'cluster');
