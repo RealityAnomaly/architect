@@ -35,7 +35,7 @@ export class Helm extends Builder {
 
   private filterHooks(chart: string, config: HelmChartOpts, resources: KubeResource[]) {
     // don't complain about hooks in gitops mode because we assume the provider can handle them
-    if (!config.gitops || config.gitops === HelmGitOpsMode.Disabled)
+    if (!config.gitops || config.gitops?.mode === HelmGitOpsMode.Disabled)
       this.assertNoHooks(chart, resources);
 
     return resources.filter(r => !(r.metadata?.annotations && "helm.sh/hook" in r.metadata.annotations));
@@ -383,6 +383,34 @@ export enum HelmGitOpsMode {
   Hybrid = 'hybrid'
 }
 
+export interface HelmGitOpsConfig {
+  /**
+   * Whether to use the GitOps provider to install the chart, if available.
+   * Note that if GitOps is used to install the chart, helmTemplate will instead return the GitOps chart resource,
+   * and resource filtering will not be performed, which may have security implications.
+   */
+  mode?: HelmGitOpsMode;
+
+  /**
+   * Whether to protect this Helm chart from deletion via pruning. Disabled by default.
+   */
+  protect?: boolean;
+
+  /**
+   * Options for FluxCD
+   */
+  flux?: {
+    valuesFrom?: {
+      kind: 'ConfigMap' | 'Secret',
+      name: string,
+      valuesKey?: string,
+      targetPath?: string,
+      optional?: boolean,
+      literal?: boolean
+    }[];
+  }
+}
+
 export interface HelmChartOpts {
   /**
    * allow creating resources outside the namespace passed to the build function
@@ -395,11 +423,9 @@ export interface HelmChartOpts {
   filter?: KubeResourceFilter;
 
   /**
-   * Whether to use the GitOps provider to install the chart, if available.
-   * Note that if GitOps is used to install the chart, helmTemplate will instead return the GitOps chart resource,
-   * and resource filtering will not be performed, which may have security implications.
+   * Configuration for GitOps providers
    */
-  gitops?: HelmGitOpsMode;
+  gitops?: HelmGitOpsConfig;
 
   /**
    * A list of patches for the Kustomize post renderer

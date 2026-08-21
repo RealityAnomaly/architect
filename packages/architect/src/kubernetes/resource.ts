@@ -326,4 +326,19 @@ export class KubeResourceUtilities {
     if (!resource.metadata.annotations) resource.metadata.annotations = {};
     resource.metadata.annotations = { ...resource.metadata.annotations, ...annotations };
   }
+
+  /**
+   * Protects the resource by applying anti-prune annotations to it
+   * @param resource
+   */
+  static protect(resource: KubeResource) {
+    KubeResourceUtilities.annotate(resource, {
+      'fluxcd.controlplane.io/prune': 'disabled',
+      'kustomize.toolkit.fluxcd.io/prune': 'disabled'
+    });
+
+    KubeResourceUtilities.label(resource, {
+      'architect.glassway.net/protected': 'true'
+    });
+  }
 }

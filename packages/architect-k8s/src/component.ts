@@ -70,7 +70,7 @@ export abstract class KubeComponent<
   protected standardRequirements = true;
 
   private _bootstrap = false;
-  private _prune = true;
+  private _protected = true;
 
   constructor(
     target: IKubeTarget,
@@ -101,10 +101,12 @@ export abstract class KubeComponent<
   }
 
   /**
-   * Whether the component's resources should be pruned automatically on removal from the cluster
+   * Whether the component should be protected from accidental deletion.
+   * When protection is enabled, anti-prune tags and Kyverno deletion policy tags will be added to the top-level ResourceSet.
+   * Protection is enabled by default for all components unless explicitly disabled.
    */
-  public get prune(): boolean {
-    return this._prune;
+  public get protected(): boolean {
+    return this._protected;
   }
 
   /**
@@ -122,8 +124,8 @@ export abstract class KubeComponent<
     return this.target.getIntrospection();
   }
 
-  protected setPrune(prune: boolean): void {
-    this._prune = prune;
+  protected setProtect(protect: boolean): void {
+    this._protected = protect;
   }
 
   protected setBootstrap(bootstrap: boolean): void {
@@ -298,7 +300,7 @@ export abstract class KubeComponent<
     } as Partial<HelmChartOpts>, config);
 
     const result: KubeResource[] = [];
-    let mode = config.gitops ?? HelmGitOpsMode.Disabled;
+    let mode = config.gitops?.mode ?? HelmGitOpsMode.Disabled;
     if (!this.target.gitops) mode = HelmGitOpsMode.Disabled;
 
     // Create the GitOps chart definition
