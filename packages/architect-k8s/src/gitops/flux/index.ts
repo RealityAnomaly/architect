@@ -62,8 +62,6 @@ export class FluxCDController extends GitOpsController {
   }
 
   private async upload(result: Result, dir: string, listener?: ICompileListener): Promise<void> {
-
-
     if (this.params.sources.oci) {
       // HACK: precache cosign key to prevent decryption prompt from being spammed
       if (this.params.sources.oci.signing?.cosign)
@@ -179,6 +177,10 @@ export class FluxCDController extends GitOpsController {
     resolved: ResolvedComponent,
     resources: KubeResource[]
   ): Promise<fluxcdControlplaneIo.v1.ResourceSet> {
+    const matchPosition = function(r: KubeResource, position: string) {
+      return (r.metadata?.labels ?? {})['architect.glassway.net/position'] === position;
+    }
+
     const component = resolved.component as KubeComponent;
     const ctx = component.context;
     const cid = this.componentName(resolved.component);
@@ -188,16 +190,10 @@ export class FluxCDController extends GitOpsController {
       return this.resourceSatisfiesAny(r, [api.v1.Namespace]);
     });
 
-    const prelude = CollectionUtilities.takeFrom(resourceCopy, r => {
-      return (r.metadata?.labels ?? {})['architect.glassway.net/position'] === 'prelude';
-    });
-
-    // Disable pruning for all namespaces if requested
-    if (!component.prune) {
+    // Protect all namespaces if requested
+    if (component.protected) {
       namespaces.forEach(n => {
-        KubeResourceUtilities.annotate(n, {
-          'fluxcd.controlplane.io/prune': 'disabled'
-        });
+        KubeResourceUtilities.protect(n);
       });
     }
 
@@ -220,17 +216,24 @@ export class FluxCDController extends GitOpsController {
       return this.resourceSatisfiesAny(r, [helmToolkitFluxcdIo.v2.HelmRelease]);
     });
 
+    const prelude = CollectionUtilities.takeFrom(resourceCopy, r => matchPosition(r, 'prelude'));
     const primary: kustomizeToolkitFluxcdIo.v1.Kustomization[] = [];
-    const epilogue = CollectionUtilities.takeFrom(resourceCopy, r => {
-      return (r.metadata?.labels ?? {})['architect.glassway.net/position'] === 'epilogue';
-    });
+    const epilogue = CollectionUtilities.takeFrom(resourceCopy, r => matchPosition(r, 'epilogue'));
 
-    primary.push(new kustomizeToolkitFluxcdIo.v1.Kustomization({
+    const commonLabels = {
+      'architect.glassway.net/component': resolved.component.context.name,
+    };
+
+    const kustomization = new kustomizeToolkitFluxcdIo.v1.Kustomization({
       metadata: {
         name: cid,
-        namespace: ctx.namespace
+        namespace: ctx.namespace,
+        labels: commonLabels
       },
       spec: {
+        commonMetadata: {
+          labels: commonLabels
+        },
         dependsOn: resolved.dependencies.map((d) => {
           return {
             name: this.componentName(d),
@@ -242,7 +245,7 @@ export class FluxCDController extends GitOpsController {
           secretRef: this.params.decryption.secretRef
         } : undefined,
         interval: "10m0s",
-        prune: component.prune,
+        prune: !component.protected,
         sourceRef: {
           // TODO: should not be static
           kind: 'OCIRepository',
@@ -251,7 +254,10 @@ export class FluxCDController extends GitOpsController {
         },
         wait: true
       },
-    }));
+    });
+
+    KubeResourceUtilities.protect(kustomization);
+    primary.push(kustomization);
 
     if (this.params.sources.oci) {
       const oci = this.params.sources.oci;
@@ -259,7 +265,8 @@ export class FluxCDController extends GitOpsController {
       sources.push(new sourceToolkitFluxcdIo.v1.OCIRepository({
         metadata: {
           name: cid,
-          namespace: 'flux-system'
+          namespace: 'flux-system',
+          labels: commonLabels
         },
         spec: {
           interval: '1m0s',
@@ -276,19 +283,21 @@ export class FluxCDController extends GitOpsController {
       }));
     }
 
-    const labels = {
-      'architect.glassway.net/component': resolved.component.context.name
-    };
-
     return new fluxcdControlplaneIo.v1.ResourceSet({
       metadata: {
         name: cid,
         namespace: 'flux-system',
-        labels: labels
+        labels: commonLabels,
+        annotations: {
+          ...(component.protected ? {
+            'fluxcd.controlplane.io/prune': 'disabled',
+            'kustomize.toolkit.fluxcd.io/prune': 'disabled'
+          } : {})
+        }
       },
       spec: {
         commonMetadata: {
-          labels: labels
+          labels: commonLabels
         },
         dependsOn: resolved.dependencies.map((d) => {
           return {
@@ -318,7 +327,7 @@ export class FluxCDController extends GitOpsController {
 
     if (this.params.sources.oci) {
       const oci = this.params.sources.oci;
-      resources.push(new sourceToolkitFluxcdIo.v1.OCIRepository({
+      const repository = new sourceToolkitFluxcdIo.v1.OCIRepository({
         metadata: {
           name: 'cluster',
           namespace: 'flux-system',
@@ -338,9 +347,12 @@ export class FluxCDController extends GitOpsController {
           } : undefined,
           secretRef: oci.secretRef
         }
-      }));
+      });
 
-      resources.push(new kustomizeToolkitFluxcdIo.v1.Kustomization({
+      KubeResourceUtilities.protect(repository);
+      resources.push(repository);
+
+      const kustomization = new kustomizeToolkitFluxcdIo.v1.Kustomization({
         metadata: {
           name: 'cluster',
           namespace: 'flux-system',
@@ -360,7 +372,10 @@ export class FluxCDController extends GitOpsController {
             name: 'cluster',
           }
         }
-      }));
+      });
+
+      KubeResourceUtilities.protect(kustomization);
+      resources.push(kustomization);
     }
 
     // add in helm repos (deduplicated clusterwide)
@@ -460,24 +475,36 @@ export class FluxCDController extends GitOpsController {
         test: {
           enable: !(config.skipTests === false)
         },
-        values: values
+        values: values,
+        valuesFrom: config.gitops?.flux?.valuesFrom
       }
     });
+
+    if (config.gitops?.protect) {
+      KubeResourceUtilities.protect(resource);
+    }
 
     return [resource];
   }
 
   private helmRepoResources(): KubeResource[] {
-    return Array.from(this.helmRepos).map(r => new sourceToolkitFluxcdIo.v1.HelmRepository({
-      metadata: {
-        namespace: 'flux-system',
-        name: this.urlToChartIdent(new URL(r))
-      },
-      spec: {
-        interval: '15m',
-        url: r
-      }
-    }));
+    return Array.from(this.helmRepos).map(r => {
+      const ident = this.urlToChartIdent(new URL(r));
+      // OCI repositories are provisioned per-chart
+      // if (ident.startsWith('oci')) return;
+
+      return new sourceToolkitFluxcdIo.v1.HelmRepository({
+        metadata: {
+          namespace: 'flux-system',
+          name: ident
+        },
+        spec: {
+          type: ident.startsWith('oci') ? 'oci' : 'default',
+          interval: '15m',
+          url: r
+        }
+      });
+    });
   }
 
   public override managesResource(resource: KubeResource): boolean {
