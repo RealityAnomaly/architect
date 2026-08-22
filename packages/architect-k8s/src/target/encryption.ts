@@ -1,9 +1,9 @@
 import * as yaml from '@std/yaml';
 import * as path from '@std/path';
 import * as logtape from '@logtape/logtape';
-import { exists } from "jsr:@std/fs/exists";
+import { exists } from '@std/fs/exists';
 
-import { architectGlasswayNet } from '@glassway/architect';
+import { TargetType } from '@glassway/architect';
 import { SOPSShim } from '../../../architect/src/index.ts';
 import { KubeTargetParams } from './target.ts';
 import { ClusterSecrets } from '../types/index.ts';
@@ -11,7 +11,7 @@ import { ClusterSecrets } from '../types/index.ts';
 const SOPS_REGEX = new RegExp('ENC\[[^\]]*\]');
 
 export class KubeTargetEncryption {
-  private readonly model: architectGlasswayNet.v1alpha1.Target;
+  private readonly model: TargetType;
   private readonly params: KubeTargetParams;
   private readonly sops: SOPSShim;
   private readonly logger: logtape.Logger;
@@ -19,13 +19,17 @@ export class KubeTargetEncryption {
   private secrets?: ClusterSecrets;
   private secretsPrivate: boolean = false;
 
-  constructor(model: architectGlasswayNet.v1alpha1.Target, params: KubeTargetParams, logger: logtape.Logger) {
+  constructor(model: TargetType, params: KubeTargetParams, logger: logtape.Logger) {
     this.model = model;
     this.params = params;
     this.logger = logger;
     this.sops = new SOPSShim();
   }
 
+  /**
+   * Returns an instance of {@link ClusterSecrets} from cluster.sops.yaml in the target folder, if it exists
+   * @param withPrivate Whether or not to decrypt the private portion of the secret file
+   */
   public async getClusterSecrets(withPrivate: boolean = false): Promise<ClusterSecrets | undefined> {
     if (this.secrets && (this.secretsPrivate || !withPrivate)) return this.secrets;
     if (!this.params.path) return undefined;

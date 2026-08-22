@@ -21,7 +21,7 @@ export interface AppCommandOptions {
 
 interface AppCommandCompileOptions extends AppCommandOptions {
   output: string;
-  components: string[];
+  component: string[];
   graph: boolean;
   direct: boolean;
   bootstrap: boolean;
@@ -30,6 +30,7 @@ interface AppCommandCompileOptions extends AppCommandOptions {
 }
 
 interface AppCommandApplyOptions extends AppCommandCompileOptions {
+  dryRun: boolean;
   force: boolean;
 }
 
@@ -126,6 +127,7 @@ export class App {
           '-b, --bootstrap',
           'applies only resources marked for bootstrapping the target'
         )
+        .option('--dry-run', 'shows the changes that would be applied')
         .option('--no-validate', 'skips resource validation')
         .option('--no-requirements', 'skips requirement validation')
         .action(this.apply.bind(this));
@@ -170,6 +172,7 @@ export class App {
     const params: TargetResolveParams = {
       direct: options.direct,
       bootstrap: options.bootstrap,
+      components: options.component,
       requirements: options.requirements,
       validate: options.validate,
       graph: options.graph,
@@ -217,6 +220,7 @@ export class App {
         const applyOptions = options as AppCommandApplyOptions;
         await v.apply(result, {
           force: applyOptions.force,
+          dryRun: applyOptions.dryRun,
           ...params,
         }, logger, bar);
       } else {

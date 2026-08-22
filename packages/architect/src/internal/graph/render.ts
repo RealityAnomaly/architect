@@ -41,21 +41,21 @@ export class DependencyGraphRenderer {
 
         if (v.component.parent) {
           const parent = v.component.parent as IComponent;
-          parentGraph = parentGraph.subgraph("cluster_" + parent.rid, {
+          parentGraph = parentGraph.subgraph("cluster_" + parent.name, {
             label: parent.name,
           });
         } else if (
           v.component.children.filter((c) => c.independent).length > 0
         ) {
-          parentGraph = parentGraph.subgraph("cluster_" + v.component.rid, {
+          parentGraph = parentGraph.subgraph("cluster_" + v.component.name, {
             label: v.component.name,
           });
         }
 
         parentGraph.node(k, { label: v.component.name });
         for (const dependency of v.dependencies) {
-          if (dependency.rid.includes("prelude")) continue;
-          g.edge([k, dependency.rid], { len: 3 });
+          if (dependency.name.includes("prelude")) continue;
+          g.edge([k, dependency.name], { len: 3 });
         }
       }
     });

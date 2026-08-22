@@ -17,6 +17,6 @@ export class ComponentInstanceMatcher implements IComponentMatcher {
   }
 
   toString(): string {
-    return `ComponentInstance("${this.instance.rid}")`;
+    return `ComponentInstance("${this.instance.name}")`;
   }
 }

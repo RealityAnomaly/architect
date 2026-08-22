@@ -39,7 +39,14 @@ export class Result {
    * Returns all merged configuration for this result
    */
   public get all(): unknown {
-    return Object.values(this.components).reduce<unknown>((prev, cur) => {
+    return this.filtered();
+  }
+
+  /**
+   * Returns merged configurations filtered by a predicate on the component name
+   */
+  public filtered(predicate?: (v: string) => boolean): unknown {
+    return Object.entries(this.components).filter(([k, _]) => !predicate || predicate(k)).map(([_, v]) => v).reduce<unknown>((prev, cur) => {
       return CollectionUtilities.recursiveMerge(prev as object, cur as object);
     }, []);
   }

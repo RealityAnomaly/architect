@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import {
-  architectGlasswayNet,
   CollectionUtilities,
   Component,
   ComponentMetadata,
@@ -19,6 +18,7 @@ import {
   Target,
   TargetParams,
   TargetResolveParams,
+  TargetType,
   ValidationError,
   ValidationErrorLevel,
 } from '@glassway/architect';
@@ -109,7 +109,7 @@ export class KubeTarget extends Target implements IKubeTarget {
   private readonly markedCRDGroups: string[] = [];
 
   constructor(
-    model: architectGlasswayNet.v1alpha1.Target,
+    model: TargetType,
     params: KubeTargetParams = {},
     project: IProject,
   ) {
@@ -129,7 +129,7 @@ export class KubeTarget extends Target implements IKubeTarget {
           }
         }
       }
-    } as Partial<architectGlasswayNet.v1alpha1.Target['spec']>;
+    } as Partial<TargetType['spec']>;
 
     model.spec = CollectionUtilities.recursiveMerge(defaults, model.spec);
     super(model, params, project);
@@ -302,9 +302,6 @@ export class KubeTarget extends Target implements IKubeTarget {
     listener?: ICompileListener,
   ): Promise<void> {
     await Promise.all(resources.map(async (r) => {
-      // in bootstrap mode, only apply resources marked with the bootstrap tag
-      if (params?.bootstrap && !('architect.glassway.net/bootstrap' in (r.metadata?.annotations ?? {}))) return;
-
       const resourceName = KubeResourceUtilities.resourceName(r);
       listener?.setStatus(resourceName ?? r.toString());
 
@@ -334,7 +331,7 @@ export class KubeTarget extends Target implements IKubeTarget {
             // not valid json
           }
 
-          logger?.error(`${resourceName}: apply failed: ${message}`);
+          logger?.error(`${resourceName}: ${params?.dryRun ? 'dry-run' : 'apply'} failed: ${message}`);
         } else {
           logger?.error(`${resourceName}: ${e}`);
         }
@@ -351,14 +348,25 @@ export class KubeTarget extends Target implements IKubeTarget {
     listener?: ICompileListener,
   ): Promise<void> {
     await super.apply(result, params, logger, listener);
-    const resources = result.all as KubeResource[];
-    listener?.setTotal(resources.length);
 
     // TODO: gitops components should be filtered to bootstrap resources only
     if (this.gitops && (!params?.direct || params?.bootstrap))
       return this.gitops.apply(result, params, logger, listener);
 
+    // filter resources by the component selector
+    let resources = result.filtered(name =>
+      !params?.components || params.components.includes(name)
+    ) as KubeResource[];
+
+    // in bootstrap mode, only apply resources marked with the bootstrap tag
+    if (params?.bootstrap) {
+      resources = resources.filter(r =>
+        'architect.glassway.net/bootstrap' in (r.metadata?.annotations ?? {})
+      );
+    }
+
     // namespaces and CRDs must be applied first
+    listener?.setTotal(resources.length);
     const client = this.getClient();
     const isFirst = (r: KubeResource) => r.kind === "Namespace" || r.kind === "CustomResourceDefinition";
     const namespaces = resources.filter(isFirst);

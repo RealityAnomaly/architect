@@ -31,6 +31,9 @@ import {
 } from '../../index.ts';
 import { IProject } from '../project/index.ts';
 
+// Alias to the target type in case the interface is ever updated
+export type TargetType = architectGlasswayNet.v1alpha1.Target;
+
 export interface TargetParams {
   /**
    * Location of the target configuration file.
@@ -49,6 +52,11 @@ export interface TargetResolveParams {
    * Applies only resources marked for bootstrapping the target
    */
   bootstrap?: boolean;
+
+  /**
+   * Optional filter of components to resolve or apply
+   */
+  components?: string[];
 
   /**
    * Enable or disable validating requirements
@@ -72,14 +80,14 @@ export interface TargetResolveParams {
 }
 
 export interface TargetApplyParams extends TargetResolveParams {
-  force?: boolean;
   dryRun?: boolean;
+  force?: boolean;
   watch?: boolean;
 }
 
 export interface ITarget {
   get app(): IArchitect;
-  get model(): architectGlasswayNet.v1alpha1.Target;
+  get model(): TargetType;
   get params(): TargetParams;
   get project(): IProject;
   get components(): TokenRegistry<IComponent>;
@@ -182,7 +190,7 @@ export interface ITarget {
 }
 
 export interface TargetFake {
-  model: architectGlasswayNet.v1alpha1.Target,
+  model: TargetType,
   state?: object
 }
 
@@ -190,14 +198,14 @@ export interface TargetFake {
  * Represents a location to which rendered configuration or objects is applied against
  */
 export class Target implements ITarget {
-  protected readonly _model: architectGlasswayNet.v1alpha1.Target;
+  protected readonly _model: TargetType;
   protected readonly _params: TargetParams;
   protected readonly _project: IProject;
   protected readonly _components: TokenRegistry<IComponent> = new TokenRegistry<IComponent>();
   protected readonly _capabilities: Capability<unknown>[] = [];
 
   public constructor(
-    model: architectGlasswayNet.v1alpha1.Target,
+    model: TargetType,
     params: TargetParams = {},
     project: IProject,
   ) {
@@ -207,7 +215,7 @@ export class Target implements ITarget {
   }
 
   public get app(): IArchitect { return this._project.app; }
-  public get model(): architectGlasswayNet.v1alpha1.Target { return this._model; }
+  public get model(): TargetType { return this._model; }
   public get params(): TargetParams { return this._params };
   public get project(): IProject { return this._project };
   public get components(): TokenRegistry<IComponent> { return this._components };
@@ -265,7 +273,7 @@ export class Target implements ITarget {
           } catch (e) {
             const message = e instanceof Error ? e.message : 'Unknown exception';
 
-            graph.components[v.component.rid].errors.push(
+            graph.components[v.component.name].errors.push(
               new ValidationError(
                 'build exception thrown: ' + message,
                 ValidationErrorLevel.ERROR,
@@ -276,7 +284,7 @@ export class Target implements ITarget {
 
           if (result === undefined) return;
 
-          results[v.component.rid] = await v.component.postBuild(context, result);
+          results[v.component.name] = await v.component.postBuild(context, result);
           listener?.onResourceEnd();
         }),
       );
