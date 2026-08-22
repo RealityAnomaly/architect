@@ -52,8 +52,12 @@ export class FluxCDController extends GitOpsController {
 
     try {
       await this.write(result, tmpdir);
-      await this.upload(result, tmpdir, listener);
-      await this.reconcile();
+
+      // TODO: how should dry run really behave in GitOps mode?
+      if (!_params?.dryRun) {
+        await this.upload(result, tmpdir, listener, _params?.components);
+        await this.reconcile();
+      }
     } finally {
       await Deno.remove(tmpdir, {
         recursive: true
@@ -61,15 +65,18 @@ export class FluxCDController extends GitOpsController {
     }
   }
 
-  private async upload(result: Result, dir: string, listener?: ICompileListener): Promise<void> {
+  private async upload(result: Result, dir: string, listener?: ICompileListener, components?: string[]): Promise<void> {
+    // if we have a component filter, filter components on that; the top-level kustomization is still uploaded
+    const entries = Object.keys(result.components).filter(name =>
+      !components || components.includes(name)
+    );
+
     if (this.params.sources.oci) {
       // HACK: precache cosign key to prevent decryption prompt from being spammed
       if (this.params.sources.oci.signing?.cosign)
         await this.getCosignKey();
 
-      const entries = Object.keys(result.components);
       listener?.setTotal(entries.length + 1);
-
       const push = async (k: string) => {
         const resolved = result.graph.components[k];
         const ctx = resolved.component.context as KubeContext;

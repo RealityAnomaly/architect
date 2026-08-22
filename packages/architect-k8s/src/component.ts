@@ -173,7 +173,7 @@ export abstract class KubeComponent<
     resources.forEach((r) => {
       if (r.apiVersion === undefined || r.kind == undefined) {
         throw new Error(
-          `in component ${this.rid}: apiVersion or kind unset on a resource passed to the build function`,
+          `in component ${this.name}: apiVersion or kind unset on a resource passed to the build function`,
         );
       }
 

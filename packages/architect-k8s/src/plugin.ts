@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import { type IArchitect, Plugin, TargetClass, architectGlasswayNet } from '@glassway/architect';
+import { type IArchitect, Plugin, TargetClass, TargetType } from '@glassway/architect';
 import { CRDCommand } from './crds/cli.ts';
 import { CrdsConfig } from './crds/config.ts';
 import { CRDManager } from './crds/index.ts';
@@ -23,7 +23,7 @@ export class K8sPluginConfig {
 
 export type K8sPluginProps = NonNullable<
   NonNullable<
-    architectGlasswayNet.v1alpha1.Target['spec']['plugins']
+    TargetType['spec']['plugins']
   >['kubernetes']
 >;
 

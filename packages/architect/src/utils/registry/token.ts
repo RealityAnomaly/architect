@@ -2,8 +2,6 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-import objectHash from 'object-hash';
-
 import { Constructor, Context, ContextUtils } from '../index.ts';
 
 /**
@@ -13,7 +11,9 @@ export class TokenRegistry<T> {
   public readonly data: Record<string, T> = {};
 
   private static ident(context: Context): string {
-    return `${context.name}-${objectHash(context)}`;
+    //return `${context.name}-${objectHash(context)}`;
+    // Vertex: Component names now must be unique due to changes in the Kubernetes backend
+    return context.name;
   }
 
   /**

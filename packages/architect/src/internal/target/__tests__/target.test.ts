@@ -90,19 +90,19 @@ Deno.test('compile compiles', async () => {
     throw 'not an Error';
   };
 
-  graph.components[component.rid] = {
+  graph.components[component.name] = {
     component: component,
     dependencies: [],
     errors: []
   };
 
-  graph.components[component2.rid] = {
+  graph.components[component2.name] = {
     component: component2,
     dependencies: [],
     errors: []
   };
 
-  graph.components[component3.rid] = {
+  graph.components[component3.name] = {
     component: component3,
     dependencies: [],
     errors: []
@@ -111,9 +111,9 @@ Deno.test('compile compiles', async () => {
   using _resolve = stub(DependencyGraph, 'resolve', async (_r) => graph);
   const result = await target.compile({}, logger, listener);
   assert.assert(result);
-  assert.assertEquals(result.components[component.rid], { foo: 'result' });
-  assert.assertEquals(result.graph.components[component2.rid].errors[0].message, 'build exception thrown: real error');
-  assert.assertEquals(result.graph.components[component3.rid].errors[0].message, 'build exception thrown: Unknown exception');
+  assert.assertEquals(result.components[component.name], { foo: 'result' });
+  assert.assertEquals(result.graph.components[component2.name].errors[0].message, 'build exception thrown: real error');
+  assert.assertEquals(result.graph.components[component3.name].errors[0].message, 'build exception thrown: Unknown exception');
 
   assert.assertEquals(_phaseChange.calls.length, 3);
   assert.assertEquals(_phaseChange.calls[0].args[0], BuildPhase.Resolve);

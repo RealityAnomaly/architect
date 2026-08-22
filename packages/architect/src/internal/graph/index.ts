@@ -70,13 +70,13 @@ export class DependencyGraph implements IDependencyGraph {
     );
     const results: Record<string, Partial<ResolvedComponent>> = Object
       .fromEntries(components.map((v): [string, Partial<ResolvedComponent>] => {
-        return [v.rid, { component: v, errors: [] }];
+        return [v.name, { component: v, errors: [] }];
       }));
 
     // validate dependency requirements
     await Promise.all(components.map(async (v) => {
       const requirements = await v.getRequirements();
-      results[v.rid].dependencies = requirements.reduce<IComponent[]>(
+      results[v.name].dependencies = requirements.reduce<IComponent[]>(
         (prev, cur) => {
           const matches = components.filter((v2) => cur.match(v2));
 
@@ -89,7 +89,7 @@ export class DependencyGraph implements IDependencyGraph {
               return prev.concat(matches);
             }
 
-            results[v.rid].errors!.push(
+            results[v.name].errors!.push(
               new ValidationError(
                 `failed to satisfy dependency on ${cur.toString()}`,
                 ValidationErrorLevel.ERROR,
