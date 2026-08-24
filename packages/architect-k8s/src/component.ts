@@ -18,6 +18,7 @@ import {
   type KubeContext,
   KubeResource,
   KubeResourceUtilities,
+  AsyncHelpers, SOPSShim,
   Plugin,
 } from '@glassway/architect';
 
@@ -33,11 +34,10 @@ import {
   HelmGitOpsMode,
   HttpFetchOptions,
   K8sPluginProps,
-  KustomizeOpts, SOPSSecret,
+  KustomizeOpts
 } from './index.ts';
 import { KubeTargetIntrospection } from './target/intro.ts';
 import { KubeBuildContext } from './target/index.ts';
-import { AsyncHelpers, SOPSShim } from '../../architect/src/index.ts';
 
 export interface KubeComponentArgs
   extends ComponentArgs<KubeComponentModelInput> {

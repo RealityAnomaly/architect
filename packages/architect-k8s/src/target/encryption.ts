@@ -3,8 +3,7 @@ import * as path from '@std/path';
 import * as logtape from '@logtape/logtape';
 import { exists } from '@std/fs/exists';
 
-import { TargetType } from '@glassway/architect';
-import { SOPSShim } from '../../../architect/src/index.ts';
+import { TargetType, SOPSShim } from '@glassway/architect';
 import { KubeTargetParams } from './target.ts';
 import { ClusterSecrets } from '../types/index.ts';
 

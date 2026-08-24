@@ -7,10 +7,9 @@ import * as yaml from '@std/yaml';
 import * as fs from 'node:fs/promises';
 
 import * as api from '@glassway/kubernetes-models';
-import { GVK, KubeContext, KubeResource, KubeResourceUtilities, Result, IWriter, WriterParams } from '@glassway/architect';
+import { GVK, KubeContext, KubeResource, KubeResourceUtilities, Result, IWriter, WriterParams, SOPSShim } from '@glassway/architect';
 import { ClusterSecrets, KubeComponent } from './index.ts';
 import { GitOpsController } from './gitops/base.ts';
-import { SOPSShim } from '../../architect/src/index.ts';
 
 export enum KubeWriterOutputFormat {
   SingleFile,

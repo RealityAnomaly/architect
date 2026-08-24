@@ -4,6 +4,7 @@
 
 import { CollectionUtilities } from '../../utils/index.ts';
 import { IDependencyGraph } from '../graph/index.ts';
+import { ITarget } from '../target/index.ts';
 
 export interface WriterParams {}
 
@@ -12,9 +13,19 @@ export interface IWriter<T extends WriterParams = WriterParams> {
 }
 
 /**
+ * Mapping of components to abstract representations of diffs printed to the console
+ */
+export type DiffResult = Record<string, string>;
+
+/**
  * Represents a response produced from a {Target}.
  */
 export class Result {
+  /**
+   * Reference to the Target instance
+   */
+  public target: ITarget;
+
   /**
    * The second stage dependency graph.
    */
@@ -26,11 +37,17 @@ export class Result {
   public readonly components: Record<string, unknown>;
 
   /**
+   * Diffs from each component.
+   */
+  public diffs?: DiffResult;
+
+  /**
    * Writer that will be used to write the result
    */
   public writer?: IWriter;
 
-  constructor(graph: IDependencyGraph, components: Record<string, unknown>) {
+  constructor(target: ITarget, graph: IDependencyGraph, components: Record<string, unknown>) {
+    this.target = target;
     this.graph = graph;
     this.components = components;
   }

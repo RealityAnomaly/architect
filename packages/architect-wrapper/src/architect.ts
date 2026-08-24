@@ -134,7 +134,9 @@ privileges = deepMerge(privileges as any, {
     write: allowed_dirs,
     env: ['*'],
     net: allowed_addrs,
-    run: ['kustomize', 'helm', 'git', 'flux', 'sops', 'cosign'],
+    // TODO: unbuffer is insecure because it lets you run anything else...
+    // but tbh, most of these could also be used to escape anyway
+    run: ['kustomize', 'helm', 'git', 'flux', 'sops', 'cosign', 'unbuffer'],
     sys: ['homedir', 'userInfo', 'uid', 'gid']
   },
   deny: {

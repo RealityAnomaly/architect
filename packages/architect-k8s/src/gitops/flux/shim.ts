@@ -29,6 +29,18 @@ export interface FluxCDOptions {
   verbose?: boolean;
 }
 
+export interface FluxCDDiffKustomizationOptions extends FluxCDOptions {
+  ignoreNotFound?: boolean;
+  ignorePaths?: boolean;
+  inMemoryBuild?: boolean;
+  kustomizationFile?: string;
+  localSources?: Record<string, string>;
+  path: string;
+  progressBar?: boolean;
+  recursive?: boolean;
+  strictSubstitute?: boolean;
+}
+
 export interface FluxCDPushArtifactOptions extends FluxCDOptions {
   annotations?: string[];
   creds?: string;
@@ -82,6 +94,35 @@ export class FluxCDShim extends Shim {
     if (options.verbose) params.push('--verbose');
 
     return params;
+  }
+
+  public async diffKustomization(kustomization: string, options: FluxCDDiffKustomizationOptions): Promise<string> {
+    const params = this.buildCommonParams(options);
+    options.progressBar = false;
+
+    params.push(kustomization)
+    if (options.ignoreNotFound) params.push('--ignore-not-found');
+    if (options.ignorePaths) params.push('--ignore-paths');
+    if (options.inMemoryBuild) params.push('--in-memory-build');
+    if (options.kustomizationFile) params.push('--kustomization-file', options.kustomizationFile);
+    if (options.localSources) params.push('--local-sources', Object.entries(options.localSources).map(([k, v]) => `${k}=${v}`).join(','));
+    params.push('--path', options.path);
+    if (options.progressBar !== undefined) params.push(`--progress-bar=${options.progressBar ? 'true' : 'false'}`);
+    if (options.recursive) params.push('--recursive');
+    if (options.strictSubstitute) params.push('--strict-substitute');
+
+    // TODO: we need to make a PR to add FORCE_COLOR support to
+    params.unshift('diff', 'kustomization');
+    const res = await this.run(params, {
+      unbuffer: true,
+      allowedExitCodes: [1],
+      env: { 'FORCE_COLOR': '1' } // doesn't work... bunt doesn't check it...
+    });
+
+    return (await res.stdout.text())
+      // stupid jank fix for this being printed in unbuffer mode
+      .replace(/^.*identified at least one change.*$\n?/m, '')
+      .trim();
   }
 
   public async pushArtifact(image: string, options: FluxCDPushArtifactOptions): Promise<FluxCDPushArtifactResult> {

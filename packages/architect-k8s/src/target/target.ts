@@ -14,6 +14,7 @@ import {
   KubeResource,
   IProject,
   Result,
+  DiffResult,
   ITarget,
   Target,
   TargetParams,
@@ -35,7 +36,7 @@ import { KubeWriter } from '../writer.ts';
 import { K8S_PLUGIN_CLASS, K8sPlugin, K8sPluginProps } from '../plugin.ts';
 import { KubeCRDDependencyGraph } from '../crds/graph.ts';
 import { NamespaceDefaults, NamespaceRef } from '../types/scn.ts';
-import { KubeResourceUtilities, TargetApplyParams, TargetFake } from '@glassway/architect';
+import { KubeResourceUtilities, TargetDiffParams, TargetApplyParams, TargetFake } from '@glassway/architect';
 import { getFakeState, getFakeTarget } from './fake.ts';
 import { KubeTargetIntrospection } from './intro.ts';
 import { GitOpsHelpers } from '../gitops/helpers.ts';
@@ -339,6 +340,21 @@ export class KubeTarget extends Target implements IKubeTarget {
 
       listener?.onResourceEnd();
     }));
+  }
+
+  public override async diff(
+    result: Result,
+    params?: TargetDiffParams,
+    logger?: logtape.Logger,
+    listener?: ICompileListener,
+  ): Promise<DiffResult> {
+    await super.diff(result, params, logger, listener);
+
+    if (this.gitops && (!params?.direct || params?.bootstrap))
+      return this.gitops.diff(result, params, logger, listener);
+
+    // TODO: diffing for directly applied resources
+    return {};
   }
 
   public override async apply(

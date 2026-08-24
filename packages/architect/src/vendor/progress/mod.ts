@@ -221,6 +221,10 @@ export default class ProgressBar {
     // this.writer.releaseLock();
   }
 
+  reset() {
+    this.#end = false;
+  }
+
   /**
    * interrupt the progress bar and write a message above it
    *

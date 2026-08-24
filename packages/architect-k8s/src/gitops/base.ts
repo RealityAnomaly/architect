@@ -5,7 +5,7 @@
 import * as logtape from '@logtape/logtape';
 import * as api from '@glassway/kubernetes-models';
 
-import { GVK, Result, ICompileListener, KubeResource, TargetApplyParams } from '@glassway/architect';
+import { GVK, DiffResult, Result, ICompileListener, KubeResource, TargetDiffParams, TargetApplyParams } from '@glassway/architect';
 import { IKubeTarget, KubeBuildContext } from '../target/index.ts';
 import { K8sPluginProps } from '../plugin.ts';
 import { HelmChartOpts } from '../builders/index.ts';
@@ -19,6 +19,7 @@ export abstract class GitOpsController {
     this.target = target;
   }
 
+  public abstract diff(result: Result, params?: TargetDiffParams, logger?: logtape.Logger, listener?: ICompileListener): Promise<DiffResult>;
   public abstract apply(result: Result, params?: TargetApplyParams, logger?: logtape.Logger, listener?: ICompileListener): Promise<void>;
   public async clusterObjects(_context: KubeBuildContext): Promise<KubeResource[]> { return []; }
 

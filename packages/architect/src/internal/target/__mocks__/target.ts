@@ -18,7 +18,7 @@ import {
   Component,
   ComponentClass,
   ExtractComponentArgs,
-  TokenRegistry, IProject, TargetFake, ContextUtils
+  TokenRegistry, IProject, TargetFake, ContextUtils, TargetDiffParams, DiffResult
 } from '../../../index.ts';
 import { architectGlasswayNet } from '../../../kubernetes/crds/index.ts';
 import { DeepLazySpec, Condition } from '../../../utils/index.ts';
@@ -88,7 +88,11 @@ export class MockTarget implements ITarget {
   async compile(params?: TargetResolveParams, logger?: Logger, listener?: ICompileListener): Promise<Result | undefined> {
     MockTarget.compileCalled = true;
     const graph = new MockDependencyGraph(this);
-    return new Result(graph, {});
+    return new Result(this, graph, {});
+  }
+
+  diff(result: Result, params?: TargetDiffParams, logger?: Logger, listener?: ICompileListener): Promise<DiffResult> {
+    throw new Error('Method not implemented.');
   }
 
   apply(result: Result, params?: TargetApplyParams, logger?: Logger, listener?: ICompileListener): Promise<void> {
@@ -144,7 +148,7 @@ export class MockTargetReturnsInvalid extends MockTarget {
   override async compile(params?: TargetResolveParams, logger?: Logger, listener?: ICompileListener): Promise<Result | undefined> {
     const graph = new MockDependencyGraph(this);
     graph._valid = false;
-    return new Result(graph, {});
+    return new Result(this, graph, {});
   }
 }
 
