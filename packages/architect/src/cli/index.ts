@@ -265,12 +265,19 @@ class App {
     if (!apply) return;
 
     // print the diffs and prompt the user for consent
+    let changes = false;
     for (const result of Object.values(results)) {
       if (!result.diffs) continue;
       for (const diff of Object.values(result.diffs)) {
         if (!diff) continue;
         console.log(diff);
+        changes = true;
       }
+    }
+
+    if (!changes) {
+      console.log('No changes to apply');
+      Deno.exit(0);
     }
 
     console.log(); // print newline

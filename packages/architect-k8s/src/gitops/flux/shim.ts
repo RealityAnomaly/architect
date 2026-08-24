@@ -115,7 +115,7 @@ export class FluxCDShim extends Shim {
     params.unshift('diff', 'kustomization');
     const res = await this.run(params, {
       unbuffer: true,
-      allowedExitCodes: [1],
+      allowedExitCodes: [1, 2],
       env: { 'FORCE_COLOR': '1' } // doesn't work... bunt doesn't check it...
     });
 
