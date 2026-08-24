@@ -44,6 +44,7 @@ export interface KubeComponentArgs
 }
 
 export interface KubeComponentGenericResources {
+  namespace?: api.v1.Namespace;
   result?: KubeResource[];
 }
 

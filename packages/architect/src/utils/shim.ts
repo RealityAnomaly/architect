@@ -57,7 +57,7 @@ export class Shim {
         processOptions?.allowedExitCodes &&
         processOptions.allowedExitCodes.includes(status.code)
       )) {
-        lastError = new Error(`Failed to run ${this.binary}`, {
+        lastError = new Error(`Failed to run ${this.binary} with exit code ${status.code}`, {
           cause: await process.stderr.text()
         });
         continue;
