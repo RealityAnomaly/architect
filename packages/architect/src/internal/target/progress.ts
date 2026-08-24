@@ -8,6 +8,7 @@ export enum BuildPhase {
   Resolve,
   Build,
   Validate,
+  Diff,
   Apply,
 }
 

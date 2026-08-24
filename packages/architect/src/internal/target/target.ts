@@ -17,7 +17,7 @@ import {
   ValidationError,
   ValidationErrorLevel,
 } from '../../utils/index.ts';
-import { Result } from '../result/index.ts';
+import { Result, DiffResult } from '../result/index.ts';
 import { Context } from '../../utils/index.ts';
 import {
   IArchitect,
@@ -79,6 +79,8 @@ export interface TargetResolveParams {
   graph?: boolean;
 }
 
+export interface TargetDiffParams extends TargetResolveParams {}
+
 export interface TargetApplyParams extends TargetResolveParams {
   dryRun?: boolean;
   force?: boolean;
@@ -109,6 +111,20 @@ export interface ITarget {
     logger?: logtape.Logger,
     listener?: ICompileListener,
   ): Promise<Result | undefined>;
+
+  /**
+   * Diffs the result of a compile operation against the target
+   * @param result
+   * @param params
+   * @param logger
+   * @param listener
+   */
+  diff(
+    result: Result,
+    params?: TargetDiffParams,
+    logger?: logtape.Logger,
+    listener?: ICompileListener,
+  ): Promise<DiffResult>;
 
   /**
    * Applies the result of a compile operation
@@ -290,7 +306,7 @@ export class Target implements ITarget {
       );
     }
 
-    const result = new Result(graph, results);
+    const result = new Result(this, graph, results);
     logger?.info(
       `${this.toString()}: ${
         Object.values(result.components).length
@@ -306,6 +322,16 @@ export class Target implements ITarget {
     }
 
     return result;
+  }
+
+  public async diff(
+    _result: Result,
+    _params?: TargetDiffParams,
+    _logger?: logtape.Logger,
+    listener?: ICompileListener,
+  ): Promise<DiffResult> {
+    listener?.onPhaseChange(BuildPhase.Diff);
+    return {};
   }
 
   public async apply(

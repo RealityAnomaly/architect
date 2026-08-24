@@ -5,7 +5,7 @@
 import * as logtape from '@logtape/logtape';
 import { ProgressBar } from '../vendor/progress/index.ts';
 import { delay } from '@std/async';
-import { BuildPhase, IComponent, ICompileListener, ITarget } from '../internal/index.ts';
+import { BuildPhase, ICompileListener, ITarget } from '../internal/index.ts';
 
 import { defaultConsoleFormatter } from '@logtape/logtape';
 
@@ -16,6 +16,7 @@ export class CompileProgressBar implements ICompileListener {
   protected title?: string;
   protected status?: string;
   protected target?: ITarget;
+  protected cancelled: boolean = false;
   protected completed: boolean = false;
   private messages: logtape.LogRecord[] = [];
 
@@ -24,7 +25,7 @@ export class CompileProgressBar implements ICompileListener {
   }
 
   private async renderBar(): Promise<void> {
-    const progress = this.completed ? this.total : this.progress;
+    const progress = this.cancelled ? this.total : this.progress;
 
     const levelMap: Record<logtape.LogLevel, string> = {
       trace: "debug",
@@ -62,6 +63,8 @@ export class CompileProgressBar implements ICompileListener {
   }
 
   async render() {
+    this.bar.reset();
+
     // start hooking log messages
     const loggerConfig = logtape.getConfig();
     let oldSink: logtape.Sink | undefined;
@@ -81,7 +84,7 @@ export class CompileProgressBar implements ICompileListener {
     }
 
     try {
-      while (!this.completed) {
+      while (!this.cancelled) {
         await this.renderBar();
         await delay(20);
       }
@@ -102,6 +105,9 @@ export class CompileProgressBar implements ICompileListener {
       // prevent it from leaving the console in a bad state
       const encoder = new TextEncoder();
       await Deno.stdout.write(encoder.encode("\x1b[?25h\x1b[0m"));
+
+      // unset cancelled
+      this.cancelled = false;
     }
   }
 
@@ -132,6 +138,9 @@ export class CompileProgressBar implements ICompileListener {
       case BuildPhase.Validate:
         prefix = 'Validating';
         break;
+      case BuildPhase.Diff:
+        prefix = 'Diffing';
+        break;
       case BuildPhase.Apply:
         prefix = 'Applying';
         break;
@@ -144,7 +153,12 @@ export class CompileProgressBar implements ICompileListener {
     this.target = target;
   }
 
+  public setCancelled() {
+    this.cancelled = true;
+  }
+
   public setCompleted() {
     this.completed = true;
+    this.setCancelled();
   }
 }

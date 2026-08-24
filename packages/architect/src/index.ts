@@ -8,9 +8,10 @@ process.on("warning", n => {
   (n.name !== "DeprecationWarning" || !n.message.includes("punycode")) && console.warn(n)
 });
 
-import { App } from './cli/index.ts';
+import App from './cli/index.ts';
 
 export * from './cli/index.ts';
+export { default as App } from './cli/index.ts'
 export * from './kubernetes/crds/index.ts';
 export * from './internal/graph/index.ts';
 export * from './kubernetes/index.ts';

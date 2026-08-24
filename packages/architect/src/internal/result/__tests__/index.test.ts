@@ -23,7 +23,7 @@ Deno.test.beforeEach(() => {
   project = new MockProject(app);
   target = new MockTarget(undefined, undefined, project);
   graph = new MockDependencyGraph(target);
-  result = new Result(graph, {
+  result = new Result(target, graph, {
     foo1: { foobar: { blah: 'foo' } },
     foo2: { foobar: { blah2: 'foo' } }
   });

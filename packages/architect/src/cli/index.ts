@@ -4,7 +4,7 @@
 
 import path from 'node:path';
 import * as commander from 'commander';
-import { TargetResolveParams } from '../internal/index.ts';
+import { ITarget, Result, TargetResolveParams } from '../internal/index.ts';
 import { Architect, IProject } from '../index.ts';
 import { ComponentCommand } from './component.ts';
 import { TargetCommand } from './target.ts';
@@ -34,7 +34,7 @@ interface AppCommandApplyOptions extends AppCommandCompileOptions {
   force: boolean;
 }
 
-export class App {
+class App {
   public instance?: Architect;
   public program: commander.Command;
   private readonly _projectClass?: ProjectClass;
@@ -168,41 +168,24 @@ export class App {
     }
   }
 
-  private async run(target: string | undefined, options: AppCommandCompileOptions | AppCommandApplyOptions, apply: boolean) {
-    const params: TargetResolveParams = {
-      direct: options.direct,
-      bootstrap: options.bootstrap,
-      components: options.component,
-      requirements: options.requirements,
-      validate: options.validate,
-      graph: options.graph,
-    };
-
-    if (apply && params?.validateOnly) {
-      this.program.error('validateOnly cannot be used at the same time as apply', { exitCode: 2 });
-    }
-
-    const ignoreErrors = false;
-    const targets = (target
-      ? [await this.project.getTarget(target)]
-      : await this.project.getTargets()).filter((t) => !!t);
-
-    if (targets.length <= 0) {
-      this.program.error('unable to find any targets', { exitCode: 2 });
-    }
-
-    // currently the bar only works when we're not rendering multiple targets in parallel
-    const bar = targets.length == 1 ? new CompileProgressBar() : undefined;
-
+  private async _compile(
+    params: TargetResolveParams,
+    targets: ITarget[],
+    options: AppCommandCompileOptions | AppCommandApplyOptions,
+    apply: boolean,
+    bar?: CompileProgressBar
+  ): Promise<Record<string, Result>> {
     const architect = this.instanceAsserted();
     const logger = architect.logger;
+    const ignoreErrors = false;
     let errors = false;
 
-    let promises = targets.map(async (v): Promise<void> => {
-      if (!v) return;
+    const promises = targets.map(async (v): Promise<[string, Result | undefined]> => {
+      const targetName = v.model.metadata.name!;
+      if (!v) return [targetName, undefined];
 
       const result = await v.compile(params, logger, bar);
-      if (result == null) return;
+      if (result == null) return [targetName, undefined];
 
       result.graph.assertValid(logger);
 
@@ -213,16 +196,11 @@ export class App {
           } else {
             bar?.setCompleted();
             errors = true;
-            return;
+            return [v.model.metadata.name!, result];
           }
         }
 
-        const applyOptions = options as AppCommandApplyOptions;
-        await v.apply(result, {
-          force: applyOptions.force,
-          dryRun: applyOptions.dryRun,
-          ...params,
-        }, logger, bar);
+        result.diffs = await v.diff(result, params, logger, bar);
       } else {
         const output = path.join(options.output, v.model.metadata.name!);
         await fs.rm(output, {recursive: true, force: true});
@@ -236,22 +214,87 @@ export class App {
         }
       }
 
-      bar?.setCompleted();
+      bar?.setCancelled();
 
       if (!result.graph.valid) {
         errors = true;
       }
+
+      return [v.model.metadata.name!, result];
     });
 
-    if (bar != undefined) {
-      promises = promises.concat(bar.render());
-    }
-
-    await Promise.all(promises);
+    const [results] = await Promise.all([
+      Promise.all(promises),
+      bar?.render()
+    ]);
 
     if (errors) {
       Deno.exit(2);
     }
+
+    return Object.fromEntries(
+      results.filter(([_, v]) => v !== undefined)
+    ) as Record<string, Result>;
+  }
+
+  private async run(target: string | undefined, options: AppCommandCompileOptions | AppCommandApplyOptions, apply: boolean) {
+    const params: TargetResolveParams = {
+      direct: options.direct,
+      bootstrap: options.bootstrap,
+      components: options.component.length > 0 ? options.component : undefined,
+      requirements: options.requirements,
+      validate: options.validate,
+      graph: options.graph,
+    };
+
+    if (apply && params?.validateOnly) {
+      this.program.error('validateOnly cannot be used at the same time as apply', { exitCode: 2 });
+    }
+
+    const targets = (target
+      ? [await this.project.getTarget(target)]
+      : await this.project.getTargets()).filter((t) => !!t);
+
+    if (targets.length <= 0) {
+      this.program.error('unable to find any targets', { exitCode: 2 });
+    }
+
+    // currently the bar only works when we're not rendering multiple targets in parallel
+    const bar = targets.length == 1 ? new CompileProgressBar() : undefined;
+    const results = await this._compile(params, targets, options, apply, bar);
+    if (!apply) return;
+
+    // print the diffs and prompt the user for consent
+    for (const result of Object.values(results)) {
+      if (!result.diffs) continue;
+      for (const diff of Object.values(result.diffs)) {
+        if (!diff) continue;
+        console.log(diff);
+      }
+    }
+
+    console.log(); // print newline
+    const confirmed = confirm('Do you want to perform these actions?');
+    if (!confirmed) Deno.exit(3);
+
+    const architect = this.instanceAsserted();
+    const logger = architect.logger;
+    const applyOptions = options as AppCommandApplyOptions;
+
+    const promises = Object.values(results).map(async v => {
+      await v.target.apply(v, {
+        force: applyOptions.force,
+        dryRun: applyOptions.dryRun,
+        ...params,
+      }, logger, bar);
+
+      bar?.setCompleted();
+    });
+
+    await Promise.all([
+      Promise.all(promises),
+      bar?.render()
+    ]);
   }
 
   private async compile(target: string | undefined, options: AppCommandCompileOptions) {
@@ -262,3 +305,5 @@ export class App {
     await this.run(target, options, true);
   }
 }
+
+export default App

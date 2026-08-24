@@ -7,12 +7,32 @@ import * as path from '@std/path';
 import * as logtape from '@logtape/logtape';
 import * as api from '@glassway/kubernetes-models';
 
-import { CollectionUtilities, Constructor, IComponent, GVK, ResolvedComponent, KubeContext, KubeResourceUtilities, KubeResource, TargetApplyParams, ICompileListener, Result, SOPSShim } from '@glassway/architect';
-import { kustomizeToolkitFluxcdIo, sourceToolkitFluxcdIo, helmToolkitFluxcdIo, fluxcdControlplaneIo } from '../../generated/crds/index.ts';
+import {
+  CollectionUtilities,
+  Constructor,
+  DiffResult,
+  GVK,
+  ICompileListener,
+  IComponent,
+  KubeContext,
+  KubeResource,
+  KubeResourceUtilities,
+  ResolvedComponent,
+  Result,
+  SOPSShim,
+  TargetApplyParams,
+  TargetDiffParams
+} from '@glassway/architect';
+import {
+  fluxcdControlplaneIo,
+  helmToolkitFluxcdIo,
+  kustomizeToolkitFluxcdIo,
+  sourceToolkitFluxcdIo
+} from '../../generated/crds/index.ts';
 import { GitOpsController, K8sPluginGitOpsProps } from '../base.ts';
 import { KubeWriter, KubeWriterOutputFormat } from '../../writer.ts';
 import { IKubeTarget, KubeBuildContext } from '../../target/index.ts';
-import { FluxCDOptions, FluxCDShim } from './shim.ts';
+import { FluxCDDiffKustomizationOptions, FluxCDOptions, FluxCDShim } from './shim.ts';
 import { OCIHelper } from '../../helpers/oci.ts';
 import { HelmChartOpts } from '../../builders/index.ts';
 import { KubeComponent } from '../../component.ts';
@@ -44,6 +64,78 @@ export class FluxCDController extends GitOpsController {
   private buildFluxOptions(): FluxCDOptions {
     return {
       context: this.target.cluster.client?.context
+    }
+  }
+
+  // TODO: we write twice, once during diff, and then again during apply. We should figure out a way to deduplicate this call
+  public async diff(result: Result, _params?: TargetDiffParams, _logger?: logtape.Logger, listener?: ICompileListener): Promise<DiffResult> {
+    const tmpdir = await Deno.makeTempDir();
+
+    try {
+      await this.write(result, tmpdir);
+
+      const components = _params?.components;
+      const entries = Object.keys(result.components).filter(name =>
+        !components || components.includes(name)
+      );
+
+      const commonOptions: Partial<FluxCDDiffKustomizationOptions> = {
+        ignoreNotFound: true,
+        progressBar: false // don't attempt to write progress bar to captured stdout
+      }
+
+      listener?.setTotal(entries.length + 1);
+      const results = Object.fromEntries(await Promise.all(entries.map(async name => {
+        const resolved = result.graph.components[name];
+        const ctx = resolved.component.context as KubeContext;
+        listener?.setStatus(`Diffing Component ${resolved.component.toString()}`);
+
+        const kustomization = this.componentKustomization(resolved);
+        const tempKsFile = await Deno.makeTempFile({
+          suffix: '.yaml'
+        });
+
+        try {
+          await Deno.writeTextFile(tempKsFile, KubeWriter.stringify(kustomization));
+          const output = await this.shim.diffKustomization(this.componentName(resolved.component), {
+            ...commonOptions,
+            kustomizationFile: tempKsFile,
+            namespace: ctx.namespace!,
+            path: path.join(tmpdir, 'components', ctx.namespace!, ctx.name)
+          });
+
+          listener?.onResourceEnd();
+          return [name, output]
+        } finally {
+          await Deno.remove(tempKsFile);
+        }
+      })));
+
+      // also diff the cluster kustomization for changes in top level resource sets
+      listener?.setStatus('Diffing Cluster Component');
+      const kustomization = this.clusterKustomization();
+      const tempKsFile = await Deno.makeTempFile({
+        suffix: '.yaml'
+      });
+
+      try {
+        await Deno.writeTextFile(tempKsFile, KubeWriter.stringify(kustomization));
+        results['cluster'] = await this.shim.diffKustomization('cluster', {
+          ...commonOptions,
+          kustomizationFile: tempKsFile,
+          namespace: 'flux-system',
+          path: path.join(tmpdir, 'cluster')
+        });
+      } finally {
+        await Deno.remove(tempKsFile);
+      }
+
+      listener?.onResourceEnd();
+      return results;
+    } finally {
+      await Deno.remove(tmpdir, {
+        recursive: true
+      });
     }
   }
 
@@ -189,7 +281,6 @@ export class FluxCDController extends GitOpsController {
     }
 
     const component = resolved.component as KubeComponent;
-    const ctx = component.context;
     const cid = this.componentName(resolved.component);
 
     const resourceCopy = Array.from(resources);
@@ -226,44 +317,9 @@ export class FluxCDController extends GitOpsController {
     const prelude = CollectionUtilities.takeFrom(resourceCopy, r => matchPosition(r, 'prelude'));
     const primary: kustomizeToolkitFluxcdIo.v1.Kustomization[] = [];
     const epilogue = CollectionUtilities.takeFrom(resourceCopy, r => matchPosition(r, 'epilogue'));
+    const commonLabels = this.componentLabels(resolved);
+    const kustomization = this.componentKustomization(resolved);
 
-    const commonLabels = {
-      'architect.glassway.net/component': resolved.component.context.name,
-    };
-
-    const kustomization = new kustomizeToolkitFluxcdIo.v1.Kustomization({
-      metadata: {
-        name: cid,
-        namespace: ctx.namespace,
-        labels: commonLabels
-      },
-      spec: {
-        commonMetadata: {
-          labels: commonLabels
-        },
-        dependsOn: resolved.dependencies.map((d) => {
-          return {
-            name: this.componentName(d),
-            namespace: (d.context as KubeContext).namespace
-          };
-        }),
-        decryption: this.params.decryption ? {
-          provider: this.params.decryption.provider,
-          secretRef: this.params.decryption.secretRef
-        } : undefined,
-        interval: "10m0s",
-        prune: !component.protected,
-        sourceRef: {
-          // TODO: should not be static
-          kind: 'OCIRepository',
-          name: cid,
-          namespace: 'flux-system'
-        },
-        wait: true
-      },
-    });
-
-    KubeResourceUtilities.protect(kustomization);
     primary.push(kustomization);
 
     if (this.params.sources.oci) {
@@ -359,29 +415,7 @@ export class FluxCDController extends GitOpsController {
       KubeResourceUtilities.protect(repository);
       resources.push(repository);
 
-      const kustomization = new kustomizeToolkitFluxcdIo.v1.Kustomization({
-        metadata: {
-          name: 'cluster',
-          namespace: 'flux-system',
-          annotations: {
-            'architect.glassway.net/gitops-exclude': 'true',
-          }
-        },
-        spec: {
-          interval: '1m0s',
-          prune: true,
-          decryption: this.params.decryption ? {
-            provider: this.params.decryption.provider,
-            secretRef: this.params.decryption.secretRef
-          } : undefined,
-          sourceRef: {
-            kind: 'OCIRepository',
-            name: 'cluster',
-          }
-        }
-      });
-
-      KubeResourceUtilities.protect(kustomization);
+      const kustomization = this.clusterKustomization();
       resources.push(kustomization);
     }
 
@@ -543,5 +577,80 @@ export class FluxCDController extends GitOpsController {
 
   private componentName(component: IComponent): string {
     return `cid-${component.context.name}`;
+  }
+
+  private componentLabels(resolved: ResolvedComponent) {
+    return {
+      'architect.glassway.net/component': resolved.component.context.name,
+    };
+  }
+
+  private clusterKustomization() {
+    const kustomization = new kustomizeToolkitFluxcdIo.v1.Kustomization({
+      metadata: {
+        name: 'cluster',
+        namespace: 'flux-system',
+        annotations: {
+          'architect.glassway.net/gitops-exclude': 'true',
+        }
+      },
+      spec: {
+        interval: '1m0s',
+        prune: true,
+        decryption: this.params.decryption ? {
+          provider: this.params.decryption.provider,
+          secretRef: this.params.decryption.secretRef
+        } : undefined,
+        sourceRef: {
+          kind: 'OCIRepository',
+          name: 'cluster',
+        }
+      }
+    });
+
+    KubeResourceUtilities.protect(kustomization);
+    return kustomization;
+  }
+
+  private componentKustomization(resolved: ResolvedComponent) {
+    const component = resolved.component as KubeComponent;
+    const ctx = component.context;
+    const cid = this.componentName(resolved.component);
+    const labels = this.componentLabels(resolved);
+
+    const kustomization = new kustomizeToolkitFluxcdIo.v1.Kustomization({
+      metadata: {
+        name: cid,
+        namespace: ctx.namespace,
+        labels: labels
+      },
+      spec: {
+        commonMetadata: {
+          labels: labels
+        },
+        dependsOn: resolved.dependencies.map((d) => {
+          return {
+            name: this.componentName(d),
+            namespace: (d.context as KubeContext).namespace
+          };
+        }),
+        decryption: this.params.decryption ? {
+          provider: this.params.decryption.provider,
+          secretRef: this.params.decryption.secretRef
+        } : undefined,
+        interval: "10m0s",
+        prune: !component.protected,
+        sourceRef: {
+          // TODO: should not be static
+          kind: 'OCIRepository',
+          name: cid,
+          namespace: 'flux-system'
+        },
+        wait: true
+      },
+    });
+
+    KubeResourceUtilities.protect(kustomization);
+    return kustomization;
   }
 }

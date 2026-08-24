@@ -1,5 +1,4 @@
-import { Shim } from '@glassway/architect';
-import { ShimProcessOptions } from '../../../../architect/src/index.ts';
+import { Shim, ShimProcessOptions } from '@glassway/architect';
 
 export interface CosignOptions {
   timeout?: string;

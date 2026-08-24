@@ -5,7 +5,9 @@
 export interface ShimProcessOptions {
   cwd?: string;
   env?: Record<string, string>;
+  unbuffer?: boolean;
   retries?: number;
+  allowedExitCodes?: number[];
 }
 
 export class Shim {
@@ -20,7 +22,11 @@ export class Shim {
   }
 
   protected async run(params: string[], processOptions?: ShimProcessOptions, work?: (p: Deno.ChildProcess) => Promise<void>): Promise<Deno.ChildProcess> {
-    const command = new Deno.Command(this.binary, {
+    if (processOptions?.unbuffer) {
+      params.unshift(this.binary);
+    }
+
+    const command = new Deno.Command(processOptions?.unbuffer ? 'unbuffer' : this.binary, {
       args: params,
       stdin: "piped",
       stdout: "piped",
@@ -47,7 +53,10 @@ export class Shim {
       }
 
       const status = await process.status;
-      if (!status.success) {
+      if (!status.success && !(
+        processOptions?.allowedExitCodes &&
+        processOptions.allowedExitCodes.includes(status.code)
+      )) {
         lastError = new Error(`Failed to run ${this.binary}`, {
           cause: await process.stderr.text()
         });
