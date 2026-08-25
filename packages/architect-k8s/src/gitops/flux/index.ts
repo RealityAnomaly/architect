@@ -652,7 +652,7 @@ export class FluxCDController extends GitOpsController {
           secretRef: this.params.decryption.secretRef
         } : undefined,
         interval: "10m0s",
-        prune: !component.protected,
+        prune: true,
         sourceRef: {
           // TODO: should not be static
           kind: 'OCIRepository',

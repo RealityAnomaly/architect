@@ -1,9 +1,9 @@
 {
   "version": "5",
   "specifiers": {
-    "jsr:@es-toolkit/es-toolkit@^1.49.0": "1.50.0",
-    "jsr:@glassway/kubernetes-models@^1.36.8": "1.36.8",
-    "jsr:@glassway/kubernetes-types@^1.0.3": "1.0.3",
+    "jsr:@es-toolkit/es-toolkit@^1.49.0": "1.51.0",
+    "jsr:@glassway/kubernetes-models@^1.36.10": "1.36.10",
+    "jsr:@glassway/kubernetes-types@^1.1.1": "1.1.1",
     "jsr:@logtape/logtape@^2.2.3": "2.2.4",
     "jsr:@match/match@0.1": "0.1.0",
     "jsr:@std/assert@0.221": "0.221.0",
@@ -61,11 +61,11 @@
     "npm:wildcard-match@^5.1.4": "5.1.4"
   },
   "jsr": {
-    "@es-toolkit/es-toolkit@1.50.0": {
-      "integrity": "dc4681775f0c743fdcdf7cee65dfb615d22d8cad0fda7a00e256b579c0e0cccc"
+    "@es-toolkit/es-toolkit@1.51.0": {
+      "integrity": "17e2ce80c9c9bcfef3f3c0228b0f7896dc05e3c0a144a37bb7b7e34c5e29f8df"
     },
-    "@glassway/kubernetes-models@1.36.8": {
-      "integrity": "24cf37c6b92bf3301144f4d0a54fbad27b14a8fceb4e6188c964524ec794f14a",
+    "@glassway/kubernetes-models@1.36.10": {
+      "integrity": "8fb9187ea4a4a37be81b5b10f3e657eed47c35fb217203093ae4316b61aa2e8f",
       "dependencies": [
         "jsr:@es-toolkit/es-toolkit",
         "jsr:@glassway/kubernetes-types",
@@ -73,8 +73,8 @@
         "npm:ohash"
       ]
     },
-    "@glassway/kubernetes-types@1.0.3": {
-      "integrity": "e3793e65777fbc1dff2a9b48675a5b26de2431a3de71b0485b2cbfac5b75b7df",
+    "@glassway/kubernetes-types@1.1.1": {
+      "integrity": "3f8898b63e3ecd192d7e320f77a355168ce6779a18f8148ffe206ba6afd993c1",
       "dependencies": [
         "jsr:@es-toolkit/es-toolkit",
         "npm:ajv",
@@ -862,8 +862,8 @@
   "workspace": {
     "dependencies": [
       "jsr:@es-toolkit/es-toolkit@^1.49.0",
-      "jsr:@glassway/kubernetes-models@^1.36.8",
-      "jsr:@glassway/kubernetes-types@^1.0.3",
+      "jsr:@glassway/kubernetes-models@^1.36.10",
+      "jsr:@glassway/kubernetes-types@^1.1.1",
       "jsr:@logtape/logtape@^2.2.3",
       "jsr:@std/assert@^1.0.9",
       "jsr:@std/async@^1.5.0",
