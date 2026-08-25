@@ -27,10 +27,12 @@ export abstract class GitOpsController {
     throw new Error('Helm resources are not implemented for this GitOps controller');
   }
 
-  public managesResource(resource: KubeResource): boolean {
+  public managesResource(resource: KubeResource): boolean | undefined {
     // namespaces are deployed at the top level because the Kustomization or equivalent gets deployed into them
     if (GVK.fromResource(resource).compare(GVK.fromCtor(api.v1.Namespace))) return true;
-    return !!(resource.metadata?.labels ?? {})['architect.glassway.net/position'];
+    const position = (resource.metadata?.labels ?? {})['architect.glassway.net/position'];
+    if (!position) return undefined;
+    return position !== 'body';
   }
 
   public get handlesSOPSSecrets(): boolean {

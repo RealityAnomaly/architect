@@ -392,6 +392,11 @@ export interface HelmGitOpsConfig {
   mode?: HelmGitOpsMode;
 
   /**
+   * Position override for the HelmRelease. If not set, the chart will be installed in the default `helm` position, which is after the prelude and before the body.
+   */
+  position?: 'prelude' | 'body' | 'epilogue';
+
+  /**
    * Whether to protect this Helm chart from deletion via pruning. Disabled by default.
    */
   protect?: boolean;

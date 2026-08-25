@@ -8,6 +8,7 @@ export enum IngressFlavor {
   Cilium = "cilium",
   Nginx = "nginx",
   Istio = "istio",
+  Envoy = "envoy",
   Pomerium = "pomerium",
 }
 
