@@ -280,6 +280,10 @@ export class FluxCDController extends GitOpsController {
       return (r.metadata?.labels ?? {})['architect.glassway.net/position'] === position;
     }
 
+    const noPosition = function(r: KubeResource) {
+      return !('architect.glassway.net/position' in (r.metadata?.labels ?? {}))
+    }
+
     const component = resolved.component as KubeComponent;
     const cid = this.componentName(resolved.component);
 
@@ -307,11 +311,11 @@ export class FluxCDController extends GitOpsController {
 
     const sources: KubeResource[] = [];
     const kustomizations = CollectionUtilities.takeFrom(resourceCopy, r => {
-      return this.resourceSatisfiesAny(r, [kustomizeToolkitFluxcdIo.v1.Kustomization]);
+      return this.resourceSatisfiesAny(r, [kustomizeToolkitFluxcdIo.v1.Kustomization]) && noPosition(r);
     });
 
     const charts = CollectionUtilities.takeFrom(resourceCopy, r => {
-      return this.resourceSatisfiesAny(r, [helmToolkitFluxcdIo.v2.HelmRelease]);
+      return this.resourceSatisfiesAny(r, [helmToolkitFluxcdIo.v2.HelmRelease]) && noPosition(r);
     });
 
     const prelude = CollectionUtilities.takeFrom(resourceCopy, r => matchPosition(r, 'prelude'));
@@ -468,10 +472,17 @@ export class FluxCDController extends GitOpsController {
     const ident = this.urlToChartIdent(url);
     this.helmRepos.add(config.repo);
 
+    const labels = {
+      ...(config.gitops?.position ? {
+        'architect.glassway.net/position': config.gitops.position
+      } : {})
+    };
+
     //each resource adds to repo set, then all repos are created in flux-system
     const resource = new helmToolkitFluxcdIo.v2.HelmRelease({
       metadata: {
-        name: chart
+        name: chart,
+        labels: Object.entries(labels).length ? labels : undefined
       },
       spec: {
         chart: {
@@ -548,14 +559,16 @@ export class FluxCDController extends GitOpsController {
     });
   }
 
-  public override managesResource(resource: KubeResource): boolean {
-    if (super.managesResource(resource)) return true;
+  public override managesResource(resource: KubeResource): boolean | undefined {
+    const verdict = super.managesResource(resource);
+    if (verdict !== undefined) return verdict;
+
     const managed = [
       helmToolkitFluxcdIo.v2.HelmRelease,
       kustomizeToolkitFluxcdIo.v1.Kustomization
     ];
 
-    return this.resourceSatisfiesAny(resource, managed);
+    return this.resourceSatisfiesAny(resource, managed) ? true : undefined;
   }
 
   public override get handlesSOPSSecrets(): boolean {
