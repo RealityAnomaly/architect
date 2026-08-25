@@ -146,6 +146,7 @@ export class KubeResourceUtilities {
    */
   static normaliseResources(value: unknown): KubeResource[] {
     if (value === undefined || value === null) return [];
+    if (typeof value !== 'object') return [];
 
     let result: KubeResource[];
     if (Array.isArray(value)) {
