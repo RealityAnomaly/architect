@@ -396,7 +396,7 @@ export class Target implements ITarget {
         capabilities.push(...component.capabilities);
     }
 
-    for (const capability of this.capabilities) {
+    for (const capability of capabilities) {
       if (ContextUtils.compareTokens(token, capability.constructor as Constructor<R>)
         && (!condition || condition(capability as R))) return capability as R;
     }
