@@ -97,6 +97,6 @@ export class CosignShim extends Shim {
 
     params.push(digest);
 
-    await this.run(params, processOptions);
+    await this.run(params, async (p) => p.stdout.text(), processOptions);
   }
 }

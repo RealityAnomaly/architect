@@ -113,13 +113,13 @@ export class FluxCDShim extends Shim {
 
     // TODO: we need to make a PR to add FORCE_COLOR support to
     params.unshift('diff', 'kustomization');
-    const res = await this.run(params, {
+    const res = await this.run(params, async (p) => p.stdout.text(), {
       unbuffer: true,
       allowedExitCodes: [1, 2],
       env: { 'FORCE_COLOR': '1' } // doesn't work... bunt doesn't check it...
     });
 
-    return (await res.stdout.text())
+    return res
       // stupid jank fix for this being printed in unbuffer mode
       .replace(/^.*identified at least one change.*$\n?/m, '')
       .trim();
@@ -142,7 +142,7 @@ export class FluxCDShim extends Shim {
     if (options.source) params.push('--source', options.source);
 
     params.unshift('push', 'artifact');
-    const res = await this.run(params, { retries: 3 });
-    return await res.stdout.json() as FluxCDPushArtifactResult;
+    const res = await this.run(params, async (p) => p.stdout.json(), { retries: 3 });
+    return res as FluxCDPushArtifactResult;
   }
 }

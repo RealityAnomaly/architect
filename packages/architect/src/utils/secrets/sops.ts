@@ -126,17 +126,17 @@ export class SOPSShim extends Shim {
     const tmpdir = await Deno.makeTempDir();
 
     try {
-      const process = await this.run(params, {
+      return await this.run(params, async (p) => {
+        if (typeof data !== 'string') {
+          const writer = p.stdin.getWriter();
+          await writer.write(data);
+          await writer.close();
+        }
+
+        return await p.stdout.bytes();
+      }, {
         cwd: tmpdir,
-      }, async (p) => {
-        if (typeof data === 'string') return;
-
-        const writer = p.stdin.getWriter();
-        await writer.write(data);
-        await writer.close();
       });
-
-      return await process.stdout.bytes();
     } finally {
       await Deno.remove(tmpdir, {
         recursive: true
