@@ -21,7 +21,7 @@ export class Shim {
     this.decoder = new TextDecoder();
   }
 
-  protected async run(params: string[], processOptions?: ShimProcessOptions, work?: (p: Deno.ChildProcess) => Promise<void>): Promise<Deno.ChildProcess> {
+  protected async run<T>(params: string[], work: (p: Deno.ChildProcess) => Promise<T>, processOptions?: ShimProcessOptions): Promise<T> {
     if (processOptions?.unbuffer) {
       params.unshift(this.binary);
     }
@@ -36,12 +36,13 @@ export class Shim {
     });
 
     let lastError: Error;
+    let result: T;
 
     for (let retry = 0; retry <= (processOptions?.retries ?? 0); retry++) {
       const process: Deno.ChildProcess = command.spawn();
 
       try {
-        if (work) await work(process);
+        result = await work(process);
         if (!process.stdin.locked)
           await process.stdin.close();
       } catch (e) {
@@ -63,7 +64,7 @@ export class Shim {
         continue;
       }
 
-      return process;
+      return result;
     }
 
     throw lastError!;
