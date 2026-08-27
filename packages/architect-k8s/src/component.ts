@@ -55,6 +55,7 @@ export interface IKubeComponent<
   TParent extends IComponent = IComponent,
 > extends IComponent<TResult, TArgs, TParent> {
   get namespace(): string;
+  get ignoreCRDDependencies(): boolean;
 }
 
 export abstract class KubeComponent<
@@ -70,6 +71,7 @@ export abstract class KubeComponent<
    * Whether to enable adding standard requirements such as CNI and DNS
    */
   protected standardRequirements = true;
+  protected _ignoreCRDDependencies = false;
 
   private _bootstrap = false;
   private _protected = true;
@@ -124,6 +126,10 @@ export abstract class KubeComponent<
 
   protected get introspection(): KubeTargetIntrospection {
     return this.target.getIntrospection();
+  }
+
+  public get ignoreCRDDependencies(): boolean {
+    return this._ignoreCRDDependencies;
   }
 
   protected setProtect(protect: boolean): void {

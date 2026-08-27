@@ -14,6 +14,7 @@ import {
 
 import * as api from '@glassway/kubernetes-models';
 import wcmatch from 'wildcard-match'
+import { IKubeComponent } from '../component.ts';
 
 export interface KubeCRDRequirement {
   component: ResolvedComponent;
@@ -153,6 +154,10 @@ export class KubeCRDDependencyGraph {
    */
   public applyDependencies() {
     Object.entries(this.data).forEach(([k, v]) => {
+      const component = this.result.graph.components[k];
+      const instance = component.component as IKubeComponent;
+      if (instance.ignoreCRDDependencies) return;
+
       // find the components that export the CRDs that this one needs
       const dependencies: IComponent[] = v.requirements.reduce((prev, cur) => {
         let name: string | undefined = undefined;
@@ -171,7 +176,6 @@ export class KubeCRDDependencyGraph {
         return prev.concat(component);
       }, [] as IComponent[]);
 
-      const component = this.result.graph.components[k];
       dependencies.forEach((d) => {
         // no self-dependencies
         if (d.clazz === component.component.clazz) return;
