@@ -38,6 +38,7 @@ import {
 } from './index.ts';
 import { KubeTargetIntrospection } from './target/intro.ts';
 import { KubeBuildContext } from './target/index.ts';
+import { JsonnetOptions } from '../../architect/src/index.ts';
 
 export interface KubeComponentArgs
   extends ComponentArgs<KubeComponentModelInput> {
@@ -332,6 +333,37 @@ export abstract class KubeComponent<
     config: KustomizeOpts = {},
   ): Promise<KubeResource[]> {
     return this.target.plugin.kustomize.build(dir, config);
+  }
+
+  /**
+   * Templates a file using Jsonnet
+   * @param filename The path to the Jsonnet file
+   * @param config Configuration to pass to Jsonnet
+   * @protected
+   */
+  protected async jsonnetTemplate(
+    filename: string,
+    config: JsonnetOptions = {}
+  ): Promise<string> {
+    return await this.target.plugin.jsonnet.template(filename, config);
+  }
+
+  /**
+   * Builds Kubernetes resources using Jsonnet
+   * @param filename The path to the Jsonnet file
+   * @param config Configuration to pass to Jsonnet
+   * @protected
+   */
+  protected async jsonnetBuild(
+    filename: string,
+    config: JsonnetOptions = {}
+  ): Promise<KubeResource[]> {
+    const result = await this.target.plugin.jsonnet.template(filename, {
+      ...config,
+      yamlStream: true
+    });
+
+    return this.target.app.kubeLoader.loadString(result);
   }
 }
 

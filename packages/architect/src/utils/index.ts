@@ -5,6 +5,7 @@
 export * from './config/index.ts';
 export * from './registry/index.ts';
 export * from './secrets/index.ts';
+export * from './shims/index.ts';
 export * from './structs/index.ts';
 export * from './async.ts';
 export * from './collections.ts';

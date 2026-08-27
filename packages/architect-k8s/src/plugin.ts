@@ -14,6 +14,7 @@ import { BuilderParams, GitBuilder, Helm, HttpBuilder, Kustomize, } from './inde
 import * as _client from '@kubernetes/client-node';
 import * as path from 'node:path';
 import { OCIHelper } from './helpers/oci.ts';
+import { JsonnetShim } from '../../architect/src/index.ts';
 
 export const K8S_PLUGIN_CLASS = "plugin.architect.glassway.net/kubernetes";
 
@@ -36,6 +37,7 @@ export class K8sPlugin extends Plugin {
   public kustomize: Kustomize;
   public gitBuilder: GitBuilder;
   public httpBuilder: HttpBuilder;
+  public jsonnet: JsonnetShim;
   public kubeConfig: _client.KubeConfig | undefined;
 
   constructor(parent: IArchitect) {
@@ -53,6 +55,7 @@ export class K8sPlugin extends Plugin {
     this.kustomize = new Kustomize(builderParams);
     this.gitBuilder = new GitBuilder(builderParams);
     this.httpBuilder = new HttpBuilder(builderParams);
+    this.jsonnet = new JsonnetShim();
   }
 
   public get config(): K8sPluginConfig {
