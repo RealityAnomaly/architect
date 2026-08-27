@@ -230,6 +230,11 @@ export abstract class KubeComponent<
     let changed = false;
     for (const [k, input] of Object.entries(state.model?.inputs || {})) {
       if (input.helm) {
+        if (input.helm.pin) {
+          state.logger?.info(`${this.constructor.name}: input '${k}' is pinned, not upgrading`);
+          continue
+        }
+
         const latest = await this.target.plugin.helm.getLatestVersion(
           input.helm.name,
           input.helm.repo,
@@ -248,6 +253,11 @@ export abstract class KubeComponent<
           input.helm.version = latest;
         }
       } else if (input.oci) {
+        if (input.oci.pin) {
+          state.logger?.info(`${this.constructor.name}: input '${k}' is pinned, not upgrading`);
+          continue
+        }
+
         const latest = await this.target.plugin.oci.getLatestVersion(input.oci.name, {
           coerce: input.oci.coerce,
           constraint: input.oci.constraint,
@@ -375,14 +385,18 @@ export interface KubeComponentContext {
   namespace?: string;
 }
 
-export interface KubeComponentInputOCIModel {
+export interface KubeComponentInputModel {
+  pin?: boolean;
+}
+
+export interface KubeComponentInputOCIModel extends KubeComponentInputModel{
   name: string;
   version: string;
   coerce?: boolean;
   constraint?: string;
 }
 
-export interface KubeComponentInputHelmModel {
+export interface KubeComponentInputHelmModel extends KubeComponentInputModel {
   name: string;
   repo: string;
   version: string;
@@ -425,6 +439,10 @@ const KubeComponentModelInputSchema: JSONSchemaType<KubeComponentModelInput> = {
         version: {
           type: 'string',
         },
+        pin: {
+          type: 'boolean',
+          nullable: true
+        },
         coerce: {
           type: 'boolean',
           nullable: true,
@@ -448,6 +466,10 @@ const KubeComponentModelInputSchema: JSONSchemaType<KubeComponentModelInput> = {
         },
         version: {
           type: 'string',
+        },
+        pin: {
+          type: 'boolean',
+          nullable: true
         },
         coerce: {
           type: 'boolean',
