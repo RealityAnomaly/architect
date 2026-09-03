@@ -16,6 +16,11 @@ export interface KubeComponentHelmResources
 export interface KubeComponentHelmOptions extends KubeComponentArgs {
   values?: object;
   helmOpts?: Partial<HelmChartOpts>;
+
+  /**
+   * Default chart name. If unset, it defaults to the name of the component.
+   */
+  defaultChartName?: string;
 }
 
 export abstract class KubeComponentHelm<
@@ -23,17 +28,22 @@ export abstract class KubeComponentHelm<
   TArgs extends KubeComponentHelmOptions = KubeComponentHelmOptions,
   TParent extends Component = Component,
 > extends KubeComponent<TResult, TArgs, TParent> {
-  public override async build(context: KubeBuildContext, resources: TResult = {} as TResult): Promise<TResult> {
+  public override async build(context: KubeBuildContext, resources: TResult = {} as TResult, values: object = {}, config: Partial<HelmChartOpts> = {}): Promise<TResult> {
     const props = await this.props.$resolve();
     const chart = props.inputs!.chart.helm!;
+    const defaultChartName = props.defaultChartName ?? this.name;
 
     resources.release = await this.helmTemplate(
       chart.name,
-      props.values || {},
+      { ...(props.values || {}), ...values },
       {
         repo: chart.repo,
         version: chart.version,
+        ...(chart.name !== defaultChartName ? {
+          releaseName: this.name
+        } : {}),
         ...props.helmOpts || {},
+        ...config
       },
     );
 
