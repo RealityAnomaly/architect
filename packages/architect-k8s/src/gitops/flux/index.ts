@@ -478,10 +478,12 @@ export class FluxCDController extends GitOpsController {
       } : {})
     };
 
+    const fluxReleaseName = config.gitops?.flux?.releaseName;
+
     //each resource adds to repo set, then all repos are created in flux-system
     const resource = new helmToolkitFluxcdIo.v2.HelmRelease({
       metadata: {
-        name: config.releaseName ?? chart,
+        name: fluxReleaseName ?? config.releaseName ?? chart,
         labels: Object.entries(labels).length ? labels : undefined
       },
       spec: {

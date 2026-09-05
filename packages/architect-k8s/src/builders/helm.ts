@@ -405,6 +405,11 @@ export interface HelmGitOpsConfig {
    * Options for FluxCD
    */
   flux?: {
+    /**
+     * Optional override for the name of the HelmRelease
+     */
+    releaseName?: string;
+
     valuesFrom?: {
       kind: 'ConfigMap' | 'Secret',
       name: string,
