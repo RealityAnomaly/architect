@@ -1,6 +1,12 @@
+import * as path from '@std/path';
 import { Shim } from '../shim.ts';
 
 export interface JsonnetOptions {
+  /**
+   * If set, will assume the target is a full Jsonnet project with a `jsonnetfile.json` and will use the `jsonnet-bundler` to resolve dependencies.
+   */
+  useBundler?: boolean;
+
   exec?: boolean;
   jpath?: string[];
   outputFile?: string;
@@ -28,8 +34,22 @@ export class JsonnetShim extends Shim {
     super(binary);
   }
 
+  // for templates: set -S and -m dist
   public async template(filename: string, options: JsonnetOptions = {}): Promise<string> {
     const params: string[] = [];
+    const dir = path.dirname(filename);
+
+    if (options.useBundler) {
+      await this.run(['install'], async (p) => p.stdout.text(), {
+        cwd: dir,
+        binary: 'jb'
+      });
+
+      options.createOutputDirs = true;
+
+      if (!options.jpath) options.jpath = [];
+      options.jpath.push('vendor');
+    }
 
     if (options.exec) params.push('--exec');
     if (options.jpath) options.jpath.forEach(j => params.push('--jpath', j));
@@ -54,6 +74,8 @@ export class JsonnetShim extends Shim {
 
     params.push(filename);
 
-    return await this.run(params, async (p) => p.stdout.text());
+    return await this.run(params, async (p) => p.stdout.text(), {
+      cwd: options.useBundler ? dir : undefined
+    });
   }
 }

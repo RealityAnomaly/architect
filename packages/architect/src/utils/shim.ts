@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 export interface ShimProcessOptions {
+  binary?: string;
   cwd?: string;
   env?: Record<string, string>;
   unbuffer?: boolean;
@@ -22,11 +23,13 @@ export class Shim {
   }
 
   protected async run<T>(params: string[], work: (p: Deno.ChildProcess) => Promise<T>, processOptions?: ShimProcessOptions): Promise<T> {
+    const binary = processOptions?.binary ?? this.binary;
+
     if (processOptions?.unbuffer) {
-      params.unshift(this.binary);
+      params.unshift(binary);
     }
 
-    const command = new Deno.Command(processOptions?.unbuffer ? 'unbuffer' : this.binary, {
+    const command = new Deno.Command(processOptions?.unbuffer ? 'unbuffer' : binary, {
       args: params,
       stdin: "piped",
       stdout: "piped",
@@ -47,7 +50,7 @@ export class Shim {
           await process.stdin.close();
       } catch (e) {
         await process.status;
-        lastError = new Error(`Failed to feed process ${this.binary}: ${e}`, {
+        lastError = new Error(`Failed to feed process ${binary}: ${e}`, {
           cause: await process.stderr.text()
         });
         continue;
@@ -58,7 +61,7 @@ export class Shim {
         processOptions?.allowedExitCodes &&
         processOptions.allowedExitCodes.includes(status.code)
       )) {
-        lastError = new Error(`Failed to run ${this.binary} with exit code ${status.code}`, {
+        lastError = new Error(`Failed to run ${binary} with exit code ${status.code}`, {
           cause: await process.stderr.text()
         });
         continue;
