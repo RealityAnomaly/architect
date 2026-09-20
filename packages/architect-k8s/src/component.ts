@@ -67,6 +67,9 @@ export abstract class KubeComponent<
   declare protected readonly _context: KubeContext;
   protected readonly sops: SOPSShim = new SOPSShim();
 
+  protected readonly labels: Record<string, string> = {};
+  protected readonly annotations: Record<string, string> = {};
+
   /**
    * Whether to enable adding standard requirements such as CNI and DNS
    */
@@ -220,6 +223,15 @@ export abstract class KubeComponent<
         KubeResourceUtilities.annotate(obj, {
           'architect.glassway.net/bootstrap': 'true'
         });
+      }
+
+      // apply our own labels and annotations
+      if (Object.keys(this.labels).length > 0) {
+        KubeResourceUtilities.label(obj, this.labels);
+      }
+
+      if (Object.keys(this.annotations).length > 0) {
+        KubeResourceUtilities.annotate(obj, this.annotations);
       }
 
       return obj;
