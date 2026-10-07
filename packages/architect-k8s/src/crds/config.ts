@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 import { HelmChartOpts } from '../builders/helm.ts';
-import { KustomizeOpts } from '../builders/kustomize.ts';
+import { KustomizeOpts } from '../builders/index.ts';
 
 export interface CrdsConfigLocal {
 }

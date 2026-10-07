@@ -16,7 +16,6 @@ import { MockTarget } from '../../target/__mocks__/target.ts';
 import { MockPlugin } from '../../plugin/__mocks__/plugin.ts';
 import { PluginClass } from '../../plugin/plugin.ts';
 import { Component, ComponentClass, ComponentLoader } from '../../component/index.ts';
-import { assertEquals } from '../../../vendor/progress/deps.test.ts';
 
 const model: ProjectConfig = { name: 'dependent' }
 

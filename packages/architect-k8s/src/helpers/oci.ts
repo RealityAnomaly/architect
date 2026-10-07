@@ -9,8 +9,8 @@ import { userInfo } from "node:os";
 
 import { Logger } from '@logtape/logtape';
 import { getImageReferenceParameters } from "oci-client/dist/parse-uri.js";
-import { generateAuthenticationHeaders } from "oci-client/dist/util/generate-authentication-headers.js";
 import { getLatestSemVer, SemVerOptions } from '@glassway/architect';
+import LinkHeader from 'http-link-header';
 
 export interface OCIVersions {
   name: string,
@@ -19,6 +19,7 @@ export interface OCIVersions {
 
 interface DockerConfig {
   auths?: Record<string, DockerCredentials>;
+  credsStore?: string;
   credHelpers?: Record<string, string>;
 }
 
@@ -29,15 +30,23 @@ interface DockerCredentialOutput {
 }
 
 interface DockerCredentials {
-  username: string;
-  password: string;
+  auth?: string;
+  username?: string;
+  password?: string;
 }
 
 export class OCIHelper {
   protected readonly logger: Logger;
+  private readonly bearerCache = new Map<string, string>();
 
   constructor(logger: Logger) {
     this.logger = logger;
+  }
+
+  private getBearerCacheName(url: string): string {
+    const u = new URL(url);
+    const match = u.pathname.match(/^\/v2\/(.+?)\/(?:tags|manifests|blobs)\//);
+    return `${u.origin}/${match ? match[1] : u.pathname}`;
   }
 
   public async getCredentials(registry: string) : Promise<DockerCredentials | undefined> {
@@ -48,16 +57,20 @@ export class OCIHelper {
       if (!result.isFile) return undefined;
 
       const config = JSON.parse(await Deno.readTextFile(configPath)) as DockerConfig;
-      // try auth value first
-      if (config.auths && registry in config.auths) {
-        const auth = config.auths[registry];
-        if ('username' in auth && 'password' in auth) return auth;
+
+      const entry = config.auths?.[registry];
+      if (entry?.username && entry?.password) {
+        return { username: entry.username, password: entry.password };
       }
 
-      // strip off any port suffix
-      registry = registry.split(':')[0];
-      if (!config.credHelpers || !(registry in config.credHelpers)) return undefined;
-      const helper = config.credHelpers[registry];
+      if (entry?.auth) {
+        const decoded = atob(entry.auth);
+        const sep = decoded.indexOf(":");
+        if (sep > 0) return { username: decoded.slice(0, sep), password: decoded.slice(sep + 1) };
+      }
+
+      const helper = config.credHelpers?.[registry] ?? config.credsStore;
+      if (!helper) return undefined;
 
       const command = new Deno.Command(`docker-credential-${helper}`, {
         args: ['get'],
@@ -80,8 +93,8 @@ export class OCIHelper {
       const output: DockerCredentialOutput = await process.stdout.json();
 
       return {
-        username: output['Username'],
-        password: output['Secret']
+        username: output.Username,
+        password: output.Secret
       }
     } catch (e) {
       this.logger.debug(`Failed to run credential helper: ${e}`)
@@ -89,11 +102,21 @@ export class OCIHelper {
     }
   }
 
-  private async fetchAuthenticate(url: string, headers?: Record<string, string>) {
-    let response = await fetch(url, {
-      headers: headers
-    });
+  private async fetchAuthenticate(url: string, credentials?: DockerCredentials) {
+    const key = this.getBearerCacheName(url);
+    const cached = this.bearerCache.get(key);
 
+    if (cached) {
+      const response = await fetch(url, {
+        headers: { Authorization: cached },
+      });
+      if (response.status !== 401) return response;
+
+      await response.body?.cancel();
+      this.bearerCache.delete(key);
+    }
+
+    let response = await fetch(url);
     if (response.ok) return response;
 
     const authenticate = response.headers.get("www-authenticate");
@@ -107,43 +130,77 @@ export class OCIHelper {
 
       const filtered: [string, string][] = Object.entries(params).filter(o => o[0] !== "realm");
       const sp = new URLSearchParams(filtered);
-      const authResult = await fetch(`${params.realm}?${sp.toString()}`);
-      const token = (await authResult.json())["token"];
+      const tokenHeaders: Record<string, string> = {};
+      if (credentials) {
+        tokenHeaders.Authorization = `Basic ${btoa(`${credentials.username}:${credentials.password}`)}`;
+      }
 
-      response = await fetch(url, {
-        headers: Object.assign({}, headers, {Authorization: `${scheme} ${token}`})
-      });
+      const authResult = await fetch(`${params.realm}?${sp.toString()}`, { headers: tokenHeaders });
+      const body = await authResult.json();
+      const token = body["token"] ?? body["access_token"];
+
+      if (token) {
+        const authorization = `${scheme} ${token}`;
+        response = await fetch(url, {
+          headers: { Authorization: authorization },
+        });
+
+        if (response.ok) {
+          this.bearerCache.set(key, authorization);
+          return response;
+        }
+
+        await response.body?.cancel();
+      }
     }
-
-    if (response.ok) return response;
 
     // finally try with anonymous bearer token as a last resort
     // required for stuff like ghcr.io?
-    return await fetch(url, {
-      headers: Object.assign({}, headers, {Authorization: 'Bearer QQ=='})
+    const anonymous = 'Bearer QQ==';
+    response = await fetch(url, {
+      headers: { Authorization: anonymous }
     });
+
+    if (response.ok) this.bearerCache.set(key, anonymous);
+    return response;
   }
 
-  private async fetchVersions(ref: client.ImageReferenceUriOrParams, auth?: client.RegistryAuthentication): Promise<OCIVersions> {
-    const imageRefParams = getImageReferenceParameters(ref);
+  private async fetchVersions(ref: client.ImageReferenceUriOrParams, credentials?: DockerCredentials): Promise<OCIVersions> {
+    function parseNextLink(header: string | null, base: string): string | undefined {
+      if (!header) return undefined;
 
-    const registryPort =
-      new URL(`dummyprotocol://${imageRefParams.registry}`).port || 443;
-    const fetchProtocol = registryPort === 443 ? "https:" : "http:";
-
-    const authHeaders = generateAuthenticationHeaders(auth);
-    const tagsUrl =
-      `${fetchProtocol}//${imageRefParams.registry}/v2/${imageRefParams.repository}/tags/list`;
-
-    const manifestResponse = await this.fetchAuthenticate(tagsUrl, authHeaders);
-
-    if (!manifestResponse.ok) {
-      throw new Error(
-        `Failed to fetch versions: ${manifestResponse.status} ${manifestResponse.statusText}`,
-      );
+      const [next] = LinkHeader.parse(header).rel("next");
+      return next ? new URL(next.uri, base).toString() : undefined;
     }
 
-    return await manifestResponse.json() as OCIVersions;
+    const imageRefParams = getImageReferenceParameters(ref);
+    //const portString = new URL(`dummyprotocol://${imageRefParams.registry}`).port;
+    //const registryPort = portString ? parseInt(portString) : 443;
+    const base = `https://${imageRefParams.registry}`;
+
+    const result: OCIVersions = { name: imageRefParams.repository, tags: [] };
+    const visited = new Set<string>();
+
+    let next: string | undefined = `${base}/v2/${imageRefParams.repository}/tags/list`;
+
+    while (next && !visited.has(next)) {
+      visited.add(next);
+
+      const response = await this.fetchAuthenticate(next, credentials);
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch versions: ${response.status} ${response.statusText}`,
+        );
+      }
+
+      const page = await response.json() as Partial<OCIVersions>;
+      if (page.name) result.name = page.name;
+      if (page.tags) result.tags.push(...page.tags);
+
+      next = parseNextLink(response.headers.get("link"), response.url);
+    }
+
+    return result;
   }
 
   public async getLatestVersion(repository: string, options?: SemVerOptions): Promise<string | undefined> {
@@ -160,11 +217,17 @@ export class OCIHelper {
       host = "registry-1.docker.io"
     }
 
+    if (host === "docker.io" || host === "index.docker.io") {
+      host = "registry-1.docker.io";
+    }
+
     const uri = `oci://${host}/${parts.join("/")}`;
+    const credentials = await this.getCredentials(host);
+
     let versions: OCIVersions;
 
     try {
-      versions = await this.fetchVersions(uri);
+      versions = await this.fetchVersions(uri, credentials);
     } catch (e) {
       this.logger.error(`OCI version fetch failed for ${uri}: ${e}`);
       return undefined;

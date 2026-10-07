@@ -92,7 +92,7 @@ export class Architect implements IArchitect {
     for (const project of this.getProjects()) {
       // register plugins for all projects
       for (const plugin of project.getPlugins()) {
-        await this._pluginRegistry.register(plugin, this);
+        this._pluginRegistry.register(plugin, this);
       }
 
       // register project modules against CRD registry

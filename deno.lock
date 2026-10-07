@@ -36,6 +36,7 @@
     "jsr:@std/url@~0.225.1": "0.225.1",
     "jsr:@std/yaml@^1.1.2": "1.1.2",
     "npm:@kubernetes/client-node@^1.4.0": "1.4.0",
+    "npm:@types/http-link-header@^1.0.7": "1.0.7",
     "npm:@types/js-yaml@^4.0.9": "4.0.9",
     "npm:@types/lodash@^4.17.24": "4.17.24",
     "npm:@types/object-hash@^3.0.6": "3.0.6",
@@ -49,6 +50,7 @@
     "npm:commander@15.0.0": "15.0.0",
     "npm:commander@^12.1.0": "12.1.0",
     "npm:fast-glob@^3.3.3": "3.3.3",
+    "npm:http-link-header@^1.1.4": "1.1.4",
     "npm:is-cidr@7": "7.0.0",
     "npm:js-yaml@^4.3.0": "4.3.0",
     "npm:lodash@^4.18.1": "4.18.1",
@@ -264,6 +266,12 @@
       "dependencies": [
         "@ts-graphviz/ast",
         "@ts-graphviz/common"
+      ]
+    },
+    "@types/http-link-header@1.0.7": {
+      "integrity": "sha512-snm5oLckop0K3cTDAiBnZDy6ncx9DJ3mCRDvs42C884MbVYPP74Tiq2hFsSDRTyjK6RyDYDIulPiW23ge+g5Lw==",
+      "dependencies": [
+        "@types/node"
       ]
     },
     "@types/js-yaml@4.0.9": {
@@ -556,6 +564,9 @@
     },
     "hpagent@1.2.0": {
       "integrity": "sha512-A91dYTeIB6NoXG+PxTQpCCDDnfHsW9kc06Lvpu1TEe9gnd6ZFeiBoRO9JvzEv6xK7EX97/dUE8g/vBMTqTS3CA=="
+    },
+    "http-link-header@1.1.4": {
+      "integrity": "sha512-xT3GPW6/ZbGuw4UvwHqErSCEjNUlwbQJuZn9/q5U4WEKfp2kENVCAlousG1zLxHeaQ/ffOHUNpWamvkbBW0eNw=="
     },
     "ip-address@10.2.0": {
       "integrity": "sha512-/+S6j4E9AHvW9SWMSEY9Xfy66O5PWvVEJ08O0y5JGyEKQpojb0K0GKpz/v5HJ/G0vi3D2sjGK78119oXZeE0qA=="
@@ -900,6 +911,7 @@
           "jsr:@match/match@0.1",
           "jsr:@std/encoding@^1.0.11",
           "npm:@kubernetes/client-node@^1.4.0",
+          "npm:@types/http-link-header@^1.0.7",
           "npm:@types/js-yaml@^4.0.9",
           "npm:@types/lodash@^4.17.24",
           "npm:@types/object-hash@^3.0.6",
@@ -907,6 +919,7 @@
           "npm:appdirsjs@^1.2.7",
           "npm:commander@^12.1.0",
           "npm:fast-glob@^3.3.3",
+          "npm:http-link-header@^1.1.4",
           "npm:js-yaml@^4.3.0",
           "npm:lodash@^4.18.1",
           "npm:object-hash@3",

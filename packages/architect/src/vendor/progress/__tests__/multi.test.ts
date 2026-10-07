@@ -3,7 +3,6 @@
 // SPDX-License-Identifier: MIT
 
 import { MultiProgressBar } from "../mod.ts";
-import { delay } from "../deps.example.ts";
 import { DummyWriter } from '../../../utils/test/helpers.ts';
 
 Deno.test(`Use MultiProgressBar in a deno test`, async () => {
