@@ -479,6 +479,8 @@ export class FluxCDController extends GitOpsController {
     };
 
     const fluxReleaseName = config.gitops?.flux?.releaseName;
+    const hasAnnotations = config.annotations && Object.keys(config.annotations).length > 0;
+    const hasLabels = config.labels && Object.keys(config.labels).length > 0;
 
     //each resource adds to repo set, then all repos are created in flux-system
     const resource = new helmToolkitFluxcdIo.v2.HelmRelease({
@@ -499,6 +501,10 @@ export class FluxCDController extends GitOpsController {
             interval: '5m'
           }
         },
+        commonMetadata: (hasAnnotations || hasLabels) ? {
+          annotations: hasAnnotations ? config.annotations : undefined,
+          labels: hasLabels ? config.labels : undefined
+        } : undefined,
         postRenderers: [{
           kustomize: {
             patches: (config.patches ?? []).map(p => {

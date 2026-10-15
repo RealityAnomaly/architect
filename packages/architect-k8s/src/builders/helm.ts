@@ -443,6 +443,16 @@ export interface HelmChartOpts {
   patches?: KustomizePatch[];
 
   /**
+   * Annotations to apply to all resources
+   */
+  annotations?: Record<string, string>;
+
+  /**
+   * Labels to apply to all resources
+   */
+  labels?: Record<string, string>;
+
+  /**
    * Kubernetes api versions used for Capabilities.APIVersions
    */
   apiVersions?: string[];
