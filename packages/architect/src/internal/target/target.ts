@@ -285,6 +285,7 @@ export class Target implements ITarget {
 
           let result = undefined;
           try {
+            await v.component.preBuild(context);
             result = await v.component.build(context);
           } catch (e) {
             const message = e instanceof Error ? e.message : 'Unknown exception';

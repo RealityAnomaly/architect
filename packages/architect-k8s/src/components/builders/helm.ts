@@ -47,6 +47,6 @@ export abstract class KubeComponentHelm<
       },
     );
 
-    return super.build(context, resources as TResult);
+    return await super.build(context, resources as TResult);
   }
 }

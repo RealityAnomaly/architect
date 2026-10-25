@@ -176,6 +176,10 @@ export abstract class KubeComponent<
     return `${this.context.namespace + '/' + this.context.name}`;
   }
 
+  public override async preBuild(context: KubeBuildContext): Promise<void> {
+    await super.preBuild(context);
+  }
+
   public override async build(context: KubeBuildContext, result?: TResult): Promise<TResult> {
     result = await super.build(context, result);
 

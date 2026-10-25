@@ -82,6 +82,13 @@ export interface IComponent<
   get props(): LazyAuto<TArgs>;
 
   /**
+   * Resolved version of the runtime configuration tree.
+   * Note that this is only accessible after {@link IComponent.preBuild} runs, so either in {@link IComponent.build} or {@link IComponent.postBuild}.
+   * If you need to access the configuration tree at other times, use {@link IComponent.props} and call .$resolve() on the tree yourself.
+   */
+  get args(): TArgs;
+
+  /**
    * Returns this component's short result ID (RID), i.e. 'foobar-b475d49'.
    */
   get rid(): string;
@@ -113,6 +120,12 @@ export interface IComponent<
    * Returns a list of {@link IComponentMatcher} defining the runtime dependencies of this component.
    */
   getRequirements(): Promise<IComponentMatcher[]>;
+
+  /**
+   * Runs right before {@link IComponent.build}.
+   * @param context The context for the build.
+   */
+  preBuild(context: BuildContext): Promise<void>;
 
   /**
    * Constructs the component's resources. The TResult passed in is used to stack resources from parent classes.
@@ -173,6 +186,7 @@ export class Component<
   protected readonly _independent: boolean;
 
   protected readonly _props: LazyAuto<TArgs>;
+  protected _args: TArgs | undefined;
   private _metadata?: ComponentMetadata;
   private readonly _logger: logtape.Logger;
   protected _validator?: ValidateFunction<unknown>;
@@ -245,6 +259,14 @@ export class Component<
     return this._props;
   }
 
+  public get args(): TArgs {
+    if (!this._args) {
+      throw new Error('Component.args is only accessible inside build() and postBuild(), use this.props instead')
+    }
+
+    return this._args;
+  }
+
   public get rid(): string {
     return Component.rid(this._context.name, this._context);
   }
@@ -294,6 +316,11 @@ export class Component<
     }
 
     return [];
+  }
+
+  // noinspection JSUnusedGlobalSymbols
+  public async preBuild(_context: BuildContext): Promise<void> {
+    this._args = await this.props.$resolve() as TArgs;
   }
 
   // noinspection JSUnusedGlobalSymbols

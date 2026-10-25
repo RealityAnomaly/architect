@@ -69,6 +69,7 @@ export class MockComponent implements IComponent {
   async getRequirements(): Promise<IComponentMatcher[]> {
     return [];
   }
+  async preBuild(context: BuildContext): Promise<void> {}
   async build(context: BuildContext, result?: object | undefined): Promise<object> {
     return this._result();
   }

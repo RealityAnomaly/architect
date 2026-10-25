@@ -21,7 +21,12 @@ export class ContextUtils {
     context?: Partial<Context>,
     force?: boolean,
   ): Context {
-    if (!context) context = {};
+    if (context) {
+      context = structuredClone(context);
+    } else {
+      context = {};
+    }
+
     if (
       (!context.name || force) &&
       Reflect.hasMetadata(Constants.CLASS_META_KEY, token)
