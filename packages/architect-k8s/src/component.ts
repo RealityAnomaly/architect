@@ -93,6 +93,8 @@ export abstract class KubeComponent<
       KubeComponentContextSchema,
       KubeComponentModelInputSchema,
     );
+
+    this.labels['architect.glassway.net/component'] = this.context.name;
   }
 
   public override get target(): IKubeTarget {
@@ -174,10 +176,6 @@ export abstract class KubeComponent<
 
   public override toString(): string {
     return `${this.context.namespace + '/' + this.context.name}`;
-  }
-
-  public override async preBuild(context: KubeBuildContext): Promise<void> {
-    await super.preBuild(context);
   }
 
   public override async build(context: KubeBuildContext, result?: TResult): Promise<TResult> {

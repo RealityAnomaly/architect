@@ -16,6 +16,7 @@ export class CrdsComponent extends KubeComponent {
   private readonly enabledGVKs: GVK[] = [];
 
   public override init(): void {
+    super.init();
     this.setBootstrap(true);
     this.standardRequirements = false;
   }
