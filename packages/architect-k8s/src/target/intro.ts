@@ -5,7 +5,7 @@
 import * as _client from '@kubernetes/client-node';
 import * as net from 'node:net';
 
-import { TargetIntrospection } from '@glassway/architect';
+import { TargetIntrospection, AsyncHelpers, NetHelpers } from '@glassway/architect';
 
 interface KubeTargetStateNodes {
   control: number;
@@ -19,12 +19,15 @@ export interface KubeTargetState {
   nodes: KubeTargetStateNodes;
 }
 
+const CONTROL_PLANE = 'node-role.kubernetes.io/control-plane';
+
 /**
  * Provides access to the deployed properties of a Kubernetes cluster
  */
 export class KubeTargetIntrospection extends TargetIntrospection<KubeTargetState> {
   protected readonly config: () => _client.KubeConfig;
   protected _api: _client.CoreV1Api | undefined;
+  private readonly cache = AsyncHelpers.singleFlight(() => this.fetchState());
 
   constructor(config: () => _client.KubeConfig) {
     super();
@@ -39,7 +42,11 @@ export class KubeTargetIntrospection extends TargetIntrospection<KubeTargetState
     return this._api;
   }
 
-  public override async loadState(): Promise<KubeTargetState> {
+  public override loadState(): Promise<KubeTargetState> {
+    return this.cache();
+  }
+
+  public async fetchState(): Promise<KubeTargetState> {
     const version = await this.getVersion();
     const nodes = await this.getNodes();
 
@@ -51,12 +58,12 @@ export class KubeTargetIntrospection extends TargetIntrospection<KubeTargetState
 
   protected async getVersion(): Promise<string> {
     const api = this.config().makeApiClient(_client.VersionApi);
-    const response = await api.getCode();
+    const response = await NetHelpers.withDnsRetry(() => api.getCode());
     return response['gitVersion'];
   }
 
   protected async getNodes(): Promise<KubeTargetStateNodes> {
-    const nodes = await this.api.listNode();
+    const nodes = await NetHelpers.withDnsRetry(() => this.api.listNode());
     const ipFamilies = new Set();
 
     let control = 0;
@@ -64,12 +71,15 @@ export class KubeTargetIntrospection extends TargetIntrospection<KubeTargetState
 
     for (const node of nodes.items) {
       const labels = node?.metadata?.labels ?? ({});
-      if ("node-role.kubernetes.io/control-plane" in labels) {
+      if (CONTROL_PLANE in labels) {
         control++;
       }
 
       // control plane nodes without the taint are treated as workers
-      if (!("node-role.kubernetes.io/control-plane:NoSchedule" in labels)) {
+      const noSchedule = (node.spec?.taints ?? []).some(
+        (t) => t.key === CONTROL_PLANE && t.effect === 'NoSchedule',
+      );
+      if (!noSchedule) {
         worker++;
       }
 
