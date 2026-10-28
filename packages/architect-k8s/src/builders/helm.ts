@@ -438,6 +438,11 @@ export interface HelmChartOpts {
   gitops?: HelmGitOpsConfig;
 
   /**
+   * Virtual cluster to deploy into
+   */
+  vcluster?: string;
+
+  /**
    * A list of patches for the Kustomize post renderer
    */
   patches?: KustomizePatch[];

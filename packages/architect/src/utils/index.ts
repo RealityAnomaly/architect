@@ -13,5 +13,6 @@ export * from './hashing.ts';
 export * from './semver.ts';
 export * from './shim.ts';
 export * from './state.ts';
+export * from './strings.ts';
 export * from './types.ts';
 export * from './validator.ts';

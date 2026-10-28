@@ -5,5 +5,13 @@
 import { Context } from '../utils/index.ts';
 
 export interface KubeContext extends Context {
+  /**
+   * Virtual cluster the resources are created in
+   */
+  vcluster?: string;
+
+  /**
+   * Namespace of the resources
+   */
   namespace?: string;
 }

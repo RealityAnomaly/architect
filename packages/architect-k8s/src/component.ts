@@ -325,6 +325,7 @@ export abstract class KubeComponent<
     const state = await this.introspection.getState();
 
     config = toolkit.merge({
+      vcluster: this.context.vcluster,
       namespace: this.context.namespace,
       kubeVersion: state.version,
       includeCRDs: true,

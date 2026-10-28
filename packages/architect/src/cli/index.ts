@@ -275,7 +275,8 @@ class App {
       }
     }
 
-    if (!changes) {
+    const applyOptions = options as AppCommandApplyOptions;
+    if (!changes && !applyOptions.force) {
       console.log('No changes to apply');
       Deno.exit(0);
     }
@@ -286,7 +287,6 @@ class App {
 
     const architect = this.instanceAsserted();
     const logger = architect.logger;
-    const applyOptions = options as AppCommandApplyOptions;
 
     const promises = Object.values(results).map(async v => {
       await v.target.apply(v, {

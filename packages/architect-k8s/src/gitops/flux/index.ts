@@ -48,6 +48,7 @@ export class FluxCDController extends GitOpsController {
   protected readonly logger: logtape.Logger;
   private readonly oci: OCIHelper;
   private readonly helmRepos: Set<string> = new Set<string>();
+  private readonly vclusters: Set<string> = new Set<string>();
 
   private _cosignKey: Record<string, string> | undefined;
 
@@ -68,7 +69,7 @@ export class FluxCDController extends GitOpsController {
   }
 
   // TODO: we write twice, once during diff, and then again during apply. We should figure out a way to deduplicate this call
-  public async diff(result: Result, _params?: TargetDiffParams, _logger?: logtape.Logger, listener?: ICompileListener): Promise<DiffResult> {
+  public async diff(result: Result, _params?: TargetDiffParams, logger?: logtape.Logger, listener?: ICompileListener): Promise<DiffResult> {
     const tmpdir = await Deno.makeTempDir();
 
     try {
@@ -84,7 +85,7 @@ export class FluxCDController extends GitOpsController {
         progressBar: false // don't attempt to write progress bar to captured stdout
       }
 
-      listener?.setTotal(entries.length + 1);
+      listener?.setTotal(entries.length);
       const results = Object.fromEntries(await Promise.all(entries.map(async name => {
         const resolved = result.graph.components[name];
         const ctx = resolved.component.context as KubeContext;
@@ -97,12 +98,19 @@ export class FluxCDController extends GitOpsController {
 
         try {
           await Deno.writeTextFile(tempKsFile, KubeWriter.stringify(kustomization));
-          const output = await this.shim.diffKustomization(this.componentName(resolved.component), {
-            ...commonOptions,
-            kustomizationFile: tempKsFile,
-            namespace: ctx.namespace!,
-            path: path.join(tmpdir, 'components', ctx.namespace!, ctx.name)
-          });
+          let output: string = '';
+
+          const name = this.componentName(resolved.component);
+          if (resolved.component.context.vcluster) {
+            logger?.warn(`${name}: vcluster diff currently not supported`)
+          } else {
+            output = await this.shim.diffKustomization(name, {
+              ...commonOptions,
+              kustomizationFile: tempKsFile,
+              namespace: ctx.namespace!,
+              path: path.join(tmpdir, 'components', ctx.namespace!, ctx.name)
+            });
+          }
 
           listener?.onResourceEnd();
           return [name, output]
@@ -111,24 +119,38 @@ export class FluxCDController extends GitOpsController {
         }
       })));
 
-      // also diff the cluster kustomization for changes in top level resource sets
-      listener?.setStatus('Diffing Cluster Component');
-      const kustomization = this.clusterKustomization();
-      const tempKsFile = await Deno.makeTempFile({
-        suffix: '.yaml'
-      });
+      // also diff the cluster kustomizations for changes in top level resource sets
+      await this.writeClusters(result, tmpdir);
+      listener?.setStatus('Diffing Cluster Components');
 
-      try {
-        await Deno.writeTextFile(tempKsFile, KubeWriter.stringify(kustomization));
-        results['cluster'] = await this.shim.diffKustomization('cluster', {
-          ...commonOptions,
-          kustomizationFile: tempKsFile,
-          namespace: 'flux-system',
-          path: path.join(tmpdir, 'cluster')
+      const clusterEntries = [this.clusterKustomization()]
+      for (const vcluster of this.vclusters)
+        clusterEntries.push(this.clusterKustomization(vcluster));
+      listener?.setTotal(entries.length + clusterEntries.length);
+
+      await Promise.all(clusterEntries.map(async kustomization => {
+        const tempKsFile = await Deno.makeTempFile({
+          suffix: '.yaml'
         });
-      } finally {
-        await Deno.remove(tempKsFile);
-      }
+
+        try {
+          await Deno.writeTextFile(tempKsFile, KubeWriter.stringify(kustomization));
+          const name = kustomization.metadata!.name!;
+          if (name.startsWith('vcluster')) {
+            results[name] = '';
+            logger?.warn(`${name}: vcluster diff currently not supported`)
+          } else {
+            results[name] = await this.shim.diffKustomization(name, {
+              ...commonOptions,
+              kustomizationFile: tempKsFile,
+              namespace: kustomization.metadata!.namespace!,
+              path: path.join(tmpdir, kustomization.metadata!.name!)
+            });
+          }
+        } finally {
+          await Deno.remove(tempKsFile);
+        }
+      }));
 
       listener?.onResourceEnd();
       return results;
@@ -144,6 +166,7 @@ export class FluxCDController extends GitOpsController {
 
     try {
       await this.write(result, tmpdir);
+      await this.writeClusters(result, tmpdir);
 
       // TODO: how should dry run really behave in GitOps mode?
       if (!_params?.dryRun) {
@@ -168,7 +191,7 @@ export class FluxCDController extends GitOpsController {
       if (this.params.sources.oci.signing?.cosign)
         await this.getCosignKey();
 
-      listener?.setTotal(entries.length + 1);
+      listener?.setTotal(entries.length + 1 + this.vclusters.size);
       const push = async (k: string) => {
         const resolved = result.graph.components[k];
         const ctx = resolved.component.context as KubeContext;
@@ -178,9 +201,15 @@ export class FluxCDController extends GitOpsController {
       }
 
       await Promise.all(entries.map(async e => await push(e)));
-      listener?.setStatus('Pushing Cluster OCI Image');
+      listener?.setStatus('Pushing Cluster OCI Images');
       await this.uploadOCI(path.join(dir, 'cluster'), 'cluster');
       listener?.onResourceEnd();
+
+      for (const vcluster of this.vclusters) {
+        const name = `vcluster-${vcluster}`;
+        await this.uploadOCI(path.join(dir, name), name);
+        listener?.onResourceEnd();
+      }
     } else {
       throw new Error('unsupported flux source type');
     }
@@ -243,13 +272,27 @@ export class FluxCDController extends GitOpsController {
   private async write(result: Result, dir: string) {
     // write all the components
     const writer = result.writer as KubeWriter;
-    await writer.write(result, path.join(dir, "components"), {
+    await writer.write(result, path.join(dir, 'components'), {
       format: KubeWriterOutputFormat.PerComponent,
       gitops: this
     });
+  }
 
-    // write the cluster dir
-    const clusterDir = path.join(dir, "cluster");
+  private async writeResources(resources: KubeResource[], dir: string) {
+    for (const resource of resources) {
+      await Deno.writeTextFile(
+        path.join(
+          dir,
+          `${KubeResourceUtilities.resourceId(resource)}.yaml`,
+        ),
+        KubeWriter.stringify(resource),
+      );
+    }
+  }
+
+  private async writeClusters(result: Result, dir: string) {
+    // write the cluster dirs
+    const clusterDir = path.join(dir, 'cluster');
     await Deno.mkdir(clusterDir);
     const resources: KubeResource[] = [];
 
@@ -261,14 +304,26 @@ export class FluxCDController extends GitOpsController {
       }),
     );
 
-    for (const resource of resources) {
-      await Deno.writeTextFile(
-        path.join(
-          clusterDir,
-          `${KubeResourceUtilities.resourceId(resource)}.yaml`,
-        ),
-        KubeWriter.stringify(resource),
-      );
+    await this.writeResources(resources, clusterDir);
+
+    for (const vcluster of this.vclusters) {
+      const vclusterDir = path.join(dir, `vcluster-${vcluster}`);
+      await Deno.mkdir(vclusterDir);
+      const vclusterResources: KubeResource[] = [];
+
+      // vcluster: write namespaces
+      Object.entries(result.components).map(([k, v]) => {
+        const component = result.graph.components[k];
+        const resolved = component.component as KubeComponent;
+        if (resolved.context.vcluster === vcluster) {
+          for (const resource of (v as KubeResource[])) {
+            if (GVK.fromResource(resource).compare(GVK.fromCtor(api.v1.Namespace)))
+              vclusterResources.push(resource);
+          }
+        }
+      });
+
+      await this.writeResources(vclusterResources, vclusterDir);
     }
   }
 
@@ -286,6 +341,8 @@ export class FluxCDController extends GitOpsController {
 
     const component = resolved.component as KubeComponent;
     const cid = this.componentName(resolved.component);
+    if (component.context.vcluster)
+      this.vclusters.add(component.context.vcluster)
 
     const resourceCopy = Array.from(resources);
     const namespaces = CollectionUtilities.takeFrom(resourceCopy, r => {
@@ -366,7 +423,9 @@ export class FluxCDController extends GitOpsController {
         commonMetadata: {
           labels: commonLabels
         },
-        dependsOn: resolved.dependencies.map((d) => {
+        // no dependsOn for vcluster
+        // TODO: should depend on vcluster itself later?
+        dependsOn: component.context.vcluster ? undefined : resolved.dependencies.map((d) => {
           return {
             apiVersion: 'fluxcd.controlplane.io/v1',
             kind: 'ResourceSet',
@@ -377,7 +436,10 @@ export class FluxCDController extends GitOpsController {
         }),
         wait: true,
         steps: [
-          { name: 'namespaces', timeout: '1m', resources: namespaces },
+          // vcluster namespaces get applied at the cluster level by the cluster kustomization
+          ...(component.context.vcluster ? [] : [
+            { name: 'namespaces', timeout: '1m', resources: namespaces },
+          ]),
           { name: 'prelude', timeout: '1m', resources: prelude },
           { name: 'sources', timeout: '2m', resources: sources },
           { name: 'kustomizations', timeout: '15m', resources: kustomizations },
@@ -389,38 +451,57 @@ export class FluxCDController extends GitOpsController {
     });
   }
 
+  private async clusterOCIRepository(vcluster?: string): Promise<sourceToolkitFluxcdIo.v1.OCIRepository> {
+    const name = vcluster ? `vcluster-${vcluster}` : 'cluster';
+
+    const oci = this.params.sources!.oci!;
+    const repository = new sourceToolkitFluxcdIo.v1.OCIRepository({
+      metadata: {
+        name: name,
+        namespace: vcluster ? name : 'flux-system',
+        annotations: {
+          ...(vcluster ? {} : {
+            'architect.glassway.net/gitops-exclude': 'true',
+          })
+        }
+      },
+      spec: {
+        interval: '1m0s',
+        url: await this.getOCIPrefix(),
+        ref: {
+          tag: name
+        },
+        verify: oci.signing?.cosign ? {
+          provider: 'cosign',
+          secretRef: oci.signing.cosign.secretRef
+        } : undefined,
+        secretRef: oci.secretRef
+      }
+    });
+
+    KubeResourceUtilities.protect(repository);
+    return repository;
+  }
+
   public override async clusterObjects(context: KubeBuildContext): Promise<KubeResource[]> {
     const resources: KubeResource[] = [];
+    const vclusters = new Set<string>();
+
+    for (const component of Object.values(context.graph.components)) {
+      const resolved = component.component as KubeComponent;
+      if (resolved.context.vcluster) vclusters.add(resolved.context.vcluster);
+    }
 
     if (this.params.sources.oci) {
-      const oci = this.params.sources.oci;
-      const repository = new sourceToolkitFluxcdIo.v1.OCIRepository({
-        metadata: {
-          name: 'cluster',
-          namespace: 'flux-system',
-          annotations: {
-            'architect.glassway.net/gitops-exclude': 'true',
-          }
-        },
-        spec: {
-          interval: '1m0s',
-          url: await this.getOCIPrefix(),
-          ref: {
-            tag: 'cluster'
-          },
-          verify: oci.signing?.cosign ? {
-            provider: 'cosign',
-            secretRef: oci.signing.cosign.secretRef
-          } : undefined,
-          secretRef: oci.secretRef
-        }
-      });
-
-      KubeResourceUtilities.protect(repository);
+      const repository = await this.clusterOCIRepository()
       resources.push(repository);
-
       const kustomization = this.clusterKustomization();
       resources.push(kustomization);
+
+      for (const vcluster of vclusters) {
+        resources.push(await this.clusterOCIRepository(vcluster));
+        resources.push(this.clusterKustomization(vcluster));
+      }
     }
 
     // add in helm repos (deduplicated clusterwide)
@@ -472,9 +553,19 @@ export class FluxCDController extends GitOpsController {
     const ident = this.urlToChartIdent(url);
     this.helmRepos.add(config.repo);
 
+    const position = config.gitops?.position;
+
+    if (config.vcluster) {
+      // vcluster-deployed charts must be at the top level of the ResourceSet
+      // as the vcluster cannot deploy its own HelmReleases through a Kustomization
+      const positions = ['body', 'epilogue'];
+      if (position && !positions.includes(position))
+        throw new Error(`unsupported position for vcluster chart: ${position}`);
+    }
+
     const labels = {
-      ...(config.gitops?.position ? {
-        'architect.glassway.net/position': config.gitops.position
+      ...(position ? {
+        'architect.glassway.net/position': position
       } : {})
     };
 
@@ -486,6 +577,8 @@ export class FluxCDController extends GitOpsController {
     const resource = new helmToolkitFluxcdIo.v2.HelmRelease({
       metadata: {
         name: fluxReleaseName ?? config.releaseName ?? chart,
+        // note: for vcluster deployments, namespace must match the vcluster namespace
+        namespace: config.vcluster ? `vcluster-${config.vcluster}` : undefined,
         labels: Object.entries(labels).length ? labels : undefined
       },
       spec: {
@@ -536,7 +629,14 @@ export class FluxCDController extends GitOpsController {
           enable: !(config.skipTests === false)
         },
         values: values,
-        valuesFrom: config.gitops?.flux?.valuesFrom
+        valuesFrom: config.gitops?.flux?.valuesFrom,
+        kubeConfig: config.vcluster ? {
+          secretRef: {
+            name: `vc-${config.vcluster}-flux`,
+            key: 'config'
+          }
+        } : undefined,
+        targetNamespace: config.vcluster ? config.namespace : undefined
       }
     });
 
@@ -606,13 +706,17 @@ export class FluxCDController extends GitOpsController {
     };
   }
 
-  private clusterKustomization() {
+  private clusterKustomization(vcluster?: string) {
+    const name = vcluster ? `vcluster-${vcluster}` : 'cluster';
+
     const kustomization = new kustomizeToolkitFluxcdIo.v1.Kustomization({
       metadata: {
-        name: 'cluster',
-        namespace: 'flux-system',
+        name: name,
+        namespace: vcluster ? `vcluster-${vcluster}` : 'flux-system',
         annotations: {
-          'architect.glassway.net/gitops-exclude': 'true',
+          ...(vcluster ? {} : {
+            'architect.glassway.net/gitops-exclude': 'true',
+          })
         }
       },
       spec: {
@@ -624,8 +728,14 @@ export class FluxCDController extends GitOpsController {
         } : undefined,
         sourceRef: {
           kind: 'OCIRepository',
-          name: 'cluster',
-        }
+          name: name,
+        },
+        kubeConfig: vcluster ? {
+          secretRef: {
+            name: `vc-${vcluster}-flux`,
+            key: 'config'
+          }
+        } : undefined
       }
     });
 
@@ -639,17 +749,21 @@ export class FluxCDController extends GitOpsController {
     const cid = this.componentName(resolved.component);
     const labels = this.componentLabels(resolved);
 
+    if (ctx.vcluster)
+      this.vclusters.add(ctx.vcluster)
+
     const kustomization = new kustomizeToolkitFluxcdIo.v1.Kustomization({
       metadata: {
         name: cid,
-        namespace: ctx.namespace,
+        namespace: ctx.vcluster ? `vcluster-${ctx.vcluster}` : ctx.namespace,
         labels: labels
       },
       spec: {
         commonMetadata: {
           labels: labels
         },
-        dependsOn: resolved.dependencies.map((d) => {
+        // TODO: dependencies currently unsupported for vcluster
+        dependsOn: ctx.vcluster ? undefined : resolved.dependencies.map((d) => {
           return {
             name: this.componentName(d),
             namespace: (d.context as KubeContext).namespace
@@ -667,6 +781,13 @@ export class FluxCDController extends GitOpsController {
           name: cid,
           namespace: 'flux-system'
         },
+        kubeConfig: ctx.vcluster ? {
+          secretRef: {
+            name: `vc-${ctx.vcluster}-flux`,
+            key: 'config'
+          }
+        } : undefined,
+        targetNamespace: ctx.vcluster ? ctx.namespace : undefined,
         wait: true
       },
     });

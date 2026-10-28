@@ -36,7 +36,7 @@ import { KubeWriter } from '../writer.ts';
 import { K8S_PLUGIN_CLASS, K8sPlugin, K8sPluginProps } from '../plugin.ts';
 import { KubeCRDDependencyGraph } from '../crds/graph.ts';
 import { NamespaceDefaults, NamespaceRef } from '../types/scn.ts';
-import { KubeResourceUtilities, TargetDiffParams, TargetApplyParams, TargetFake } from '@glassway/architect';
+import { KubeResourceUtilities, TargetDiffParams, TargetApplyParams, TargetFake, IDependencyGraph } from '@glassway/architect';
 import { getFakeState, getFakeTarget } from './fake.ts';
 import { KubeTargetIntrospection } from './intro.ts';
 import { GitOpsHelpers } from '../gitops/helpers.ts';
@@ -439,8 +439,9 @@ export class KubeTarget extends Target implements IKubeTarget {
     return this.client;
   }
 
-  protected override getBuildContext(params: TargetResolveParams): KubeBuildContext {
+  protected override getBuildContext(params: TargetResolveParams, graph: IDependencyGraph): KubeBuildContext {
     return {
+      ...super.getBuildContext(params, graph),
       bootstrap: params.bootstrap,
       gitops: this.gitops && !params.direct
     }

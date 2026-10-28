@@ -277,7 +277,7 @@ export class Target implements ITarget {
         .sort(([a], [b]) => a - b)
         .map(([, value]) => value);
 
-    const context = this.getBuildContext(params ?? {});
+    const context = this.getBuildContext(params ?? {}, graph);
 
     for (const bucket of buckets) {
       await Promise.all(bucket.map(async (v): Promise<void> => {
@@ -448,8 +448,10 @@ export class Target implements ITarget {
     }
   }
 
-  protected getBuildContext(_params: TargetResolveParams): BuildContext {
-    return {};
+  protected getBuildContext(_params: TargetResolveParams, graph: IDependencyGraph): BuildContext {
+    return {
+      graph: graph
+    }
   }
 
   public getIntrospection(): TargetIntrospection<unknown> | undefined {
